@@ -10,26 +10,6 @@
 (setv  T True  F False)
 
 
-(defn pretty [x [indent ""]]
-  (cond
-    (isinstance x construct.lib.containers.Container)
-      (+ "Container:\n" (.join "\n" (gfor
-        [k v] (.items x)
-        :if (not (.startswith k "_"))
-        (+ indent "  :" (hy.unmangle k) " " (pretty v (+ indent "  "))))))
-    (isinstance x construct.lib.containers.ListContainer)
-      (+ "ListContainer:\n" (.join "\n" (gfor
-        v x
-        (+ indent "  " (pretty v (+ indent "  "))))))
-    (isinstance x #(str bytes)) (do
-      (setv n-prefix (if (isinstance x bytes) 10 32))
-      (+ (hy.repr (cut x n-prefix)) (if (> (len x) n-prefix)
-        f" [trunc: {(len x):,}]"
-        "")))
-    T
-      (hy.repr x)))
-
-
 (eval-when-compile (defn replace-atoms [x f]
   (import hyrule [coll?])
   (if (coll? x)
@@ -140,16 +120,3 @@
   (setv x (machfs.Volume))
   (.read x (.read-bytes (Path (get os.environ "SIMALQ_IQ2_PATH"))))
   (get x (or file-name "Infinity Quest II 1.0.1")))
-
-(defn string-resource [name]
-  (import macresources)
-  (setv x (next (gfor
-    x (macresources.parse-file (. (iq-file) rsrc))
-    :if (= #(x.type x.name) #(b"STR#" name))
-    (bytes x))))
-
-  (.parse :data x (with-construct (FocusedSeq "list"
-    (/ "n" Int16ub)
-    (/ "list" (Array this.n
-      (PascalString Byte "ASCII")))
-    Terminated))))
