@@ -1,0 +1,5 @@
+__pycache__/
+/.pytest-cache
+/dist
+/build
+/simalq.egg-info
