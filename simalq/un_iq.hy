@@ -9,8 +9,8 @@
 (import
   os
   pathlib [Path]
+  zipfile [ZipFile]
   construct
-  machfs
   toolz [partition]
   simalq.geometry [Map Pos]
   simalq.quest [Quest Level]
@@ -123,11 +123,7 @@
 ;; --------------------------------------------------------------
 
 (defn read-quest [inp]
-  (setv data (.parse
-    quest-fmt
-    (if (isinstance inp machfs.directory.File)
-      inp.data
-      (.read-bytes (Path inp)))))
+  (setv data (.parse quest-fmt inp))
 
   (defn mk-pos [m xy]
     "Convert from IQ coordinates (1-based indices, y = 1 on top, 0
@@ -160,8 +156,23 @@
         :map m)))))
 
 
-(defn iq-file [[file-name None]]
-  "Get a `machfs.File` object for the requested file in IQ."
-  (setv x (machfs.Volume))
-  (.read x (.read-bytes (Path (get os.environ "SIMALQ_IQ2_PATH"))))
-  (get x (or file-name "Infinity Quest II 1.0.1")))
+(defn iq-quest [quest-name]
+  "Get the given original quest file from IQ, as a raw `bytes`
+  object."
+
+  ; Download the quests if needed.
+  (assert (get os.environ "XDG_CACHE_HOME"))
+  (setv path (/ (Path (get os.environ "XDG_CACHE_HOME")) "simalq"))
+  (.mkdir path :exist-ok T)
+  (setv path (/ path "infinity_quests_2.zip"))
+  (unless (.exists path)
+    (import http.client contextlib)
+    (with [con (contextlib.closing (http.client.HTTPConnection "arfer.net"))]
+      (.request con "GET" "/downloads/infinity_quests_2.zip")
+      (setv r (.getresponse con))
+      (assert (= r.status 200))
+      (.write-bytes path (.read r))))
+
+  ; Get the requested quest (heh).
+  (with [z (ZipFile path "r")]
+    (.read z (+ "infinity_quests_2/" quest-name))))

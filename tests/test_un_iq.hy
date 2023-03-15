@@ -2,18 +2,18 @@
   collections [Counter]
   toolz [partition]
   simalq.geometry [Pos]
-  simalq.un-iq [read-quest iq-file])
+  simalq.un-iq [read-quest iq-quest])
 
 
 (defn test-read-bootcamp []
-  (setv quest (read-quest (iq-file "Boot Camp 2")))
+  (setv quest (read-quest (iq-quest "Boot Camp 2")))
   (assert (= quest.title "Boot Camp will teach you how to play Infinity Quest II"))
   (assert (= quest.starting-life 500))
   (assert (= (len quest.levels) 26)))
 
 
 (defn test-read-bootcamp-level1 []
-  (setv level (. (read-quest (iq-file "Boot Camp 2")) levels [0]))
+  (setv level (. (read-quest (iq-quest "Boot Camp 2")) levels [0]))
 
   ; Check the level attributes.
   (for [[got expected] (partition 2 [
