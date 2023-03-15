@@ -25,6 +25,17 @@
     (get m.data 0 m.height)))
 
 
+(defn test-pos []
+  (setv m (Map :data (* [(* [T] 3)] 3) :wrap-x F :wrap-y F))
+  (Pos m 0 0)
+  (Pos m 0 1)
+  (Pos m 0 2)
+  (with [(pytest.raises GeometryError)]
+    (Pos m 0 3))
+  (with [(pytest.raises GeometryError)]
+    (Pos m 0 -1)))
+
+
 (defn test-pos+ []
   (setv map-data (* [(* [T] 5)] 5))
 

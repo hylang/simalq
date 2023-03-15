@@ -26,17 +26,22 @@
 
 (defdataclass Pos []
   [map x y]
-  :frozen T)
+  :frozen T
+
+  (defn __init__ [self m x y]
+    (when m.wrap-x
+      (%= x m.width))
+    (when m.wrap-y
+      (%= y m.height))
+    (unless (and (<= 0 x (- m.width 1)) (<= 0 y (- m.height 1)))
+      (raise (GeometryError f"Illegal position: {x}, {y}")))
+    (for [[k v] (.items (dict  :map m  :x x  :y y))]
+      ; Call `object.__setattr__` to bypass `dataclass`'s frozen
+      ; checks.
+      (object.__setattr__ self k v))))
 
 (defn pos+ [pos direction]
-  (setv  m pos.map  x (+ direction.x pos.x)  y (+ direction.y pos.y))
-  (when m.wrap-x
-    (%= x m.width))
-  (when m.wrap-y
-    (%= y m.height))
-  (unless (and (<= 0 x (- m.width 1)) (<= 0 y (- m.height 1)))
-    (raise (GeometryError f"Illegal pos+: ({pos.x}, {pos.y}) {direction}")))
-  (Pos m x y))
+  (Pos pos.map (+ direction.x pos.x) (+ direction.y pos.y)))
 
 
 (defclass GeometryError [Exception])
