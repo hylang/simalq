@@ -6,6 +6,8 @@
   construct
   machfs
   toolz [partition]
+  simalq.geometry [Map Pos]
+  simalq.quest [Quest Level]
   simalq.tile [tile-types-by-iq-ix])
 (setv  T True  F False)
 
@@ -18,8 +20,9 @@
 
 
 (defmacro with-construct [#* body]
-  ; Replaces all symbols starting with an uppercase letter, like
-  ; `Foo`, with `construct.Foo`.
+  "Replaces all symbols starting with an uppercase letter, like
+  `Foo`, with `construct.Foo`, plus `this`, minus booleans and
+  `None`."
   `(do ~@(replace-atoms body (fn [x]
     (if (or
           (= x 'this)
@@ -58,17 +61,9 @@
   ; A Boolean encoded as the last bit of a 2-byte sequence.
   (get {0 F  1 T} obj)))
 
-(defn iq-coords [xy map-height]
-  ; Convert from IQ coordinates (1-based indices, y = 1 on top, 0
-  ; means missing) to SQ coordinates (0-based indices with y = 0 on
-  ; bottom, None means missing).
-  (if (and #* xy)
-    #((- (get xy 0) 1) (- map-height (get xy 1)))
-    None))
-
-(defmacro coords [map-height] `(adapt
+(setv iq-pos (adapt
   (with-construct (Sequence Byte Byte))
-  (iq-coords obj ~map-height)))
+  (tuple obj)))
 
 
 (setv quest-fmt (with-construct (sym-struct
@@ -82,37 +77,60 @@
     'floor-tile Byte
     'width Byte
     'height Byte
-    'start (coords context.height)
+    'player-start iq-pos
     'n-tile-extras Int16ub
     'wrap-x big-bool
     'wrap-y big-bool
     'next-level Int16ub
     'light Int16ub
-    'poison Int16ub
-    'time Int16ub
+    'poison-interval Int16ub
+    'time-limit Int16ub
     'exit-speed Int16ub
     (Const (bytes [0]))
     'wall-tile Byte
-    'moving-exit-start (coords context.height)
-    'map (adapt
-      (Bytes (* this.width this.height))
-      (lfor
-        column (partition context.height obj)
-        (lfor
-          iq-ix (reversed column)
-            ; Reversed so that y = 0 is the bottom row.
-          (get tile-types-by-iq-ix iq-ix))))
+    'moving-exit-start iq-pos
+    'map (Bytes (* this.width this.height))
     'tile-extras (Array this.n-tile-extras (sym-struct
-      'pos (coords context._.height)
+      'pos iq-pos
       'data (Bytes 2)))))
   Terminated)))
 
 (defn read-quest [inp]
-  (.parse
+  (setv data (.parse
     quest-fmt
     (if (isinstance inp machfs.directory.File)
       inp.data
       (.read-bytes (Path inp)))))
+
+  (defn iq-coords [m xy]
+    "Convert from IQ coordinates (1-based indices, y = 1 on top, 0
+    means missing) to SQ coordinates (0-based indices with y = 0 on
+    bottom, None means missing)."
+    (if (and #* xy)
+      (Pos m (- (get xy 0) 1) (- m.height (get xy 1)))
+      None))
+
+  (Quest
+    :title data.title
+    :starting-life data.starting-life
+    :levels (tuple (gfor
+      [i l] (enumerate data.levels)
+      :setv m (Map l.wrap-x l.wrap-y (lfor
+        column (partition l.height l.map)
+        (lfor
+          iq-ix (reversed column)
+            ; Reversed so that y = 0 is the bottom row.
+          (get tile-types-by-iq-ix iq-ix))))
+      (Level
+        :n (+ i 1)
+        :title l.title
+        :player-start (iq-coords m l.player-start)
+        :next-level l.next-level
+        :poison-interval l.poison-interval
+        :time-limit l.time-limit
+        :exit-speed l.exit-speed
+        :moving-exit-start (iq-coords m l.moving-exit-start)
+        :map m)))))
 
 
 (defn iq-file [[file-name None]]

@@ -4,11 +4,9 @@
 (setv  T True  F False)
 
 
-(defclass Map []
-  (setv __slots__ ["data" "wrap_x" "wrap_y"])
-
-  (defn __init__ [self data wrap_x wrap_y]
-    (setv  self.data data  self.wrap-x wrap-x  self.wrap-y wrap-y))
+(defdataclass Map []
+  [wrap-x wrap-y data]
+  :frozen T
 
   (defn [property] width [self]
     (len self.data))

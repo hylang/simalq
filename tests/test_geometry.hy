@@ -28,7 +28,7 @@
 (defn test-pos+ []
   (setv map-data (* [(* [T] 5)] 5))
 
-  (setv m (Map map-data :wrap-x F :wrap-y F))
+  (setv m (Map :data map-data :wrap-x F :wrap-y F))
   (assert (=
     (pos+ (Pos m 0 0) NORTH)
     (Pos m 0 1)))
@@ -41,7 +41,7 @@
   (with [(pytest.raises GeometryError)]
     (pos+ (Pos m 0 0) WEST))
 
-  (setv m (Map map-data :wrap-x T :wrap-y F))
+  (setv m (Map :data map-data :wrap-x T :wrap-y F))
   (assert (=
     (pos+ (Pos m 0 0) WEST)
     (Pos m 4 0)))
