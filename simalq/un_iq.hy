@@ -1,3 +1,9 @@
+"Parse IQ quest files."
+
+;; --------------------------------------------------------------
+;; * Imports
+;; --------------------------------------------------------------
+
 (require
   hyrule [unless])
 (import
@@ -11,6 +17,9 @@
   simalq.tile [tile-types-by-iq-ix])
 (setv  T True  F False)
 
+;; --------------------------------------------------------------
+;; * Helpers for Construct
+;; --------------------------------------------------------------
 
 (eval-when-compile (defn replace-atoms [x f]
   (import hyrule [coll?])
@@ -18,9 +27,8 @@
     ((type x) (gfor  elem x  (replace-atoms elem f)))
     (f x))))
 
-
 (defmacro with-construct [#* body]
-  "Replaces all symbols starting with an uppercase letter, like
+  "Replace all symbols starting with an uppercase letter, like
   `Foo`, with `construct.Foo`, plus `this`, minus booleans and
   `None`."
   `(do ~@(replace-atoms body (fn [x]
@@ -34,6 +42,7 @@
       x)))))
 
 (defn sym-struct [#* args]
+  "Create a `construct.Struct`, naming the fields with Hy symbols."
   (setv  args (list args)  new [])
   (while args
     (setv k (when (isinstance (get args 0) hy.models.Symbol)
@@ -43,6 +52,7 @@
   (construct.Struct #* new))
 
 (defmacro adapt [old-cls #* body]
+  "Syntactic sugar for `construct.Adapter`."
   (setv C (hy.gensym))
   `(do
     (defclass ~C [construct.Adapter]
@@ -50,21 +60,34 @@
         ~@body))
     (~C ~old-cls)))
 
-(defn mac-roman-str [n] (adapt (construct.Bytes n)
-  (.replace (.decode obj "mac_roman") "\r" "\n")))
-(defn iq-str [n] (with-construct (FocusedSeq "string"
-  (/ "len" Byte)
-  (/ "string" (mac-roman-str this.len))
-  (Bytes (- n 2 this.len)))))
+(defn mac-roman-str [n]
+  "A Mac Roman-encoded string of length `n` with Mac-style newlines."
+  (adapt
+    (construct.Bytes n)
+    (.replace (.decode obj "mac_roman") "\r" "\n")))
 
-(setv big-bool (adapt construct.Int16ub
+(defn iq-str [n]
+  "A length-prefixed string that may have trailing junk data."
+  (with-construct (FocusedSeq "string"
+    (/ "len" Byte)
+    (/ "string" (mac-roman-str this.len))
+    (Bytes (- n 2 this.len)))))
+
+(setv big-bool
   ; A Boolean encoded as the last bit of a 2-byte sequence.
-  (get {0 F  1 T} obj)))
+  (adapt
+    construct.Int16ub
+    (get {0 F  1 T} obj)))
 
-(setv iq-pos (adapt
-  (with-construct (Sequence Byte Byte))
-  (tuple obj)))
+(setv iq-pos
+  ; Coordinates for a map position, encoded as a pair of bytes.
+  (adapt
+    (with-construct (Sequence Byte Byte))
+    (tuple obj)))
 
+;; --------------------------------------------------------------
+;; * The Construct format for quest files
+;; --------------------------------------------------------------
 
 (setv quest-fmt (with-construct (sym-struct
   'n-levels Byte
@@ -95,6 +118,10 @@
       'data (Bytes 2)))))
   Terminated)))
 
+;; --------------------------------------------------------------
+;; * `read-quest`, `iq-file`
+;; --------------------------------------------------------------
+
 (defn read-quest [inp]
   (setv data (.parse
     quest-fmt
@@ -102,7 +129,7 @@
       inp.data
       (.read-bytes (Path inp)))))
 
-  (defn iq-coords [m xy]
+  (defn mk-pos [m xy]
     "Convert from IQ coordinates (1-based indices, y = 1 on top, 0
     means missing) to SQ coordinates (0-based indices with y = 0 on
     bottom, None means missing)."
@@ -124,12 +151,12 @@
       (Level
         :n (+ i 1)
         :title l.title
-        :player-start (iq-coords m l.player-start)
+        :player-start (mk-pos m l.player-start)
         :next-level l.next-level
         :poison-interval l.poison-interval
         :time-limit l.time-limit
         :exit-speed l.exit-speed
-        :moving-exit-start (iq-coords m l.moving-exit-start)
+        :moving-exit-start (mk-pos m l.moving-exit-start)
         :map m)))))
 
 
