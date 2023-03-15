@@ -1,8 +1,7 @@
 (defmacro defdataclass [class-name superclasses [fields #()] #* kwargs]
-  (import toolz [partition])
-  (setv dataclass (hy.gensym))
   (when (not fields)
     (+= kwargs '#(:frozen True)))
+  (setv dataclass (hy.gensym))
   `(do
     (import dataclasses [dataclass :as ~dataclass])
     (defclass [(~dataclass :slots True ~@kwargs)] ~class-name ~superclasses
