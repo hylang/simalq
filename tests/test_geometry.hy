@@ -7,18 +7,18 @@
 (defn test-map []
   (setv  w 5  h 3)
   (setv m (Map :wrap-x F :wrap-y F :data
-    (lfor
+    (tuple (gfor
       x (range w)
-      (lfor
+      (tuple (gfor
         y (range h)
-        (+ (* x 10) y)))))
+        [(+ (* x 10) y)]))))))
 
   (assert (= m.width w))
   (assert (= m.height h))
-  (assert (= (get m.data 0 0) 0))
-  (assert (= (get m.data 0 2) 2))
-  (assert (= (get m.data 4 0) 40))
-  (assert (= (get m.data 4 2) 42))
+  (assert (= (get m.data 0 0) [0]))
+  (assert (= (get m.data 0 2) [2]))
+  (assert (= (get m.data 4 0) [40]))
+  (assert (= (get m.data 4 2) [42]))
   (with [(pytest.raises IndexError)]
     (get m.data m.width 0))
   (with [(pytest.raises IndexError)]
@@ -26,7 +26,7 @@
 
 
 (defn test-pos []
-  (setv m (Map :data (* [(* [T] 3)] 3) :wrap-x F :wrap-y F))
+  (setv m (Map :data (* #((* #([T]) 3)) 3) :wrap-x F :wrap-y F))
   (Pos m 0 0)
   (Pos m 0 1)
   (Pos m 0 2)
@@ -37,7 +37,7 @@
 
 
 (defn test-pos+ []
-  (setv map-data (* [(* [T] 5)] 5))
+  (setv map-data (* #((* #([T]) 5)) 5))
 
   (setv m (Map :data map-data :wrap-x F :wrap-y F))
   (assert (=

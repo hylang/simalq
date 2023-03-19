@@ -21,6 +21,8 @@
 ;; * Helpers for Construct
 ;; --------------------------------------------------------------
 
+(setv FLOOR 1)
+
 (eval-when-compile (defn replace-atoms [x f]
   (import hyrule [coll?])
   (if (coll? x)
@@ -138,12 +140,15 @@
     :starting-life data.starting-life
     :levels (tuple (gfor
       [i l] (enumerate data.levels)
-      :setv m (Map l.wrap-x l.wrap-y (lfor
-        column (partition l.height l.map)
-        (lfor
-          iq-ix (reversed column)
-            ; Reversed so that y = 0 is the bottom row.
-          (get Tile.types-by-iq-ix iq-ix))))
+      :setv m (Map.make l.wrap-x l.wrap-y l.width l.height)
+      :do (for [x (range l.width)  y (range l.height)]
+        ; Fill in `m`.
+        (setv iq-ix (get l.map (+ (* x l.height) (- l.height y 1))))
+          ; We have to reverse y-coordinates to get y = 0 as the
+          ; bottom row.
+        (unless (= iq-ix FLOOR)
+          (.append (get m.data x y)
+            ((get Tile.types-by-iq-ix iq-ix) :pos (Pos m x y)))))
       (Level
         :n (+ i 1)
         :title l.title

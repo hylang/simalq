@@ -10,7 +10,6 @@ yet meaningfully implement or substitute."
 
 (for [[iq-ix stem] [
 
-    [1 "floor"]
     [2 "wall"]
     [3 "damaged_wall"]
     [4 "crumbling_wall"]

@@ -6,7 +6,20 @@
 
 (defdataclass Map []
   [wrap-x wrap-y data]
+    ; `wrap-x` and `wrap-y` are Booleans.
+    ; `data` is a tuple of tuples representing the squares of the map.
+    ; Each tile is itself a list representing a stack of tiles on
+    ; that square. An empty stack means that the tile has only floor.
   :frozen T
+
+  (defn [classmethod] make [self wrap-x wrap-y width height]
+    "Create a new blank map."
+    (Map
+      wrap-x
+      wrap-y
+      (tuple (gfor
+        _ (range width)
+        (tuple (gfor  _ (range height)  []))))))
 
   (defn [property] width [self]
     (len self.data))

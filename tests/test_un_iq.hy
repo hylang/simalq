@@ -36,14 +36,12 @@
 
     (dict (Counter (gfor
       row level.map.data
-      tile row
+      stack row
+      tile stack
       tile.stem)))
 
     (dict
 
-      :floor (py "(
-        4*3 + 4*3 - 1 + 4*6 + 4*2 + 4*3 - 1 + 6*10 - 7 +
-        5*5 - 1 + 10*5 - 15 - 1)")
       :wall 50
       :door 1
       :one-way-door-west 1
@@ -62,6 +60,6 @@
 
   ; Check a few corner tiles, so we know we haven't rotated or
   ; reflected the map.
-  (assert (= (. level map data [0] [0] stem) "floor"))
-  (assert (= (. level map data [15] [0] stem) "key"))
-  (assert (= (. level map data [15] [15] stem) "crumbling_wall")))
+  (assert (= (. level map data [0] [0]) [])) ; I.e., floor
+  (assert (= (. level map data [15] [0] [0] stem) "key"))
+  (assert (= (. level map data [15] [15] [0] stem) "crumbling_wall")))
