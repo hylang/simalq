@@ -37,7 +37,7 @@
     (dict (Counter (gfor
       row level.map.data
       tile row
-      (.replace tile.slug "-" "_"))))
+      tile.stem)))
 
     (dict
 
@@ -62,6 +62,6 @@
 
   ; Check a few corner tiles, so we know we haven't rotated or
   ; reflected the map.
-  (assert (= (. level map data [0] [0] slug) "floor"))
-  (assert (= (. level map data [15] [0] slug) "key"))
-  (assert (= (. level map data [15] [15] slug) "crumbling-wall")))
+  (assert (= (. level map data [0] [0] stem) "floor"))
+  (assert (= (. level map data [15] [0] stem) "key"))
+  (assert (= (. level map data [15] [15] stem) "crumbling_wall")))

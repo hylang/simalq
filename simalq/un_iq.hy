@@ -14,7 +14,7 @@
   toolz [partition]
   simalq.geometry [Map Pos]
   simalq.quest [Quest Level]
-  simalq.tile [tile-types-by-iq-ix])
+  simalq.tile [Tile])
 (setv  T True  F False)
 
 ;; --------------------------------------------------------------
@@ -143,7 +143,7 @@
         (lfor
           iq-ix (reversed column)
             ; Reversed so that y = 0 is the bottom row.
-          (get tile-types-by-iq-ix iq-ix))))
+          (get Tile.types-by-iq-ix iq-ix))))
       (Level
         :n (+ i 1)
         :title l.title
