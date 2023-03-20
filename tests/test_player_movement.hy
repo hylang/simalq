@@ -39,4 +39,10 @@
     (mv EAST))
   (assert (= (. (at G.player-pos) [0] stem) "door"))
   ; Try walking diagonally past the wall to the north.
-  (cant (mv NORTHEAST) "That diagonal is blocked by a neighbor."))
+  (cant (mv NORTHEAST) "That diagonal is blocked by a neighbor.")
+  ; Walk diagonally between some pillars.
+  (setv G.player-pos (Pos G.map 3 1))
+  (assert (= (. (get G.map.data 3 2 0) stem) "pillar"))
+  (assert (= (. (get G.map.data 4 1 0) stem) "pillar"))
+  (mv NORTHEAST)
+  (assert (= G.player-pos (Pos G.map 4 2))))
