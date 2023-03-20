@@ -9,7 +9,7 @@
 
 (defdataclass Action []
   "A discrete effect that the player can have on the gamestate.")
-(defdataclass Move [Action]
+(defdataclass Walk [Action]
   "Try to walk one step in the given direction, or attack something
   that's in the way with your sword."
   [direction]
@@ -18,7 +18,7 @@
 
 (defn do-action [action]
   (ecase (type action)
-    Move (do
+    Walk (do
       (setv d action.direction)
       (try
         (setv target (pos+ G.player-pos d))
