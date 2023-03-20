@@ -7,9 +7,13 @@
   simalq.main [start-quest])
 
 
-(defmacro cant [#* body]
-  `(with [(pytest.raises ActionError)]
-    ~@body))
+(defmacro cant [form msg-check]
+  (setv e (hy.gensym))
+  `(do
+    (with [~e (pytest.raises ActionError)]
+      ~form)
+    (assert (in ~msg-check (. ~e value args [0])))))
+
 
 
 (defn test-bootcamp-level1 []
@@ -25,14 +29,14 @@
   (mv SOUTH)
   (assert (= G.player-pos (Pos G.map 0 14)))
   ; Try going west, bumping into the level border.
-  (cant (mv WEST))
+  (cant (mv WEST) "The border of the dungeon blocks your movement.")
   ; Try walking into a wall tile.
   (mv SOUTH)
-  (cant (mv SOUTH))
+  (cant (mv SOUTH) "Your way is blocked.")
   ; Walk into the (plain) door to the east.
   (mv NORTHEAST)
   (for [_ (range 3)]
     (mv EAST))
   (assert (= (. (at G.player-pos) [0] stem) "door"))
   ; Try walking diagonally past the wall to the north.
-  (cant (mv NORTHEAST)))
+  (cant (mv NORTHEAST) "That diagonal is blocked by a neighbor."))

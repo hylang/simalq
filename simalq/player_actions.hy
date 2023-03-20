@@ -23,7 +23,7 @@
       (try
         (setv target (pos+ G.player-pos d))
         (except [e GeometryError]
-          (raise ActionError :from e)))
+          (raise (ActionError "The border of the dungeon blocks your movement.") :from e)))
       (when (has target it.blocks-move)
         (raise (ActionError "Your way is blocked.")))
       ; For diagonal movement, check that the two orthogonal neighbors
