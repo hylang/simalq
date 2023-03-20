@@ -10,17 +10,14 @@ yet meaningfully implement or substitute."
 
 (for [[iq-ix stem] [
 
-    [2 "wall"]
     [3 "damaged_wall"]
     [4 "crumbling_wall"]
-    [5 "door"]
     [6 "locked_door"]
     [7 "exit"]
     [8 "one_way_door_north"]
     [9 "one_way_door_south"]
     [10 "one_way_door_west"]
     [11 "one_way_door_east"]
-    [12 "pillar"]
     [13 "trap_1"]
     [14 "trapped_wall_1"]
     [15 "damageable_wall"]

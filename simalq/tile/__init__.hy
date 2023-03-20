@@ -10,4 +10,5 @@
 
 
 (import ; For side-effects.
+  simalq.tile.scenery
   simalq.tile.not-implemented)

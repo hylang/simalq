@@ -23,3 +23,9 @@
         field fields
         `(annotate ~field ...))
       ~@rest)))
+
+
+(defmacro has [pos predicate-form]
+  `(do
+    (import simalq.geometry)
+    (next (gfor  it (simalq.geometry.at ~pos)  :if ~predicate-form  it) None)))

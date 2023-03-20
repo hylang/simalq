@@ -56,5 +56,8 @@
 (defn pos+ [pos direction]
   (Pos pos.map (+ direction.x pos.x) (+ direction.y pos.y)))
 
+(defn at [pos]
+  (get pos.map.data pos.x pos.y))
+
 
 (defclass GeometryError [Exception])
