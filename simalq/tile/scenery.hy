@@ -1,9 +1,12 @@
 (require
-  simalq.macros [defdataclass])
+  simalq.macros [defdataclass]
+  hyrule [unless])
 (import
   re
   dataclasses [dataclass]
-  simalq.tile [Tile])
+  simalq.geometry [NORTH EAST SOUTH WEST GeometryError pos+]
+  simalq.tile [Tile]
+  simalq.player-actions [ActionError])
 (setv  T True  F False)
 
 
@@ -67,3 +70,30 @@
 (defscenery "a door"
   :iq-ix 5
   :flavor "Unlocked, but it just won't stay open. Maybe that's for the best, since monsters are too dumb to operate it.")
+
+((fn []
+
+  (defn safe-pos+ [pos direction]
+    (try
+      (pos+ pos direction)
+      (except [GeometryError])))
+
+  (defdataclass OneWayDoor [Scenery]
+    []
+
+    (setv direction None)
+
+    (defn hook-player-walk-to [self origin]
+      (unless (= (safe-pos+ origin self.direction) self.pos)
+        (setv op (get {NORTH SOUTH  EAST WEST  SOUTH NORTH  WEST EAST} self.direction))
+        (raise (ActionError f"That one-way door must be entered from the {op.name}."))))
+    (defn hook-player-walk-from [self target]
+      (unless (= (safe-pos+ self.pos self.direction) target)
+        (raise (ActionError f"You can only go {self.direction.name} from this one-way door."))))
+
+    (setv flavor "My way or the highway!"))
+
+  (for [[direction iq-ix] [[NORTH 8] [EAST 11] [SOUTH 9] [WEST 10]]]
+    (defscenery f"a one-way door ({direction.name})" OneWayDoor
+      :iq-ix iq-ix
+      :direction direction))))

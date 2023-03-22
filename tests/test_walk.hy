@@ -1,7 +1,7 @@
 (import
   pytest
   simalq.game-state [G]
-  simalq.geometry [Pos at NORTH EAST SOUTH WEST NORTHEAST]
+  simalq.geometry [Pos pos+ at NORTH EAST SOUTH WEST NORTHEAST SOUTHEAST SOUTHWEST]
   simalq.un-iq [read-quest iq-quest]
   simalq.player-actions [do-action Walk ActionError]
   simalq.main [start-quest])
@@ -45,4 +45,18 @@
   (assert (= (. (get G.map.data 3 2 0) stem) "pillar"))
   (assert (= (. (get G.map.data 4 1 0) stem) "pillar"))
   (wk NORTHEAST)
-  (assert (= G.player-pos (Pos G.map 4 2))))
+  (assert (= G.player-pos (Pos G.map 4 2)))
+  ; Try some one-way doors.
+  (setv G.player-pos (Pos G.map 3 13))
+  (cant (wk SOUTH) "That one-way door must be entered from the east.")
+  (wk WEST)
+  (setv (cut (at (pos+ G.player-pos SOUTH))) [])
+    ; We remove a wall so that stepping into these one-way doors
+    ; diagonally won't be blocked by it.
+  (cant (wk SOUTHEAST) "That one-way door must be entered from the east.")
+  (cant (wk SOUTHWEST) "That one-way door must be entered from the north.")
+  (wk WEST)
+  (wk SOUTH) ; Now we're on the door.
+  (cant (wk NORTH) "You can only go south from this one-way door.")
+  (wk SOUTH)
+  (cant (wk NORTH) "That one-way door must be entered from the north."))

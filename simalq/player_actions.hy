@@ -36,6 +36,10 @@
               (Pos target.map target.x G.player-pos.y)]
             (has p2 it.blocks-diag))))
         (raise (ActionError "That diagonal is blocked by a neighbor.")))
+      (for [tile (at G.player-pos)]
+        (.hook-player-walk-from tile target))
+      (for [tile (at target)]
+        (.hook-player-walk-to tile G.player-pos))
       (setv G.player-pos target))))
 
 

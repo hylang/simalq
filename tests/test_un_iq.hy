@@ -44,9 +44,9 @@
 
       "wall" 50
       "door" 1
-      "one_way_door_west" 1
-      "one_way_door_south" 1
-      "one_way_door_east" 2
+      "one-way door (west)" 1
+      "one-way door (south)" 1
+      "one-way door (east)" 2
       "damaged_wall" 1
       "crumbling_wall" 1
       "locked_door" 1

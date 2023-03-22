@@ -6,7 +6,10 @@
 (defdataclass Tile []
   [pos]
   :frozen T
-  (setv types-by-iq-ix {}))
+  (setv types-by-iq-ix {})
+
+  (defn hook-player-walk-to [self origin])
+  (defn hook-player-walk-from [self target]))
 
 
 (import ; For side-effects.
