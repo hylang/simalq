@@ -40,23 +40,23 @@
       tile stack
       tile.stem)))
 
-    (dict
+    {
 
-      :wall 50
-      :door 1
-      :one-way-door-west 1
-      :one-way-door-south 1
-      :one-way-door-east 2
-      :damaged-wall 1
-      :crumbling-wall 1
-      :locked-door 1
-      :locked-disappearing-door 1
-      :pillar 15
-      :exit 1
+      "wall" 50
+      "door" 1
+      "one_way_door_west" 1
+      "one_way_door_south" 1
+      "one_way_door_east" 2
+      "damaged_wall" 1
+      "crumbling_wall" 1
+      "locked_door" 1
+      "locked_disappearing_door" 1
+      "pillar" 15
+      "exit" 1
 
-      :key 2
-      :pile-of-gold 1
-      :handful-of-gems 1)))
+      "key" 2
+      "pile_of_gold" 1
+      "handful_of_gems" 1}))
 
   ; Check a few corner tiles, so we know we haven't rotated or
   ; reflected the map.
