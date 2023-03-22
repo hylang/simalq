@@ -9,36 +9,43 @@
 
 (defdataclass Scenery [Tile]
   []
-  (setv types {}))
+  (setv types {})
 
-(defn defscenery [
-    name
-    flavor
-      ; Flavor text show in a help screen.
-    [iq-ix None]
+  (setv
+    article None
+      ; "a", "the", etc.
+    stem None
+      ; The main part of the name.
+    flavor None
+      ; Flavor text to show in a help screen.
+    iq-ix None
       ; The number that represents this tile in IQ.
-    [blocks-move F]
+    blocks-move F
       ; Block movement.
-    [blocks-diag F]]
+    blocks-diag F))
       ; Block diagonal movement between orthogonally adjacent squares.
+
+(defn defscenery [name [superclass Scenery] #** kwargs]
 
   (setv article None)
   (setv stem (re.sub r"\A(a|an|the) "
     (fn [m] (nonlocal article) (setv article (.group m 1)) "")
     name))
 
+  (assert (all (gfor  k kwargs  (hasattr superclass k))))
+
   (assert (not-in stem Scenery.types))
   (setv (get Scenery.types stem) ((dataclass :frozen T) (type
     stem
-    #(Scenery)
+    #(superclass)
     (dict
       :article article
       :stem stem
-      :blocks-move blocks-move
-      :blocks-diag blocks-diag
-      :flavor flavor))))
-  (assert (not-in iq-ix Tile.types-by-iq-ix))
-  (setv (get Tile.types-by-iq-ix iq-ix) (get Scenery.types stem)))
+      #** kwargs))))
+
+  (when (setx iq-ix (.get kwargs "iq_ix"))
+    (assert (not-in iq-ix Tile.types-by-iq-ix))
+    (setv (get Tile.types-by-iq-ix iq-ix) (get Scenery.types stem))))
 
 
 (defscenery "a wall"
