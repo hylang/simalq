@@ -30,6 +30,7 @@
   (Pos m 0 0)
   (Pos m 0 1)
   (Pos m 0 2)
+  (assert (= (str (Pos m 0 2)) "<Pos 0,2>"))
   (with [(pytest.raises GeometryError)]
     (Pos m 0 3))
   (with [(pytest.raises GeometryError)]

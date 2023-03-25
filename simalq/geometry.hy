@@ -70,7 +70,11 @@
     (for [[k v] (.items (dict  :map m  :x x  :y y))]
       ; Call `object.__setattr__` to bypass `dataclass`'s frozen
       ; checks.
-      (object.__setattr__ self k v))))
+      (object.__setattr__ self k v)))
+
+  (defn __str__ [self]
+    "Provide a concise representation, without the linked map."
+    f"<Pos {self.x},{self.y}>"))
 
 (defn pos+ [pos direction]
   (Pos pos.map (+ direction.x pos.x) (+ direction.y pos.y)))
