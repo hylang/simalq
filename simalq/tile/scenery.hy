@@ -2,56 +2,23 @@
   simalq.macros [defdataclass]
   hyrule [unless])
 (import
-  re
-  dataclasses [dataclass]
   simalq.geometry [Direction GeometryError pos+]
-  simalq.tile [Tile]
+  simalq.tile [Tile deftile]
   simalq.player-actions [ActionError])
 (setv  T True  F False)
 
 
 (defdataclass Scenery [Tile]
   []
-  (setv types {})
 
   (setv
-    article None
-      ; "a", "the", etc.
-    stem None
-      ; The main part of the name.
-    flavor None
-      ; Flavor text to show in a help screen.
-    iq-ix None
-      ; The number that represents this tile in IQ.
     blocks-move F
       ; Block movement.
     blocks-diag F))
       ; Block diagonal movement between orthogonally adjacent squares.
 
-(defn defscenery [name [superclass Scenery] #** kwargs]
 
-  (setv article None)
-  (setv stem (re.sub r"\A(a|an|the) "
-    (fn [m] (nonlocal article) (setv article (.group m 1)) "")
-    name))
-
-  (assert (all (gfor  k kwargs  (hasattr superclass k))))
-
-  (assert (not-in stem Scenery.types))
-  (setv (get Scenery.types stem) ((dataclass :frozen T) (type
-    stem
-    #(superclass)
-    (dict
-      :article article
-      :stem stem
-      #** kwargs))))
-
-  (when (setx iq-ix (.get kwargs "iq_ix"))
-    (assert (not-in iq-ix Tile.types-by-iq-ix))
-    (setv (get Tile.types-by-iq-ix iq-ix) (get Scenery.types stem))))
-
-
-(defscenery "a wall"
+(deftile Scenery "a wall"
   :iq-ix 2
   :blocks-move T :blocks-diag T
   :flavor (.join "\n" [
@@ -62,12 +29,12 @@
     "  And through Wall's chink, poor souls, they are content"
     "  To whisper, at the which let no man wonder."]))
 
-(defscenery "a pillar"
+(deftile Scenery "a pillar"
   :iq-ix 12
   :blocks-move T
   :flavor "A structure of vaguely Roman style.")
 
-(defscenery "a door"
+(deftile Scenery "a door"
   :iq-ix 5
   :flavor "Unlocked, but it just won't stay open. Maybe that's for the best, since monsters are too dumb to operate it.")
 
@@ -96,6 +63,6 @@
   (for [[direction iq-ix] [
       [Direction.N 8] [Direction.E 11]
       [Direction.S 9] [Direction.W 10]]]
-    (defscenery f"a one-way door ({direction.name})" OneWayDoor
+    (deftile OneWayDoor f"a one-way door ({direction.name})"
       :iq-ix iq-ix
       :direction direction))))
