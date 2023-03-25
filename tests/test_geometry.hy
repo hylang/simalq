@@ -1,6 +1,6 @@
 (import
   pytest
-  simalq.geometry [Map Pos NORTH EAST WEST SOUTH NORTHEAST pos+ GeometryError])
+  simalq.geometry [Map Pos Direction pos+ GeometryError])
 (setv  T True  F False)
 
 
@@ -41,23 +41,23 @@
 
   (setv m (Map :data map-data :wrap-x F :wrap-y F))
   (assert (=
-    (pos+ (Pos m 0 0) NORTH)
+    (pos+ (Pos m 0 0) Direction.N)
     (Pos m 0 1)))
   (assert (=
-    (pos+ (Pos m 2 2) WEST)
+    (pos+ (Pos m 2 2) Direction.W)
     (Pos m 1 2)))
   (assert (=
-    (pos+ (Pos m 0 0) NORTHEAST)
+    (pos+ (Pos m 0 0) Direction.NE)
     (Pos m 1 1)))
   (with [(pytest.raises GeometryError)]
-    (pos+ (Pos m 0 0) WEST))
+    (pos+ (Pos m 0 0) Direction.W))
 
   (setv m (Map :data map-data :wrap-x T :wrap-y F))
   (assert (=
-    (pos+ (Pos m 0 0) WEST)
+    (pos+ (Pos m 0 0) Direction.W)
     (Pos m 4 0)))
   (assert (=
-    (pos+ (Pos m 4 0) EAST)
+    (pos+ (Pos m 4 0) Direction.E)
     (Pos m 0 0)))
   (with [(pytest.raises GeometryError)]
-    (pos+ (Pos m 0 0) SOUTH)))
+    (pos+ (Pos m 0 0) Direction.S)))

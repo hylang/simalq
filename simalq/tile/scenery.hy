@@ -4,7 +4,7 @@
 (import
   re
   dataclasses [dataclass]
-  simalq.geometry [NORTH EAST SOUTH WEST GeometryError pos+]
+  simalq.geometry [Direction GeometryError pos+]
   simalq.tile [Tile]
   simalq.player-actions [ActionError])
 (setv  T True  F False)
@@ -85,15 +85,17 @@
 
     (defn hook-player-walk-to [self origin]
       (unless (= (safe-pos+ origin self.direction) self.pos)
-        (setv op (get {NORTH SOUTH  EAST WEST  SOUTH NORTH  WEST EAST} self.direction))
-        (raise (ActionError f"That one-way door must be entered from the {op.name}."))))
+        (raise (ActionError (.format "That one-way door must be entered from the {}."
+          self.direction.opposite.name)))))
     (defn hook-player-walk-from [self target]
       (unless (= (safe-pos+ self.pos self.direction) target)
         (raise (ActionError f"You can only go {self.direction.name} from this one-way door."))))
 
     (setv flavor "My way or the highway!"))
 
-  (for [[direction iq-ix] [[NORTH 8] [EAST 11] [SOUTH 9] [WEST 10]]]
+  (for [[direction iq-ix] [
+      [Direction.N 8] [Direction.E 11]
+      [Direction.S 9] [Direction.W 10]]]
     (defscenery f"a one-way door ({direction.name})" OneWayDoor
       :iq-ix iq-ix
       :direction direction))))

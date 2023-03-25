@@ -30,11 +30,30 @@
 (defdataclass Direction []
   [name x y]
   :frozen T)
-
-(for [[d [x y]] (zip
-    (.split "north east  south  west   northeast southeast southwest northwest")
-    [        [0 1] [1 0] [0 -1] [-1 0] [1 1]     [1 -1]    [-1 -1]   [1 -1]])]
-  (setv (get (globals) (.upper d)) (Direction d x y)))
+((fn []
+  ; Define the direction constants (`Direction.N`, `.NE`, etc.)
+  ; and collections thereof (`Direction.orths`, `.diags`, `.all`).
+  (setv Direction.orths (tuple (map Direction
+    ["north" "east" "south" "west"]
+    [0       1       0      -1]
+    [1       0      -1       0])))
+  (for [d Direction.orths]
+    (setattr Direction (.upper (get d.name 0)) d))
+  (setv Direction.diags (tuple (gfor
+    d1 [Direction.N Direction.S]
+    d2 [Direction.E Direction.W]
+    :setv new (Direction (+ d1.name d2.name) (+ d1.x d2.x) (+ d1.y d2.y))
+    :do (setattr Direction (.upper (+ (get d1.name 0) (get d2.name 0))) new)
+    new)))
+  (setv Direction.all (+ Direction.orths Direction.diags))
+  ; Define opposite directions.
+  (setv opposites (dfor
+    d1 Direction.all
+    d2 Direction.all
+    :if (and (= d1.x (- d2.x)) (= d1.y (- d2.y)))
+    d1 d2))
+  (setv Direction.opposite (property (fn [self]
+    (get opposites self))))))
 
 
 (defdataclass Pos []
