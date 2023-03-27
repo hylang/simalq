@@ -50,13 +50,13 @@
 
     (setv direction None)
 
+    (defn hook-player-walk-from [self target]
+      (unless (= (safe-pos+ self.pos self.direction) target)
+        (raise (ActionError f"You can only go {self.direction.name} from this one-way door."))))
     (defn hook-player-walk-to [self origin]
       (unless (= (safe-pos+ origin self.direction) self.pos)
         (raise (ActionError (.format "That one-way door must be entered from the {}."
           self.direction.opposite.name)))))
-    (defn hook-player-walk-from [self target]
-      (unless (= (safe-pos+ self.pos self.direction) target)
-        (raise (ActionError f"You can only go {self.direction.name} from this one-way door."))))
 
     (setv flavor "My way or the highway!"))
 

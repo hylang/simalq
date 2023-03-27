@@ -23,8 +23,8 @@
     iq-ix None)
       ; The number that represents this tile in IQ.
 
-  (defn hook-player-walk-to [self origin])
-  (defn hook-player-walk-from [self target]))
+  (defn hook-player-walk-from [self target])
+  (defn hook-player-walk-to [self origin]))
 
 
 (defn deftile [superclass name #** kwargs]
