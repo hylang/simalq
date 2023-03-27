@@ -1,17 +1,13 @@
+(require
+  tests.lib [wk])
 (import
+  tests.lib [init]
   simalq.geometry [Pos Direction pos+ at]
-  simalq.game-state [G]
-  simalq.un-iq [read-quest iq-quest]
-  simalq.main [start-quest]
-  simalq.player-actions [do-action Walk])
-
-
-(defmacro wk [direction-abbr]
-  `(do-action (Walk (. Direction ~direction-abbr))))
+  simalq.game-state [G])
 
 
 (defn test-treasure []
-  (start-quest (read-quest (iq-quest "Boot Camp 2")))
+  (init "Boot Camp 2")
 
   (setv G.player-pos (Pos G.map 6 14))
   (assert (= G.score 0))

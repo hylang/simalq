@@ -1,10 +1,11 @@
+(require
+  tests.lib [wk])
 (import
   pytest
+  tests.lib [init]
   simalq.game-state [G]
   simalq.geometry [Pos Direction pos+ at]
-  simalq.un-iq [read-quest iq-quest]
-  simalq.player-actions [do-action Walk ActionError]
-  simalq.main [start-quest])
+  simalq.player-actions [ActionError])
 
 
 (defmacro cant [form msg-check]
@@ -14,12 +15,9 @@
       ~form)
     (assert (in ~msg-check (. ~e value args [0])))))
 
-(defmacro wk [direction-abbr]
-  `(do-action (Walk (. Direction ~direction-abbr))))
-
 
 (defn test-bootcamp-level1 []
-  (start-quest (read-quest (iq-quest "Boot Camp 2")))
+  (init "Boot Camp 2")
   (assert (= G.level-n 1))
 
   ; We start at the extreme northwest.
