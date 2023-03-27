@@ -3,7 +3,8 @@
   simalq.macros [defdataclass has])
 (import
   simalq.geometry [Pos GeometryError pos+ at]
-  simalq.game-state [G])
+  simalq.game-state [G]
+  simalq.tile.scenery [Scenery])
 (setv  T True  F False)
 
 
@@ -24,7 +25,7 @@
         (setv target (pos+ G.player-pos d))
         (except [e GeometryError]
           (raise (ActionError "The border of the dungeon blocks your movement.") :from e)))
-      (when (has target it.blocks-move)
+      (when (has target Scenery it.blocks-move)
         (raise (ActionError "Your way is blocked.")))
       ; For diagonal movement, check that the two orthogonal neighbors
       ; are clear of diagonal blockers.
@@ -34,7 +35,7 @@
             p2 [
               (Pos target.map G.player-pos.x target.y)
               (Pos target.map target.x G.player-pos.y)]
-            (has p2 it.blocks-diag))))
+            (has p2 Scenery it.blocks-diag))))
         (raise (ActionError "That diagonal is blocked by a neighbor.")))
       (for [tile (at G.player-pos)]
         (.hook-player-walk-from tile target))

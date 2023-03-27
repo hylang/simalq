@@ -25,7 +25,12 @@
       ~@rest)))
 
 
-(defmacro has [pos predicate-form]
+(defmacro has [pos tile-type predicate-form]
   `(do
     (import simalq.geometry)
-    (next (gfor  it (simalq.geometry.at ~pos)  :if ~predicate-form  it) None)))
+    (next
+      (gfor
+        it (simalq.geometry.at ~pos)
+        :if (and (isinstance it ~tile-type) ~predicate-form)
+        it)
+      None)))
