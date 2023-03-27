@@ -2,7 +2,8 @@
   simalq.macros [defdataclass])
 (import
   re
-  dataclasses [dataclass])
+  dataclasses [dataclass]
+  simalq.geometry [at])
 (setv  T True  F False)
 
 
@@ -24,7 +25,8 @@
       ; The number that represents this tile in IQ.
 
   (defn hook-player-walk-from [self target])
-  (defn hook-player-walk-to [self origin]))
+  (defn hook-player-walk-to [self origin])
+  (defn hook-player-walked-into [self]))
 
 
 (defn deftile [superclass name #** kwargs]
@@ -48,6 +50,10 @@
   (when (setx iq-ix (.get kwargs "iq_ix"))
     (assert (not-in iq-ix Tile.types-by-iq-ix))
     (setv (get Tile.types-by-iq-ix iq-ix) (get Tile.types stem))))
+
+
+(defn rm-tile [tile]
+  (.remove (at tile.pos) tile))
 
 
 (import ; For side-effects.

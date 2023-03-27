@@ -8,6 +8,7 @@
 
 
 (defdataclass Scenery [Tile]
+  "A mostly static part of the level, such as a wall or trap."
   []
 
   (setv

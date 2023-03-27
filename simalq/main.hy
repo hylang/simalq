@@ -3,7 +3,9 @@
 
 
 (defn start-quest [quest]
-  (setv G.quest quest)
+  (setv
+    G.quest quest
+    G.score 0)
   (start-level 1))
 
 

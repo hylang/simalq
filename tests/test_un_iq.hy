@@ -55,8 +55,8 @@
       "exit" 1
 
       "key" 2
-      "pile_of_gold" 1
-      "handful_of_gems" 1}))
+      "pile of gold" 1
+      "handful of gems" 1}))
 
   ; Check a few corner tiles, so we know we haven't rotated or
   ; reflected the map.
