@@ -19,7 +19,6 @@ yet meaningfully implement or substitute."
     [15 "damageable_wall"]
     [16 "treasure_chest"]
     [17 "void"]
-    [19 "key"]
     [20 "healing_potion"]
     [21 "unknown_potion"]
     [22 "moveable_wall"]

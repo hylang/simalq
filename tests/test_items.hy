@@ -1,5 +1,5 @@
 (require
-  tests.lib [wk])
+  tests.lib [cant wk])
 (import
   tests.lib [init assert-at]
   simalq.geometry [Pos Direction pos+ at]
@@ -21,3 +21,16 @@
   (wk N)
   (assert (= G.score 350))
   (assert (= (at G.player-pos) [])))
+
+
+(defn test-key-get []
+  (init "Boot Camp 2")
+  (setv G.player-pos (Pos G.map 13 10))
+  (assert (= G.keys 0))
+  (wk S)
+  (assert (= G.keys 1))
+
+  (init "Boot Camp 2")
+  (setv G.player-pos (Pos G.map 13 10))
+  (setv G.keys hy.M.simalq/tile/item.MAX-KEYS)
+  (cant (wk S) "Your keyring has no room for another key."))
