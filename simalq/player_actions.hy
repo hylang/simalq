@@ -2,6 +2,7 @@
   hyrule [ecase]
   simalq.macros [defdataclass has])
 (import
+  simalq.util [ActionError]
   simalq.geometry [Pos GeometryError pos+ at]
   simalq.game-state [G]
   simalq.tile.scenery [Scenery])
@@ -48,6 +49,3 @@
       (setv G.player-pos target)
       (for [tile (at target)]
         (.hook-player-walked-into tile)))))
-
-
-(defclass ActionError [Exception])

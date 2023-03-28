@@ -2,6 +2,7 @@
   simalq.macros [defdataclass]
   hyrule [unless])
 (import
+  simalq.util [ActionError]
   simalq.geometry [Direction GeometryError pos+]
   simalq.tile [Tile deftile rm-tile replace-tile]
   simalq.game-state [G])
@@ -44,7 +45,7 @@
   (setv destroy-when-opened None)
   (defn hook-player-walk-to [self origin]
     (unless G.keys
-      (raise (hy.M.simalq.player-actions.ActionError "It's locked, and you're keyless at the moment.")))
+      (raise (ActionError "It's locked, and you're keyless at the moment.")))
     (-= G.keys 1)
     (if self.destroy-when-opened
       (rm-tile self)
@@ -75,12 +76,10 @@
 
     (defn hook-player-walk-from [self target]
       (unless (= (safe-pos+ self.pos self.direction) target)
-        (import simalq.player-actions [ActionError :as E])
-        (raise (E f"You can only go {self.direction.name} from this one-way door."))))
+        (raise (ActionError f"You can only go {self.direction.name} from this one-way door."))))
     (defn hook-player-walk-to [self origin]
       (unless (= (safe-pos+ origin self.direction) self.pos)
-        (import simalq.player-actions [ActionError :as E])
-        (raise (E (.format "That one-way door must be entered from the {}."
+        (raise (ActionError (.format "That one-way door must be entered from the {}."
           self.direction.opposite.name)))))
 
     (setv flavor "My way or the highway!"))

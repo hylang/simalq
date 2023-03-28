@@ -24,7 +24,7 @@
 (defmacro cant [form msg-check]
   (setv e (hy.gensym))
   `(do
-    (with [~e (hy.M.pytest.raises hy.M.simalq/player-actions.ActionError)]
+    (with [~e (hy.M.pytest.raises hy.M.simalq/util.ActionError)]
       ~form)
     (assert (in ~msg-check (. ~e value args [0])))))
 
