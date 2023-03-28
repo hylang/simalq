@@ -5,9 +5,6 @@
 
 
 (defmacro wk [direction-abbr]
-  (setv do-action (hy.gensym) Walk (hy.gensym) Direction (hy.gensym))
-  `(do
-    (import
-      simalq.geometry [Direction :as ~Direction]
-      simalq.player-actions [do-action :as ~do-action Walk :as ~Walk])
-    (~do-action (~Walk (. ~Direction ~direction-abbr)))))
+  `(hy.M.simalq/player-actions.do-action
+    (hy.M.simalq/player-actions.Walk
+      (. hy.M.simalq/geometry.Direction ~direction-abbr))))

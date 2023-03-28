@@ -14,23 +14,20 @@
     (.append kwargs (.pop rest 0)))
   (unless fields
     (.extend kwargs '[:frozen True]))
-  (setv dataclass (hy.gensym))
-  `(do
-    (import dataclasses [dataclass :as ~dataclass])
-    (defclass [(~dataclass :slots True ~@kwargs)] ~class-name ~superclasses
-      ~@docstring
-      ~@(gfor
-        field fields
-        `(annotate ~field ...))
-      ~@rest)))
+  `(defclass
+    [(hy.M.dataclasses.dataclass :slots True ~@kwargs)]
+    ~class-name ~superclasses
+    ~@docstring
+    ~@(gfor
+      field fields
+      `(annotate ~field ...))
+    ~@rest))
 
 
 (defmacro has [pos tile-type predicate-form]
-  `(do
-    (import simalq.geometry)
-    (next
-      (gfor
-        it (simalq.geometry.at ~pos)
-        :if (and (isinstance it ~tile-type) ~predicate-form)
-        it)
-      None)))
+  `(next
+    (gfor
+      it (hy.M.simalq/geometry.at ~pos)
+      :if (and (isinstance it ~tile-type) ~predicate-form)
+      it)
+    None))
