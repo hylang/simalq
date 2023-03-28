@@ -1,19 +1,10 @@
 (require
-  tests.lib [wk])
+  tests.lib [cant wk])
 (import
   pytest
   tests.lib [init assert-at]
   simalq.game-state [G]
-  simalq.geometry [Pos Direction pos+ at]
-  simalq.player-actions [ActionError])
-
-
-(defmacro cant [form msg-check]
-  (setv e (hy.gensym))
-  `(do
-    (with [~e (pytest.raises ActionError)]
-      ~form)
-    (assert (in ~msg-check (. ~e value args [0])))))
+  simalq.geometry [Pos Direction pos+ at])
 
 
 (defn test-bootcamp-level1 []

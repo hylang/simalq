@@ -19,6 +19,14 @@
   (assert (= tile.stem stem)))
 
 
+(defmacro cant [form msg-check]
+  (setv e (hy.gensym))
+  `(do
+    (with [~e (hy.M.pytest.raises hy.M.simalq/player-actions.ActionError)]
+      ~form)
+    (assert (in ~msg-check (. ~e value args [0])))))
+
+
 (defmacro wk [direction-abbr [n-steps 1]]
   `(for [_ (range ~n-steps)]
     (hy.M.simalq/player-actions.do-action
