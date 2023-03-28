@@ -2,7 +2,7 @@
   tests.lib [wk])
 (import
   pytest
-  tests.lib [init]
+  tests.lib [init assert-at]
   simalq.game-state [G]
   simalq.geometry [Pos Direction pos+ at]
   simalq.player-actions [ActionError])
@@ -33,13 +33,13 @@
   ; Walk into the (plain) door to the east.
   (wk NE)
   (wk E 3)
-  (assert (= (. (at G.player-pos) [0] stem) "door"))
+  (assert-at 'here "door")
   ; Try walking diagonally past the wall to the north.
   (cant (wk NE) "That diagonal is blocked by a neighbor.")
   ; Walk diagonally between some pillars.
   (setv G.player-pos (Pos G.map 3 1))
-  (assert (= (. (get G.map.data 3 2 0) stem) "pillar"))
-  (assert (= (. (get G.map.data 4 1 0) stem) "pillar"))
+  (assert-at 'N "pillar")
+  (assert-at 'E "pillar")
   (wk NE)
   (assert (= G.player-pos (Pos G.map 4 2)))
   ; Try some one-way doors.

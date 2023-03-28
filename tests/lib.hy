@@ -4,6 +4,21 @@
   (start-quest (read-quest (iq-quest quest))))
 
 
+(defn assert-at [locator stem]
+  (import simalq.geometry [at pos+ Direction])
+  (import simalq.game-state [G])
+
+  (setv [tile] (at (cond
+    (= locator 'here)
+      G.player-pos
+    (isinstance locator hy.models.Symbol)
+      (pos+ G.player-pos (getattr Direction (str locator)))
+    True
+      locator)))
+
+  (assert (= tile.stem stem)))
+
+
 (defmacro wk [direction-abbr [n-steps 1]]
   `(for [_ (range ~n-steps)]
     (hy.M.simalq/player-actions.do-action
