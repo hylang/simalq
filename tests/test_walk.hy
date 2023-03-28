@@ -32,8 +32,7 @@
   (cant (wk S) "Your way is blocked.")
   ; Walk into the (plain) door to the east.
   (wk NE)
-  (for [_ (range 3)]
-    (wk E))
+  (wk E 3)
   (assert (= (. (at G.player-pos) [0] stem) "door"))
   ; Try walking diagonally past the wall to the north.
   (cant (wk NE) "That diagonal is blocked by a neighbor.")
