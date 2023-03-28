@@ -55,6 +55,11 @@
 (defn rm-tile [tile]
   (.remove (at tile.pos) tile))
 
+(defn replace-tile [old new-stem]
+  (setv
+    (get (at old.pos) (.index (at old.pos) old))
+    ((get Tile.types new-stem) :pos old.pos)))
+
 
 (import ; For side-effects.
   simalq.tile.scenery

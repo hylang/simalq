@@ -40,7 +40,10 @@
       (for [tile (at G.player-pos)]
         (.hook-player-walk-from tile target))
       (for [tile (at target)]
-        (.hook-player-walk-to tile G.player-pos))
+        (when (.hook-player-walk-to tile G.player-pos)
+          ; The hook returned true, meaning the player's action is
+          ; over.
+          (return)))
       ; No exceptions have stopped us, so go.
       (setv G.player-pos target)
       (for [tile (at target)]

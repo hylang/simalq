@@ -12,7 +12,6 @@ yet meaningfully implement or substitute."
 
     [3 "damaged_wall"]
     [4 "crumbling_wall"]
-    [6 "locked_door"]
     [7 "exit"]
     [13 "trap_1"]
     [14 "trapped_wall_1"]
@@ -80,7 +79,6 @@ yet meaningfully implement or substitute."
     [78 "trapped_wall_2"]
     [79 "trapped_wall_3"]
     [80 "trapped_wall_4"]
-    [81 "locked_disappearing_door"]
     [82 "broken_pillar"]
     [83 "healing_salve"]
     [84 "strong_bomb"]

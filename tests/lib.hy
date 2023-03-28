@@ -8,7 +8,7 @@
   (import simalq.geometry [at pos+ Direction])
   (import simalq.game-state [G])
 
-  (setv [tile] (at (cond
+  (setv stack (at (cond
     (= locator 'here)
       G.player-pos
     (isinstance locator hy.models.Symbol)
@@ -16,7 +16,9 @@
     True
       locator)))
 
-  (assert (= tile.stem stem)))
+  (if (= stem 'floor)
+    (assert (= (len stack) 0))
+    (assert (and (= (len stack) 1) (= (. stack [0] stem) stem)))))
 
 
 (defmacro cant [form msg-check]

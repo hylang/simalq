@@ -47,3 +47,25 @@
   (cant (wk N) "You can only go south from this one-way door.")
   (wk S)
   (cant (wk N) "That one-way door must be entered from the north."))
+
+
+(defn test-locked-doors []
+  (init "Boot Camp 2")
+  (setv G.keys 2)
+
+  (setv G.player-pos (Pos G.map 13 6))
+  (assert-at 'S "locked door")
+  (setv p G.player-pos)
+  (wk S)
+    ; This just unlocks the door, without moving us.
+  (assert-at 'S "door")
+  (assert (= G.player-pos p))
+  (assert (= G.keys 1))
+
+  (setv G.player-pos (Pos G.map 11 2))
+  (assert-at 'W "locked disappearing door")
+  (setv p G.player-pos)
+  (wk W)
+  (assert-at 'W 'floor)
+  (assert (= G.player-pos p))
+  (assert (= G.keys 0)))

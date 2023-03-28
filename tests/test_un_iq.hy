@@ -49,8 +49,8 @@
       "one-way door (east)" 2
       "damaged_wall" 1
       "crumbling_wall" 1
-      "locked_door" 1
-      "locked_disappearing_door" 1
+      "locked door" 1
+      "locked disappearing door" 1
       "pillar" 15
       "exit" 1
 
