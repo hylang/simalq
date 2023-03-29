@@ -69,3 +69,24 @@
   (assert-at 'W 'floor)
   (assert (= G.player-pos p))
   (assert (= G.keys 0)))
+
+
+(defn test-exit []
+  (init "Boot Camp 2")
+
+  ; Exit from level 1.
+  (setv G.player-pos (Pos G.map 0 1))
+  (assert (= G.level-n 1))
+  (setv map-was G.map)
+  (assert-at 'N "exit")
+  (wk N)
+  (assert (= G.level-n 2))
+  (assert (!= G.map map-was))
+
+  ; Exit from the last level, winning the game.
+  (init "Boot Camp 2" 26)
+  (assert (= G.player-pos (Pos G.map 0 9)))
+  (wk E 14)
+  (with [e (pytest.raises hy.M.simalq/util.GameOverException)]
+    (wk E))
+  (assert (= e.value.args #('won))))

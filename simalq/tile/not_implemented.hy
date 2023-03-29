@@ -12,7 +12,6 @@ yet meaningfully implement or substitute."
 
     [3 "damaged_wall"]
     [4 "crumbling_wall"]
-    [7 "exit"]
     [13 "trap_1"]
     [14 "trapped_wall_1"]
     [15 "damageable_wall"]

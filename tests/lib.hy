@@ -1,7 +1,9 @@
-(defn init [quest]
+(defn init [quest [level-n 1]]
   (import simalq.un-iq [read-quest iq-quest])
-  (import simalq.main [start-quest])
-  (start-quest (read-quest (iq-quest quest))))
+  (import simalq.main [start-quest start-level])
+  (start-quest (read-quest (iq-quest quest)))
+  (when (!= level-n 1)
+    (start-level level-n)))
 
 
 (defn assert-at [locator stem]

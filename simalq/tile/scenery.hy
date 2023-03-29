@@ -2,7 +2,7 @@
   simalq.macros [defdataclass]
   hyrule [unless])
 (import
-  simalq.util [ActionError]
+  simalq.util [ActionError GameOverException]
   simalq.geometry [Direction GeometryError pos+]
   simalq.tile [Tile deftile rm-tile replace-tile]
   simalq.game-state [G])
@@ -90,3 +90,12 @@
     (deftile OneWayDoor f"a one-way door ({direction.name})"
       :iq-ix iq-ix
       :direction direction))))
+
+(deftile Scenery "the exit"
+  :iq-ix 7
+  :hook-player-walked-into (fn [self]
+    (setv next-level (. (get G.quest.levels (- G.level-n 1)) next-level))
+    (when (>= next-level (len G.quest.levels))
+      (raise (GameOverException 'won)))
+    (hy.M.simalq/main.start-level next-level))
+  :flavor "Get me outta here.")
