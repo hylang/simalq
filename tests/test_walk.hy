@@ -62,6 +62,29 @@
   (cant (wk N) "That one-way door must be entered from the north."))
 
 
+(defn test-wrapping []
+  (init (Quest :title None :starting-hp 10 :levels [
+    (mk-level :n 1 :width 20 :height 20 :wrap-y True
+      :tiles ["exit"])
+    (mk-level :n 2 :width 20 :height 20 :wrap-x True :wrap-y True)]))
+
+  (assert (= G.player-pos (Pos G.map 0 0)))
+  (wk S)
+  (assert (= G.player-pos (Pos G.map 0 19)))
+  (wk S 19)
+  (assert (= G.player-pos (Pos G.map 0 0)))
+  (cant (wk W) "The border of the dungeon blocks your movement.")
+  (wk E)
+
+  (assert (= G.level-n 2))
+  (wk W)
+  (assert (= G.player-pos (Pos G.map 19 0)))
+  (wk S)
+  (assert (= G.player-pos (Pos G.map 19 19)))
+  (wk NE)
+  (assert (= G.player-pos (Pos G.map 0 0))))
+
+
 (defn test-locked-doors []
   (init "Boot Camp 2")
   (setv G.keys 2)
