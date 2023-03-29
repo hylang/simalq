@@ -5,9 +5,11 @@
   tests.lib [cant wk])
 (import
   pytest
-  tests.lib [init assert-at wait]
+  tests.lib [init assert-at wait mk-level]
+  simalq.util [GameOverException]
   simalq.game-state [G]
-  simalq.geometry [Pos Direction pos+ at])
+  simalq.geometry [Pos Direction pos+ at]
+  simalq.quest [Quest])
 
 
 (defn test-bootcamp-level1 []
@@ -107,6 +109,51 @@
 
   ; Exit from the last level, winning the game.
   (wk E 14)
-  (with [e (pytest.raises hy.M.simalq/util.GameOverException)]
+  (with [e (pytest.raises GameOverException)]
     (wk E))
   (assert (= e.value.args #('won))))
+
+
+(defn test-ambient-poison []
+  (init "Boot Camp 2")
+  (assert (= G.player-hp 500))
+  (assert (= G.level.poison-interval 5))
+  (wait 4)
+  (assert (= G.player-hp 500))
+  (wait)
+  (assert (= G.player-hp 499))
+  (setv G.player-hp 1)
+  (wait 4)
+  (with [e (pytest.raises GameOverException)]
+    (wait))
+  (assert (= e.value.args #('dead)))
+
+  ; Check what happens when you move between levels with different
+  ; poison intervals. This behavior differs from IQ, which uses a
+  ; poison counter that gets reset, instead of a nondecreasing turn
+  ; counter.
+  (init (Quest :title None :starting-hp 10 :levels [
+    (mk-level :n 1 :poison-interval 3
+      :tiles ["exit"])
+    (mk-level :n 2 :poison-interval 5)]))
+  (assert (and (= G.turn-n 0) (= G.player-hp 10)))
+  (wait 2)
+  (assert (and (= G.turn-n 2) (= G.player-hp 10)))
+  (wait)
+  (assert (and (= G.turn-n 3) (= G.player-hp 9)))
+  (wait 2)
+  (assert (and (= G.turn-n 5) (= G.player-hp 9)))
+  (wk E)
+  (assert (= G.level-n 2))
+  (assert (and (= G.turn-n 6) (= G.player-hp 9)))
+  (wait 3)
+  (assert (and (= G.turn-n 9) (= G.player-hp 9)))
+  (wait)
+  (assert (and (= G.turn-n 10) (= G.player-hp 8)))
+
+  ; Try a level with no poison.
+  (init "Boot Camp 2" 26)
+  (assert (= G.player-hp 500))
+  (assert (is G.level.poison-interval None))
+  (wait 50)
+  (assert (= G.player-hp 500)))

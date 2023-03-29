@@ -154,7 +154,7 @@
         :title l.title
         :player-start (mk-pos m l.player-start)
         :next-level l.next-level
-        :poison-interval l.poison-interval
+        :poison-interval (or l.poison-interval None)
         :time-limit l.time-limit
         :exit-speed l.exit-speed
         :moving-exit-start (mk-pos m l.moving-exit-start)

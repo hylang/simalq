@@ -52,6 +52,9 @@
     (setv (get Tile.types-by-iq-ix iq-ix) (get Tile.types stem))))
 
 
+(defn add-tile [pos stem]
+  (.append (at pos) ((get Tile.types stem) :pos pos)))
+
 (defn rm-tile [tile]
   (.remove (at tile.pos) tile))
 
