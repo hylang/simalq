@@ -63,3 +63,16 @@
   (assert (= (. level map data [0] [0]) [])) ; I.e., floor
   (assert (= (. level map data [15] [0] [0] stem) "key"))
   (assert (= (. level map data [15] [15] [0] stem) "crumbling_wall")))
+
+
+(defn test-read-varlife []
+  ; The life of variable-life monsters is stored in the second byte
+  ; of their tile extras.
+  (setv m (. (read-quest (iq-quest "New First Quest"))
+    levels [2] map data))
+  (setv t (get m 11 11 0))
+  (assert (= t.stem "dark_knight"))
+  (assert (= (get t.tile-extras 1) 1))
+  (setv t (get m 11 2 0))
+  (assert (= t.stem "tricorn"))
+  (assert (= (get t.tile-extras 1) 4)))

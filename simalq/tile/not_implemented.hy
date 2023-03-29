@@ -209,7 +209,10 @@ yet meaningfully implement or substitute."
     [211 "lord_of_the_undead"]]]
 
   (assert (not-in iq-ix Tile.types-by-iq-ix))
-  (setv (get Tile.types-by-iq-ix iq-ix) ((dataclass :frozen T) (type
+  (setv (get Tile.types-by-iq-ix iq-ix) (type
     stem
     #(Tile)
-    (dict :stem stem)))))
+    (dict
+      :stem stem
+      :__setattr__ (fn [self a v]
+        (object.__setattr__ self a v))))))

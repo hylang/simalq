@@ -141,14 +141,20 @@
     :levels (tuple (gfor
       [i l] (enumerate data.levels)
       :setv m (Map.make l.wrap-x l.wrap-y l.width l.height)
+      :setv tile-extras (dfor
+        c l.tile-extras
+        (mk-pos m c.pos) (tuple c.data))
       :do (for [x (range l.width)  y (range l.height)]
         ; Fill in `m`.
         (setv iq-ix (get l.map (+ (* x l.height) (- l.height y 1))))
           ; We have to reverse y-coordinates to get y = 0 as the
           ; bottom row.
         (unless (= iq-ix FLOOR)
-          (.append (get m.data x y)
-            ((get Tile.types-by-iq-ix iq-ix) :pos (Pos m x y)))))
+          (setv p (Pos m x y))
+          (setv t ((get Tile.types-by-iq-ix iq-ix) :pos p))
+          (when (in p tile-extras)
+            (setv t.tile-extras (get tile-extras p)))
+          (.append (get m.data x y) t)))
       (Level
         :n (+ i 1)
         :title l.title

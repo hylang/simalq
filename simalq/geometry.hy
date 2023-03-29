@@ -74,7 +74,13 @@
 
   (defn __str__ [self]
     "Provide a concise representation, without the linked map."
-    f"<Pos {self.x},{self.y}>"))
+    f"<Pos {self.x},{self.y}>")
+
+  (defn __eq__ [self b]
+    (and (= self.x b.x) (= self.y b.y) (is self.map b.map)))
+
+  (defn __hash__ [self]
+    (hash #(self.x self.y (id self.map)))))
 
 (defn pos+ [pos direction]
   (Pos pos.map (+ direction.x pos.x) (+ direction.y pos.y)))
