@@ -1,8 +1,11 @@
+"Test the walk action, as well as the wait action."
+
+
 (require
   tests.lib [cant wk])
 (import
   pytest
-  tests.lib [init assert-at]
+  tests.lib [init assert-at wait]
   simalq.game-state [G]
   simalq.geometry [Pos Direction pos+ at])
 
@@ -18,12 +21,16 @@
   (wk S)
   (assert (= G.player-pos (Pos G.map 0 14)))
   (assert (= G.turn-n 1))
+  ; Wait 1 turn.
+  (wait)
+  (assert (= G.player-pos (Pos G.map 0 14)))
+  (assert (= G.turn-n 2))
   ; Try going west, bumping into the level border.
   (cant (wk W) "The border of the dungeon blocks your movement.")
-  (assert (= G.turn-n 1))   ; Failed attempts at actions don't take turns.
+  (assert (= G.turn-n 2))   ; Failed attempts at actions don't take turns.
   ; Try walking into a wall tile.
   (wk S)
-  (assert (= G.turn-n 2))
+  (assert (= G.turn-n 3))
   (cant (wk S) "Your way is blocked.")
   ; Walk into the (plain) door to the east.
   (wk NE)

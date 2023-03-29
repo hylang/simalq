@@ -11,6 +11,9 @@
 
 (defdataclass Action []
   "A discrete effect that the player can have on the gamestate.")
+(defdataclass Wait [Action]
+  "Do nothing, passing your turn (or, more precisely, passing
+  one opportunity for an action).")
 (defdataclass Walk [Action]
   "Try to walk one step in the given direction, or attack something
   that's in the way with your sword."
@@ -20,6 +23,11 @@
 
 (defn do-action [action]
   (ecase (type action)
+
+    Wait
+      ; Nothing to do. This action should always succeed.
+      None
+
     Walk (do
       (setv d action.direction)
       (try

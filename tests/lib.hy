@@ -1,15 +1,18 @@
+(import
+  simalq.geometry [at pos+ Direction]
+  simalq.un-iq [read-quest iq-quest]
+  simalq.game-state [G]
+  simalq.player-actions [Wait]
+  simalq.main [start-quest start-level take-turn])
+
+
 (defn init [quest [level-n 1]]
-  (import simalq.un-iq [read-quest iq-quest])
-  (import simalq.main [start-quest start-level])
   (start-quest (read-quest (iq-quest quest)))
   (when (!= level-n 1)
     (start-level level-n)))
 
 
 (defn assert-at [locator stem]
-  (import simalq.geometry [at pos+ Direction])
-  (import simalq.game-state [G])
-
   (setv stack (at (cond
     (= locator 'here)
       G.player-pos
@@ -36,3 +39,6 @@
     (hy.M.simalq/main.take-turn
       (hy.M.simalq/player-actions.Walk
         (. hy.M.simalq/geometry.Direction ~direction-abbr)))))
+
+(defn wait []
+  (take-turn (Wait)))
