@@ -96,9 +96,16 @@
   (assert (= G.level-n 2))
   (assert (!= G.map map-was))
 
-  ; Exit from the last level, winning the game.
-  (init "Boot Camp 2" 26)
+  ; Exit from the penultimate level.
+  (init "Boot Camp 2" 25)
+  (assert (= G.player-pos (Pos G.map 9 21)))
+  (setv G.player-pos (Pos G.map 26 9))
+  (assert-at 'NE "exit")
+  (wk NE)
+  (assert (= G.level-n 26))
   (assert (= G.player-pos (Pos G.map 0 9)))
+
+  ; Exit from the last level, winning the game.
   (wk E 14)
   (with [e (pytest.raises hy.M.simalq/util.GameOverException)]
     (wk E))

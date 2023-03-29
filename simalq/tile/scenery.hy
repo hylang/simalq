@@ -95,7 +95,7 @@
   :iq-ix 7
   :hook-player-walked-into (fn [self]
     (setv next-level (. (get G.quest.levels (- G.level-n 1)) next-level))
-    (when (>= next-level (len G.quest.levels))
+    (when (> next-level (len G.quest.levels))
       (raise (GameOverException 'won)))
     (hy.M.simalq/main.start-level next-level))
   :flavor "Get me outta here.")
