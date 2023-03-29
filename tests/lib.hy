@@ -33,6 +33,6 @@
 
 (defmacro wk [direction-abbr [n-steps 1]]
   `(for [_ (range ~n-steps)]
-    (hy.M.simalq/player-actions.do-action
+    (hy.M.simalq/main.take-turn
       (hy.M.simalq/player-actions.Walk
         (. hy.M.simalq/geometry.Direction ~direction-abbr)))))
