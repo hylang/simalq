@@ -94,7 +94,7 @@
 (setv quest-fmt (with-construct (sym-struct
   'n-levels Byte
   (Bytes 261)
-  'starting-life Int16ub
+  'starting-hp Int16ub
   'title (iq-str 256)
   (Bytes 897)
   'levels (Array this.n-levels (sym-struct
@@ -137,7 +137,7 @@
 
   (Quest
     :title data.title
-    :starting-life data.starting-life
+    :starting-hp data.starting-hp
     :levels (tuple (gfor
       [i l] (enumerate data.levels)
       :setv m (Map.make l.wrap-x l.wrap-y l.width l.height)

@@ -5,7 +5,7 @@
 
 (defdataclass Quest []
   "A scenario or campaign; a sequence of levels to play."
-  [title starting-life levels]
+  [title starting-hp levels]
   :frozen T)
 
 
