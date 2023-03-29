@@ -1,6 +1,7 @@
 (import
+  toolz [partition]
   simalq.geometry [Map Pos at pos+ Direction]
-  simalq.quest [Level]
+  simalq.quest [Quest Level]
   simalq.un-iq [read-quest iq-quest]
   simalq.game-state [G]
   simalq.tile [add-tile]
@@ -14,6 +15,16 @@
     quest))
   (when (!= level-n 1)
     (start-level level-n)))
+
+(defn mk-quest [
+    #* levels
+    [title None]
+    [starting-hp 10]]
+  (Quest :title title :starting-hp starting-hp :levels (tuple (gfor
+    [i level-args] (enumerate levels)
+    (mk-level :n (+ i 1) #** (dfor
+      [k v] (partition 2 level-args)
+      (hy.mangle k.name) v))))))
 
 (defn mk-level [
     n

@@ -5,11 +5,10 @@
   tests.lib [cant wk])
 (import
   pytest
-  tests.lib [init assert-at wait mk-level]
+  tests.lib [init assert-at wait mk-quest]
   simalq.util [GameOverException]
   simalq.game-state [G]
-  simalq.geometry [Pos Direction pos+ at]
-  simalq.quest [Quest])
+  simalq.geometry [Pos Direction pos+ at])
 
 
 (defn test-bootcamp-level1 []
@@ -63,10 +62,10 @@
 
 
 (defn test-wrapping []
-  (init (Quest :title None :starting-hp 10 :levels [
-    (mk-level :n 1 :width 20 :height 20 :wrap-y True
-      :tiles ["exit"])
-    (mk-level :n 2 :width 20 :height 20 :wrap-x True :wrap-y True)]))
+  (init (mk-quest
+    [:width 20 :height 20 :wrap-y True
+      :tiles ["exit"]]
+    [:width 20 :height 20 :wrap-x True :wrap-y True]))
 
   (assert (= G.player-pos (Pos G.map 0 0)))
   (wk S)
@@ -155,10 +154,9 @@
   ; poison intervals. This behavior differs from IQ, which uses a
   ; poison counter that gets reset, instead of a nondecreasing turn
   ; counter.
-  (init (Quest :title None :starting-hp 10 :levels [
-    (mk-level :n 1 :poison-interval 3
-      :tiles ["exit"])
-    (mk-level :n 2 :poison-interval 5)]))
+  (init (mk-quest
+    [:poison-interval 3 :tiles ["exit"]]
+    [:poison-interval 5]))
   (assert (and (= G.turn-n 0) (= G.player-hp 10)))
   (wait 2)
   (assert (and (= G.turn-n 2) (= G.player-hp 10)))
