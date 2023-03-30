@@ -1,4 +1,5 @@
 (import
+  fractions [Fraction]
   toolz [partition]
   simalq.geometry [Map Pos at pos+ Direction]
   simalq.quest [Quest Level]
@@ -34,7 +35,7 @@
       ; The requested tiles are placed in a line east of (0, 0).
     [title None]
     [next-level None]
-    [poison-interval None]
+    [poison-intensity (Fraction 0)]
     [time-limit None] [exit-speed None] [moving-exit-start None]]
   (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
   (for [[i stem] (enumerate tiles)]
@@ -45,7 +46,7 @@
     :next-level (or next-level (+ n 1))
     :map m
     :player-start (Pos m #* player-start)
-    :poison-interval poison-interval
+    :poison-intensity poison-intensity
     :time-limit time-limit
     :exit-speed exit-speed
     :moving-exit-start moving-exit-start))

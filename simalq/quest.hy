@@ -12,6 +12,9 @@
 (defdataclass Level []
   "A map and associated data for playing it."
   [n title player-start next-level
-    poison-interval time-limit exit-speed moving-exit-start
+    poison-intensity time-limit exit-speed moving-exit-start
     map]
+  ; Poison intensity is a fraction.Fraction, the amount of poison to
+  ; dose the player with per turn, which converts to poison damage
+  ; once it gets ≥ 1.
   :frozen T)

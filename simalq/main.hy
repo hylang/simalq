@@ -1,4 +1,5 @@
 (import
+  fractions [Fraction]
   simalq.util [hurt-player DamageType]
   simalq.game-state [G]
   simalq.player-actions [do-action])
@@ -10,6 +11,7 @@
     G.score 0
     G.turn-n 0
     G.player-hp quest.starting-hp
+    G.poison-dose (Fraction 0)
     G.keys 0)
   (start-level 1))
 
@@ -25,13 +27,15 @@
 (defn take-turn [action]
   (do-action action)
 
-  ; End-of-turn processing.
-  (when (and
-      (is-not G.level.poison-interval None)
-      (= (% (+ G.turn-n 1) G.level.poison-interval) 0))
-        ; `G.turn-n` is incremented here so that the first poison
-        ; damage occurs after the poison counter has elapsed once.
-    (hurt-player 1 DamageType.Poison))
+  ; Now do end-of-turn processing.
+
+  ; Dose the player with poison, and convert an accumulated dose ≥1
+  ; into damage.
+  (+= G.poison-dose G.level.poison-intensity)
+  (setv dose-integer (.__floor__ G.poison-dose))
+  (when dose-integer
+    (hurt-player dose-integer DamageType.Poison)
+    (-= G.poison-dose dose-integer))
 
   ; Advance the turn counter last.
   (+= G.turn-n 1))

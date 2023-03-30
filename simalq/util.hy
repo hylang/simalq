@@ -19,6 +19,7 @@
   Poison Trap Bomb]))))
 
 (defn hurt-player [amount damage-type]
+  (assert (isinstance amount int))
   (assert (isinstance damage-type DamageType))
     ; The type isn't really used yet.
   (-= G.player-hp amount)

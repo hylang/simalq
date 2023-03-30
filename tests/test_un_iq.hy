@@ -1,5 +1,6 @@
 (import
   collections [Counter]
+  fractions [Fraction]
   toolz [partition]
   simalq.geometry [Pos]
   simalq.un-iq [read-quest iq-quest])
@@ -23,7 +24,7 @@
         "Shift-click to identify objects."])
       level.player-start (Pos level.map 0 15)
       level.next-level 2
-      level.poison-interval 5
+      level.poison-intensity (Fraction 1 5)
       level.time-limit 0
       level.exit-speed 10
       level.moving-exit-start None

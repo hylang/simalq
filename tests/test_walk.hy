@@ -4,6 +4,7 @@
 (require
   tests.lib [cant wk])
 (import
+  fractions [Fraction :as f/]
   pytest
   tests.lib [init assert-at wait mk-quest]
   simalq.util [GameOverException]
@@ -137,44 +138,59 @@
 
 
 (defn test-ambient-poison []
+  (defn check [poison hp]
+    (assert (and
+      (isinstance G.poison-dose f/)
+      (= G.poison-dose poison)
+      (= G.player-hp hp))))
+
   (init "Boot Camp 2")
-  (assert (= G.player-hp 500))
-  (assert (= G.level.poison-interval 5))
+  (check (f/ 0  ) 500)
+  (assert (= G.level.poison-intensity (f/ 1 5)))
   (wait 4)
-  (assert (= G.player-hp 500))
+  (check (f/ 4 5) 500)
   (wait)
-  (assert (= G.player-hp 499))
-  (setv G.player-hp 1)
-  (wait 4)
+  (check (f/ 0  ) 499)
+  (setv G.player-hp 10)
+  (wait 49)
+  (check (f/ 4 5)   1)
   (with [e (pytest.raises GameOverException)]
     (wait))
   (assert (= e.value.args #('dead)))
 
   ; Check what happens when you move between levels with different
-  ; poison intervals. This behavior differs from IQ, which uses a
-  ; poison counter that gets reset, instead of a nondecreasing turn
-  ; counter.
+  ; poison intensities. This works quite differently from IQ's integer
+  ; poison counter.
   (init (mk-quest
-    [:poison-interval 3 :tiles ["exit"]]
-    [:poison-interval 5]))
-  (assert (and (= G.turn-n 0) (= G.player-hp 10)))
+    [:poison-intensity (f/ 1 3) :tiles ["exit"]]
+    [:poison-intensity (f/ 1 5)]))
+  (check (f/  0  3) 10)
   (wait 2)
-  (assert (and (= G.turn-n 2) (= G.player-hp 10)))
+  (check (f/  2  3) 10)
   (wait)
-  (assert (and (= G.turn-n 3) (= G.player-hp 9)))
+  (check (f/  0  3)  9)
   (wait 2)
-  (assert (and (= G.turn-n 5) (= G.player-hp 9)))
+  (check (f/  2  3)  9)
   (wk E)
   (assert (= G.level-n 2))
-  (assert (and (= G.turn-n 6) (= G.player-hp 9)))
-  (wait 3)
-  (assert (and (= G.turn-n 9) (= G.player-hp 9)))
+  (check (f/ 13 15)  9)
   (wait)
-  (assert (and (= G.turn-n 10) (= G.player-hp 8)))
+  (check (f/  1 15)  8)
 
   ; Try a level with no poison.
   (init "Boot Camp 2" 26)
-  (assert (= G.player-hp 500))
-  (assert (is G.level.poison-interval None))
+  (check (f/ 0) 500)
+  (assert (= G.level.poison-intensity (f/ 0)))
   (wait 50)
-  (assert (= G.player-hp 500)))
+  (check (f/ 0) 500)
+
+  ; Try a lot of poison (more than IQ would support).
+  (init (mk-quest
+    [:poison-intensity (+ 2 (f/ 1 3))]))
+  (check (f/ 0  ) 10)
+  (wait)
+  (check (f/ 1 3)  8)
+  (wait)
+  (check (f/ 2 3)  6)
+  (wait)
+  (check (f/ 0  )  3))

@@ -7,6 +7,7 @@
 (require
   hyrule [unless])
 (import
+  fractions [Fraction]
   os
   pathlib [Path]
   zipfile [ZipFile]
@@ -160,7 +161,9 @@
         :title l.title
         :player-start (mk-pos m l.player-start)
         :next-level l.next-level
-        :poison-interval (or l.poison-interval None)
+        :poison-intensity (if (= l.poison-interval 0)
+          (Fraction 0)
+          (Fraction 1 l.poison-interval))
         :time-limit l.time-limit
         :exit-speed l.exit-speed
         :moving-exit-start (mk-pos m l.moving-exit-start)
