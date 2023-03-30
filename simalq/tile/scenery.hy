@@ -1,5 +1,4 @@
 (require
-  simalq.macros [defdataclass]
   hyrule [unless])
 (import
   simalq.util [ActionError GameOverException]
@@ -9,11 +8,11 @@
 (setv  T True  F False)
 
 
-(defdataclass Scenery [Tile]
+(defclass Scenery [Tile]
   "A mostly static part of the level, such as a wall or trap."
-  []
 
   (setv
+    __slots__ []
     blocks-move F
       ; Block movement.
     blocks-diag F))
@@ -40,9 +39,10 @@
   :iq-ix 5
   :flavor "Unlocked, but it just won't stay open. Maybe that's for the best, since monsters are too dumb to operate it.")
 
-(defdataclass LockedDoor [Scenery]
-  []
-  (setv destroy-when-opened None)
+(defclass LockedDoor [Scenery]
+  (setv
+    __slots__ []
+    destroy-when-opened None)
   (defn hook-player-walk-to [self origin]
     (unless G.keys
       (raise (ActionError "It's locked, and you're keyless at the moment.")))
@@ -69,10 +69,11 @@
       (pos+ pos direction)
       (except [GeometryError])))
 
-  (defdataclass OneWayDoor [Scenery]
-    []
+  (defclass OneWayDoor [Scenery]
 
-    (setv direction None)
+    (setv
+      __slots__ []
+      direction None)
 
     (defn hook-player-walk-from [self target]
       (unless (= (safe-pos+ self.pos self.direction) target)

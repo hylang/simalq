@@ -1,20 +1,22 @@
-(require
-  simalq.macros [defdataclass])
 (import
   re
-  dataclasses [dataclass]
   simalq.geometry [at])
-(setv  T True  F False)
 
 
-(defdataclass Tile []
-  [pos]
-  :frozen T
+(defclass Tile []
+  (setv __slots__ ["pos"])
   (setv types {})
   (setv types-by-iq-ix {})
 
+  (defn __init__ [self * pos]
+    (object.__setattr__ self "pos" pos))
+
+  (defn __setattr__ [self name value]
+    (raise (AttributeError f"Tried to set attribute {name !r} on an instance of {(type self) !r}. Attributes of tiles should be set with properties, or `object.__setattr__` if you really mean it.")))
+
+  ; Class variables overrriden by subclasses.
+
   (setv
-    ; Class variables overrriden by subclasses.
     article None
       ; "a", "the", etc.
     stem None
@@ -30,6 +32,9 @@
 
 
 (defn deftile [superclass name #** kwargs]
+  "Declare a new concrete and final tile type. Superclasses of tiles
+  not meant to themselves be instantiated should be declared with
+  `defclass`."
 
   (setv article None)
   (setv stem (re.sub r"\A(a|an|the) "
@@ -37,15 +42,18 @@
     name))
 
   (assert (all (gfor  k kwargs  (hasattr superclass k))))
+    ; New attributes should be introduced in a superclass. Otherwise,
+    ; you're probably just typoing an attribute name.
+  (.setdefault kwargs "__slots__" #())
 
   (assert (not-in stem Tile.types))
-  (setv (get Tile.types stem) ((dataclass :frozen T) (type
+  (setv (get Tile.types stem) (type
     stem
     #(superclass)
     (dict
       :article article
       :stem stem
-      #** kwargs))))
+      #** kwargs)))
 
   (when (setx iq-ix (.get kwargs "iq_ix"))
     (assert (not-in iq-ix Tile.types-by-iq-ix))
@@ -64,7 +72,9 @@
     ((get Tile.types new-stem) :pos old.pos)))
 
 
-(import ; For side-effects.
+(import
+  ; For side-effects: namely, filling out `Tile.types` and
+  ; `Tile.types-by-iq-ix`.
   simalq.tile.scenery
   simalq.tile.item
   simalq.tile.not-implemented)

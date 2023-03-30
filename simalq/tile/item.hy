@@ -1,16 +1,14 @@
-(require
-  simalq.macros [defdataclass])
 (import
   simalq.util [ActionError]
   simalq.game-state [G]
   simalq.tile [Tile deftile rm-tile])
 
 
-(defdataclass Item [Tile]
+(defclass Item [Tile]
   "An object the player can pick up."
-  []
 
   (setv
+    __slots__ []
     points None)
       ; How many points the player gets for picking up the item.
 
