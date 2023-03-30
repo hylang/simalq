@@ -30,15 +30,29 @@
 
 
 (defn test-pos []
-  (setv m (Map :data (* #((* #([T]) 3)) 3) :wrap-x F :wrap-y F))
+  (defn example-map []
+    (Map :data (* #((* #([T]) 3)) 3) :wrap-x F :wrap-y F))
+
+  (setv m (example-map))
   (Pos m 0 0)
   (Pos m 0 1)
   (Pos m 0 2)
-  (assert (= (str (Pos m 0 2)) "<Pos 0,2>"))
   (with [(pytest.raises GeometryError)]
     (Pos m 0 3))
   (with [(pytest.raises GeometryError)]
-    (Pos m 0 -1)))
+    (Pos m 0 -1))
+
+  (assert (= (Pos m 0 2) (Pos m 0 2)))
+  (assert (!= (Pos m 0 2) (Pos m 2 0)))
+  (assert (=
+    (get {(Pos m 0 2) "a"  (Pos m 2 0) "b"} (Pos m 2 0))
+    "b"))
+
+  (assert (= (str (Pos m 0 2)) "<Pos 0,2>"))
+
+  (setv m2 (example-map))
+  (assert (!= m m2))
+  (assert (!= (Pos m 0 1) (Pos m2 0 1))))
 
 
 (defn test-pos+ []
@@ -66,3 +80,9 @@
     (Pos m 0 0)))
   (with [(pytest.raises GeometryError)]
     (pos+ (Pos m 0 0) Direction.S)))
+
+
+(defn test-direction []
+  (assert (= Direction.N.opposite Direction.S))
+  (assert (= Direction.SW.opposite Direction.NE))
+  (assert (= (len Direction.all) 8)))
