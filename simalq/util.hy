@@ -16,7 +16,7 @@
 (setv DamageType (Enum "DamageType" (list (map str '[
   PlayerMelee MonsterMelee
   MundaneArrow MagicArrow MonsterShot
-  Poison Trap Bomb]))))
+  Poison Trap Fire DeathMagic]))))
 
 (defn hurt-player [amount damage-type]
   (assert (isinstance amount int))
