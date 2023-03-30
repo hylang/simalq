@@ -5,6 +5,8 @@
 
 (defclass Tile []
   (setv __slots__ ["pos"])
+    ; `pos` is generally a `Pos`, but could be `None` for e.g. an item
+    ; in the player's inventory.
   (setv types {})
   (setv types-by-iq-ix {})
 
