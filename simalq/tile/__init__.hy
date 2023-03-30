@@ -10,8 +10,18 @@
   (setv types {})
   (setv types-by-iq-ix {})
 
-  (defn __init__ [self * pos]
-    (object.__setattr__ self "pos" pos))
+  (defn __init__ [self #** kwargs]
+    ; - The set of keyword arguments used must exactly equal the set of
+    ;   available slots.
+    ; - All subclasses must set `__slots__` (if only to an empty list).
+    ; - No slot named may be used twice in a single inheritance chain.
+    (for [
+         cls (. (type self) __mro__)
+         :if (is-not cls object)
+         slot cls.__slots__]
+       (object.__setattr__ self slot (.pop kwargs slot)))
+    (when kwargs
+      (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}"))))
 
   (defn __setattr__ [self name value]
     (raise (AttributeError f"Tried to set attribute {name !r} on an instance of {(type self) !r}. Attributes of tiles should be set with properties, or `object.__setattr__` if you really mean it.")))
@@ -27,6 +37,11 @@
       ; Flavor text to show in a help screen.
     iq-ix None)
       ; The number that represents this tile in IQ.
+
+  (defn [classmethod] read-tile-extras [cls v1 v2]
+    "This method should return a dictionary of instance variables
+    to set for a new instance."
+    (raise (TypeError (+ "Tile extras not implemented: " cls.stem))))
 
   (defn hook-player-walk-from [self target])
   (defn hook-player-walk-to [self origin])

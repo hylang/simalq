@@ -154,10 +154,11 @@
           ; bottom row.
         (unless (= iq-ix FLOOR)
           (setv p (Pos m x y))
-          (setv t ((get Tile.types-by-iq-ix iq-ix) :pos p))
-          (when (in p tile-extras)
-            (setv t.tile-extras (get tile-extras p)))
-          (.append (get m.data x y) t)))
+          (setv cls (get Tile.types-by-iq-ix iq-ix))
+          (.append (get m.data x y) (cls :pos p #**
+            (if (in p tile-extras)
+              (.read-tile-extras cls #* (get tile-extras p))
+              {})))))
       (Level
         :n (+ i 1)
         :title l.title

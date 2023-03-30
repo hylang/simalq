@@ -213,6 +213,10 @@ yet meaningfully implement or substitute."
     stem
     #(Tile)
     (dict
+      :__slots__ ["tile_extras"]
+      :__init__ (fn [self * pos [tile-extras None]]
+        (object.__setattr__ self "pos" pos)
+        (object.__setattr__ self "tile_extras" tile-extras))
       :stem stem
-      :__setattr__ (fn [self a v]
-        (object.__setattr__ self a v))))))
+      :read-tile-extras (classmethod (fn [cls a b]
+        (dict :tile-extras #(a b))))))))
