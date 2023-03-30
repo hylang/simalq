@@ -1,4 +1,5 @@
 (import
+  copy [deepcopy]
   pytest
   simalq.geometry [Map Pos Direction pos+ GeometryError])
 (setv  T True  F False)
@@ -22,7 +23,10 @@
   (with [(pytest.raises IndexError)]
     (get m.data m.width 0))
   (with [(pytest.raises IndexError)]
-    (get m.data 0 m.height)))
+    (get m.data 0 m.height))
+
+  (setv m2 (deepcopy m))
+  (assert (!= m m2)))
 
 
 (defn test-pos []

@@ -10,7 +10,7 @@
     ; `data` is a tuple of tuples representing the squares of the map.
     ; Each tile is itself a list representing a stack of tiles on
     ; that square. An empty stack means that the tile has only floor.
-  :frozen T
+  :frozen T :eq F
 
   (defn [classmethod] make [self wrap-x wrap-y width height]
     "Create a new blank map."
@@ -75,9 +75,6 @@
   (defn __str__ [self]
     "Provide a concise representation, without the linked map."
     f"<Pos {self.x},{self.y}>")
-
-  (defn __eq__ [self b]
-    (and (= self.x b.x) (= self.y b.y) (is self.map b.map)))
 
   (defn __hash__ [self]
     (hash #(self.x self.y (id self.map)))))
