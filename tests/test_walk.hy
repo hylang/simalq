@@ -164,18 +164,18 @@
   (init (mk-quest
     [:poison-intensity (f/ 1 3) :tiles ["exit"]]
     [:poison-intensity (f/ 1 5)]))
-  (check (f/  0  3) 10)
+  (check (f/  0  3) 100)
   (wait 2)
-  (check (f/  2  3) 10)
+  (check (f/  2  3) 100)
   (wait)
-  (check (f/  0  3)  9)
+  (check (f/  0  3)  99)
   (wait 2)
-  (check (f/  2  3)  9)
+  (check (f/  2  3)  99)
   (wk E)
   (assert (= G.level-n 2))
-  (check (f/ 13 15)  9)
+  (check (f/ 13 15)  99)
   (wait)
-  (check (f/  1 15)  8)
+  (check (f/  1 15)  98)
 
   ; Try a level with no poison.
   (init "Boot Camp 2" 26)
@@ -187,10 +187,10 @@
   ; Try a lot of poison (more than IQ would support).
   (init (mk-quest
     [:poison-intensity (+ 2 (f/ 1 3))]))
-  (check (f/ 0  ) 10)
+  (check (f/ 0  ) 100)
   (wait)
-  (check (f/ 1 3)  8)
+  (check (f/ 1 3)  98)
   (wait)
-  (check (f/ 2 3)  6)
+  (check (f/ 2 3)  96)
   (wait)
-  (check (f/ 0  )  3))
+  (check (f/ 0  )  93))
