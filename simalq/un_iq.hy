@@ -19,7 +19,7 @@
 (setv  T True  F False)
 
 ;; --------------------------------------------------------------
-;; * Helpers for Construct
+;; * Helpers
 ;; --------------------------------------------------------------
 
 (setv FLOOR 1)
@@ -122,10 +122,12 @@
   Terminated)))
 
 ;; --------------------------------------------------------------
-;; * `read-quest`, `iq-file`
+;; * `read-quest`, `iq-quest`
 ;; --------------------------------------------------------------
 
 (defn read-quest [inp]
+  "Parse `bytes` into a `Quest`."
+
   (setv data (.parse quest-fmt inp))
 
   (defn mk-pos [m xy]
