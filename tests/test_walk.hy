@@ -9,7 +9,8 @@
   tests.lib [init assert-at wait mk-quest]
   simalq.util [GameOverException]
   simalq.game-state [G]
-  simalq.geometry [Pos Direction pos+ at])
+  simalq.geometry [Pos Direction pos+ at]
+  simalq.tile [add-tile])
 
 
 (defn test-bootcamp-level1 []
@@ -89,6 +90,7 @@
   (init "Boot Camp 2")
   (setv G.keys 2)
 
+  ; Unlocked a locked door.
   (setv G.player-pos (Pos G.map 13 6))
   (assert-at 'S "locked door")
   (setv p G.player-pos)
@@ -99,6 +101,7 @@
   (assert (= G.keys 1))
   (assert (= G.turn-n 1))  ; But it still takes a turn to do this.
 
+  ; Unlocked a locked disappearing door.
   (setv G.player-pos (Pos G.map 11 2))
   (assert-at 'W "locked disappearing door")
   (setv p G.player-pos)
@@ -106,7 +109,12 @@
   (assert-at 'W 'floor)
   (assert (= G.player-pos p))
   (assert (= G.keys 0))
-  (assert (= G.turn-n 2)))
+  (assert (= G.turn-n 2))
+
+  ; Try and fail to unlock a locked door.
+  (add-tile (pos+ G.player-pos Direction.E) "locked door")
+  (cant (wk E) "It's locked, and you're keyless at the moment.")
+  (assert (= G.turn-n 2)))  ; This doesn't take a turn.
 
 
 (defn test-exit []
