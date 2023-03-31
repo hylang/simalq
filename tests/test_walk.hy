@@ -142,7 +142,16 @@
   (wk E 14)
   (with [e (pytest.raises GameOverException)]
     (wk E))
-  (assert (= e.value.args #('won))))
+  (assert (= e.value.args #('won)))
+
+  ; If the player steps on a tile with two exits, she should only
+  ; advance one level, because her turn should end as soon as the
+  ; first exit triggers.
+  (init (mk-quest [] [] []))
+  (for [_ (range 2)]
+    (add-tile (pos+ G.player-pos Direction.E) "exit"))
+  (wk E)
+  (assert (= G.level-n 2)))
 
 
 (defn test-ambient-poison []

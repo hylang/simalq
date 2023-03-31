@@ -56,4 +56,7 @@
       ; No exceptions have stopped us, so go.
       (setv G.player-pos target)
       (for [tile (at target)]
-        (.hook-player-walked-into tile)))))
+        (when (.hook-player-walked-into tile)
+          ; The hook returned true, meaning the player's turn should
+          ; end.
+          (return))))))

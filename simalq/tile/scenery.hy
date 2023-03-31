@@ -97,5 +97,6 @@
   :hook-player-walked-into (fn [self]
     (when (> G.level.next-level (len G.quest.levels))
       (raise (GameOverException 'won)))
-    (hy.M.simalq/main.start-level G.level.next-level))
+    (hy.M.simalq/main.start-level G.level.next-level)
+    True)
   :flavor "Get me outta here.")
