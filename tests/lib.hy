@@ -78,7 +78,7 @@
   `(do
     (with [~e (hy.M.pytest.raises hy.M.simalq/util.ActionError)]
       ~form)
-    (assert (in ~msg-check (. ~e value args [0])))))
+    (assert (= (. ~e value args [0]) ~msg-check))))
 
 
 (defmacro wk [direction-abbr [n-steps 1]]
