@@ -6,11 +6,6 @@
   simalq.game-state [G])
 
 
-(setv REALITY-BUBBLE-SIZE 6)
-  ; The reality bubble is the (Chebyshev) radius around the player in
-  ; which monsters etc. get to act.
-
-
 (defn seq [a b [step 1]]
   "A version of `range` that includes both ends (given a compatible
   step size)."
@@ -26,7 +21,7 @@
 
 (defn player-melee-damage []
   "Return how much damage the player does with her sword."
-  2)
+  G.rules.base-player-melee-damage)
 
 
 (setv DamageType (Enum "DamageType" (list (map str '[

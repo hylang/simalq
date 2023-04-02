@@ -32,5 +32,5 @@
 
   (init "Boot Camp 2")
   (setv G.player-pos (Pos G.map 13 10))
-  (setv G.keys hy.M.simalq/tile/item.MAX-KEYS)
+  (setv G.keys G.rules.max-keys)
   (cant (wk S) "Your keyring has no room for another key."))

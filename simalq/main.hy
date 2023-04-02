@@ -1,19 +1,22 @@
 (import
   fractions [Fraction]
-  simalq.util [REALITY-BUBBLE-SIZE hurt-player DamageType]
+  simalq.util [hurt-player DamageType]
   simalq.geometry [burst at]
-  simalq.game-state [G]
+  simalq.game-state [G Rules]
   simalq.player-actions [do-action])
 
 
 (defn start-quest [quest]
   (setv
+    G.rules (Rules)
     G.quest quest
     G.score 0
     G.turn-n 0
     G.player-hp quest.starting-hp
     G.poison-dose (Fraction 0)
     G.keys 0)
+  (for [[k v] (.items Rules.slot-defaults)]
+    (setattr G.rules k v))
   (start-level 1))
 
 
@@ -31,7 +34,7 @@
   ; Allow actors in the reality bubble to act, in `burst`'s spiral
   ; order.
   (for [
-      pos (burst G.player-pos REALITY-BUBBLE-SIZE)
+      pos (burst G.player-pos G.rules.reality-bubble-size)
       tile (at pos)
       :if (isinstance tile hy.M.simalq/tile.Actor)]
     (.maybe-act tile))
