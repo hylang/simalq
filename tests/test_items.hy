@@ -14,13 +14,13 @@
   (assert-at 'E "pile of gold")
   (wk E)
   (assert (= G.score 100))
-  (assert (= (at G.player-pos) []))
+  (assert-at 'here 'floor)
 
   (setv G.player-pos (Pos G.map 5 10))
   (assert-at 'N "handful of gems")
   (wk N)
   (assert (= G.score 350))
-  (assert (= (at G.player-pos) [])))
+  (assert-at 'here 'floor))
 
 
 (defn test-key-get []

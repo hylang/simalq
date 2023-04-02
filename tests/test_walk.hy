@@ -10,7 +10,7 @@
   tests.lib [init assert-at wait mk-quest set-square]
   simalq.util [GameOverException]
   simalq.game-state [G]
-  simalq.geometry [Pos Direction pos+ at]
+  simalq.geometry [Pos]
   simalq.tile [add-tile])
 
 
@@ -52,7 +52,7 @@
   (setv G.player-pos (Pos G.map 3 13))
   (cant (wk S) "That one-way door must be entered from the east.")
   (wk W)
-  (setv (cut (at (pos+ G.player-pos Direction.S))) [])
+  (set-square 'S)
     ; We remove a wall so that stepping into these one-way doors
     ; diagonally won't be blocked by it.
   (cant (wk SE) "That one-way door must be entered from the east.")
@@ -113,7 +113,7 @@
   (assert (= G.turn-n 2))
 
   ; Try and fail to unlock a locked door.
-  (add-tile (pos+ G.player-pos Direction.E) "locked door")
+  (set-square 'E "locked door")
   (cant (wk E) "It's locked, and you're keyless at the moment.")
   (assert (= G.turn-n 2))  ; This doesn't take a turn.
 
@@ -158,8 +158,7 @@
   ; advance one level, because her turn should end as soon as the
   ; first exit triggers.
   (init (mk-quest [] [] []))
-  (do-n 2
-    (add-tile (pos+ G.player-pos Direction.E) "exit"))
+  (set-square 'E #* (* ["exit"] 2))
   (wk E)
   (assert (= G.level-n 2)))
 
