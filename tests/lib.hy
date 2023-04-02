@@ -10,6 +10,12 @@
   simalq.main [start-quest start-level take-turn])
 
 
+(defn kwdict [iterable]
+  (dfor
+    [k v] (partition 2 iterable)
+    (hy.mangle k.name) v))
+
+
 (defn init [quest [level-n 1]]
   (start-quest (if (isinstance quest str)
     (read-quest (iq-quest quest))
@@ -23,9 +29,7 @@
     [starting-hp 10]]
   (Quest :title title :starting-hp starting-hp :levels (tuple (gfor
     [i level-args] (enumerate levels)
-    (mk-level :n (+ i 1) #** (dfor
-      [k v] (partition 2 level-args)
-      (hy.mangle k.name) v))))))
+    (mk-level :n (+ i 1) #** (kwdict level-args))))))
 
 (defn mk-level [
     n
@@ -38,8 +42,11 @@
     [poison-intensity (Fraction 0)]
     [time-limit None] [exit-speed None] [moving-exit-start None]]
   (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
-  (for [[i stem] (enumerate tiles)]
-    (add-tile (Pos m (+ i 1) 0) stem))
+  (for [[i tile-spec] (enumerate tiles)]
+    (if (isinstance tile-spec str)
+      (setv  d {}  stem tile-spec)
+      (setv  [stem #* d] tile-spec  d (kwdict d)))
+    (add-tile (Pos m (+ i 1) 0) stem #** d))
   (Level
     :title title
     :n n

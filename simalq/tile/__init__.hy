@@ -24,7 +24,15 @@
       (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}"))))
 
   (defn __setattr__ [self name value]
-    (raise (AttributeError f"Tried to set attribute {name !r} on an instance of {(type self) !r}. Attributes of tiles should be set with properties, or `object.__setattr__` if you really mean it.")))
+    (if (in name (.all-mutable-slots self))
+      (object.__setattr__ self name value)
+      (raise (AttributeError f"Tried to set attribute {name !r} on an instance of {(type self) !r}. Use `object.__setattr__` if you really mean it."))))
+
+  (defn [classmethod] all-mutable-slots [cls]
+    (sfor
+      c cls.__mro__
+      s (getattr c "mutable_slots" #())
+      s))
 
   ; Class variables overrriden by subclasses.
 
@@ -77,8 +85,8 @@
     (setv (get Tile.types-by-iq-ix iq-ix) (get Tile.types stem))))
 
 
-(defn add-tile [pos stem]
-  (.append (at pos) ((get Tile.types stem) :pos pos)))
+(defn add-tile [pos stem #** kwargs]
+  (.append (at pos) ((get Tile.types stem) :pos pos #** kwargs)))
 
 (defn rm-tile [tile]
   (.remove (at tile.pos) tile))
@@ -94,4 +102,5 @@
   ; `Tile.types-by-iq-ix`.
   simalq.tile.scenery
   simalq.tile.item
+  simalq.tile.monster
   simalq.tile.not-implemented)

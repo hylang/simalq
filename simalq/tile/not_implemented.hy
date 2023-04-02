@@ -50,7 +50,6 @@ yet meaningfully implement or substitute."
     [50 "specter"]
     [51 "thorn_tree"]
     [52 "negaton"]
-    [53 "dark_knight"]
     [54 "tricorn"]
     [55 "ghost_2"]
     [56 "ghost_3"]

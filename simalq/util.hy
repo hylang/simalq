@@ -13,6 +13,11 @@
   "Represents a game ending, whether by losing or winning.")
 
 
+(defn player-melee-damage []
+  "Return how much damage the player does with her sword."
+  2)
+
+
 (setv DamageType (Enum "DamageType" (list (map str '[
   PlayerMelee MonsterMelee
   MundaneArrow MagicArrow MonsterShot

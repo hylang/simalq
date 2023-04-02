@@ -67,13 +67,13 @@
 
 
 (defn test-read-varlife []
-  ; The life of variable-life monsters is stored in the second byte
-  ; of their tile extras.
   (setv m (. (read-quest (iq-quest "New First Quest"))
     levels [2] map data))
   (setv t (get m 11 11 0))
-  (assert (= t.stem "dark_knight"))
-  (assert (= (get t.tile-extras 1) 1))
+  (assert (= t.stem "Dark Knight"))
+  (assert (= t.hp 1))
+  ; The life of variable-life monsters is stored in the second byte
+  ; of their tile extras.
   (setv t (get m 11 2 0))
   (assert (= t.stem "tricorn"))
   (assert (= (get t.tile-extras 1) 4)))
