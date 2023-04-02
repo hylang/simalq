@@ -7,7 +7,7 @@
   simalq.quest [Quest Level]
   simalq.un-iq [read-quest iq-quest]
   simalq.game-state [G]
-  simalq.tile [add-tile]
+  simalq.tile [add-tile rm-tile]
   simalq.player-actions [Wait]
   simalq.main [start-quest start-level take-turn])
 
@@ -61,15 +61,26 @@
     :moving-exit-start moving-exit-start))
 
 
-(defn assert-at [locator stem]
-  (setv stack (at (cond
+(defn locate [locator]
+  (cond
     (= locator 'here)
       G.player-pos
     (isinstance locator hy.models.Symbol)
       (pos+ G.player-pos (getattr Direction (str locator)))
-    True
-      locator)))
+    (isinstance locator Pos)
+      locator))
 
+(defn set-square [locator #* stems]
+  "Remove all tiles at the given square, then add new ones as
+  requested."
+  (setv p (locate locator))
+  (for [tile (at p)]
+    (rm-tile tile))
+  (for [stem stems]
+    (add-tile p stem)))
+
+(defn assert-at [locator stem]
+  (setv stack (at (locate locator)))
   (if (= stem 'floor)
     (assert (= (len stack) 0))
     (assert (and (= (len stack) 1) (= (. stack [0] stem) stem)))))

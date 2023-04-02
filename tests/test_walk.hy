@@ -7,7 +7,7 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init assert-at wait mk-quest]
+  tests.lib [init assert-at wait mk-quest set-square]
   simalq.util [GameOverException]
   simalq.game-state [G]
   simalq.geometry [Pos Direction pos+ at]
@@ -115,7 +115,16 @@
   ; Try and fail to unlock a locked door.
   (add-tile (pos+ G.player-pos Direction.E) "locked door")
   (cant (wk E) "It's locked, and you're keyless at the moment.")
-  (assert (= G.turn-n 2)))  ; This doesn't take a turn.
+  (assert (= G.turn-n 2))  ; This doesn't take a turn.
+
+  ; Several locks on the same square each take their own key and their
+  ; own action to unlock.
+  (set-square 'E #* (* ["locked disappearing door"] 2))
+  (setv G.keys 2)
+  (wk E 2)
+  (assert-at 'E 'floor)
+  (assert (= G.turn-n 4))
+  (assert (= G.keys 0)))
 
 
 (defn test-exit []
