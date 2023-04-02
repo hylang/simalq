@@ -1,7 +1,7 @@
 (import
   copy [deepcopy]
   pytest
-  simalq.geometry [Map Pos Direction pos+ GeometryError])
+  simalq.geometry [Map Pos Direction pos+ adjacent? dist GeometryError])
 (setv  T True  F False)
 
 
@@ -86,3 +86,82 @@
   (assert (= Direction.N.opposite Direction.S))
   (assert (= Direction.SW.opposite Direction.NE))
   (assert (= (len Direction.all) 8)))
+
+
+(defn test-adjacent? []
+  (defn all-adjacencies [[wrap-x F] [wrap-y F]]
+    "Get all adjacencies from (0, 0)."
+    (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width 4 :height 5))
+    (lfor
+      y (reversed (range m.height))
+      x (range m.width)
+      (adjacent? (Pos m 0 0) (Pos m x y))))
+
+  (assert (= (all-adjacencies) [
+    0 0 0 0
+    0 0 0 0
+    0 0 0 0
+    1 1 0 0
+    0 1 0 0]))
+  (assert (= (all-adjacencies :wrap-x T) [
+    0 0 0 0
+    0 0 0 0
+    0 0 0 0
+    1 1 0 1
+    0 1 0 1]))
+  (assert (= (all-adjacencies :wrap-y T) [
+    1 1 0 0
+    0 0 0 0
+    0 0 0 0
+    1 1 0 0
+    0 1 0 0]))
+  (assert (= (all-adjacencies :wrap-x T :wrap-y T) [
+    1 1 0 1
+    0 0 0 0
+    0 0 0 0
+    1 1 0 1
+    0 1 0 1])))
+
+
+(defn test-dist []
+  (setv d 7)
+  (defn all-dists [[wrap-x F] [wrap-y F]]
+    "Get all distances from (1, 1)."
+    (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width d :height d))
+    (lfor
+      y (reversed (range m.height))
+      x (range m.width)
+      (dist (Pos m 1 1) (Pos m x y))))
+
+  (assert (= (all-dists) [
+    5 5 5 5 5 5 5
+    4 4 4 4 4 4 5
+    3 3 3 3 3 4 5
+    2 2 2 2 3 4 5
+    1 1 1 2 3 4 5
+    1 0 1 2 3 4 5
+    1 1 1 2 3 4 5]))
+  (assert (= (all-dists :wrap-x T) [
+    5 5 5 5 5 5 5
+    4 4 4 4 4 4 4
+    3 3 3 3 3 3 3
+    2 2 2 2 3 3 2
+    1 1 1 2 3 3 2
+    1 0 1 2 3 3 2
+    1 1 1 2 3 3 2]))
+  (assert (= (all-dists :wrap-y T) [
+    2 2 2 2 3 4 5
+    3 3 3 3 3 4 5
+    3 3 3 3 3 4 5
+    2 2 2 2 3 4 5
+    1 1 1 2 3 4 5
+    1 0 1 2 3 4 5
+    1 1 1 2 3 4 5]))
+  (assert (= (all-dists :wrap-x T :wrap-y T) [
+    2 2 2 2 3 3 2
+    3 3 3 3 3 3 3
+    3 3 3 3 3 3 3
+    2 2 2 2 3 3 2
+    1 1 1 2 3 3 2
+    1 0 1 2 3 3 2
+    1 1 1 2 3 3 2])))

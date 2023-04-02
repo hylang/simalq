@@ -85,5 +85,22 @@
 (defn at [pos]
   (get pos.map.data pos.x pos.y))
 
+(defn adjacent? [p1 p2]
+  (= (dist p1 p2) 1))
+
+(defn dist [p1 p2]
+  "Chebyshev distance as the crow flies between the given positions,
+  accounting for the possibilty of wrapping."
+  (setv m p1.map)
+  (unless (is p2.map m)
+    (raise (ValueError "Tried to compute a distance between maps")))
+  (setv dx (abs (- p1.x p2.x)))
+  (when m.wrap-x
+    (setv dx (min dx (- m.width dx))))
+  (setv dy (abs (- p1.y p2.y)))
+  (when m.wrap-y
+    (setv dy (min dy (- m.height dy))))
+  (max dx dy))
+
 
 (defclass GeometryError [Exception])
