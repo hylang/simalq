@@ -5,6 +5,8 @@
 
 
 (defdataclass Map []
+  "A level layout."
+
   [wrap-x wrap-y data]
     ; `wrap-x` and `wrap-y` are Booleans.
     ; `data` is a tuple of tuples representing the squares of the map.
@@ -57,6 +59,8 @@
 
 
 (defdataclass Pos []
+  "A position; a point on a map."
+
   [map x y]
   :frozen T
 
