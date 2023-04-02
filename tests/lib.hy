@@ -1,3 +1,5 @@
+(require
+  hyrule [do-n])
 (import
   fractions [Fraction]
   toolz [partition]
@@ -88,5 +90,5 @@
         (. hy.M.simalq/geometry.Direction ~direction-abbr)))))
 
 (defn wait [[n-times 1]]
-  (for [_ (range n-times)]
+  (do-n n-times
     (take-turn (Wait))))

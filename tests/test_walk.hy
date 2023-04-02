@@ -2,7 +2,8 @@
 
 
 (require
-  tests.lib [cant wk])
+  tests.lib [cant wk]
+  hyrule [do-n])
 (import
   fractions [Fraction :as f/]
   pytest
@@ -148,7 +149,7 @@
   ; advance one level, because her turn should end as soon as the
   ; first exit triggers.
   (init (mk-quest [] [] []))
-  (for [_ (range 2)]
+  (do-n 2
     (add-tile (pos+ G.player-pos Direction.E) "exit"))
   (wk E)
   (assert (= G.level-n 2)))
