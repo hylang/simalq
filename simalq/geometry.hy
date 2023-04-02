@@ -1,6 +1,10 @@
 (require
   hyrule [unless]
   simalq.macros [defdataclass])
+(import
+  itertools [chain]
+  toolz [unique]
+  simalq.util [seq])
 (setv  T True  F False)
 
 
@@ -105,6 +109,36 @@
   (when m.wrap-y
     (setv dy (min dy (- m.height dy))))
   (max dx dy))
+
+(defn burst [center size]
+  "Return a generator of all distinct points within distance `size` of
+  `center`. Thus the points form a square that's `size + 1` squares
+  wide. The order in which they're generated spirals outwards like
+  this (with size = 2):
+
+      21 20 19 18 17
+      22  7  6  5 16
+      23  8  0  4 15
+      24  1  2  3 14
+       9 10 11 12 13
+
+  This follows `SpiralX` and `SpiralY` in IQ (but upside-down). An
+  important property of it is that activating monsters in this order
+  allows monsters closer to the player to move first, so a line of
+  monsters can march toward the player without creating gaps."
+
+  (unique (gfor
+    c (seq 0 size)
+    [x y] (py "chain(
+      (( x, -c) for x in seq(    -c,      c,  1)),
+      (( c,  y) for y in seq(-c + 1,      c,  1)),
+      (( x,  c) for x in seq( c - 1,     -c, -1)),
+      ((-c,  y) for y in seq( c - 1, -c + 1, -1)))")
+    :setv p (try
+      (Pos center.map (+ center.x x) (+ center.y y))
+      (except [GeometryError]))
+    :if p
+    p)))
 
 
 (defclass GeometryError [Exception])

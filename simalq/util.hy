@@ -6,6 +6,12 @@
   simalq.game-state [G])
 
 
+(defn seq [a b [step 1]]
+  "A version of `range` that includes both ends (given a compatible
+  step size)."
+  (range a (+ b step) step))
+
+
 (defclass ActionError [Exception]
   "Represents an attempt by the player to make an illegal move, such as walking through a wall.")
 

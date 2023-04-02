@@ -1,7 +1,11 @@
+(require
+  hyrule [ebranch])
 (import
   copy [deepcopy]
   pytest
-  simalq.geometry [Map Pos Direction pos+ adjacent? dist GeometryError])
+  simalq.util [seq]
+  simalq.geometry [
+    Map Pos Direction pos+ adjacent? dist burst GeometryError])
 (setv  T True  F False)
 
 
@@ -165,3 +169,65 @@
     1 1 1 2 3 3 2
     1 0 1 2 3 3 2
     1 1 1 2 3 3 2])))
+
+
+(defn test-burst []
+  (for [size [2 6]  wrap-x [F T]  wrap-y [F T]]
+    (setv m (Map.make :width 5 :height 7
+      :wrap-x wrap-x :wrap-y wrap-y))
+    (setv p0 (Pos m 1 1))
+    (setv b (tuple (burst p0 size)))
+    ; A burst shouldn't duplicate positions.
+    (assert (= (len b) (len (set b))))
+    ; A point should be in a burst if and only if it's close enough to
+    ; the center.
+    (for [x (range m.width)  y (range m.height)]
+      (setv p (Pos m x y))
+      (assert (=
+        (<= (dist p p0) size)
+        (in p b))))))
+
+
+(defn test-burst-spiral []
+  "`burst` should return points in IQ's spiral order (but actually
+  upside-down, since our y-coordinates have the opposite meaning)."
+
+  (setv iq-spiral-size 6)
+  (setv iq-spiral (list (zip
+    ; Translated directly from `SetSpiralX` and `SetSpiralY` in IQ.
+    (gfor  i (seq 0 168)  (ebranch (in i it)
+      #(121 157 158 159 160 161 162 163 164 165 166 167 168)  -6
+      #(81 122 156 111 112 113 114 115 116 117 118 119 120)  -5
+      #(49 73 74 75 76 77 78 79 80 82 110 123 155)  -4
+      #(25 43 44 45 46 47 48 50 72 83 109 124 154)  -3
+      #(9 21 22 23 24 26 42 51 71 84 108 125 153)  -2
+      #(1 7 8 10 20 27 41 52 70 85 107 126 152)  -1
+      #(0 2 6 11 19 28 40 53 69 86 106 127 151)  0
+      #(3 4 5 12 18 29 39 54 68 87 105 128 150)  1
+      #(13 14 15 16 17 30 38 55 67 88 104 129 149)  2
+      #(31 32 33 34 35 36 37 56 66 89 103 130 148)  3
+      #(57 58 59 60 61 62 63 64 65 90 102 131 147)  4
+      #(91 92 93 94 95 96 97 98 99 100 101 132 146)  5
+      #(133 134 135 136 137 138 139 140 141 142 143 144 145)  6))
+    (gfor  i (seq 0 168) (ebranch (in i it)
+      #(145 146 147 148 149 150 151 152 153 154 155 156 157)  6
+      #(101 102 103 104 105 106 107 108 109 110 111 144 158)  5
+      #(65 66 67 68 69 70 71 72 73 100 112 143 159)  4
+      #(37 38 39 40 41 42 43 64 74 99 113 142 160)  3
+      #(17 18 19 20 21 36 44 63 75 98 114 141 161)  2
+      #(5 6 7 16 22 35 45 62 76 97 115 140 162)  1
+      #(0 4 8 15 23 34 46 61 77 96 116 139 163)  0
+      #(1 2 3 14 24 33 47 60 78 95 117 138 164)  -1
+      #(9 10 11 12 13 32 48 59 79 94 118 137 165)  -2
+      #(25 26 27 28 29 30 31 58 80 93 119 136 166)  -3
+      #(49 50 51 52 53 54 55 56 57 92 120 135 167)  -4
+      #(81 82 83 84 85 86 87 88 89 90 91 134 168)  -5
+      #(121 122 123 124 125 126 127 128 129 130 131 132 133)  -6)))))
+
+  (setv m (Map.make :width 20 :height 20 :wrap-x F :wrap-y F))
+  (setv p0 (Pos m 10 10))
+  (setv sq-spiral (lfor
+    p (burst p0 iq-spiral-size)
+    #((- p.x p0.x) (- p.y p0.y))))
+
+  (assert (= sq-spiral iq-spiral)))
