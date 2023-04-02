@@ -1,6 +1,7 @@
 (import
   fractions [Fraction]
-  simalq.util [hurt-player DamageType]
+  simalq.util [REALITY-BUBBLE-SIZE hurt-player DamageType]
+  simalq.geometry [burst at]
   simalq.game-state [G]
   simalq.player-actions [do-action])
 
@@ -27,10 +28,18 @@
 (defn take-turn [action]
   (do-action action)
 
+  ; Allow actors in the reality bubble to act, in `burst`'s spiral
+  ; order.
+  (for [
+      pos (burst G.player-pos REALITY-BUBBLE-SIZE)
+      tile (at pos)
+      :if (isinstance tile hy.M.simalq/tile.Actor)]
+    (.maybe-act tile))
+
   ; Now do end-of-turn processing.
 
-  ; Dose the player with poison, and convert an accumulated dose ≥1
-  ; into damage.
+  ; Dose the player with ambient poison, and convert an accumulated
+  ; dose ≥1 into damage.
   (+= G.poison-dose G.level.poison-intensity)
   (setv dose-integer (.__floor__ G.poison-dose))
   (when dose-integer

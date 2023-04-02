@@ -1,5 +1,6 @@
 (import
   re
+  simalq.game-state [G]
   simalq.geometry [at])
 
 
@@ -12,14 +13,17 @@
 
   (defn __init__ [self #** kwargs]
     ; - The set of keyword arguments used must exactly equal the set of
-    ;   available slots.
+    ;   available slots, minus slots initialized with `slot-init`.
     ; - All subclasses must set `__slots__` (if only to an empty list).
     ; - No slot named may be used twice in a single inheritance chain.
     (for [
          cls (. (type self) __mro__)
          :if (is-not cls object)
          slot cls.__slots__]
-       (object.__setattr__ self slot (.pop kwargs slot)))
+       (object.__setattr__ self slot
+         (if (in slot (getattr cls "slot_init" {}))
+           (get cls.slot-init slot)
+           (.pop kwargs slot))))
     (when kwargs
       (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}"))))
 
@@ -95,6 +99,26 @@
   (setv
     (get (at old.pos) (.index (at old.pos) old))
     ((get Tile.types new-stem) :pos old.pos)))
+
+
+(defclass Actor [Tile]
+  "A kind of tile (typically a monster) that gets to do something each
+  turn that it's in the reality bubble."
+
+  (setv
+    __slots__ ["last_acted"]
+      ; The turn number on which the actor last got a turn.
+    mutable-slots #("last_acted")
+    slot-init {"last_acted" None})
+
+  (defn maybe-act [self]
+    "Act, if we haven't already acted this turn."
+    (when (or (is self.last-acted None) (< self.last-acted G.turn-n))
+      (.act self)
+      (setv self.last-acted G.turn-n)))
+
+  (defn act [self]
+    (raise (TypeError f"No `act` method defined for actor {(type self)}"))))
 
 
 (import

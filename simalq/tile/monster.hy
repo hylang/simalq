@@ -2,14 +2,15 @@
   simalq.macros [defdataclass])
 (import
   enum [Enum]
-  simalq.util [player-melee-damage DamageType]
+  simalq.util [player-melee-damage DamageType hurt-player]
+  simalq.geometry [adjacent?]
   simalq.game-state [G]
-  simalq.tile [Tile deftile rm-tile])
+  simalq.tile [Actor deftile rm-tile])
 
 
 (setv AI (Enum "AI" ["Approach"]))
 
-(defclass Monster [Tile]
+(defclass Monster [Actor]
   "A non-player character, typically out to kill the player."
 
   (setv
@@ -33,7 +34,15 @@
   (defn hook-player-walk-to [self origin]
     "Attack the monster in melee."
     (hurt-monster self (player-melee-damage) DamageType.PlayerMelee)
-    True))
+    True)
+
+  (defn act [self]
+    (when (adjacent? self.pos G.player-pos)
+      ; We're in melee range of the player, so bonk her.
+        (hurt-player self.damage-melee DamageType.MonsterMelee)
+        ; That uses up our action.
+        (return))
+    (raise (ValueError "Other monster actions are not yet implemented."))))
 
 (defn hurt-monster [monster amount damage-type]
   (when (in damage-type monster.immune)

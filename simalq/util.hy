@@ -6,6 +6,11 @@
   simalq.game-state [G])
 
 
+(setv REALITY-BUBBLE-SIZE 6)
+  ; The reality bubble is the (Chebyshev) radius around the player in
+  ; which monsters etc. get to act.
+
+
 (defn seq [a b [step 1]]
   "A version of `range` that includes both ends (given a compatible
   step size)."
