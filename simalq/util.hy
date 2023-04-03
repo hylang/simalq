@@ -11,6 +11,13 @@
   step size)."
   (range a (+ b step) step))
 
+(defn sign [x]
+  (cond
+    (< x 0) -1
+    (> x 0)  1
+    (= x 0)  0
+    True     (raise TypeError)))
+
 
 (defclass ActionError [Exception]
   "Represents an attempt by the player to make an illegal move, such as walking through a wall.")

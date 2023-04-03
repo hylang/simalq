@@ -4,7 +4,7 @@
 (import
   itertools [chain]
   toolz [unique]
-  simalq.util [seq])
+  simalq.util [seq sign])
 (setv  T True  F False)
 
 
@@ -52,6 +52,9 @@
     :do (setattr Direction (.upper (+ (get d1.name 0) (get d2.name 0))) new)
     new)))
   (setv Direction.all (+ Direction.orths Direction.diags))
+  (setv Direction.from-coords (dfor
+    d Direction.all
+    #(d.x d.y) d))
   ; Define opposite directions.
   (setv opposites (dfor
     d1 Direction.all
@@ -109,6 +112,24 @@
   (when m.wrap-y
     (setv dy (min dy (- m.height dy))))
   (max dx dy))
+
+(defn dir-to [p1 p2]
+  "The most logical direction for a first step from `p1` to `p2`. If
+  `p2` is the same distance walking with or without wrapping, then the
+  preference is not to wrap."
+  (setv m p1.map)
+  (unless (is p2.map m)
+    (raise (ValueError "Tried to find a direction between maps")))
+  (when (= p1 p2)
+    (return None))
+  (setv dx (- p2.x p1.x))
+  (when (and m.wrap-x (> (abs dx) (/ m.width 2)))
+    (*= dx -1))
+  (setv dy (- p2.y p1.y))
+  (when (and m.wrap-y (> (abs dy) (/ m.height 2)))
+    (*= dy -1))
+  (get Direction.from-coords #((sign dx) (sign dy))))
+
 
 (defn burst [center size]
   "Return a generator of all distinct points within distance `size` of

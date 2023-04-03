@@ -5,7 +5,7 @@
   pytest
   simalq.util [seq]
   simalq.geometry [
-    Map Pos Direction pos+ adjacent? dist burst GeometryError])
+    Map Pos Direction pos+ adjacent? dir-to dist burst GeometryError])
 (setv  T True  F False)
 
 
@@ -125,6 +125,50 @@
     0 0 0 0
     1 1 0 1
     0 1 0 1])))
+
+
+(defn test-dir-to []
+  (defn all-dirs [[wrap-x F] [wrap-y F]]
+    "Get all directions from (1, 1)."
+    (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width 5 :height 6))
+    (lfor
+      y (reversed (range m.height))
+      x (range m.width)
+      (dir-to (Pos m 1 1) (Pos m x y))))
+  (defmacro dirs [#* abbreviations]
+    (hy.models.List (gfor
+      a abbreviations
+      (if (= a '0) None `(. Direction ~a)))))
+
+  (assert (= (all-dirs) (dirs
+    NW  N NE NE NE
+    NW  N NE NE NE
+    NW  N NE NE NE
+    NW  N NE NE NE
+     W  0  E  E  E
+    SW  S SE SE SE)))
+  (assert (= (all-dirs :wrap-x T) (dirs
+    NW  N NE NE NW
+    NW  N NE NE NW
+    NW  N NE NE NW
+    NW  N NE NE NW
+     W  0  E  E  W
+    SW  S SE SE SW)))
+  (assert (= (all-dirs :wrap-y T) (dirs
+    SW  S SE SE SE
+    NW  N NE NE NE
+    NW  N NE NE NE
+    NW  N NE NE NE
+     W  0  E  E  E
+    SW  S SE SE SE)))
+
+  (assert (= (all-dirs :wrap-x T :wrap-y T) (dirs
+    SW  S SE SE SW
+    NW  N NE NE NW
+    NW  N NE NE NW
+    NW  N NE NE NW
+     W  0  E  E  W
+    SW  S SE SE SW))))
 
 
 (defn test-dist []
