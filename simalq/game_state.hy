@@ -1,11 +1,11 @@
 (defclass GameState []
   (setv __slots__ [
     "rules"
-    "quest" "map" "level_n" "player_pos"
+    "quest" "level" "level_n" "player_pos"
     "score" "turn_n"
     "player_hp" "poison_dose" "keys"])
-  (defn [property] level [self]
-    (get self.quest.levels (- self.level-n 1))))
+  (defn [property] map [self]
+    self.level.map))
 (setv G (GameState))
 
 

@@ -199,6 +199,10 @@
   (check (f/  2  3)  99)
   (wk E)
   (assert (= G.level-n 2))
+  ; Since the player always gets the first move on each level, she
+  ; hasn't yet breathed in any of the new poison.
+  (check (f/  2  3)  99)
+  (wait)
   (check (f/ 13 15)  99)
   (wait)
   (check (f/  1 15)  98)

@@ -1,4 +1,5 @@
 (import
+  copy [deepcopy]
   fractions [Fraction]
   simalq.util [hurt-player DamageType]
   simalq.geometry [burst at]
@@ -23,13 +24,21 @@
 (defn start-level [level-n]
   (setv
     G.level-n level-n
-    level (get G.quest.levels (- G.level-n 1))
-    G.map level.map
-    G.player-pos level.player-start))
+    G.level (deepcopy (get G.quest.levels (- level-n 1)))
+      ; The default behavior of `deepcopy` is smart enough to make all
+      ; the references to `G.level.map` in tiles point to the new map.
+    G.player-pos G.level.player-start))
 
 
 (defn take-turn [action]
+  (setv level-was G.level)
   (do-action action)
+
+  (when (is-not G.level level-was)
+    ; If the player has changed levels, let her take another action
+    ; this turn. This means she always gets the first action on a
+    ; level.
+    (return))
 
   ; Allow actors in the reality bubble to act, in `burst`'s spiral
   ; order.

@@ -1,4 +1,5 @@
 (import
+  copy [deepcopy]
   re
   simalq.game-state [G]
   simalq.geometry [at])
@@ -16,10 +17,7 @@
     ;   available slots, minus slots initialized with `slot-init`.
     ; - All subclasses must set `__slots__` (if only to an empty list).
     ; - No slot named may be used twice in a single inheritance chain.
-    (for [
-         cls (. (type self) __mro__)
-         :if (is-not cls object)
-         slot cls.__slots__]
+    (for [[cls slot] (.all-slots self)]
        (object.__setattr__ self slot
          (if (in slot (getattr cls "slot_init" {}))
            (get cls.slot-init slot)
@@ -31,6 +29,20 @@
     (if (in name (.all-mutable-slots self))
       (object.__setattr__ self name value)
       (raise (AttributeError f"Tried to set attribute {name !r} on an instance of {(type self) !r}. Use `object.__setattr__` if you really mean it."))))
+
+  (defn __deepcopy__ [self memo]
+    ; We provide this to avoid triggering `__setattr__` in `deepcopy`.
+    ((type self) #** (dfor
+      [cls slot] (.all-slots self)
+      :if (not-in slot (getattr cls "slot_init" {}))
+      slot (deepcopy (getattr self slot) memo))))
+
+  (defn [classmethod] all-slots [cls]
+    (lfor
+      c cls.__mro__
+      :if (is-not c object)
+      s c.__slots__
+      #(c s)))
 
   (defn [classmethod] all-mutable-slots [cls]
     (sfor
