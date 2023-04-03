@@ -1,4 +1,4 @@
-"Test the walk action, as well as the wait action."
+"Test core features."
 
 
 (require
@@ -13,6 +13,8 @@
 
 
 (defn test-bootcamp-level1 []
+  "Test the basics of walking, waiting, walls, plain doors, and pillars."
+
   (init "Boot Camp 2")
   (assert (= G.level-n 1)) ; The level counter is 1-based.
 
@@ -40,6 +42,7 @@
   (assert-at 'here "door")
   ; Try walking diagonally past the wall to the north.
   (cant (wk NE) "That diagonal is blocked by a neighbor.")
+
   ; Walk diagonally between some pillars.
   (setv G.player-pos (Pos G.map 3 1))
   (assert-at 'N "pillar")
@@ -48,7 +51,7 @@
   (assert (= G.player-pos (Pos G.map 4 2))))
 
 
-(defn test-wrapping []
+(defn test-walk-wrapping []
   (init (mk-quest
     [:width 20 :height 20 :wrap-y True
       :tiles ["exit"]]
@@ -72,6 +75,8 @@
 
 
 (defn test-ambient-poison []
+  ; This also tests dying from hit-point loss.
+
   (defn check [poison hp]
     (assert (and
       (isinstance G.poison-dose f/)
