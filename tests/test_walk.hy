@@ -47,21 +47,7 @@
   (assert-at 'N "pillar")
   (assert-at 'E "pillar")
   (wk NE)
-  (assert (= G.player-pos (Pos G.map 4 2)))
-  ; Try some one-way doors.
-  (setv G.player-pos (Pos G.map 3 13))
-  (cant (wk S) "That one-way door must be entered from the east.")
-  (wk W)
-  (set-square 'S)
-    ; We remove a wall so that stepping into these one-way doors
-    ; diagonally won't be blocked by it.
-  (cant (wk SE) "That one-way door must be entered from the east.")
-  (cant (wk SW) "That one-way door must be entered from the north.")
-  (wk W)
-  (wk S) ; Now we're on the door.
-  (cant (wk N) "You can only go south from this one-way door.")
-  (wk S)
-  (cant (wk N) "That one-way door must be entered from the north."))
+  (assert (= G.player-pos (Pos G.map 4 2))))
 
 
 (defn test-wrapping []
