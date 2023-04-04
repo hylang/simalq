@@ -18,6 +18,12 @@
     (= x 0)  0
     True     (raise TypeError)))
 
+(defn next-in-cycle [sequence e]
+  (when (is e None)
+    (return (get sequence 0)))
+  (setv i (+ 1 (.index sequence e)))
+  (get sequence (if (= i (len sequence)) 0 i)))
+
 
 (defclass ActionError [Exception]
   "Represents an attempt by the player to make an illegal move, such as walking through a wall.")

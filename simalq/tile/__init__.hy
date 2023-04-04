@@ -120,6 +120,11 @@
 (defn rm-tile [tile]
   (.remove (at tile.pos) tile))
 
+(defn mv-tile [tile pos]
+  (rm-tile tile)
+  (.append (at pos) tile)
+  (object.__setattr__ tile "pos" pos))
+
 (defn replace-tile [old new-stem]
   (setv
     (get (at old.pos) (.index (at old.pos) old))

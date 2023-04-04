@@ -38,17 +38,17 @@
     [player-start #(0 0)]
     [width 16] [height 16] [wrap-x False] [wrap-y False]
     [tiles #()]
-      ; The requested tiles are placed in a line east of (0, 0).
+      ; The requested tiles are placed in a line east of the player
+      ; start.
     [title None]
     [next-level None]
     [poison-intensity (Fraction 0)]
     [time-limit None] [exit-speed None] [moving-exit-start None]]
   (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
   (for [[i tile-spec] (enumerate tiles)]
-    (if (isinstance tile-spec str)
-      (setv  d {}  stem tile-spec)
-      (setv  [stem #* d] tile-spec  d (kwdict d)))
-    (add-tile (Pos m (+ i 1) 0) stem #** d))
+    (mk-tile
+      (Pos m (+ (get player-start 0) i 1) (get player-start 1))
+      tile-spec))
   (Level
     :title title
     :n n
@@ -70,14 +70,22 @@
     (isinstance locator Pos)
       locator))
 
-(defn set-square [locator #* stems]
+(defn mk-tile [p tile-spec]
+  (when (= tile-spec 'floor)
+    (return))
+  (if (isinstance tile-spec str)
+    (setv  d {}  stem tile-spec)
+    (setv  [stem #* d] tile-spec  d (kwdict d)))
+  (add-tile p stem #** d))
+
+(defn set-square [locator #* tile-specs]
   "Remove all tiles at the given square, then add new ones as
   requested."
   (setv p (locate locator))
   (for [tile (at p)]
     (rm-tile tile))
-  (for [stem stems]
-    (add-tile p stem)))
+  (for [tile-spec tile-specs]
+    (mk-tile p tile-spec)))
 
 (defn assert-at [locator thing]
   (setv stack (at (locate locator)))

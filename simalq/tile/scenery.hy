@@ -3,7 +3,7 @@
   simalq.macros [has])
 (import
   simalq.util [ActionError GameOverException]
-  simalq.geometry [Pos Direction GeometryError pos+]
+  simalq.geometry [Pos Direction GeometryError pos+ at]
   simalq.tile [Tile deftile rm-tile replace-tile]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -15,13 +15,17 @@
   (setv
     __slots__ []
     blocks-move F
-      ; Block movement.
-    blocks-diag F))
+      ; Block player and monster movement.
+    blocks-diag F
       ; Block diagonal movement between orthogonally adjacent squares.
+    blocks-monster F))
+      ; Block monster movement, even if `blocks-move` is false.
 
-(defn walkability [p direction]
+(defn walkability [p direction monster?]
   "Can an actor at `p` walk in `direction`, or at least bump something
   there (e.g., attacking a monster), considering geometry and scenery?
+  `monster?` should be true for a monster and false for the player.
+
   Return a 2-tuple. The first element is the target position (`None`
   if it's out of bounds) and the second is a symbol:
 
@@ -43,7 +47,9 @@
             (Pos target.map target.x p.y)]
           (has p2 Scenery it.blocks-diag))))
       'blocked-diag
-    (has target Scenery it.blocks-move)
+    (or
+        (and monster? G.rules.dainty-monsters (at target))
+        (has target Scenery it.blocks-move))
       'bump
     True
       'walk)))
@@ -67,12 +73,14 @@
 
 (deftile Scenery "a door"
   :iq-ix 5
+  :blocks-monster T
   :flavor "Unlocked, but it just won't stay open. Maybe that's for the best, since monsters are too dumb to operate it.")
 
 (defclass LockedDoor [Scenery]
   (setv
     __slots__ []
-    destroy-when-opened None)
+    destroy-when-opened None
+    blocks-monster T)
   (defn hook-player-bump [self origin]
     (unless G.keys
       (raise (ActionError "It's locked, and you're keyless at the moment.")))
@@ -103,6 +111,7 @@
 
     (setv
       __slots__ []
+      blocks-monster T
       direction None)
 
     (defn hook-player-walk-from [self target]
@@ -124,6 +133,7 @@
 
 (deftile Scenery "the exit"
   :iq-ix 7
+  :blocks-monster T
   :hook-player-walked-into (fn [self]
     (when (> G.level.next-level (len G.quest.levels))
       (raise (GameOverException 'won)))

@@ -30,7 +30,7 @@
 
     Walk (do
       (setv d action.direction)
-      (setv [target wly] (walkability G.player-pos d))
+      (setv [target wly] (walkability G.player-pos d :monster? F))
       (when (= wly 'out-of-bounds)
         (raise (ActionError "The border of the dungeon blocks your movement.")))
       (when (= wly 'blocked-diag)
