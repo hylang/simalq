@@ -1,8 +1,9 @@
 (require
-  hyrule [unless])
+  hyrule [unless]
+  simalq.macros [has])
 (import
   simalq.util [ActionError GameOverException]
-  simalq.geometry [Direction GeometryError pos+]
+  simalq.geometry [Pos Direction GeometryError pos+]
   simalq.tile [Tile deftile rm-tile replace-tile]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -17,6 +18,35 @@
       ; Block movement.
     blocks-diag F))
       ; Block diagonal movement between orthogonally adjacent squares.
+
+(defn walkability [p direction]
+  "Can an actor at `p` walk in `direction`, or at least bump something
+  there (e.g., attacking a monster), considering geometry and scenery?
+  Return a 2-tuple. The first element is the target position (`None`
+  if it's out of bounds) and the second is a symbol:
+
+  - 'out-of-bounds
+  - 'blocked-diag
+  - 'bump (you can bump something there, but not go there)
+  - 'walk (you can walk there)"
+
+  (setv target (try
+    (pos+ p direction)
+    (except [e GeometryError]
+      (return #(None 'out-of-bounds)))))
+  #(target (cond
+    (and
+        direction.x direction.y
+        (any (gfor
+          p2 [
+            (Pos target.map p.x target.y)
+            (Pos target.map target.x p.y)]
+          (has p2 Scenery it.blocks-diag))))
+      'blocked-diag
+    (has target Scenery it.blocks-move)
+      'bump
+    True
+      'walk)))
 
 
 (deftile Scenery "a wall"
@@ -43,7 +73,7 @@
   (setv
     __slots__ []
     destroy-when-opened None)
-  (defn hook-player-walk-to [self origin]
+  (defn hook-player-bump [self origin]
     (unless G.keys
       (raise (ActionError "It's locked, and you're keyless at the moment.")))
     (-= G.keys 1)

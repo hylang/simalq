@@ -1,5 +1,5 @@
 (require
-  hyrule [do-n])
+  hyrule [do-n unless])
 (import
   fractions [Fraction]
   toolz [partition]
@@ -79,11 +79,14 @@
   (for [stem stems]
     (add-tile p stem)))
 
-(defn assert-at [locator stem]
+(defn assert-at [locator thing]
   (setv stack (at (locate locator)))
-  (if (= stem 'floor)
+  (if (= thing 'floor)
     (assert (= (len stack) 0))
-    (assert (and (= (len stack) 1) (= (. stack [0] stem) stem)))))
+    (do
+      (unless (isinstance thing list)
+        (setv thing [thing]))
+      (assert (= (lfor  tile stack  tile.stem) thing)))))
 
 
 (defmacro cant [form msg-check]

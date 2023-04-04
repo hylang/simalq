@@ -1,7 +1,7 @@
 (require
   tests.lib [cant wk])
 (import
-  tests.lib [init assert-at]
+  tests.lib [init mk-quest assert-at set-square]
   simalq.geometry [Pos Direction pos+ at]
   simalq.game-state [G])
 
@@ -35,4 +35,16 @@
   (setv G.keys G.rules.max-keys)
   (assert (and (= G.keys G.rules.max-keys) (= G.score 0)))
   (cant (wk S) "Your keyring has no room for another key.")
-  (assert (and (= G.keys G.rules.max-keys) (= G.score 0))))
+  (assert (and (= G.keys G.rules.max-keys) (= G.score 0)))
+
+  ; Being maxed out on keys doesn't prevent you from unlocking a door
+  ; on the same square.
+  (init (mk-quest []))
+  (set-square 'E "key" "locked door")
+  (assert-at 'E ["key" "locked door"])
+  (setv G.keys G.rules.max-keys)
+  (wk E)
+  (assert-at 'E ["key" "door"])
+  (assert (= G.keys (- G.rules.max-keys 1)))
+  (wk E)
+  (assert-at 'here "door"))

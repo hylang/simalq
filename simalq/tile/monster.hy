@@ -31,7 +31,7 @@
     damage-shot None)
       ; Likewise for shots.
 
-  (defn hook-player-walk-to [self origin]
+  (defn hook-player-bump [self origin]
     "Attack the monster in melee."
     (hurt-monster self (player-melee-damage) DamageType.PlayerMelee)
     True)

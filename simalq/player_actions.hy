@@ -1,11 +1,11 @@
 (require
   hyrule [ecase]
-  simalq.macros [defdataclass has])
+  simalq.macros [defdataclass])
 (import
   simalq.util [ActionError]
-  simalq.geometry [Pos GeometryError pos+ at]
+  simalq.geometry [at]
   simalq.game-state [G]
-  simalq.tile.scenery [Scenery])
+  simalq.tile.scenery [walkability])
 (setv  T True  F False)
 
 
@@ -30,33 +30,22 @@
 
     Walk (do
       (setv d action.direction)
-      (try
-        (setv target (pos+ G.player-pos d))
-        (except [e GeometryError]
-          (raise (ActionError "The border of the dungeon blocks your movement.") :from e)))
-      (when (has target Scenery it.blocks-move)
-        (raise (ActionError "Your way is blocked.")))
-      ; For diagonal movement, check that the two orthogonal neighbors
-      ; are clear of diagonal blockers.
-      (when (and
-          d.x d.y
-          (any (gfor
-            p2 [
-              (Pos target.map G.player-pos.x target.y)
-              (Pos target.map target.x G.player-pos.y)]
-            (has p2 Scenery it.blocks-diag))))
+      (setv [target wly] (walkability G.player-pos d))
+      (when (= wly 'out-of-bounds)
+        (raise (ActionError "The border of the dungeon blocks your movement.")))
+      (when (= wly 'blocked-diag)
         (raise (ActionError "That diagonal is blocked by a neighbor.")))
+      (for [tile (at target)]
+        (when (.hook-player-bump tile G.player-pos)
+          (return)))
+      (when (= wly 'bump)
+        (raise (ActionError "Your way is blocked.")))
       (for [tile (at G.player-pos)]
         (.hook-player-walk-from tile target))
       (for [tile (at target)]
-        (when (.hook-player-walk-to tile G.player-pos)
-          ; The hook returned true, meaning the player's action is
-          ; over.
-          (return)))
+        (.hook-player-walk-to tile G.player-pos))
       ; No exceptions have stopped us, so go.
       (setv G.player-pos target)
       (for [tile (at target)]
         (when (.hook-player-walked-into tile)
-          ; The hook returned true, meaning the player's turn should
-          ; end.
           (return))))))

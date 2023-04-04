@@ -67,9 +67,22 @@
     to set for a new instance."
     (raise (TypeError (+ "Tile extras not implemented: " cls.stem))))
 
-  (defn hook-player-walk-from [self target])
-  (defn hook-player-walk-to [self origin])
-  (defn hook-player-walked-into [self]))
+  (defn hook-player-bump [self origin]
+    "Called when the player tries to walk towards this tile. Return
+    true to end her turn."
+    None)
+  (defn hook-player-walk-from [self target]
+    "Called when the player is about to walk from a square containing
+    this tile. The hook shouldn't change the game state, but it can
+    raise ActionError to halt the movement."
+    None)
+  (defn hook-player-walk-to [self origin]
+    "Analogous to `Tile.hook-player-walk-from`."
+    None)
+  (defn hook-player-walked-into [self]
+    "Called when the player successfully walks into this tile. Return
+    true to end her turn."
+    None))
 
 
 (defn deftile [superclass name #** kwargs]
