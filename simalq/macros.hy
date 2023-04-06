@@ -24,6 +24,14 @@
     ~@rest))
 
 
+(defmacro slot-defaults [#* items]
+  (import toolz [partition])
+  (setv slots (dfor  [k v] (partition 2 items)  (hy.mangle k) v))
+  `(setv
+    __slots__ [~@(.keys slots)]
+    slot-defaults ~slots))
+
+
 (defmacro has [pos tile-type predicate-form]
   `(next
     (gfor
