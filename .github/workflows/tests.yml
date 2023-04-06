@@ -1,0 +1,23 @@
+name: Run tests
+
+on: [pull_request, push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      XDG_CACHE_HOME: /tmp/xdg-cache
+
+    steps:
+    - uses: actions/checkout@v3
+    - run: pip install .
+    - uses: actions/cache@v3
+      with:
+        key: XDG_CACHE_HOME
+        path: ${{ env.XDG_CACHE_HOME }}
+    - name: Further setup
+      shell: bash
+      run: |
+          mkdir -p "$XDG_CACHE_HOME"
+          pip install pytest
+    - run: pytest tests
