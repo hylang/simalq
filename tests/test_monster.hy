@@ -38,7 +38,7 @@
 
   ; A monster can approach in a straight line.
   (init (mk-quest
-    [:tiles ['floor 'floor 'floor ["Dark Knight" :hp 3]]]))
+    [:tiles ['floor 'floor 'floor "Dark Knight"]]))
   (assert-at 'E 'floor)
   (wait 2)
   (assert-at 'E 'floor)
@@ -51,7 +51,7 @@
 
   ; A monster stymied when trying to go west will first try northwest.
   (init (mk-quest
-    [:tiles ["pillar" ["Dark Knight" :hp 3]]]))
+    [:tiles ["pillar" "Dark Knight"]]))
   (wait)
   (assert-at 'NE "Dark Knight")
 
@@ -59,7 +59,7 @@
   ; to finally try southwest.
   (init (mk-quest
     [:player-start #(1 1)
-      :tiles ["pillar" ["Dark Knight" :hp 3]]]))
+      :tiles ["pillar" "Dark Knight"]]))
   (set-square 'NE "pillar")
   (do-n 3
     (assert-at 'SE 'floor)
@@ -70,7 +70,7 @@
   ; forever.
   (init (mk-quest
     [:player-start #(1 1)
-      :tiles ["wall" ["Dark Knight" :hp 3]]]))
+      :tiles ["wall" "Dark Knight"]]))
         ; A wall, unlike a pillar, blocks diagonal movement.
   (setv [monster] (at (Pos G.map 3 1)))
   (assert (= monster.stem "Dark Knight"))
@@ -82,7 +82,7 @@
   (setv r G.rules.reality-bubble-size)
   (init (mk-quest [:tiles [
     #* (* ['floor] r)
-    ["Dark Knight" :hp 3]]]))
+    "Dark Knight"]]))
   (setv [monster] (at (Pos G.map (+ r 1) 0)))
   (assert (= monster.stem "Dark Knight"))
   (assert (= monster.pos (Pos G.map (+ r 1) 0)))
@@ -98,7 +98,7 @@
   (init (mk-quest [
     :player-start #(4 4)
     :width 9 :height 9 :wrap-y T]))
-  (set-square 'N ["Dark Knight" :hp 3])
+  (set-square 'N "Dark Knight")
   (do-n 100
     (wk S)
     (assert-at 'N "Dark Knight")))
@@ -106,7 +106,7 @@
 
 (defn test-nondainty []
   (init (mk-quest
-    [:tiles ["pile of gold" ["Dark Knight" :hp 3]]]))
+    [:tiles ["pile of gold" "Dark Knight"]]))
   (set-square 'NE "pile of gold")
   (setv [monster] (at (Pos G.map 2 0)))
   (assert (= monster.stem "Dark Knight"))
