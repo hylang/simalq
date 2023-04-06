@@ -4,14 +4,22 @@
 
 
 (defclass GameState []
-  (setv __slots__ [
-    "rules"
-    "quest" "level" "level_n" "player_pos"
-    "score" "turn_n"
-    "player_hp" "poison_dose" "keys"])
+  (slot-defaults
+    rules None
+    quest None
+    level None
+    level-n None
+    player-pos None
+    score 0
+    turn-n 0
+    player-hp 1
+    poison-dose 0
+    keys 0)
   (defn [property] map [self]
     self.level.map))
 (setv G (GameState))
+(for [[k v] (.items G.slot-defaults)]
+  (setattr G k v))
 
 
 (defclass Rules []

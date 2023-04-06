@@ -1,6 +1,6 @@
 (require
   hyrule [unless]
-  simalq.macros [defdataclass])
+  simalq.macros [defdataclass slot-defaults])
 (import
   enum [Enum]
   simalq.util [player-melee-damage DamageType hurt-player next-in-cycle]
@@ -16,16 +16,15 @@
 (defclass Monster [Actor]
   "A non-player character, typically out to kill the player."
 
-  (setv
-    __slots__ [
-      "hp"
+  (slot-defaults
+    hp 1
         ; The monster's number of hit points (HP). When a monster's
         ; HP hits 0, it dies.
-      "movement_state"]
+    movement-state None)
         ; A bit of memory or plan that the monster uses to choose
         ; its movements. Its meaning depends on `ai`.
+  (setv
     mutable-slots #("hp" "movement_state")
-    slot-init {"movement_state" None}
     points None
       ; How many points the player gets for killing the monster (or
       ; just for damaging it, if it's a generated monster).

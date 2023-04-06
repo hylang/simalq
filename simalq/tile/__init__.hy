@@ -1,3 +1,5 @@
+(require
+  simalq.macros [slot-defaults])
 (import
   copy [deepcopy]
   re
@@ -6,22 +8,22 @@
 
 
 (defclass Tile []
-  (setv __slots__ ["pos"])
-    ; `pos` is generally a `Pos`, but could be `None` for e.g. an item
-    ; in the player's inventory.
+  (slot-defaults
+    pos None)
+      ; Generally this will actually be a `Pos`, but it could be
+      ; `None` for e.g. an item in the player's inventory.
   (setv types {})
   (setv types-by-iq-ix {})
 
   (defn __init__ [self #** kwargs]
-    ; - The set of keyword arguments used must exactly equal the set of
-    ;   available slots, minus slots initialized with `slot-init`.
+    ; - Each keyword argument must match a slot.
     ; - All subclasses must set `__slots__` (if only to an empty list).
     ; - No slot named may be used twice in a single inheritance chain.
     (for [[cls slot] (.all-slots self)]
        (object.__setattr__ self slot
-         (if (in slot (getattr cls "slot_init" {}))
-           (get cls.slot-init slot)
-           (.pop kwargs slot))))
+         (if (in slot kwargs)
+           (.pop kwargs slot)
+           (get cls.slot-defaults slot))))
     (when kwargs
       (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}"))))
 
@@ -34,7 +36,6 @@
     ; We provide this to avoid triggering `__setattr__` in `deepcopy`.
     ((type self) #** (dfor
       [cls slot] (.all-slots self)
-      :if (not-in slot (getattr cls "slot_init" {}))
       slot (deepcopy (getattr self slot) memo))))
 
   (defn [classmethod] all-slots [cls]
@@ -135,11 +136,9 @@
   "A kind of tile (typically a monster) that gets to do something each
   turn that it's in the reality bubble."
 
-  (setv
-    __slots__ ["last_acted"]
-      ; The turn number on which the actor last got a turn.
-    mutable-slots #("last_acted")
-    slot-init {"last_acted" None})
+  (slot-defaults
+    last-acted None)
+  (setv mutable-slots #("last_acted"))
 
   (defn maybe-act [self]
     "Act, if we haven't already acted this turn."
