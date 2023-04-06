@@ -185,7 +185,8 @@
   (unless (.exists path)
     (import http.client contextlib)
     (with [con (contextlib.closing (http.client.HTTPConnection "arfer.net"))]
-      (.request con "GET" "/downloads/infinity_quests_2.zip")
+      (.request con "GET" "/downloads/infinity_quests_2.zip"
+        :headers {"User-Agent" "Infinitesimal Quest 2 + epsilon"})
       (setv r (.getresponse con))
       (assert (= r.status 200))
       (.write-bytes path (.read r))))
