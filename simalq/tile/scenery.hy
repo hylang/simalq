@@ -2,9 +2,9 @@
   hyrule [unless]
   simalq.macros [has])
 (import
-  simalq.util [ActionError GameOverException]
+  simalq.util [ActionError GameOverException player-melee-damage DamageType]
   simalq.geometry [Pos Direction GeometryError pos+ at]
-  simalq.tile [Tile deftile rm-tile replace-tile]
+  simalq.tile [Tile deftile rm-tile replace-tile damage-tile]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -140,3 +140,19 @@
     (hy.M.simalq/main.start-level G.level.next-level)
     True)
   :flavor "Get me outta here.")
+
+(deftile Scenery "a cracked wall"
+  :__slots__ ["hp"]
+  :slot-defaults (dict :hp 0)
+  :mutable-slots #("hp")
+  :iq-ix-mapper ["hp"
+    {3 4  4 2  15 6}]
+
+  :blocks-move T :blocks-diag T
+  :damageable T
+  :hook-player-bump (fn [self origin]
+    "Damage the wall."
+    (damage-tile self (player-melee-damage) DamageType.PlayerMelee)
+    True)
+
+  :flavor "I think this dungeon might not be up to code.")

@@ -19,6 +19,9 @@
 
   (setv
      ; Attributes to be overriden in subclasses.
+    mutable-slots #()
+      ; Slots whose values should be freely adjustable with `setv`,
+      ; `+=`, etc.
     points 0
       ; Points awarded for picking up an object, killing a monster,
       ; etc.
@@ -74,8 +77,14 @@
       ; The main part of the name.
     flavor None
       ; Flavor text to show in a help screen.
-    iq-ix None)
+    iq-ix None
       ; The number that represents this tile in IQ.
+    iq-ix-mapper None)
+      ; An alternative to `iq-ix` for many-to-one matchups from IQ to
+      ; SQ tiles. It should be a list like
+      ;   ["hp" {1 2  3 4  5 6}]
+      ; where the first element is a slot name and the second is a
+      ; dictionary mapping IQ values to values for the slot.
 
   (defn [classmethod] read-tile-extras [cls v1 v2]
     "This method should return a dictionary of instance variables
@@ -110,13 +119,14 @@
     (fn [m] (nonlocal article) (setv article (.group m 1)) "")
     name))
 
-  (assert (all (gfor  k kwargs  (hasattr superclass k))))
-    ; New attributes should be introduced in a superclass. Otherwise,
-    ; you're probably just typoing an attribute name.
+  (setv new-attrs (lfor  k kwargs  :if (not (hasattr superclass k))  k))
+  (when new-attrs
+    (raise (TypeError f"Unknown attributes: {new-attrs}")))
+      ; New attributes should be introduced in a superclass. Otherwise,
+      ; you're probably just typoing an attribute name.
   (.setdefault kwargs "__slots__" #())
 
-  (assert (not-in stem Tile.types))
-  (setv (get Tile.types stem) (type
+  (setv cls (type
     stem
     #(superclass)
     (dict
@@ -124,9 +134,19 @@
       :stem stem
       #** kwargs)))
 
+  (assert (not-in stem Tile.types))
+  (setv (get Tile.types stem) cls)
+
   (when (setx iq-ix (.get kwargs "iq_ix"))
     (assert (not-in iq-ix Tile.types-by-iq-ix))
-    (setv (get Tile.types-by-iq-ix iq-ix) (get Tile.types stem))))
+    (setv (get Tile.types-by-iq-ix iq-ix) cls))
+  (when (in "iq_ix_mapper" kwargs)
+    (setv [slot d] (get kwargs "iq_ix_mapper"))
+    (assert (in slot (sfor  [_ s] (.all-slots cls)  s)))
+    (for [[iq-ix slot-value] (.items d)]
+      (assert (not-in iq-ix Tile.types-by-iq-ix))
+      (setv (get Tile.types-by-iq-ix iq-ix)
+        (dict :cls cls :slot slot :value slot-value)))))
 
 
 (defn add-tile [pos stem #** kwargs]

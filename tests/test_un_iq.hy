@@ -48,8 +48,7 @@
       "one-way door (west)" 1
       "one-way door (south)" 1
       "one-way door (east)" 2
-      "damaged_wall" 1
-      "crumbling_wall" 1
+      "cracked wall" 2
       "locked door" 1
       "locked disappearing door" 1
       "pillar" 15
@@ -63,7 +62,11 @@
   ; reflected the map.
   (assert (= (. level map data [0] [0]) [])) ; I.e., floor
   (assert (= (. level map data [15] [0] [0] stem) "key"))
-  (assert (= (. level map data [15] [15] [0] stem) "crumbling_wall")))
+  (assert (= (. level map data [15] [15] [0] stem) "cracked wall"))
+
+  ; Check the hit points of the two cracked walls.
+  (assert (= (. level map data [7] [8] [0] hp) 4))
+  (assert (= (. level map data [15] [15] [0] hp) 2)))
 
 
 (defn test-read-varlife []

@@ -10,11 +10,8 @@ yet meaningfully implement or substitute."
 
 (for [[iq-ix stem] [
 
-    [3 "damaged_wall"]
-    [4 "crumbling_wall"]
     [13 "trap_1"]
     [14 "trapped_wall_1"]
-    [15 "damageable_wall"]
     [16 "treasure_chest"]
     [17 "void"]
     [20 "healing_potion"]

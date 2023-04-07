@@ -111,3 +111,26 @@
   (set-square 'E #* (* ["exit"] 2))
   (wk E)
   (assert (= G.level-n 2)))
+
+
+(defn test-cracked-wall []
+
+  ; Destroy a wall with 4 HP.
+  (init "Boot Camp 2")
+  (setv G.player-pos (Pos G.map 7 7))
+  (assert-at 'N "cracked wall")
+  (wk N)
+  (assert-at 'N "cracked wall")
+  (wk N)
+  (assert-at 'N 'floor)
+  (assert (= G.player-pos (Pos G.map 7 7)))
+
+  ; Destroy a wall with 10 HP.
+  (init (mk-quest
+    [:tiles [["cracked wall" :hp 10]]]))
+  (assert-at 'E "cracked wall")
+  (wk E 4)
+  (assert-at 'E "cracked wall")
+  (wk E)
+  (assert-at 'E 'floor)
+  (assert (= G.player-pos (Pos G.map 0 0))))

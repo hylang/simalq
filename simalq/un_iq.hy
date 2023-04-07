@@ -155,7 +155,11 @@
         (unless (= iq-ix FLOOR)
           (setv p (Pos m x y))
           (setv cls (get Tile.types-by-iq-ix iq-ix))
-          (.append (get m.data x y) (cls :pos p #**
+          (setv d {})
+          (when (is (type cls) dict)
+            (setv d {(get cls "slot") (get cls "value")})
+            (setv cls (get cls "cls")))
+          (.append (get m.data x y) (cls :pos p #** d #**
             (if (in p tile-extras)
               (.read-tile-extras cls #* (get tile-extras p))
               {})))))
