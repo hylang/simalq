@@ -6,7 +6,7 @@
   simalq.util [player-melee-damage DamageType hurt-player next-in-cycle]
   simalq.geometry [Direction adjacent? dir-to]
   simalq.game-state [G]
-  simalq.tile [Actor deftile rm-tile mv-tile]
+  simalq.tile [Actor deftile rm-tile mv-tile damage-tile]
   simalq.tile.scenery [walkability])
 (setv  T True  F False)
 
@@ -25,14 +25,10 @@
         ; its movements. Its meaning depends on `ai`.
   (setv
     mutable-slots #("hp" "movement_state")
-    points None
-      ; How many points the player gets for killing the monster (or
-      ; just for damaging it, if it's a generated monster).
+    damageable T
     ai AI.Approach
       ; The monster's basic artificial intelligence for deciding what
       ; to do on its turn.
-    immune #()
-      ; Damage types the monster ignores.
     damage-melee None
       ; How much damage the monster does with its basic melee attack.
     damage-shot None)
@@ -40,7 +36,7 @@
 
   (defn hook-player-bump [self origin]
     "Attack the monster in melee."
-    (hurt-monster self (player-melee-damage) DamageType.PlayerMelee)
+    (damage-tile self (player-melee-damage) DamageType.PlayerMelee)
     True)
 
   (defn act [self]
@@ -80,16 +76,6 @@
 
     ; We're clear to move.
     (mv-tile self target)))
-
-(defn hurt-monster [monster amount damage-type]
-  (when (in damage-type monster.immune)
-    ; The monster shrugs off the attack.
-    (return))
-  (-= monster.hp amount)
-  (when (<= monster.hp 0)
-    ; It's dead.
-    (+= G.score monster.points)
-    (rm-tile monster)))
 
 
 (defclass NonGen [Monster]

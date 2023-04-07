@@ -1,10 +1,12 @@
 (require
+  hyrule [unless]
   simalq.macros [slot-defaults])
 (import
   copy [deepcopy]
   re
   simalq.game-state [G]
   simalq.geometry [at])
+(setv  T True  F False)
 
 
 (defclass Tile []
@@ -14,6 +16,18 @@
       ; `None` for e.g. an item in the player's inventory.
   (setv types {})
   (setv types-by-iq-ix {})
+
+  (setv
+     ; Attributes to be overriden in subclasses.
+    points 0
+      ; Points awarded for picking up an object, killing a monster,
+      ; etc.
+    damageable F
+      ; Whether a tile of this kind can be hurt by the player's sword
+      ; etc. To be overridden in subclasses, which, if they enable it,
+      ; should include a slot `hp`.
+    immune #())
+      ; Damage types the tile ignores.
 
   (defn __init__ [self #** kwargs]
     ; - Each keyword argument must match a slot.
@@ -131,6 +145,19 @@
   (setv
     (get (at old.pos) (.index (at old.pos) old))
     ((get Tile.types new-stem) :pos old.pos)))
+
+
+(defn damage-tile [tile amount damage-type]
+  (unless tile.damageable
+    (raise TypeError))
+  (when (in damage-type tile.immune)
+    ; The tile shrugs off the attack.
+    (return))
+  (-= tile.hp amount)
+  (when (<= tile.hp 0)
+    ; It's destroyed.
+    (+= G.score tile.points)
+    (rm-tile tile)))
 
 
 (defclass Actor [Tile]

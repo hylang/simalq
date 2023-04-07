@@ -7,10 +7,7 @@
 (defclass Item [Tile]
   "An object the player can pick up."
 
-  (setv
-    __slots__ []
-    points None)
-      ; How many points the player gets for picking up the item.
+  (setv __slots__ [])
 
   (defn hook-player-walked-into [self]
     (rm-tile self)
