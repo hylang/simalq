@@ -133,9 +133,9 @@
 
 (defn burst [center size]
   "Return a generator of all distinct points within distance `size` of
-  `center`. Thus the points form a square that's `size + 1` squares
-  wide. The order in which they're generated spirals outwards like
-  this (with size = 2):
+  `center`. Thus the points form a square that's `2 * size + 1`
+  squares wide. The order in which they're generated spirals outwards
+  like this (with size = 2):
 
       21 20 19 18 17
       22  7  6  5 16
