@@ -43,9 +43,4 @@
   Poison Trap Fire DeathMagic]))))
 
 (defn hurt-player [amount damage-type]
-  (assert (isinstance amount int))
-  (assert (isinstance damage-type DamageType))
-    ; The type isn't really used yet.
-  (-= G.player-hp amount)
-  (when (<= G.player-hp 0)
-    (raise (GameOverException 'dead))))
+  (hy.M.simalq/tile.damage-tile G.player amount damage-type))

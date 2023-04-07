@@ -106,6 +106,10 @@
   (defn hook-player-walked-into [self]
     "Called when the player successfully walks into this tile. Return
     true to end her turn."
+    None)
+  (defn hook-destroyed [self pos]
+    "Called when the tile is destroyed by damage. The tile has already
+    been removed, but its previous position is given by `pos`."
     None))
 
 
@@ -180,7 +184,9 @@
   (when (<= tile.hp 0)
     ; It's destroyed.
     (+= G.score tile.points)
-    (rm-tile tile)))
+    (setv tile-was tile.pos)
+    (rm-tile tile)
+    (.hook-destroyed tile tile.pos)))
 
 
 (defclass Actor [Tile]

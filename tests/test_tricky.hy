@@ -15,14 +15,14 @@
     [:tiles [["Dark Knight" :hp 3] "exit"]]
     [:tiles [["Dark Knight" :hp 1]]]))
   (wk E 2)
-  (assert (and (= G.player-hp 88)))
+  (assert (and (= G.player.hp 88)))
   (wk E 2)
   ; We're now on level 2, but the second monster won't get a hit in.
   (assert (and (= G.level-n 2)))
-  (assert (and (= G.player-hp 88)))
+  (assert (and (= G.player.hp 88)))
   (assert-at 'E "Dark Knight")
   (wk E)
-  (assert (and (= G.player-hp 88)))
+  (assert (and (= G.player.hp 88)))
   (assert-at 'E 'floor))
 
 
@@ -34,11 +34,11 @@
   (assert (= G.player.pos (Pos G.map 0 0)))
   (assert (= G.level-n 1))
   (wk E 4)
-  (assert (and (= G.player-hp 88) (= G.player.keys 1)))
+  (assert (and (= G.player.hp 88) (= G.player.keys 1)))
   (wk E)
   (assert (= G.player.pos (Pos G.map 0 0)))
   (assert (= G.level-n 1))
   ; The monster and the item are back now.
   (wk E 4)
-  (print G.player-hp G.player.keys)
-  (assert (and (= G.player-hp 76) (= G.player.keys 2))))
+  (print G.player.hp G.player.keys)
+  (assert (and (= G.player.hp 76) (= G.player.keys 2))))

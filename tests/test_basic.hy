@@ -81,7 +81,7 @@
     (assert (and
       (isinstance G.player.poison-dose f/)
       (= G.player.poison-dose poison)
-      (= G.player-hp hp))))
+      (= G.player.hp hp))))
 
   (init "Boot Camp 2")
   (check (f/ 0  ) 500)
@@ -90,7 +90,7 @@
   (check (f/ 4 5) 500)
   (wait)
   (check (f/ 0  ) 499)
-  (setv G.player-hp 10)
+  (setv G.player.hp 10)
   (wait 49)
   (check (f/ 4 5)   1)
   (with [e (pytest.raises GameOverException)]

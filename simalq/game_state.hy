@@ -11,8 +11,7 @@
     level-n None
     score 0
     turn-n 0
-    player None
-    player-hp 1)
+    player None)
   (defn [property] map [self]
     self.level.map))
 (setv G (GameState))

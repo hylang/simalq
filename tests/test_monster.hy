@@ -16,7 +16,7 @@
   (defn check [turn score tris mon]
     (assert (and
       (= G.turn-n turn) (= G.score score)
-      (= G.player-hp tris) (or (is mon None) (= monster.hp mon)))))
+      (= G.player.hp tris) (or (is mon None) (= monster.hp mon)))))
 
   (check :turn 0 :score 0 :tris 100 :mon 5)
   ; Attack the monster, doing 2 damage. We get hit for 12 damage.
@@ -44,10 +44,10 @@
   (assert-at 'E 'floor)
   (wait)
   (assert-at 'E "Dark Knight")
-  (assert (= G.player-hp 100))
+  (assert (= G.player.hp 100))
   ; Now if Tris lollygags for another turn, he can hit her. Owie.
   (wait)
-  (assert (= G.player-hp 88))
+  (assert (= G.player.hp 88))
 
   ; A monster stymied when trying to go west will first try northwest.
   (init (mk-quest
