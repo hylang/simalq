@@ -142,8 +142,8 @@
   :flavor "Get me outta here.")
 
 (deftile Scenery "a cracked wall"
-  :__slots__ ["hp"]
-  :slot-defaults (dict :hp 0)
+  :slot-defaults (dict
+    :hp 0)
   :mutable-slots #("hp")
   :iq-ix-mapper ["hp"
     {3 4  4 2  15 6}]

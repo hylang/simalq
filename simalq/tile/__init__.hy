@@ -124,7 +124,9 @@
     (raise (TypeError f"Unknown attributes: {new-attrs}")))
       ; New attributes should be introduced in a superclass. Otherwise,
       ; you're probably just typoing an attribute name.
-  (.setdefault kwargs "__slots__" #())
+  (.setdefault kwargs "__slots__" (if (in "slot_defaults" kwargs)
+    (tuple (.keys (get kwargs "slot_defaults")))
+    #()))
 
   (setv cls (type
     stem
