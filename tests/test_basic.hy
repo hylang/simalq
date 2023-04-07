@@ -79,8 +79,8 @@
 
   (defn check [poison hp]
     (assert (and
-      (isinstance G.poison-dose f/)
-      (= G.poison-dose poison)
+      (isinstance G.player.poison-dose f/)
+      (= G.player.poison-dose poison)
       (= G.player-hp hp))))
 
   (init "Boot Camp 2")

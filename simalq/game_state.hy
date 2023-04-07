@@ -13,7 +13,6 @@
     turn-n 0
     player None
     player-hp 1
-    poison-dose 0
     keys 0)
   (defn [property] map [self]
     self.level.map))

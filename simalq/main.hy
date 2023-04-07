@@ -1,6 +1,5 @@
 (import
   copy [deepcopy]
-  fractions [Fraction]
   simalq.util [hurt-player DamageType]
   simalq.geometry [burst at]
   simalq.game-state [G Rules]
@@ -18,7 +17,6 @@
     G.player (Player
       :pos None)
     G.player-hp quest.starting-hp
-    G.poison-dose (Fraction 0)
     G.keys 0)
   (for [[k v] (.items Rules.slot-defaults)]
     (setattr G.rules k v))
@@ -56,11 +54,11 @@
 
   ; Dose the player with ambient poison, and convert an accumulated
   ; dose ≥1 into damage.
-  (+= G.poison-dose G.level.poison-intensity)
-  (setv dose-integer (.__floor__ G.poison-dose))
+  (+= G.player.poison-dose G.level.poison-intensity)
+  (setv dose-integer (.__floor__ G.player.poison-dose))
   (when dose-integer
     (hurt-player dose-integer DamageType.Poison)
-    (-= G.poison-dose dose-integer))
+    (-= G.player.poison-dose dose-integer))
 
   ; Advance the turn counter last.
   (+= G.turn-n 1))
