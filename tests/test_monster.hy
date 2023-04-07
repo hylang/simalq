@@ -119,4 +119,4 @@
   (setv G.rules.dainty-monsters F)
   (wait 1)
   (assert (= monster.pos (Pos G.map 1 0)))
-  (assert-at monster.pos ["pile of gold" "Dark Knight"]))
+  (assert-at monster.pos ["Dark Knight" "pile of gold"]))

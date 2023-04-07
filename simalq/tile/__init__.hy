@@ -116,14 +116,14 @@
 
 
 (defn add-tile [pos stem #** kwargs]
-  (.append (at pos) ((get Tile.types stem) :pos pos #** kwargs)))
+  (.insert (at pos) 0 ((get Tile.types stem) :pos pos #** kwargs)))
 
 (defn rm-tile [tile]
   (.remove (at tile.pos) tile))
 
 (defn mv-tile [tile pos]
   (rm-tile tile)
-  (.append (at pos) tile)
+  (.insert (at pos) 0 tile)
   (object.__setattr__ tile "pos" pos))
 
 (defn replace-tile [old new-stem]

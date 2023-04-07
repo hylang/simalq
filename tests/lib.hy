@@ -84,7 +84,7 @@
   (setv p (locate locator))
   (for [tile (at p)]
     (rm-tile tile))
-  (for [tile-spec tile-specs]
+  (for [tile-spec (reversed tile-specs)]
     (mk-tile p tile-spec)))
 
 (defn assert-at [locator thing]
