@@ -43,7 +43,7 @@
   (mv-player 1 0)
   ; Try unlocking a door.
   (set-square 'E "locked door")
-  (+= G.keys 1)
+  (+= G.player.keys 1)
   (wk E)
   (assert-at 'E "door")
   (cant (wk E) "You can only go north from this one-way door.")
@@ -56,7 +56,7 @@
 
 (defn test-locked-doors []
   (init "Boot Camp 2")
-  (setv G.keys 2)
+  (setv G.player.keys 2)
 
   ; Unlocked a locked door.
   (mv-player 13 6)
@@ -66,7 +66,7 @@
   (wk S)  ; This just unlocks the door, without moving us.
   (assert-at 'S "door")
   (assert (= G.player.pos p))
-  (assert (= G.keys 1))
+  (assert (= G.player.keys 1))
   (assert (= G.turn-n 1))  ; But it still takes a turn to do this.
 
   ; Unlocked a locked disappearing door.
@@ -76,7 +76,7 @@
   (wk W)
   (assert-at 'W 'floor)
   (assert (= G.player.pos p))
-  (assert (= G.keys 0))
+  (assert (= G.player.keys 0))
   (assert (= G.turn-n 2))
 
   ; Try and fail to unlock a locked door.
@@ -87,11 +87,11 @@
   ; Several locks on the same square each take their own key and their
   ; own action to unlock.
   (set-square 'E #* (* ["locked disappearing door"] 2))
-  (setv G.keys 2)
+  (setv G.player.keys 2)
   (wk E 2)
   (assert-at 'E 'floor)
   (assert (= G.turn-n 4))
-  (assert (= G.keys 0)))
+  (assert (= G.player.keys 0)))
 
 
 (defn test-exit []

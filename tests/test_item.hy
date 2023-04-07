@@ -26,25 +26,25 @@
 (defn test-key-get []
   (init "Boot Camp 2")
   (mv-player 13 10)
-  (assert (and (= G.keys 0) (= G.score 0)))
+  (assert (and (= G.player.keys 0) (= G.score 0)))
   (wk S)
-  (assert (and (= G.keys 1) (= G.score 50)))
+  (assert (and (= G.player.keys 1) (= G.score 50)))
 
   (init "Boot Camp 2")
   (mv-player 13 10)
-  (setv G.keys G.rules.max-keys)
-  (assert (and (= G.keys G.rules.max-keys) (= G.score 0)))
+  (setv G.player.keys G.rules.max-keys)
+  (assert (and (= G.player.keys G.rules.max-keys) (= G.score 0)))
   (cant (wk S) "Your keyring has no room for another key.")
-  (assert (and (= G.keys G.rules.max-keys) (= G.score 0)))
+  (assert (and (= G.player.keys G.rules.max-keys) (= G.score 0)))
 
   ; Being maxed out on keys doesn't prevent you from unlocking a door
   ; on the same square.
   (init (mk-quest []))
   (set-square 'E "key" "locked door")
   (assert-at 'E ["key" "locked door"])
-  (setv G.keys G.rules.max-keys)
+  (setv G.player.keys G.rules.max-keys)
   (wk E)
   (assert-at 'E ["key" "door"])
-  (assert (= G.keys (- G.rules.max-keys 1)))
+  (assert (= G.player.keys (- G.rules.max-keys 1)))
   (wk E)
   (assert-at 'here ['player "door"]))

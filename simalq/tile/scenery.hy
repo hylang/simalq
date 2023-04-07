@@ -82,9 +82,9 @@
     destroy-when-opened None
     blocks-monster T)
   (defn hook-player-bump [self origin]
-    (unless G.keys
+    (unless G.player.keys
       (raise (ActionError "It's locked, and you're keyless at the moment.")))
-    (-= G.keys 1)
+    (-= G.player.keys 1)
     (if self.destroy-when-opened
       (rm-tile self)
       (replace-tile self "door"))

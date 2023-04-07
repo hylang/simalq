@@ -16,8 +16,7 @@
     G.turn-n 0
     G.player (Player
       :pos None)
-    G.player-hp quest.starting-hp
-    G.keys 0)
+    G.player-hp quest.starting-hp)
   (for [[k v] (.items Rules.slot-defaults)]
     (setattr G.rules k v))
   (start-level 1))
