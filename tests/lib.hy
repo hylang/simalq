@@ -7,7 +7,7 @@
   simalq.quest [Quest Level]
   simalq.un-iq [read-quest iq-quest]
   simalq.game-state [G]
-  simalq.tile [add-tile rm-tile]
+  simalq.tile [add-tile rm-tile mv-tile ]
   simalq.player-actions [Wait]
   simalq.main [start-quest start-level take-turn])
 
@@ -64,9 +64,9 @@
 (defn locate [locator]
   (cond
     (= locator 'here)
-      G.player-pos
+      G.player.pos
     (isinstance locator hy.models.Symbol)
-      (pos+ G.player-pos (getattr Direction (str locator)))
+      (pos+ G.player.pos (getattr Direction (str locator)))
     (isinstance locator Pos)
       locator))
 
@@ -94,7 +94,14 @@
     (do
       (unless (isinstance thing list)
         (setv thing [thing]))
-      (assert (= (lfor  tile stack  tile.stem) thing)))))
+      (assert (=
+        (lfor
+          tile stack
+          (if (is tile G.player) 'player tile.stem))
+        thing)))))
+
+(defn mv-player [x y]
+  (mv-tile G.player (Pos G.map x y)))
 
 
 (defmacro cant [form msg-check]

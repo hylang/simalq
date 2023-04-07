@@ -2,7 +2,7 @@
   tests.lib [cant wk])
 (import
   pytest
-  tests.lib [init mk-quest assert-at set-square]
+  tests.lib [init mk-quest assert-at set-square mv-player]
   simalq.util [GameOverException]
   simalq.geometry [at Pos]
   simalq.game-state [G])
@@ -22,7 +22,7 @@
 (defn test-one-way-door []
   (init "Boot Camp 2")
 
-  (setv G.player-pos (Pos G.map 3 13))
+  (mv-player 3 13)
   (cant (wk S) "That one-way door must be entered from the east.")
   (wk W)
   (set-square 'S)
@@ -40,7 +40,7 @@
   ; IQ is inconsistent about this.
   (init (mk-quest
     [:tiles ["one-way door (north)"]]))
-  (setv G.player-pos (Pos G.map 1 0))
+  (mv-player 1 0)
   ; Try unlocking a door.
   (set-square 'E "locked door")
   (+= G.keys 1)
@@ -59,23 +59,23 @@
   (setv G.keys 2)
 
   ; Unlocked a locked door.
-  (setv G.player-pos (Pos G.map 13 6))
+  (mv-player 13 6)
   (assert-at 'S "locked door")
-  (setv p G.player-pos)
+  (setv p G.player.pos)
   (assert (= G.turn-n 0))
   (wk S)  ; This just unlocks the door, without moving us.
   (assert-at 'S "door")
-  (assert (= G.player-pos p))
+  (assert (= G.player.pos p))
   (assert (= G.keys 1))
   (assert (= G.turn-n 1))  ; But it still takes a turn to do this.
 
   ; Unlocked a locked disappearing door.
-  (setv G.player-pos (Pos G.map 11 2))
+  (mv-player 11 2)
   (assert-at 'W "locked disappearing door")
-  (setv p G.player-pos)
+  (setv p G.player.pos)
   (wk W)
   (assert-at 'W 'floor)
-  (assert (= G.player-pos p))
+  (assert (= G.player.pos p))
   (assert (= G.keys 0))
   (assert (= G.turn-n 2))
 
@@ -98,7 +98,7 @@
   (init "Boot Camp 2")
 
   ; Exit from level 1.
-  (setv G.player-pos (Pos G.map 0 1))
+  (mv-player 0 1)
   (assert (= G.level-n 1))
   (setv map-was G.map)
   (assert-at 'N "exit")
@@ -108,12 +108,12 @@
 
   ; Exit from the penultimate level.
   (init "Boot Camp 2" 25)
-  (assert (= G.player-pos (Pos G.map 9 21)))
-  (setv G.player-pos (Pos G.map 26 9))
+  (assert (= G.player.pos (Pos G.map 9 21)))
+  (mv-player 26 9)
   (assert-at 'NE "exit")
   (wk NE)
   (assert (= G.level-n 26))
-  (assert (= G.player-pos (Pos G.map 0 9)))
+  (assert (= G.player.pos (Pos G.map 0 9)))
 
   ; Exit from the last level, winning the game.
   (wk E 14)
@@ -134,13 +134,13 @@
 
   ; Destroy a wall with 4 HP.
   (init "Boot Camp 2")
-  (setv G.player-pos (Pos G.map 7 7))
+  (mv-player 7 7)
   (assert-at 'N "cracked wall")
   (wk N)
   (assert-at 'N "cracked wall")
   (wk N)
   (assert-at 'N 'floor)
-  (assert (= G.player-pos (Pos G.map 7 7)))
+  (assert (= G.player.pos (Pos G.map 7 7)))
 
   ; Destroy a wall with 10 HP.
   (init (mk-quest
@@ -150,4 +150,4 @@
   (assert-at 'E "cracked wall")
   (wk E)
   (assert-at 'E 'floor)
-  (assert (= G.player-pos (Pos G.map 0 0))))
+  (assert (= G.player.pos (Pos G.map 0 0))))

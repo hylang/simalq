@@ -9,9 +9,9 @@
     quest None
     level None
     level-n None
-    player-pos None
     score 0
     turn-n 0
+    player None
     player-hp 1
     poison-dose 0
     keys 0)

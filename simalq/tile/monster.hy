@@ -40,7 +40,7 @@
     True)
 
   (defn act [self]
-    (when (adjacent? self.pos G.player-pos)
+    (when (adjacent? self.pos G.player.pos)
       ; We're in melee range of the player, so bonk her.
         (hurt-player self.damage-melee DamageType.MonsterMelee)
         ; That uses up our action.
@@ -49,7 +49,7 @@
       (raise (ValueError "Other AIs are not yet implemented.")))
 
     ; Try to get closer to the player.
-    (setv d (dir-to self.pos G.player-pos))
+    (setv d (dir-to self.pos G.player.pos))
     (when (is d None)
       ; The player is in our square. Just give up.
       (return))

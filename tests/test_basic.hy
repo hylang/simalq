@@ -6,7 +6,7 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init assert-at wait mk-quest]
+  tests.lib [init assert-at wait mk-quest mv-player]
   simalq.util [GameOverException]
   simalq.game-state [G]
   simalq.geometry [Pos])
@@ -19,15 +19,15 @@
   (assert (= G.level-n 1)) ; The level counter is 1-based.
 
   ; We start at the extreme northwest.
-  (assert (= G.player-pos (Pos G.map 0 15)))
+  (assert (= G.player.pos (Pos G.map 0 15)))
   (assert (= G.turn-n 0)) ; The turn counter is 0-based.
   ; Walk south 1 step.
   (wk S)
-  (assert (= G.player-pos (Pos G.map 0 14)))
+  (assert (= G.player.pos (Pos G.map 0 14)))
   (assert (= G.turn-n 1))
   ; Wait 1 turn.
   (wait)
-  (assert (= G.player-pos (Pos G.map 0 14)))
+  (assert (= G.player.pos (Pos G.map 0 14)))
   (assert (= G.turn-n 2))
   ; Try going west, bumping into the level border.
   (cant (wk W) "The border of the dungeon blocks your movement.")
@@ -39,16 +39,16 @@
   ; Walk into the (plain) door to the east.
   (wk NE)
   (wk E 3)
-  (assert-at 'here "door")
+  (assert-at 'here ['player "door"])
   ; Try walking diagonally past the wall to the north.
   (cant (wk NE) "That diagonal is blocked by a neighbor.")
 
   ; Walk diagonally between some pillars.
-  (setv G.player-pos (Pos G.map 3 1))
+  (mv-player 3 1)
   (assert-at 'N "pillar")
   (assert-at 'E "pillar")
   (wk NE)
-  (assert (= G.player-pos (Pos G.map 4 2))))
+  (assert (= G.player.pos (Pos G.map 4 2))))
 
 
 (defn test-walk-wrapping []
@@ -57,21 +57,21 @@
       :tiles ["exit"]]
     [:width 20 :height 20 :wrap-x True :wrap-y True]))
 
-  (assert (= G.player-pos (Pos G.map 0 0)))
+  (assert (= G.player.pos (Pos G.map 0 0)))
   (wk S)
-  (assert (= G.player-pos (Pos G.map 0 19)))
+  (assert (= G.player.pos (Pos G.map 0 19)))
   (wk S 19)
-  (assert (= G.player-pos (Pos G.map 0 0)))
+  (assert (= G.player.pos (Pos G.map 0 0)))
   (cant (wk W) "The border of the dungeon blocks your movement.")
   (wk E)
 
   (assert (= G.level-n 2))
   (wk W)
-  (assert (= G.player-pos (Pos G.map 19 0)))
+  (assert (= G.player.pos (Pos G.map 19 0)))
   (wk S)
-  (assert (= G.player-pos (Pos G.map 19 19)))
+  (assert (= G.player.pos (Pos G.map 19 19)))
   (wk NE)
-  (assert (= G.player-pos (Pos G.map 0 0))))
+  (assert (= G.player.pos (Pos G.map 0 0))))
 
 
 (defn test-ambient-poison []

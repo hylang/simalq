@@ -4,6 +4,8 @@
   simalq.util [hurt-player DamageType]
   simalq.geometry [burst at]
   simalq.game-state [G Rules]
+  simalq.tile [Tile mv-tile]
+  simalq.tile.player [Player]
   simalq.player-actions [do-action])
 
 
@@ -13,6 +15,8 @@
     G.quest quest
     G.score 0
     G.turn-n 0
+    G.player (Player
+      :pos None)
     G.player-hp quest.starting-hp
     G.poison-dose (Fraction 0)
     G.keys 0)
@@ -24,10 +28,10 @@
 (defn start-level [level-n]
   (setv
     G.level-n level-n
-    G.level (deepcopy (get G.quest.levels (- level-n 1)))
+    G.level (deepcopy (get G.quest.levels (- level-n 1))))
       ; The default behavior of `deepcopy` is smart enough to make all
       ; the references to `G.level.map` in tiles point to the new map.
-    G.player-pos G.level.player-start))
+  (mv-tile G.player G.level.player-start))
 
 
 (defn take-turn [action]
@@ -43,7 +47,7 @@
   ; Allow actors in the reality bubble to act, in `burst`'s spiral
   ; order.
   (for [
-      pos (burst G.player-pos G.rules.reality-bubble-size)
+      pos (burst G.player.pos G.rules.reality-bubble-size)
       tile (at pos)
       :if (isinstance tile hy.M.simalq/tile.Actor)]
     (.maybe-act tile))

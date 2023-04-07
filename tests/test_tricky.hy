@@ -31,12 +31,12 @@
   (init (mk-quest [
     :next-level 1 :tiles [["Dark Knight" :hp 3] "key" "exit"]]))
 
-  (assert (= G.player-pos (Pos G.map 0 0)))
+  (assert (= G.player.pos (Pos G.map 0 0)))
   (assert (= G.level-n 1))
   (wk E 4)
   (assert (and (= G.player-hp 88) (= G.keys 1)))
   (wk E)
-  (assert (= G.player-pos (Pos G.map 0 0)))
+  (assert (= G.player.pos (Pos G.map 0 0)))
   (assert (= G.level-n 1))
   ; The monster and the item are back now.
   (wk E 4)

@@ -153,8 +153,9 @@
   (.insert (at pos) 0 ((get Tile.types stem) :pos pos #** kwargs)))
 
 (defn rm-tile [tile]
-  (.remove (at tile.pos) tile)
-  (object.__setattr__ tile "pos" None))
+  (when (is-not tile.pos None)
+    (.remove (at tile.pos) tile)
+    (object.__setattr__ tile "pos" None)))
 
 (defn mv-tile [tile pos]
   (rm-tile tile)
@@ -201,6 +202,7 @@
 (import
   ; For side-effects: namely, filling out `Tile.types` and
   ; `Tile.types-by-iq-ix`.
+  simalq.tile.player
   simalq.tile.scenery
   simalq.tile.item
   simalq.tile.monster
