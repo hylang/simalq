@@ -34,7 +34,24 @@
   (wk S) ; Now we're on the door.
   (cant (wk N) "You can only go south from this one-way door.")
   (wk S)
-  (cant (wk N) "That one-way door must be entered from the north."))
+  (cant (wk N) "That one-way door must be entered from the north.")
+
+  ; On a one-way door, you can still bump in the forbidden directions.
+  ; IQ is inconsistent about this.
+  (init (mk-quest
+    [:tiles ["one-way door (north)"]]))
+  (setv G.player-pos (Pos G.map 1 0))
+  ; Try unlocking a door.
+  (set-square 'E "locked door")
+  (+= G.keys 1)
+  (wk E)
+  (assert-at 'E "door")
+  (cant (wk E) "You can only go north from this one-way door.")
+  ; Try attacking a monster.
+  (set-square 'E "Dark Knight")
+  (wk E)
+  (assert-at 'E 'floor)
+  (cant (wk E) "You can only go north from this one-way door."))
 
 
 (defn test-locked-doors []
