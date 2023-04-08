@@ -20,18 +20,24 @@
 
   ; We start at the extreme northwest.
   (assert (= G.player.pos (Pos G.map 0 15)))
-  (assert (= G.turn-n 0)) ; The turn counter is 0-based.
+  (assert (= G.state-i 0)) ; The state index is 0-based.
+  (assert (= G.turn-n 0)) ; Likewise the turn counter.
   ; Walk south 1 step.
   (wk S)
   (assert (= G.player.pos (Pos G.map 0 14)))
+  (assert (= G.state-i 1))
   (assert (= G.turn-n 1))
   ; Wait 1 turn.
   (wait)
   (assert (= G.player.pos (Pos G.map 0 14)))
+  (assert (= G.state-i 2))
   (assert (= G.turn-n 2))
   ; Try going west, bumping into the level border.
   (cant (wk W) "The border of the dungeon blocks your movement.")
-  (assert (= G.turn-n 2))   ; Failed attempts at actions don't take turns.
+  (assert (= G.state-i 2))
+    ; Failed attempts at actions don't advance the game-state index.
+  (assert (= G.turn-n 2))
+    ; Nor take turns.
   ; Try walking into a wall tile.
   (wk S)
   (assert (= G.turn-n 3))
