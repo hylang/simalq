@@ -55,6 +55,13 @@
       [cls slot] (.all-slots self)
       slot (deepcopy (getattr self slot) memo))))
 
+  (defn __setstate__ [self state]
+    ; We provide this to avoid triggering `__setattr__` in
+    ; `pickle.load`.
+    (setv [_ slot-dict] state)
+    (for [[k v] (.items slot-dict)]
+      (object.__setattr__ self k v)))
+
   (defn [classmethod] all-slots [cls]
     (lfor
       c cls.__mro__
@@ -142,6 +149,10 @@
 
   (assert (not-in stem Tile.types))
   (setv (get Tile.types stem) cls)
+
+  ; Also add the new class as a global variable of `simalq.tile` so
+  ; `pickle` can find it.
+  (setv (get (globals) stem) cls)
 
   (when (setx iq-ix (.get kwargs "iq_ix"))
     (assert (not-in iq-ix Tile.types-by-iq-ix))

@@ -8,7 +8,7 @@
   pytest
   tests.lib [init assert-at wait mk-quest mv-player]
   simalq.util [GameOverException]
-  simalq.game-state [G]
+  simalq.game-state [G save-game load-game]
   simalq.geometry [Pos])
 
 
@@ -189,3 +189,31 @@
   (setv G.state-i 2)
   (with [(pytest.raises IndexError)]
     (check  2 2 325 88  'floor 'player 'floor)))
+
+
+(defn test-saveload [tmp-path]
+  (init "Boot Camp 2")
+  (defn check [i n-states score keys thing px py]
+    (assert (and
+      (= G.state-i i) (= G.turn-n i) (= (len G.states) n-states)
+      (= G.score score) (= G.player.keys keys)
+      (= G.player.pos.x px) (= G.player.pos.y py)))
+    (assert-at (Pos G.map 10 2) thing))
+
+  ; Pick up a key, open a locked disappering door, and step there.
+  (mv-player 13 10)
+  (wk S)
+  (mv-player 11 2)
+  (wk W 2)
+  (check  3 4  50 0  'player  10 2)
+  ; Undo the last two actions.
+  (setv G.state-i 1)
+  (check  1 4  50 1  "locked disappearing door"  11 2)
+  ; Save.
+  (save-game (/ tmp-path "mygame"))
+  ; Take a new action, discarding the redo history.
+  (wk E)
+  (check  2 3  50 1  "locked disappearing door"  12 2)
+  ; Load, restoring the previous state and the previous history.
+  (load-game (/ tmp-path "mygame"))
+  (check  1 4  50 1  "locked disappearing door"  11 2))

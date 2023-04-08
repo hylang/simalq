@@ -205,7 +205,7 @@ yet meaningfully implement or substitute."
     [211 "lord_of_the_undead"]]]
 
   (assert (not-in iq-ix Tile.types-by-iq-ix))
-  (setv (get Tile.types-by-iq-ix iq-ix) (type
+  (setv cls (type
     stem
     #(Tile)
     (dict
@@ -215,4 +215,7 @@ yet meaningfully implement or substitute."
         (object.__setattr__ self "tile_extras" tile-extras))
       :stem stem
       :read-tile-extras (classmethod (fn [cls a b]
-        (dict :tile-extras #(a b))))))))
+        (dict :tile-extras #(a b)))))))
+  (setv (get Tile.types-by-iq-ix iq-ix) cls)
+  ; Add a global variable for the class so `pickle` can find it.
+  (setv (get (globals) stem) cls))

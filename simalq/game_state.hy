@@ -1,5 +1,9 @@
 (require
   simalq.macros [slot-defaults])
+(import
+  pathlib [Path]
+  pickle
+  zlib)
 (eval-and-compile (setv  T True  F False))
 
 
@@ -24,13 +28,38 @@
   ; Attributes of `GameState` can be treated as attributes of
   ; `Global`. Such access is passed through to the current state.
   (defn __getattr__ [self name]
-    (getattr (get self.states self.state-i) name))
+    (if (in name GameState.__slots__)
+      (getattr (get self.states self.state-i) name)
+      (object.__getattribute__ self name)))
   (defn __setattr__ [self name value]
     (if (in name GameState.__slots__)
       (setattr (get self.states self.state-i) name value)
-      (object.__setattr__ self name value))))
+      (object.__setattr__ self name value)))
+
+  (defn [property] map [self]
+    (. self states [self.state-i] level map)))
 
 (setv G (Global))
+  ; This instance is the active `Global` object. It should only be
+  ; modified in place, not reassigned.
+
+(defn save-game [[path None]]
+  "Save the global object."
+
+  (setv x (zlib.compress (pickle.dumps G pickle.HIGHEST-PROTOCOL)))
+  (when path
+    (.write-bytes (Path path) x)
+    (return None))
+  x)
+
+(defn load-game [inp]
+  "Replace the global object with a serialized version."
+
+  (when (isinstance inp Path)
+    (setv inp (.read-bytes inp)))
+  (setv new-global (pickle.loads (zlib.decompress inp)))
+  (for [k Global.__slots__]
+    (setattr G k (getattr new-global k))))
 
 
 (defclass GameState []
@@ -53,11 +82,8 @@
       ; The number of rounds that have elapsed so far. This usually
       ; increments by 1 between successive states, but not always, due
       ; to effects that give the player extra actions.
-    player None)
+    player None))
       ; A `Player` object.
-
-  (defn [property] map [self]
-    self.level.map))
 
 
 (defclass Rules []
