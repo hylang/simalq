@@ -3,13 +3,44 @@
 (eval-and-compile (setv  T True  F False))
 
 
-(defclass GameState []
+(defclass Global []
+  "All state information for the game being played, including an undo
+  history of individual `GameState`s."
+
   (slot-defaults
     rules None
-      ; A `Rules` object.
+      ; A `Rules` object. It shouldn't be mutated mid-game, or the
+      ; game-state history can get desynchronized.
     quest None
       ; A `Quest` object. It shouldn't be mutated, so fresh copies
       ; of each level can be retrieved from it.
+    states None
+      ; A history of `GameState` objects.
+    state-i None)
+      ; An index of `states`, pointing to the current state. Typically
+      ; its value is `(- (len states) 1)`, but it's decremented when
+      ; states are undone.
+
+  ; Attributes of `GameState` can be treated as attributes of
+  ; `Global`. Such access is passed through to the current state.
+  (defn __getattr__ [self name]
+    (getattr (get self.states self.state-i) name))
+  (defn __setattr__ [self name value]
+    (if (in name GameState.__slots__)
+      (setattr (get self.states self.state-i) name value)
+      (object.__setattr__ self name value))))
+
+(setv G (Global))
+
+
+(defclass GameState []
+  "A state in which the game is ready to receive another action from
+  the player."
+
+  (slot-defaults
+    action None
+      ; The player's `Action` that produced this game state from the
+      ; previous one. It's `None` only for the initial state.
     level None
       ; A `Level` object. This is mutated to represent the level
       ; changing, such as monsters moving around.
@@ -27,9 +58,6 @@
 
   (defn [property] map [self]
     self.level.map))
-(setv G (GameState))
-(for [[k v] (.items G.slot-defaults)]
-  (setattr G k v))
 
 
 (defclass Rules []

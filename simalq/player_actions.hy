@@ -2,6 +2,7 @@
   hyrule [ecase]
   simalq.macros [defdataclass])
 (import
+  copy [deepcopy]
   simalq.util [ActionError]
   simalq.geometry [at]
   simalq.game-state [G]
@@ -23,6 +24,21 @@
 
 
 (defn do-action [action]
+  ; Set up a new game state.
+  (.append G.states (deepcopy (get G.states G.state-i)))
+  (+= G.state-i 1)
+  (setv G.action action)
+
+  (try
+    (_execute-action action)
+    (except [ActionError]
+      ; No action occurred. Abort the new game state before bubbling
+      ; the exception up.
+      (del (get G.states G.state-i))
+      (-= G.state-i 1)
+      (raise))))
+
+(defn _execute-action [action]
   (ecase (type action)
 
     Wait

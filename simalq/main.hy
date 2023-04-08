@@ -2,7 +2,7 @@
   copy [deepcopy]
   simalq.util [hurt-player DamageType]
   simalq.geometry [burst at]
-  simalq.game-state [G Rules]
+  simalq.game-state [G Rules GameState]
   simalq.tile [Tile mv-tile]
   simalq.tile.player [Player]
   simalq.player-actions [do-action])
@@ -13,13 +13,15 @@
   (setv
     G.rules (Rules)
     G.quest quest
-    G.score 0
-    G.turn-n 0
-    G.player (Player
-      :pos None)
-    G.player.hp quest.starting-hp)
-  (for [[k v] (.items Rules.slot-defaults)]
-    (setattr G.rules k v))
+    G.states []
+    state (GameState))
+  (for [thing [G.rules state] [k v] (.items thing.slot-defaults)]
+    (setattr thing k v))
+  (setv
+    state.player (Player :pos None)
+    state.player.hp quest.starting-hp)
+  (.append G.states state)
+  (setv G.state-i 0)
   (start-level 1))
 
 
