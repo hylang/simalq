@@ -25,10 +25,23 @@
 
 (defn do-action [action]
   ; Set up a new game state.
-  (.append G.states (deepcopy (get G.states G.state-i)))
+  (setv new-state (deepcopy (get G.states G.state-i)))
   (+= G.state-i 1)
+  (cond
+    (= G.state-i (len G.states))
+      ; We're at the end of the undo history, so append the new state.
+      (.append G.states new-state)
+    (= (. G.states [G.state-i] action) action)
+      ; We should effectively be redoing this state, since it's the
+      ; same action as last time and the game is deterministic.
+      ; Keep the remaining history for further redoing.
+      (setv (get G.states G.state-i) new-state)
+    True
+      ; We're branching off in a new direction. Discard the now-
+      ; obsolete redo history. (We don't support a full-blown tree
+      ; of states, just a line.)
+      (setv (cut G.states G.state-i None) [new-state]))
   (setv G.action action)
-
   (try
     (_execute-action action)
     (except [ActionError]
