@@ -16,9 +16,11 @@
     :poison-dose (Fraction 0)
       ; The current amount of ambient poison breathed in. Amounts
       ; ≥ 1 get converted to damage.
+    :just-exited F
+      ; Did you just use an exit?
     :keys 0)
       ; How many (regular, and not yet used) keys you're carrying.
-  :mutable-slots #("hp" "poison_dose" "keys")
+  :mutable-slots #("hp" "poison_dose" "just_exited" "keys")
 
   :damageable T
   :hook-destroyed (fn [self pos]

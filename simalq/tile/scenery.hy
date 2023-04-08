@@ -138,6 +138,7 @@
     (when (> G.level.next-level (len G.quest.levels))
       (raise (GameOverException 'won)))
     (hy.M.simalq/main.start-level G.level.next-level)
+    (setv G.player.just-exited T)
     True)
   :flavor "Get me outta here.")
 

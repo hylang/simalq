@@ -6,6 +6,7 @@
   simalq.tile [Tile mv-tile]
   simalq.tile.player [Player]
   simalq.player-actions [do-action])
+(setv  T True  F False)
 
 
 (defn start-quest [quest]
@@ -32,13 +33,13 @@
 
 
 (defn take-turn [action]
-  (setv level-was G.level)
   (do-action action)
 
-  (when (is-not G.level level-was)
+  (when G.player.just-exited
     ; If the player has changed levels, let her take another action
     ; this turn. This means she always gets the first action on a
     ; level.
+    (setv G.player.just-exited F)
     (return))
 
   ; Allow actors in the reality bubble to act, in `burst`'s spiral
