@@ -61,6 +61,11 @@
     :moving-exit-start moving-exit-start))
 
 
+(defn xy [pos]
+  "This is useful for comparing `Pos`es that wouldn't be equal because
+  they're from different game states."
+  #(pos.x pos.y))
+
 (defn locate [locator]
   (cond
     (= locator 'here)

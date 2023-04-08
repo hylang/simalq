@@ -11,12 +11,11 @@
 (defn test-simple-melee-combat []
   (init (mk-quest
     [:tiles [["Dark Knight" :hp 5]]]))
-  (setv monster-p (locate 'E))
-  (setv [monster] (at monster-p))
+  (defn monster [] (get (at (locate 'E)) 0))
   (defn check [turn score tris mon]
     (assert (and
       (= G.turn-n turn) (= G.score score)
-      (= G.player.hp tris) (or (is mon None) (= monster.hp mon)))))
+      (= G.player.hp tris) (or (is mon None) (= (. (monster) hp) mon)))))
 
   (check :turn 0 :score 0 :tris 100 :mon 5)
   ; Attack the monster, doing 2 damage. We get hit for 12 damage.
@@ -25,13 +24,12 @@
   ; And again.
   (wk E)
   (check :turn 2 :score 0 :tris 76 :mon 1)
-  (assert (is (get (at monster-p) 0) monster))
-    ; The monster's still there, and he's the same object that we
-    ; started with.
+  (assert (= (. (monster) stem) "Dark Knight"))
+    ; The monster's still there.
   ; Finish the monster off. We take no damage this time.
   (wk E)
   (check :turn 3 :score 75 :tris 76 :mon None)
-  (assert-at monster-p 'floor))
+  (assert-at 'E 'floor))
 
 
 (defn test-approach []
@@ -72,26 +70,22 @@
     [:player-start #(1 1)
       :tiles ["wall" "Dark Knight"]]))
         ; A wall, unlike a pillar, blocks diagonal movement.
-  (setv [monster] (at (Pos G.map 3 1)))
-  (assert (= monster.stem "Dark Knight"))
-  (assert (= monster.pos (Pos G.map 3 1)))
+  (defn assert-mon-at [x y]
+    (assert (= (. (at (Pos G.map x y)) [0] stem) "Dark Knight")))
+  (assert-mon-at 3 1)
   (wait 100)
-  (assert (= monster.pos (Pos G.map 3 1)))
+  (assert-mon-at 3 1)
 
   ; A monster outside the reality bubble can't move.
   (setv r G.rules.reality-bubble-size)
   (init (mk-quest [:tiles [
     #* (* ['floor] r)
     "Dark Knight"]]))
-  (setv [monster] (at (Pos G.map (+ r 1) 0)))
-  (assert (= monster.stem "Dark Knight"))
-  (assert (= monster.pos (Pos G.map (+ r 1) 0)))
+  (assert-mon-at (+ r 1) 0)
   (wait 100)
-  (assert (= monster.pos (Pos G.map (+ r 1) 0)))
-  ; Move east, bringing the monster into the reality bubble.
-  ; Now he can approach.
+  (assert-mon-at (+ r 1) 0)
   (wk E)
-  (assert (= monster.pos (Pos G.map r 0)))
+  (assert-mon-at r 0)
 
   ; A monster can chase Tris around a wrapped map.
   ; (Accompanied by "Yakety Sax", one imagines.)
@@ -105,18 +99,19 @@
 
 
 (defn test-nondainty []
-  (init (mk-quest
-    [:tiles ["pile of gold" "Dark Knight"]]))
-  (set-square 'NE "pile of gold")
-  (setv [monster] (at (Pos G.map 2 0)))
-  (assert (= monster.stem "Dark Knight"))
+  (for [dainty [F T]]
+    (init (mk-quest
+      [:tiles ["pile of gold" "Dark Knight"]]))
+    (set-square 'NE "pile of gold")
+    (when (not dainty)
+      (setv G.rules.dainty-monsters F))
 
-  ; By default, normal monsters will only step on plain floor.
-  (wait 10)
-  (assert (= monster.pos (Pos G.map 2 0)))
-
-  ; If dainty-monsters mode is off, they can step on e.g. items.
-  (setv G.rules.dainty-monsters F)
-  (wait 1)
-  (assert (= monster.pos (Pos G.map 1 0)))
-  (assert-at monster.pos ["Dark Knight" "pile of gold"]))
+    (if dainty
+      ; By default, normal monsters will only step on plain floor.
+      (do
+        (wait 10)
+        (assert (= (. (at (Pos G.map 2 0)) [0] stem) "Dark Knight")))
+      ; If dainty-monsters mode is off, they can step on e.g. items.
+      (do
+        (wait 1)
+        (assert-at 'E ["Dark Knight" "pile of gold"])))))
