@@ -6,12 +6,25 @@
 (defclass GameState []
   (slot-defaults
     rules None
+      ; A `Rules` object.
     quest None
+      ; A `Quest` object. It shouldn't be mutated, so fresh copies
+      ; of each level can be retrieved from it.
     level None
+      ; A `Level` object. This is mutated to represent the level
+      ; changing, such as monsters moving around.
     level-n None
+      ; An integer indicating the level we're currently playing.
+      ; Numbered starting from 1.
     score 0
+      ; How many points the player has accumulated.
     turn-n 0
+      ; The number of rounds that have elapsed so far. This usually
+      ; increments by 1 between successive states, but not always, due
+      ; to effects that give the player extra actions.
     player None)
+      ; A `Player` object.
+
   (defn [property] map [self]
     self.level.map))
 (setv G (GameState))
