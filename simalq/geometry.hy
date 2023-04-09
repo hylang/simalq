@@ -43,8 +43,11 @@
     ["north" "east" "south" "west"]
     [0       1       0      -1]
     [1       0      -1       0])))
+  (setv arrows
+    ["↑"     "→"    "↓"     "←"])
   (for [d Direction.orths]
     (setattr Direction (.upper (get d.name 0)) d))
+  (setv Direction.arrows (dict (zip Direction.orths arrows)))
   (setv Direction.diags (tuple (gfor
     d1 [Direction.N Direction.S]
     d2 [Direction.E Direction.W]

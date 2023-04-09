@@ -16,18 +16,17 @@
   (defn pick-up [self]))
 
 
-(deftile Item "a pile of gold"
+(deftile Item "$ " "a pile of gold"
   :iq-ix 18
   :points 100
   :flavor "Ooh, shiny.")
 
-(deftile Item "a handful of gems"
+(deftile Item "$ " "a handful of gems"
   :iq-ix 109
   :points 250
   :flavor "Ooh, shinier.")
 
-
-(deftile Item "a key"
+(deftile Item "⚷ " "a key"
   :iq-ix 19
   :points 50
 

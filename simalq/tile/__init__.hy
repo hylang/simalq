@@ -70,6 +70,10 @@
       ; "a", "the", etc.
     stem None
       ; The main part of the name.
+    mapsym "� "
+      ; A two-character symbol to represent the tile on screen.
+      ; The first character may be a space, but the first shouldn't
+      ; be.
     flavor None
       ; Flavor text to show in a help screen.
     iq-ix None
@@ -118,7 +122,7 @@
     None))
 
 
-(defn deftile [superclass name #** kwargs]
+(defn deftile [superclass mapsym name #** kwargs]
   "Declare a new concrete and final tile type. Superclasses of tiles
   not meant to themselves be instantiated should be declared with
   `defclass`."
@@ -127,6 +131,7 @@
   (setv stem (re.sub r"\A(a|an|the) "
     (fn [m] (nonlocal article) (setv article (.group m 1)) "")
     name))
+  (assert (= (len mapsym) 2))
 
   (setv new-attrs (lfor  k kwargs  :if (not (hasattr superclass k))  k))
   (when new-attrs
@@ -143,6 +148,7 @@
     (dict
       :article article
       :stem stem
+      :mapsym mapsym
       #** kwargs)))
 
   (assert (not-in stem Tile.types))

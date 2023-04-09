@@ -55,7 +55,7 @@
       'walk)))
 
 
-(deftile Scenery "a wall"
+(deftile Scenery "██" "a wall"
   :iq-ix 2
   :blocks-move T :blocks-diag T
   :flavor (.join "\n" [
@@ -66,12 +66,12 @@
     "  And through Wall's chink, poor souls, they are content"
     "  To whisper, at the which let no man wonder."]))
 
-(deftile Scenery "a pillar"
+(deftile Scenery "| " "a pillar"
   :iq-ix 12
   :blocks-move T
   :flavor "A structure of vaguely Roman style.")
 
-(deftile Scenery "a door"
+(deftile Scenery "++" "a door"
   :iq-ix 5
   :blocks-monster T
   :flavor "Unlocked, but it just won't stay open. Maybe that's for the best, since monsters are too dumb to operate it.")
@@ -90,12 +90,12 @@
       (replace-tile self "door"))
     True))
 
-(deftile LockedDoor "a locked door"
+(deftile LockedDoor "++" "a locked door"
   :iq-ix 6
   :destroy-when-opened False
   :flavor "Fortunately, Tris knows how to pick locks. Unfortunately, she was wearing her hair down when she got whisked away to the dungeon, so she doesn't have any hairpins. You may have to use a key.")
 
-(deftile LockedDoor "a locked disappearing door"
+(deftile LockedDoor "++" "a locked disappearing door"
   :iq-ix 81
   :destroy-when-opened True
   :flavor "This advanced door destroys not only the key used to unlock it, but also itself. A true marvel of engineering.")
@@ -127,11 +127,12 @@
   (for [[direction iq-ix] [
       [Direction.N 8] [Direction.E 11]
       [Direction.S 9] [Direction.W 10]]]
-    (deftile OneWayDoor f"a one-way door ({direction.name})"
+    (setv c (get Direction.arrows direction))
+    (deftile OneWayDoor f"+{c}" f"a one-way door ({direction.name})"
       :iq-ix iq-ix
       :direction direction))))
 
-(deftile Scenery "the exit"
+(deftile Scenery "> " "the exit"
   :iq-ix 7
   :blocks-monster T
   :hook-player-walked-into (fn [self]
@@ -142,7 +143,8 @@
     True)
   :flavor "Get me outta here.")
 
-(deftile Scenery "a cracked wall"
+
+(deftile Scenery "##" "a cracked wall"
   :slot-defaults (dict
     :hp 0)
   :mutable-slots #("hp")

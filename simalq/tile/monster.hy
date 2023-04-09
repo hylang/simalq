@@ -89,7 +89,7 @@
       (dict :hp v2)))
 
 
-(deftile NonGen "a Dark Knight"
+(deftile NonGen "K " "a Dark Knight"
   :iq-ix 53
   :points 75
 

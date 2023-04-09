@@ -7,7 +7,7 @@
 
 (setv character-name "Princess Triskaidecagonn XIII")
 
-(deftile Tile character-name
+(deftile Tile "@ " character-name
   ; A type representing the player-character.
 
   :slot-defaults (dict
