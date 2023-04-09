@@ -17,21 +17,6 @@
   (setv types {})
   (setv types-by-iq-ix {})
 
-  (setv
-     ; Attributes to be overriden in subclasses.
-    mutable-slots #()
-      ; Slots whose values should be freely adjustable with `setv`,
-      ; `+=`, etc.
-    points 0
-      ; Points awarded for picking up an object, killing a monster,
-      ; etc.
-    damageable F
-      ; Whether a tile of this kind can be hurt by the player's sword
-      ; etc. To be overridden in subclasses, which, if they enable it,
-      ; should include a slot `hp`.
-    immune #())
-      ; Damage types the tile ignores.
-
   (defn __init__ [self #** kwargs]
     ; - Each keyword argument must match a slot.
     ; - All subclasses must set `__slots__` (if only to an empty list).
@@ -75,9 +60,12 @@
       s (getattr c "mutable_slots" #())
       s))
 
-  ; Class variables overrriden by subclasses.
+  ; The below variables and methods may be overridden by subclasses.
 
   (setv
+    mutable-slots #()
+      ; Slots whose values should be freely adjustable with `setv`,
+      ; `+=`, etc.
     article None
       ; "a", "the", etc.
     stem None
@@ -86,12 +74,22 @@
       ; Flavor text to show in a help screen.
     iq-ix None
       ; The number that represents this tile in IQ.
-    iq-ix-mapper None)
+    iq-ix-mapper None
       ; An alternative to `iq-ix` for many-to-one matchups from IQ to
       ; SQ tiles. It should be a list like
       ;   ["hp" {1 2  3 4  5 6}]
       ; where the first element is a slot name and the second is a
       ; dictionary mapping IQ values to values for the slot.
+     ; Attributes to be overriden in subclasses.
+    points 0
+      ; Points awarded for picking up an object, killing a monster,
+      ; etc.
+    damageable F
+      ; Whether a tile of this kind can be hurt by the player's sword
+      ; etc. To be overridden in subclasses, which, if they enable it,
+      ; should include a slot `hp`.
+    immune #())
+      ; Damage types the tile ignores.
 
   (defn [classmethod] read-tile-extras [cls v1 v2]
     "This method should return a dictionary of instance variables
