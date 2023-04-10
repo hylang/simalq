@@ -14,7 +14,8 @@ setuptools.setup(
         'hy @ git+https://github.com/hylang/hy@0e3409abf38bc7271a28b4388f146f24c93efeb1',
         'hyrule @ git+https://github.com/Kodiologist/hyrule@edc465943e21be671f294b11d245694a3fa90bc7',
         'toolz >= 0.12.0',
-        'construct >= 2.10.68'],
+        'construct >= 2.10.68',
+        'blessed >= 1.20.0'],
     packages = setuptools.find_packages(),
     package_data = dict(simalq = [
         str(p.relative_to('simalq'))

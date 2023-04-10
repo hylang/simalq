@@ -14,7 +14,7 @@ Infinitesimal Quest 2 + ε (or "SQ" for short; Python package name ``simalq``) i
 Usage
 ============================================================
 
-There's no user interface yet, but you can run the tests with the command ``pytest``.
+You can install SQ from source with the command ``pip install .``. Launch the game with ``python3 -m simalq 'New First Quest'``, or run the tests with ``pytest``.
 
 The first time that SQ requires IQ's original quests, it will download them automatically. The download is cached, so no Internet connection is needed afterwards.
 

@@ -1,12 +1,21 @@
 (import
   copy [deepcopy]
-  simalq.util [hurt-player DamageType]
+  blessed
+  simalq.util [ActionError hurt-player DamageType]
+  simalq.color :as color
   simalq.geometry [burst at]
   simalq.game-state [G Rules GameState]
   simalq.tile [Tile mv-tile]
   simalq.tile.player [Player]
-  simalq.player-actions [do-action])
+  simalq.un-iq [read-quest iq-quest]
+  simalq.player-actions [do-action get-action]
+  simalq.display [draw-map])
 (setv  T True  F False)
+
+
+(defn main [iq-quest-name]
+  (start-quest (read-quest (iq-quest iq-quest-name)))
+  (main-io-loop))
 
 
 (defn start-quest [quest]
@@ -64,3 +73,30 @@
 
   ; Advance the turn counter last.
   (+= G.turn-n 1))
+
+
+(defn main-io-loop []
+  (setv B (blessed.Terminal))
+
+  (with [_ (B.cbreak)  _ (B.fullscreen)  _ (B.hidden-cursor)]
+    (while True
+
+      ; Print the map.
+      (print
+        :flush T :sep "" :end ""
+        B.home B.clear
+        (.join "" (gfor
+          [color-fg color-bg mapsym] (draw-map B.width B.height)
+          ((B.on-color-rgb #* (get color.by-name color-bg))
+            ((B.color-rgb #* (get color.by-name color-fg))
+              mapsym)))))
+
+      ; Get input.
+      (while
+        (try
+          (while (not (setx action (get-action (B.inkey)))))
+          (take-turn action)
+          (break)
+          (except [e ActionError]
+            ; ActionErrors are silent, for now.
+            (continue)))))))

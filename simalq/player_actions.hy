@@ -4,7 +4,7 @@
 (import
   copy [deepcopy]
   simalq.util [ActionError]
-  simalq.geometry [at]
+  simalq.geometry [Direction at]
   simalq.game-state [G]
   simalq.tile [mv-tile]
   simalq.tile.scenery [walkability])
@@ -21,6 +21,19 @@
   that's in the way with your sword."
   [direction]
   :frozen T)
+
+
+(defn get-action [key]
+  (when (setx v (.get dir-keys (str key)))
+    (return (if (= v 'center)
+      (Wait)
+      (Walk v))))
+  None)
+
+(setv dir-keys {
+  "7" Direction.NW  "8" Direction.N  "9" Direction.NE
+  "4" Direction.W   "5" 'center      "6" Direction.E
+  "1" Direction.SW  "2" Direction.S  "3" Direction.SE})
 
 
 (defn do-action [action]
