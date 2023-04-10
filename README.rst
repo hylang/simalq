@@ -21,7 +21,7 @@ The first time that SQ requires IQ's original quests, it will download them auto
 The story so far
 ============================================================
 
-Her Royal Highness Princess Triskaidecagonn XIII (whose friends call her "Tris"), tiring of her studies, shut the heavy grimoire of nonstandard analysis. "For too long I have been obliged to concern myself with tedious scholarship," she lamented aloud, "while my older brother Argonn has sallied forth on many an heroic quest. Here I sit, idling, with nary an opportunity to test my own skills in the sword, the bow, and the sliding-block puzzle."
+Her Royal Highness Princess Triskaidecagonn XIII (whose friends call her "Tris"), tiring of her studies, shut the heavy grimoire of nonstandard analysis. "For too long I have been obliged to concern myself with tedious scholarship" she lamented aloud "while my older brother Argonn has sallied forth on many an heroic quest. Here I sit, idling, with nary an opportunity to test my own skills in the sword, the bow, and the sliding-block puzzle."
 
 "Aha!" cried the fell wizard Idok, deep in his underground laboratory, who had been spying on the princess through his mystical Macintosh LC so he could copy her homework answers. "Here is an opportunity to teach you, young princess, to be careful what you wish for." He typed a dread incantation in Hy, the long-dead language of squids born of snakes, and in a swarm of foul parentheses, Tris was carried off to a vast dungeon deep beneath the faraway elven land of Québec. The place looked familiar, and Tris realized that Idok had plagiarized pretty much the whole thing from the thesis of his doctoral advisor, the wicked sorcerer Karvarel. Her brother had braved these very dungeons years ago. She didn't have his memoirs handy, but she did know one really good magic spell, which allowed her to predict the future. Now, with this clairvoyance, her trusty sword and bow, and anything handy she happens to find lying around, Tris must escape the dungeon or die in the attempt. And if she can stuff her pockets with loot on the way, that would really help with her kingdom's latest financial crisis.
 
@@ -35,7 +35,7 @@ While the author of IQ kindly provided me with its source code for reference, SQ
 Contributing
 ============================================================
 
-At this stage of development, bugs and feature requests are unlikely to be useful, so the GitHub issues list is disabled. If you'd like to get involved, get in touch with me directly.
+At this stage of development, bug reports and feature requests are unlikely to be useful, so the GitHub issues list is disabled. If you'd like to get involved, get in touch with me directly.
 
 License
 ============================================================
