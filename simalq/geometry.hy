@@ -1,5 +1,5 @@
 (require
-  hyrule [unless]
+  hyrule [unless do-n]
   simalq.macros [defdataclass])
 (import
   itertools [chain]
@@ -95,6 +95,22 @@
 
 (defn pos+ [pos direction]
   (Pos pos.map (+ direction.x pos.x) (+ direction.y pos.y)))
+
+(defn ray [pos direction length]
+  "Return a line of `length` points in `direction` from `pos`, not
+  including `pos`. If it wraps far enough that it would get to `pos`,
+  it stops just before it."
+
+  (setv out [pos])
+  (do-n length
+    (try
+      (setv new (pos+ (get out -1) direction))
+      (except [GeometryError]
+        (break)))
+    (when (= new pos)
+      (break))
+    (.append out new))
+  (tuple (cut out 1 None)))
 
 (defn at [pos]
   (get pos.map.data pos.x pos.y))
