@@ -6,6 +6,14 @@
 (setv  T True  F False)
 
 
+(setv hide-messages #(
+  ; These messages are probably too naggy to actually show. They're
+  ; still implemented for the sake of testing the corresponding
+  ; `ActionError`s.
+  "Your way is blocked."
+  "The border of the dungeon blocks your movement."))
+
+
 (defn draw-screen [width height message]
   "Return a list of lines. Each line is a list of (foreground color,
   background color, character) tuples."
@@ -13,7 +21,7 @@
   (setv the-map (draw-map
     width
     (- height status-bar-lines)))
-  (when message
+  (when (and message (not-in message hide-messages))
     ; Write the message over the last line of the map.
     (setv message (cut (+ message " ") width))
     (setv (cut (get the-map -1) (len message)) (gfor
