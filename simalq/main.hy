@@ -9,7 +9,7 @@
   simalq.tile.player [Player]
   simalq.un-iq [read-quest iq-quest]
   simalq.player-actions [do-action get-action]
-  simalq.display [draw-map draw-status-bar status-bar-lines])
+  simalq.display [draw-screen])
 (setv  T True  F False)
 
 
@@ -81,23 +81,16 @@
   (with [_ (B.cbreak)  _ (B.fullscreen)  _ (B.hidden-cursor)]
     (while True
 
+      ; Draw the screen.
       (print
         :flush T :sep "" :end ""
         B.home B.clear
-        ; Print the map.
         (.join "" (gfor
-          [color-fg color-bg mapsym] (draw-map
-            B.width
-            (- B.height status-bar-lines))
+          line (draw-screen B.width B.height)
+          [color-fg color-bg character] line
           ((B.on-color-rgb #* (get color.by-name color-bg))
             ((B.color-rgb #* (get color.by-name color-fg))
-              mapsym))))
-        ; Then the status bar.
-        ((B.on-color-rgb #* (get color.by-name color.default-bg))
-          ((B.color-rgb #* (get color.by-name color.default-fg))
-            (.join "" (gfor
-              line (draw-status-bar)
-              (cut (.ljust line B.width) B.width))))))
+              character)))))
 
       ; Get input.
       (while

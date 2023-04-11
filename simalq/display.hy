@@ -6,16 +6,26 @@
 (setv  T True  F False)
 
 
-(defn draw-map [width height]
-  "Return a generator of (foreground color, background color,
-  character) tuples."
+(defn draw-screen [width height]
+  "Return a list of lines. Each line is a list of (foreground color,
+  background color, character) tuples."
 
-  (gfor
+  (setv the-map (draw-map
+    width
+    (- height status-bar-lines)))
+  (setv status-bar (lfor line (draw-status-bar) (lfor
+    c (cut (.ljust line width) width)
+    #(color.default-fg color.default-bg c))))
+  (+ the-map status-bar))
+
+
+(defn draw-map [width height]
+  (lfor
     ; Loop over the screen coordinates `sy` and `sx`. I number `sy`
     ; bottom-to-top, although it's returned top-to-bottom, for
     ; similarity with `Pos`.
     sy (reversed (range height))
-    sx (range 0 width 2)
+    (lfor sx (range 0 width 2)
     ; Find the map coordinates `mx` and `my`, using the rule
     ; that the screen should be centered on the player.
     :setv mx (+ G.player.pos.x (- (// sx 2) (// width 4)))
@@ -34,7 +44,7 @@
     ; character of the rightmost mapsym.
     :if (not (and (% width 2) (= sx (- width 1)) i))
     ; Yield one character at a time.
-    #(color-fg color-bg mapsym)))
+    #(color-fg color-bg mapsym))))
 
 
 (setv status-bar-lines 2)
