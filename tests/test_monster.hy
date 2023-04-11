@@ -3,7 +3,7 @@
   tests.lib [wk])
 (import
   tests.lib [init mk-quest locate assert-at wait set-square]
-  simalq.geometry [Pos at]
+  simalq.geometry [Direction Pos ray at]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -96,6 +96,31 @@
   (do-n 100
     (wk S)
     (assert-at 'N "Dark Knight")))
+
+
+(defn test-approach-march []
+  "Lines of monsters can march towards the player without losing
+  turns or going astray by blocking each other. This is an important
+  property of the spiral activation order of monsters that we inherit
+  from IQ."
+
+  (init (mk-quest
+    [:player-start #(8 8)]))
+
+  (defn arms []
+    (lfor
+      direction Direction.all
+      (ray G.player.pos direction 4)))
+
+  (for [arm (arms)  p (cut arm 1 None)]
+    (set-square p "Dark Knight"))
+  (assert (=
+    (sfor  arm (arms)  (tuple (gfor  p arm  (len (at p)))))
+    #{#(0 1 1 1)}))
+  (wait)
+  (assert (=
+    (sfor  arm (arms)  (tuple (gfor  p arm  (len (at p)))))
+    #{#(1 1 1 0)})))
 
 
 (defn test-nondainty []
