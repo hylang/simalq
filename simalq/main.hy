@@ -8,7 +8,7 @@
   simalq.tile [Tile mv-tile]
   simalq.tile.player [Player]
   simalq.un-iq [read-quest iq-quest]
-  simalq.player-actions [do-action get-action]
+  simalq.player-actions [Action get-command do-command do-action]
   simalq.display [draw-screen])
 (setv  T True  F False)
 
@@ -97,8 +97,10 @@
       (setv message None)
 
       ; Get input.
-      (while (not (setx action (get-action (B.inkey)))))
+      (while (not (setx cmd (get-command (B.inkey)))))
       (try
-        (take-turn action)
+        (if (isinstance cmd Action)
+          (take-turn cmd)
+          (do-command cmd))
         (except [e ActionError]
           (setv message (get e.args 0)))))))

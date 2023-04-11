@@ -11,7 +11,10 @@
 (setv  T True  F False)
 
 
-(defdataclass Action []
+(defdataclass Command []
+  "Something the player wants to do, translated from user input.")
+
+(defdataclass Action [Command]
   "A discrete effect that the player can have on the gamestate.")
 (defdataclass Wait [Action]
   "Do nothing, passing your turn (or, more precisely, passing
@@ -22,18 +25,44 @@
   [direction]
   :frozen T)
 
+(defdataclass ShiftHistory [Command]
+  "Undo or redo."
+  [steps]
+  :frozen T)
 
-(defn get-action [key]
+
+(defn get-command [key]
   (when (setx v (.get dir-keys (str key)))
     (return (if (= v 'center)
       (Wait)
       (Walk v))))
+  (when (setx v (.get cmd-keys (str key)))
+    (return ((get v 0) #* (cut v 1 None))))
   None)
 
 (setv dir-keys {
   "7" Direction.NW  "8" Direction.N  "9" Direction.NE
   "4" Direction.W   "5" 'center      "6" Direction.E
   "1" Direction.SW  "2" Direction.S  "3" Direction.SE})
+
+(setv cmd-keys (dict
+  :u [ShiftHistory -1]    ; Undo
+  :r [ShiftHistory +1]))  ; Redo
+
+
+(defn do-command [cmd]
+  "This function is only for commands that aren't actions; see
+  `do-action` for actions."
+
+  (ecase (type cmd)
+
+    ShiftHistory (do
+      (setv target (+ G.state-i cmd.steps))
+      (when (>= target (len G.states))
+        (raise (ActionError "Nothing to redo.")))
+      (when (< target 0)
+        (raise (ActionError "Nothing to undo.")))
+      (setv G.state-i target))))
 
 
 (defn do-action [action]
