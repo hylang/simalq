@@ -37,6 +37,36 @@
     #(color-fg color-bg mapsym)))
 
 
+(setv status-bar-lines 2)
+
+(defn draw-status-bar []
+  "Return each line of status bar."
+
+  (defn j [#* xs]
+    (.join "  " (gfor  x xs  :if (is-not x None)  x)))
+
+  #(
+    (j
+      (.format "HP {:,}{}"
+        G.player.hp
+        "") ; Reserved for showing damage, like " (-999)"
+      (when G.level.poison-intensity
+        (+ "☠ " (str G.level.poison-intensity)))
+      None ; Reserved for time limits, like "Tm 1,000"
+      (when G.player.keys
+        (.format "⚷ {}" G.player.keys))
+      None) ; Reserved for three inventory items (2 characters apiece)
+    (j
+      (.format "Turn {:,}{}"
+        G.turn-n
+        (if (= G.turn-n (. G.states [-1] turn-n))
+          ""
+          (.format " ({})" (- G.turn-n (. G.states [-1] turn-n)))))
+      (.format "Score {:,}"
+        G.score)
+      None))) ; Reserved for status-effect indicators
+
+
 (defn mapsym-at-pos [p]
   (setv floor-mapsym ". ")
   (setv multiple-tile-mapsym "&&")
