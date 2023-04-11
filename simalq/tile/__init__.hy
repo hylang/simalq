@@ -4,6 +4,7 @@
 (import
   copy [deepcopy]
   re
+  simalq.color :as color
   simalq.game-state [G]
   simalq.geometry [at])
 (setv  T True  F False)
@@ -74,6 +75,13 @@
       ; A two-character symbol to represent the tile on screen.
       ; The first character may be a space, but the first shouldn't
       ; be.
+    color color.default-fg
+      ; A foreground color for the mapsym. It can be a single color
+      ; or a tuple of two colors (for the two characters).
+    color-bg None
+      ; Similar, for the background color. `None` means allowing
+      ; other background-color effects, like the reality fringe, to
+      ; determine it.
     flavor None
       ; Flavor text to show in a help screen.
     iq-ix None

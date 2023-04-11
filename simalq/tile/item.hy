@@ -17,11 +17,13 @@
 
 
 (deftile Item "$ " "a pile of gold"
+  :color 'dark-yellow
   :iq-ix 18
   :points 100
   :flavor "Ooh, shiny.")
 
 (deftile Item "$ " "a handful of gems"
+  :color 'red
   :iq-ix 109
   :points 250
   :flavor "Ooh, shinier.")

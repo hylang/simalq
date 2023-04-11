@@ -72,6 +72,7 @@
   :flavor "A structure of vaguely Roman style.")
 
 (deftile Scenery "++" "a door"
+  :color 'brown
   :iq-ix 5
   :blocks-monster T
   :flavor "Unlocked, but it just won't stay open. Maybe that's for the best, since monsters are too dumb to operate it.")
@@ -91,11 +92,13 @@
     True))
 
 (deftile LockedDoor "++" "a locked door"
+  :color 'navy
   :iq-ix 6
   :destroy-when-opened False
   :flavor "Fortunately, Tris knows how to pick locks. Unfortunately, she was wearing her hair down when she got whisked away to the dungeon, so she doesn't have any hairpins. You may have to use a key.")
 
 (deftile LockedDoor "++" "a locked disappearing door"
+  :color 'steel-blue
   :iq-ix 81
   :destroy-when-opened True
   :flavor "This advanced door destroys not only the key used to unlock it, but also itself. A true marvel of engineering.")
@@ -112,7 +115,8 @@
     (setv
       __slots__ []
       blocks-monster T
-      direction None)
+      direction None
+      color #('brown 'red))
 
     (defn hook-player-walk-from [self target]
       (unless (= (safe-pos+ self.pos self.direction) target)
@@ -133,6 +137,7 @@
       :direction direction))))
 
 (deftile Scenery "> " "the exit"
+  :color-bg 'lime
   :iq-ix 7
   :blocks-monster T
   :hook-player-walked-into (fn [self]
