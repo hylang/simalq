@@ -8,7 +8,7 @@
   simalq.tile [Tile mv-tile]
   simalq.tile.player [Player]
   simalq.un-iq [read-quest iq-quest]
-  simalq.player-actions [Action get-command do-command do-action]
+  simalq.commands [Action get-command do-command do-action]
   simalq.display [draw-screen])
 (setv  T True  F False)
 

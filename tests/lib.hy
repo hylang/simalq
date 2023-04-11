@@ -8,7 +8,7 @@
   simalq.un-iq [read-quest iq-quest]
   simalq.game-state [G]
   simalq.tile [add-tile rm-tile mv-tile ]
-  simalq.player-actions [Wait]
+  simalq.commands [Wait]
   simalq.main [start-quest start-level take-turn])
 
 
@@ -120,7 +120,7 @@
 (defmacro wk [direction-abbr [n-steps 1]]
   `(for [_ (range ~n-steps)]
     (hy.M.simalq/main.take-turn
-      (hy.M.simalq/player-actions.Walk
+      (hy.M.simalq/commands.Walk
         (. hy.M.simalq/geometry.Direction ~direction-abbr)))))
 
 (defn wait [[n-times 1]]
