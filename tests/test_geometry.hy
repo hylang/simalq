@@ -38,7 +38,7 @@
     (Map :data (* #((* #([T]) 3)) 3) :wrap-x F :wrap-y F))
 
   (setv m (example-map))
-  (Pos m 0 0)
+  (Pos :map m :x 0 :y 0)
   (Pos m 0 1)
   (Pos m 0 2)
   (with [(pytest.raises GeometryError)]

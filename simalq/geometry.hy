@@ -74,14 +74,14 @@
   [map x y]
   :frozen T
 
-  (defn __init__ [self m x y]
-    (when m.wrap-x
-      (%= x m.width))
-    (when m.wrap-y
-      (%= y m.height))
-    (unless (and (<= 0 x (- m.width 1)) (<= 0 y (- m.height 1)))
+  (defn __init__ [self map x y]
+    (when map.wrap-x
+      (%= x map.width))
+    (when map.wrap-y
+      (%= y map.height))
+    (unless (and (<= 0 x (- map.width 1)) (<= 0 y (- map.height 1)))
       (raise (GeometryError f"Illegal position: {x}, {y}")))
-    (for [[k v] (.items (dict  :map m  :x x  :y y))]
+    (for [[k v] (.items (dict  :map map  :x x  :y y))]
       ; Call `object.__setattr__` to bypass `dataclass`'s frozen
       ; checks.
       (object.__setattr__ self k v)))
