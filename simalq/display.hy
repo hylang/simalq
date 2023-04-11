@@ -6,13 +6,19 @@
 (setv  T True  F False)
 
 
-(defn draw-screen [width height]
+(defn draw-screen [width height message]
   "Return a list of lines. Each line is a list of (foreground color,
   background color, character) tuples."
 
   (setv the-map (draw-map
     width
     (- height status-bar-lines)))
+  (when message
+    ; Write the message over the last line of the map.
+    (setv message (cut (+ message " ") width))
+    (setv (cut (get the-map -1) (len message)) (gfor
+      c message
+      #(color.default-fg color.message-bg c))))
   (setv status-bar (lfor line (draw-status-bar) (lfor
     c (cut (.ljust line width) width)
     #(color.default-fg color.default-bg c))))

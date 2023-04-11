@@ -77,6 +77,7 @@
 
 (defn main-io-loop []
   (setv B (blessed.Terminal))
+  (setv message None)
 
   (with [_ (B.cbreak)  _ (B.fullscreen)  _ (B.hidden-cursor)]
     (while True
@@ -86,18 +87,18 @@
         :flush T :sep "" :end ""
         B.home B.clear
         (.join "" (gfor
-          line (draw-screen B.width B.height)
+          line (draw-screen B.width B.height message)
           [color-fg color-bg character] line
           ((B.on-color-rgb #* (get color.by-name color-bg))
             ((B.color-rgb #* (get color.by-name color-fg))
               character)))))
 
+      ; Clear the message buffer.
+      (setv message None)
+
       ; Get input.
-      (while
-        (try
-          (while (not (setx action (get-action (B.inkey)))))
-          (take-turn action)
-          (break)
-          (except [e ActionError]
-            ; ActionErrors are silent, for now.
-            (continue)))))))
+      (while (not (setx action (get-action (B.inkey)))))
+      (try
+        (take-turn action)
+        (except [e ActionError]
+          (setv message (get e.args 0)))))))
