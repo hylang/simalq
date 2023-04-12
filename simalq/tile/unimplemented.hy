@@ -1,12 +1,13 @@
-"Fill in `Tile.Tile.types-by-iq-ix` with IQ tile types that we don't
-yet meaningfully implement or substitute."
-
-
 (import
   dataclasses [dataclass]
   simalq.tile [Tile])
 (setv  T True  F False)
 
+
+(defclass UnimplementedTile [Tile]
+  "An IQ tile type that we don't yet meaningfully implement or
+  substitute, but we can put in `Tile.Tile.types-by-iq-ix` as a
+  stub.")
 
 (for [[iq-ix stem] [
 
@@ -207,7 +208,7 @@ yet meaningfully implement or substitute."
   (assert (not-in iq-ix Tile.types-by-iq-ix))
   (setv cls (type
     stem
-    #(Tile)
+    #(UnimplementedTile)
     (dict
       :__slots__ ["tile_extras"]
       :__init__ (fn [self * pos [tile-extras None]]
