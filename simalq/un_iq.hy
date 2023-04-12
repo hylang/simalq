@@ -179,7 +179,7 @@
 
 (defn iq-quest [quest-name]
   "Get the given original quest file from IQ, as a raw `bytes`
-  object."
+  object. Or use the symbol `all` to get all quests as a dictionary."
 
   ; Download the quests if needed.
   (assert (get os.environ "XDG_CACHE_HOME"))
@@ -196,5 +196,12 @@
       (.write-bytes path (.read r))))
 
   ; Get the requested quest (heh).
+  (setv prefix "infinity_quests_2/")
   (with [z (ZipFile path "r")]
-    (.read z (+ "infinity_quests_2/" quest-name))))
+    (if (= quest-name 'all)
+      (dfor
+        q (.namelist z)
+        :setv v (.read z q)
+        :if v
+        (.removeprefix q prefix) v)
+      (.read z (+ prefix quest-name)))))

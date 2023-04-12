@@ -6,6 +6,12 @@
   simalq.un-iq [read-quest iq-quest])
 
 
+(defn test-get-all []
+  (setv d (iq-quest 'all))
+  (assert (is (type d) dict))
+  (assert (= (len d) 7)))
+
+
 (defn test-read-bootcamp []
   (setv quest (read-quest (iq-quest "Boot Camp 2")))
   (assert (= quest.title "Boot Camp will teach you how to play Infinity Quest II"))
