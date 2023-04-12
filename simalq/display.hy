@@ -71,16 +71,17 @@
 
   #(
     (j
-      (.format "HP {:,}{}"
-        G.player.hp
-        "") ; Reserved for showing damage, like " (-999)"
+      (.format "HP {:,}"
+        G.player.hp)
       (when G.level.poison-intensity
         (+ "☠ " (str G.level.poison-intensity)))
       None ; Reserved for time limits, like "Tm 1,000"
       (when G.player.keys
         (.format "⚷ {}" G.player.keys))
-      None) ; Reserved for three inventory items (2 characters apiece)
+      None) ; Reserved for inventory items (2 characters apiece)
     (j
+      (.format "DL {:,}"
+        G.level-n)
       (.format "Turn {:,}{}"
         G.turn-n
         (if (= G.turn-n (. G.states [-1] turn-n))
