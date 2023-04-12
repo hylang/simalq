@@ -115,7 +115,7 @@
   (defn hook-player-walk-from [self target]
     "Called when the player is about to walk from a square containing
     this tile. The hook shouldn't change the game state, but it can
-    raise ActionError to halt the movement."
+    raise CommandError to halt the movement."
     None)
   (defn hook-player-walk-to [self origin]
     "Analogous to `Tile.hook-player-walk-from`."

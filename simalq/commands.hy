@@ -3,7 +3,7 @@
   simalq.macros [defdataclass])
 (import
   copy [deepcopy]
-  simalq.util [ActionError]
+  simalq.util [CommandError]
   simalq.geometry [Direction at]
   simalq.game-state [G]
   simalq.tile [mv-tile]
@@ -59,9 +59,9 @@
     ShiftHistory (do
       (setv target (+ G.state-i cmd.steps))
       (when (>= target (len G.states))
-        (raise (ActionError "Nothing to redo.")))
+        (raise (CommandError "Nothing to redo.")))
       (when (< target 0)
-        (raise (ActionError "Nothing to undo.")))
+        (raise (CommandError "Nothing to undo.")))
       (setv G.state-i target))))
 
 
@@ -86,7 +86,7 @@
   (setv G.action action)
   (try
     (_execute-action action)
-    (except [ActionError]
+    (except [CommandError]
       ; No action occurred. Abort the new game state before bubbling
       ; the exception up.
       (del (get G.states G.state-i))
@@ -104,14 +104,14 @@
       (setv d action.direction)
       (setv [target wly] (walkability G.player.pos d :monster? F))
       (when (= wly 'out-of-bounds)
-        (raise (ActionError "The border of the dungeon blocks your movement.")))
+        (raise (CommandError "The border of the dungeon blocks your movement.")))
       (when (= wly 'blocked-diag)
-        (raise (ActionError "That diagonal is blocked by a neighbor.")))
+        (raise (CommandError "That diagonal is blocked by a neighbor.")))
       (for [tile (at target)]
         (when (.hook-player-bump tile G.player.pos)
           (return)))
       (when (= wly 'bump)
-        (raise (ActionError "Your way is blocked.")))
+        (raise (CommandError "Your way is blocked.")))
       (for [tile (at G.player.pos)]
         (.hook-player-walk-from tile target))
       (for [tile (at target)]

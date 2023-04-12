@@ -1,7 +1,7 @@
 (import
   copy [deepcopy]
   blessed
-  simalq.util [ActionError hurt-player DamageType]
+  simalq.util [CommandError hurt-player DamageType]
   simalq.color :as color
   simalq.geometry [burst at]
   simalq.game-state [G Rules GameState]
@@ -102,5 +102,5 @@
         (if (isinstance cmd Action)
           (take-turn cmd)
           (do-command cmd))
-        (except [e ActionError]
+        (except [e CommandError]
           (setv message (get e.args 0)))))))

@@ -1,5 +1,5 @@
 (import
-  simalq.util [ActionError]
+  simalq.util [CommandError]
   simalq.game-state [G]
   simalq.tile [Tile deftile rm-tile])
 
@@ -34,7 +34,7 @@
 
   :hook-player-walk-to (fn [self origin]
     (when (>= G.player.keys G.rules.max-keys)
-      (raise (ActionError "Your keyring has no room for another key."))))
+      (raise (CommandError "Your keyring has no room for another key."))))
   :pick-up (fn [self]
     (+= G.player.keys 1)
     (assert (<= G.player.keys G.rules.max-keys)))

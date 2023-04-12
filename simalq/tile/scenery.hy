@@ -2,7 +2,7 @@
   hyrule [unless]
   simalq.macros [has])
 (import
-  simalq.util [ActionError GameOverException player-melee-damage DamageType]
+  simalq.util [CommandError GameOverException player-melee-damage DamageType]
   simalq.geometry [Pos Direction GeometryError pos+ at]
   simalq.tile [Tile deftile rm-tile replace-tile damage-tile]
   simalq.game-state [G])
@@ -84,7 +84,7 @@
     blocks-monster T)
   (defn hook-player-bump [self origin]
     (unless G.player.keys
-      (raise (ActionError "It's locked, and you're keyless at the moment.")))
+      (raise (CommandError "It's locked, and you're keyless at the moment.")))
     (-= G.player.keys 1)
     (if self.destroy-when-opened
       (rm-tile self)
@@ -120,10 +120,10 @@
 
     (defn hook-player-walk-from [self target]
       (unless (= (safe-pos+ self.pos self.direction) target)
-        (raise (ActionError f"You can only go {self.direction.name} from this one-way door."))))
+        (raise (CommandError f"You can only go {self.direction.name} from this one-way door."))))
     (defn hook-player-walk-to [self origin]
       (unless (= (safe-pos+ origin self.direction) self.pos)
-        (raise (ActionError (.format "That one-way door must be entered from the {}."
+        (raise (CommandError (.format "That one-way door must be entered from the {}."
           self.direction.opposite.name)))))
 
     (setv flavor "My way or the highway!"))

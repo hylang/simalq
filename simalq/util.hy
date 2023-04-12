@@ -25,8 +25,8 @@
   (get sequence (if (= i (len sequence)) 0 i)))
 
 
-(defclass ActionError [Exception]
-  "Represents an attempt by the player to make an illegal move, such as walking through a wall.")
+(defclass CommandError [Exception]
+  "Represents a failure to execute the player's command.")
 
 (defclass GameOverException [Exception]
   "Represents a game ending, whether by losing or winning.")

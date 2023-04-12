@@ -9,7 +9,7 @@
 (setv hide-messages #(
   ; These messages are probably too naggy to actually show. They're
   ; still implemented for the sake of testing the corresponding
-  ; `ActionError`s.
+  ; `CommandError`s.
   "Your way is blocked."
   "The border of the dungeon blocks your movement."))
 
