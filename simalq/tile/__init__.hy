@@ -237,4 +237,4 @@
   simalq.tile.scenery
   simalq.tile.item
   simalq.tile.monster
-  simalq.tile.not-implemented)
+  simalq.tile.unimplemented)
