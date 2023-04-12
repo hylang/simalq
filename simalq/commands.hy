@@ -3,9 +3,9 @@
   simalq.macros [defdataclass])
 (import
   copy [deepcopy]
-  simalq.util [CommandError]
+  simalq.util [CommandError save-game-path]
   simalq.geometry [Direction at]
-  simalq.game-state [G]
+  simalq.game-state [G save-game load-game]
   simalq.tile [mv-tile]
   simalq.tile.scenery [walkability])
 (setv  T True  F False)
@@ -29,6 +29,10 @@
   "Undo or redo."
   [steps]
   :frozen T)
+(defdataclass SaveGame [Command]
+  "Write the global state to a file.")
+(defdataclass LoadGame [Command]
+  "Read a file and replace the global state with its contents.")
 
 
 (defn get-command [key]
@@ -37,7 +41,9 @@
       (Wait)
       (Walk v))))
   (when (setx v (.get cmd-keys (str key)))
-    (return ((get v 0) #* (cut v 1 None))))
+    (return (if (isinstance v list)
+      ((get v 0) #* (cut v 1 None))
+      (v))))
   None)
 
 (setv dir-keys {
@@ -46,8 +52,10 @@
   "1" Direction.SW  "2" Direction.S  "3" Direction.SE})
 
 (setv cmd-keys (dict
-  :u [ShiftHistory -1]    ; Undo
-  :r [ShiftHistory +1]))  ; Redo
+  :u [ShiftHistory -1]  ; Undo
+  :r [ShiftHistory +1]  ; Redo
+  :S SaveGame
+  :L LoadGame))
 
 
 (defn do-command [cmd]
@@ -62,7 +70,20 @@
         (raise (CommandError "Nothing to redo.")))
       (when (< target 0)
         (raise (CommandError "Nothing to undo.")))
-      (setv G.state-i target))))
+      (setv G.state-i target))
+
+    SaveGame
+      (try
+        (.parent.mkdir save-game-path :exist-ok T)
+        (save-game save-game-path)
+        (except [e IOError]
+          (raise (CommandError (+ "Save failed: " (str e))))))
+
+    LoadGame
+      (try
+        (load-game save-game-path)
+        (except [e IOError]
+          (raise (CommandError (+ "Load failed: " (str e))))))))
 
 
 (defn do-action [action]
