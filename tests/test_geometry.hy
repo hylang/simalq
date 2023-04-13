@@ -108,7 +108,10 @@
   (setv p0 (Pos :x 3 :y 2
     :map (Map.make :wrap-x T :wrap-y F :width 10 :height 10)))
   (assert (= (r Direction.W 20)
-    [2 2  1 2  0 2  9 2  8 2  7 2  6 2  5 2  4 2])))
+    [2 2  1 2  0 2  9 2  8 2  7 2  6 2  5 2  4 2]))
+
+  (assert (= (r Direction.NW Inf)
+    [2 3  1 4  0 5  9 6  8 7  7 8  6 9])))
 
 
 (defn test-direction []
