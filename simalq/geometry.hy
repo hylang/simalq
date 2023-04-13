@@ -168,7 +168,7 @@
   monsters can march toward the player without creating gaps."
 
   (unique (gfor
-    c (seq 0 size)
+    c (seq 0 (min size (max center.map.width center.map.height)))
     [x y] (py "chain(
       (( x, -c) for x in seq(    -c,      c,  1)),
       (( c,  y) for y in seq(-c + 1,      c,  1)),

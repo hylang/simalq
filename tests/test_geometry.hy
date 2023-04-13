@@ -303,3 +303,9 @@
     #((- p.x p0.x) (- p.y p0.y))))
 
   (assert (= sq-spiral iq-spiral)))
+
+
+(defn test-burst-infinite []
+  (setv m (Map.make :width 20 :height 20 :wrap-x T :wrap-y T))
+  (setv b (list (burst (Pos m 4 7) Inf)))
+  (assert (= (len b) (* 20 20))))
