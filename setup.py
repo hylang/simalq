@@ -12,7 +12,7 @@ setuptools.setup(
         'Source Code': 'https://github.com/hylang/simalq'},
     install_requires = [
         'hy @ git+https://github.com/hylang/hy@0e3409abf38bc7271a28b4388f146f24c93efeb1',
-        'hyrule @ git+https://github.com/Kodiologist/hyrule@edc465943e21be671f294b11d245694a3fa90bc7',
+        'hyrule @ git+https://github.com/Kodiologist/hyrule@4978273ee5ee0c1d52012a87f6fbbc6abf3979e9',
         'toolz >= 0.12.0',
         'construct >= 2.10.68',
         'blessed >= 1.20.0'],
