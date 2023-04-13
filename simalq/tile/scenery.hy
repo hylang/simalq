@@ -151,7 +151,7 @@
 
 (deftile Scenery "##" "a cracked wall"
   :slot-defaults (dict
-    :hp 0)
+    :hp 2)
   :mutable-slots #("hp")
   :iq-ix-mapper ["hp"
     {3 4  4 2  15 6}]
