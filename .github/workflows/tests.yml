@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       XDG_CACHE_HOME: /tmp/xdg-cache
+      XDG_DATA_HOME: /tmp/xdg-data
 
     steps:
     - uses: actions/checkout@v3
