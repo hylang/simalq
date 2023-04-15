@@ -65,7 +65,7 @@
   "This function is only for commands that aren't actions; see
   `do-action` for actions."
   (import
-    simalq.main [io-mode print-main-screen])
+    simalq.main [io-mode print-main-screen info-screen])
 
   (ecase (type cmd)
 
@@ -75,13 +75,18 @@
         :draw (fn []
           (print-main-screen focus :status-bar F))
         :on-input (fn [key]
-          (if (setx v (.get dir-keys (str key)))
-            (when (!= v 'center)
+          (setv dir-v (.get dir-keys (str key)))
+          (cond
+            (and dir-v (!= dir-v 'center))
               (try
                 (nonlocal focus)
-                (setv focus (pos+ focus v))
-                (except [GeometryError])))
-            'done))))
+                (setv focus (pos+ focus dir-v))
+                (except [GeometryError]))
+            (or (= dir-v 'center) (= (str key) ";"))
+              (when (at focus)
+                (info-screen (get (at focus) 0)))
+            True
+              'done))))
 
     ShiftHistory (do
       (setv target (+ G.state-i cmd.steps))

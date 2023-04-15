@@ -7,6 +7,9 @@
   simalq.game-state [G Rules GameState]
   simalq.tile [Tile mv-tile]
   simalq.tile.player [Player]
+  simalq.tile.scenery [Scenery]
+  simalq.tile.item [Item]
+  simalq.tile.monster [Monster]
   simalq.un-iq [read-quest iq-quest]
   simalq.commands [Action get-command do-command do-action]
   simalq.display [draw-screen bless-colorstr])
@@ -136,3 +139,66 @@
     B.home B.clear
     (bless-colorstr B (draw-screen
       B.width B.height focus status-bar message))))
+
+
+(defn info-screen [t]
+  "Enter an `io-mode` for showing information about the tile `t`."
+
+  (setv x-margin (* 2 " "))
+  (setv y-margin 1)
+  (setv max-wrap-cols 75)
+
+  (import
+    re
+    simalq.display [color-tile])
+
+  (defn wrapped [x]
+    (lfor
+      line (B.wrap
+        x
+        (min max-wrap-cols (- B.width (len x-margin))))
+      (+ x-margin line)))
+
+  (setv lines [
+    #* (* [""] y-margin)
+    (+ x-margin (bless-colorstr B (color-tile t)) "  " t.full-name)
+    ""
+    (+ x-margin (B.bold (next (gfor
+      cls [Scenery Item Monster (type t)]
+      :if (isinstance t cls)
+      cls.__name__))))
+    ""
+    #* (gfor
+      bullet (.info-bullets t)
+      :if bullet
+      line (wrapped (re.sub r"\s+" " " (if (isinstance bullet tuple)
+        (+
+          (B.bold f"• {(get bullet 0)}:")
+          " " (str (get bullet 1)))
+        (B.bold f"• {bullet}"))))
+      line)
+    ""
+    #* (wrapped t.flavor)])
+
+  (setv top-line-ix 0)
+
+  (io-mode
+
+    :draw (fn []
+      (print
+        :flush T :sep "" :end ""
+        B.home B.clear
+        (.join "\n" (cut lines
+          top-line-ix
+          (+ top-line-ix B.height)))))
+
+    :on-input (fn [key]
+      ; Advance `top-line-ix` (i.e., scroll the screen), or exit if
+      ; we've shown it all.
+      (nonlocal top-line-ix)
+      (setv new-ix (min
+        (+ top-line-ix B.height)
+        (max 0 (- (len lines) B.height))))
+      (if (= new-ix top-line-ix)
+        'done
+        (setv top-line-ix new-ix)))))
