@@ -75,7 +75,22 @@
         (return)))
 
     ; We're clear to move.
-    (mv-tile self target)))
+    (mv-tile self target))
+
+  (defn info-bullets [self] [
+    #("Hit points" self.hp)
+    (if self.immune
+      #("Immune to" self.immune)
+      "No immunities")
+    (if self.damage-melee
+      #("Melee damage" self.damage-melee)
+      "No melee attack")
+    (if self.damage-shot
+      #("Shot damage" self.damage-shot)
+      "No ranged attack")
+    #("Point value" self.points)
+    #("Behavior" "Approach — If the monster is adjacent to you, it makes a melee attack. Otherwise, if it can shoot you, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction.")
+    #("Movement state" self.movement-state)]))
 
 
 (defclass NonGen [Monster]

@@ -39,3 +39,24 @@
       :if (and (isinstance it ~tile-type) ~predicate-form)
       it)
     None))
+
+
+(defmacro defn-dd [fname params doc-form #* body]
+  #[[Define a function with a "dynamic docstring": another function
+  stored in an attribute `dynadoc` of the host function.]]
+  `(do ~@(_defn-dd fname params doc-form body)))
+
+(defmacro fn-dd [params doc-form #* body]
+  "As `defn-dd`, for an anonymous function."
+  (setv fname (hy.gensym))
+  `(do
+    ~@(_defn-dd fname params doc-form body)
+    ~fname))
+
+(defn _defn-dd [fname params doc-form body]
+  (assert (and
+    (isinstance doc-form hy.models.Expression)
+    (= (get doc-form 0) 'doc)))
+  [
+    `(defn ~fname ~params ~@body)
+    `(setv (. ~fname dynadoc) (fn [it] ~@(cut doc-form 1 None)))])

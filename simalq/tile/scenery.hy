@@ -1,6 +1,6 @@
 (require
   hyrule [unless]
-  simalq.macros [has])
+  simalq.macros [has defn-dd])
 (import
   simalq.util [CommandError GameOverException player-melee-damage DamageType]
   simalq.geometry [Pos Direction GeometryError pos+ at]
@@ -18,8 +18,36 @@
       ; Block player and monster movement.
     blocks-diag F
       ; Block diagonal movement between orthogonally adjacent squares.
-    blocks-monster F))
+    blocks-monster F)
       ; Block monster movement, even if `blocks-move` is false.
+
+  (defn dod [self prefix attr-sym]
+    (setv a (hy.mangle attr-sym))
+    (when (is-not (getattr (type self) a) (getattr Tile a))
+      #(prefix (or
+        (. (getattr self a) __doc__)
+        ((. (getattr self a) dynadoc) self)))))
+
+  (defn info-bullets [self]
+    (setv blocks-monster (or self.blocks-monster self.blocks-move))
+    [
+      (when self.damageable
+        #("Hit points" self.hp))
+      (when self.damageable
+        (if self.immune
+          #("Immune to" self.immune)
+          "No immunities"))
+      (when self.blocks-move
+        "Blocks all movement")
+      (when (and (not self.blocks-move) (or self.blocks-monster G.dainty-monsters))
+        "Blocks monster movement")
+      (when self.blocks-diag
+        "Blocks diagonal movement around itself")
+      (.dod self "Effect when bumped" 'hook-player-bump)
+      (.dod self "Effect when trying to enter" 'hook-player-walk-to)
+      (.dod self "Effect when stepped onto" 'hook-player-walked-into)
+      (.dod self "Effect when trying to exit" 'hook-player-walk-from)]))
+
 
 (defn walkability [p direction monster?]
   "Can an actor at `p` walk in `direction`, or at least bump something
@@ -80,27 +108,33 @@
 (defclass LockedDoor [Scenery]
   (setv
     __slots__ []
-    destroy-when-opened None
+    result-when-opened None
     blocks-monster T)
-  (defn hook-player-bump [self origin]
+
+  (defn-dd hook-player-bump [self origin]
+    (doc (+ "Consumes one key to "
+      (if it.result-when-opened
+        f"replace the tile with {(hy.repr it.result-when-opened)}."
+        "destroy the tile.")))
+
     (unless G.player.keys
       (raise (CommandError "It's locked, and you're keyless at the moment.")))
     (-= G.player.keys 1)
-    (if self.destroy-when-opened
-      (rm-tile self)
-      (replace-tile self "door"))
+    (if self.result-when-opened
+      (replace-tile self self.result-when-opened)
+      (rm-tile self))
     True))
 
 (deftile LockedDoor "++" "a locked door"
   :color 'navy
   :iq-ix 6
-  :destroy-when-opened False
+  :result-when-opened "door"
   :flavor "Fortunately, Tris knows how to pick locks. Unfortunately, she was wearing her hair down when she got whisked away to the dungeon, so she doesn't have any hairpins. You may have to use a key.")
 
 (deftile LockedDoor "++" "a locked disappearing door"
   :color 'steel-blue
   :iq-ix 81
-  :destroy-when-opened True
+  :result-when-opened None
   :flavor "This advanced door destroys not only the key used to unlock it, but also itself. A true marvel of engineering.")
 
 ((fn []
@@ -118,10 +152,13 @@
       direction None
       color #('brown 'red))
 
-    (defn hook-player-walk-from [self target]
+    (defn-dd hook-player-walk-from [self target]
+      (doc f"Only allows you to walk {it.direction.name}.")
       (unless (= (safe-pos+ self.pos self.direction) target)
         (raise (CommandError f"You can only go {self.direction.name} from this one-way door."))))
-    (defn hook-player-walk-to [self origin]
+    (defn-dd hook-player-walk-to [self origin]
+      (doc f"Only allows you to enter from the
+        {it.direction.opposite.name}.")
       (unless (= (safe-pos+ origin self.direction) self.pos)
         (raise (CommandError (.format "That one-way door must be entered from the {}."
           self.direction.opposite.name)))))
@@ -140,12 +177,17 @@
   :color-bg 'lime
   :iq-ix 7
   :blocks-monster T
+
   :hook-player-walked-into (fn [self]
+    "Takes you to the next dungeon level. If there is no such level,
+    you win the quest."
+
     (when (> G.level.next-level (len G.quest.levels))
       (raise (GameOverException 'won)))
     (hy.M.simalq/main.start-level G.level.next-level)
     (setv G.player.just-exited T)
     True)
+
   :flavor "Get me outta here.")
 
 
@@ -159,7 +201,7 @@
   :blocks-move T :blocks-diag T
   :damageable T
   :hook-player-bump (fn [self origin]
-    "Damage the wall."
+    "You attack the wall with your sword."
     (damage-tile self (player-melee-damage) DamageType.PlayerMelee)
     True)
 

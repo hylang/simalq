@@ -61,6 +61,9 @@
       s (getattr c "mutable_slots" #())
       s))
 
+  (defn [classmethod property] full-name [cls]
+    (+ (if cls.article (+ cls.article " ") "") cls.stem))
+
   ; The below variables and methods may be overridden by subclasses.
 
   (setv
@@ -107,6 +110,11 @@
     "This method should return a dictionary of instance variables
     to set for a new instance."
     (raise (TypeError (+ "Tile extras not implemented: " cls.stem))))
+
+  (defn info-bullets [self]
+    "Return a list of bulleted items for an info screen. `None`s
+    in this list will be filtered out by the caller."
+    [])
 
   (defn hook-player-bump [self origin]
     "Called when the player tries to walk towards this tile. Return

@@ -1,3 +1,5 @@
+(require
+  simalq.macros [fn-dd])
 (import
   simalq.util [CommandError]
   simalq.game-state [G]
@@ -13,7 +15,14 @@
     (rm-tile self)
     (+= G.score self.points)
     (.pick-up self))
-  (defn pick-up [self]))
+  (defn pick-up [self])
+
+  (defn info-bullets [self] [
+    #("Point value" self.points)
+    (when (is-not (. (type self) pick-up) Item.pick-up)
+      #("Pickup effect" (or
+        self.pick-up.__doc__
+        (self.pick-up.dynadoc self))))]))
 
 
 (deftile Item "$ " "a pile of gold"
@@ -35,7 +44,10 @@
   :hook-player-walk-to (fn [self origin]
     (when (>= G.player.keys G.rules.max-keys)
       (raise (CommandError "Your keyring has no room for another key."))))
-  :pick-up (fn [self]
+
+  :pick-up (fn-dd [self]
+    (doc f"Adds to your count of keys. If you're at the maximum number
+      of keys ({G.rules.max-keys}), you can't step on its square.")
     (+= G.player.keys 1)
     (assert (<= G.player.keys G.rules.max-keys)))
 
