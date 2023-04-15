@@ -9,7 +9,7 @@
   simalq.tile.player [Player]
   simalq.un-iq [read-quest iq-quest]
   simalq.commands [Action get-command do-command do-action]
-  simalq.display [draw-screen])
+  simalq.display [draw-screen bless-colorstr])
 (setv  T True  F False)
 
 
@@ -86,12 +86,7 @@
       (print
         :flush T :sep "" :end ""
         B.home B.clear
-        (.join "" (gfor
-          line (draw-screen B.width B.height message)
-          [color-fg color-bg character] line
-          ((B.on-color-rgb #* (get color.by-name color-bg))
-            ((B.color-rgb #* (get color.by-name color-fg))
-              character)))))
+        (bless-colorstr B (draw-screen B.width B.height message)))
 
       ; Clear the message buffer.
       (setv message None)
