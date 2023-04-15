@@ -45,25 +45,29 @@
     (fg (bg c.char)))))
 
 
-(defn draw-screen [width height message]
+(defn draw-screen [width height focus status-bar message]
   "Return a colorstr for the main screen."
 
   (setv the-map (draw-map
+    focus
     width
-    (- height status-bar-lines)))
+    (- height (if status-bar status-bar-lines 0))))
   (when (and message (not-in message hide-messages))
     ; Write the message over the last line of the map.
     (setv message (cut (+ message " ") width))
     (setv (cut (get the-map -1) (len message))
       (colorstr message None color.message-bg)))
-  (setv status-bar (lfor
-    line (draw-status-bar)
-    (colorstr (cut (.ljust line width) width))))
+  (setv status-bar (if status-bar
+    (lfor
+      line (draw-status-bar)
+      (colorstr (cut (.ljust line width) width)))
+     []))
   (+ #* (+ the-map status-bar)))
 
 
-(defn draw-map [width height]
-  "Return a list of colorstrs, one per line."
+(defn draw-map [focus width height]
+  "Return a list of colorstrs, one per line. The map is centered on
+  `focus`, a `Pos`."
 
   (lfor
     ; Loop over the screen coordinates `sy` and `sx`. I number `sy`
@@ -71,10 +75,9 @@
     ; similarity with `Pos`.
     sy (reversed (range height))
     (lfor sx (range 0 width 2)
-    ; Find the map coordinates `mx` and `my`, using the rule
-    ; that the screen should be centered on the player.
-    :setv mx (+ G.player.pos.x (- (// sx 2) (// width 4)))
-    :setv my (+ G.player.pos.y (- sy (// height 2)))
+    ; Find the map coordinates `mx` and `my`.
+    :setv mx (+ focus.x (- (// sx 2) (// width 4)))
+    :setv my (+ focus.y (- sy (// height 2)))
     ; Get the two characters and their colors for the corresponding
     ; mapsym.
     [i c] (enumerate
@@ -85,6 +88,8 @@
         (mapsym-at-pos (Pos G.map mx my))
         ; Otherwise, we're off the map. Draw border.
         (colorstr "██" color.void)))
+    :do (when (= [mx my] [focus.x focus.y])
+      (setv c.bg color.focus))
     ; If the screen has an odd width, we can only draw the first
     ; character of the rightmost mapsym.
     :if (not (and (% width 2) (= sx (- width 1)) i))

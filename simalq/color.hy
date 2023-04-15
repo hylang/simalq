@@ -8,6 +8,7 @@
       'dark-gray [(/ 1 4) (/ 1 4) (/ 1 4)]
       'light-gray [(/ 3 4) (/ 3 4) (/ 3 4)]
       'brown [(/ 1 2) (/ 1 4) 0]
+      'yellow [1 1 0]
       'pale-yellow [1 1 (/ 3 4)]
       'dark-yellow [(/ 1 2) (/ 1 2) 0]
       'red [(/ 3 4) 0 0]
@@ -24,4 +25,5 @@
   void 'dark-navy
   reality-fringe 'light-gray
   reality-fringe-block 'dark-gray
+  focus 'yellow
   message-bg 'pale-yellow)

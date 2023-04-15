@@ -75,27 +75,64 @@
   (+= G.turn-n 1))
 
 
-(defn main-io-loop []
-  (setv B (blessed.Terminal))
-  (setv message None)
+(setv B None)
 
-  (with [_ (B.cbreak)  _ (B.fullscreen)  _ (B.hidden-cursor)]
+(defn io-mode [draw on-input]
+  "Enter a modal interface that alternates between the callbacks
+  `draw` (nullary) and `on-input` (unary, taking a key from
+  `blessed.Terminal.inkey`. `on-input` can return the symbol `done`
+  to exit the mode."
+
+  (global B)
+  (setv top-io-mode F)
+  (when (is B None)
+    (setv B (blessed.Terminal))
+    (setv top-io-mode T))
+
+  (defn f []
     (while True
+      (draw)
+      (when (= (on-input (B.inkey)) 'done)
+        (break))))
 
+  (if top-io-mode
+    (with [_ (B.cbreak)  _ (B.fullscreen)  _ (B.hidden-cursor)]
+      (f))
+    (f))
+
+  (when top-io-mode
+    (del B)))
+
+
+(defn main-io-loop []
+  (setv message None)
+  (io-mode
+
+    :draw (fn []
+      (nonlocal message)
       ; Draw the screen.
-      (print
-        :flush T :sep "" :end ""
-        B.home B.clear
-        (bless-colorstr B (draw-screen B.width B.height message)))
-
+      (print-main-screen
+        :focus G.player.pos
+        :status-bar T
+        :message message)
       ; Clear the message buffer.
-      (setv message None)
+      (setv message None))
 
-      ; Get input.
-      (while (not (setx cmd (get-command (B.inkey)))))
+    :on-input (fn [key]
+      (setv cmd (get-command key))
+      (when (is cmd None)
+        (return))
       (try
         (if (isinstance cmd Action)
           (take-turn cmd)
           (do-command cmd))
         (except [e CommandError]
+          (nonlocal message)
           (setv message (get e.args 0)))))))
+
+(defn print-main-screen [focus status-bar [message None]]
+  (print
+    :flush T :sep "" :end ""
+    B.home B.clear
+    (bless-colorstr B (draw-screen
+      B.width B.height focus status-bar message))))

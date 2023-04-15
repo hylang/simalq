@@ -4,7 +4,7 @@
 (import
   copy [deepcopy]
   simalq.util [CommandError save-game-path]
-  simalq.geometry [Direction at]
+  simalq.geometry [Direction GeometryError pos+ at]
   simalq.game-state [G save-game load-game]
   simalq.tile [mv-tile]
   simalq.tile.scenery [walkability])
@@ -25,6 +25,8 @@
   [direction]
   :frozen T)
 
+(defdataclass Look [Command]
+  "Move the cursor around the level.")
 (defdataclass ShiftHistory [Command]
   "Undo or redo."
   [steps]
@@ -51,18 +53,35 @@
   "4" Direction.W   "5" 'center      "6" Direction.E
   "1" Direction.SW  "2" Direction.S  "3" Direction.SE})
 
-(setv cmd-keys (dict
-  :u [ShiftHistory -1]  ; Undo
-  :r [ShiftHistory +1]  ; Redo
-  :S SaveGame
-  :L LoadGame))
+(setv cmd-keys {
+  ";" Look
+  "u" [ShiftHistory -1]  ; Undo
+  "r" [ShiftHistory +1]  ; Redo
+  "S" SaveGame
+  "L" LoadGame})
 
 
 (defn do-command [cmd]
   "This function is only for commands that aren't actions; see
   `do-action` for actions."
+  (import
+    simalq.main [io-mode print-main-screen])
 
   (ecase (type cmd)
+
+    Look (do
+      (setv focus G.player.pos)
+      (io-mode
+        :draw (fn []
+          (print-main-screen focus :status-bar F))
+        :on-input (fn [key]
+          (if (setx v (.get dir-keys (str key)))
+            (when (!= v 'center)
+              (try
+                (nonlocal focus)
+                (setv focus (pos+ focus v))
+                (except [GeometryError])))
+            'done))))
 
     ShiftHistory (do
       (setv target (+ G.state-i cmd.steps))
