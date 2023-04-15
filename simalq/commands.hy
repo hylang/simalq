@@ -3,7 +3,7 @@
   simalq.macros [defdataclass])
 (import
   copy [deepcopy]
-  simalq.util [CommandError save-game-path]
+  simalq.util [CommandError save-game-path msg]
   simalq.geometry [Direction GeometryError pos+ at]
   simalq.game-state [G save-game load-game]
   simalq.tile [mv-tile]
@@ -100,12 +100,14 @@
       (try
         (.parent.mkdir save-game-path :exist-ok T)
         (save-game save-game-path)
+        (msg "Game saved.")
         (except [e IOError]
           (raise (CommandError (+ "Save failed: " (str e))))))
 
     LoadGame
       (try
         (load-game save-game-path)
+        (msg "Game loaded.")
         (except [e IOError]
           (raise (CommandError (+ "Load failed: " (str e))))))))
 
