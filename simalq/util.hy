@@ -55,5 +55,11 @@
   MundaneArrow MagicArrow MonsterShot
   Poison Trap Fire DeathMagic]))))
 
+
+(setv hp-warning-threshold 100)
+
 (defn hurt-player [amount damage-type]
-  (hy.M.simalq/tile.damage-tile G.player amount damage-type))
+  (setv hp-was G.player.hp)
+  (hy.M.simalq/tile.damage-tile G.player amount damage-type)
+  (when (chainc G.player.hp <= hp-warning-threshold < hp-was)
+    (msg "Princess needs food badly!")))
