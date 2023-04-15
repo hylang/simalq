@@ -38,6 +38,13 @@
   "Represents a game ending, whether by losing or winning.")
 
 
+
+(setv message-queue [])
+
+(defn msg [#* args]
+  (.append message-queue (.join " " (map str args))))
+
+
 (defn player-melee-damage []
   "Return how much damage the player does with her sword."
   G.rules.base-player-melee-damage)

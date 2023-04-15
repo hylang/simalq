@@ -1,6 +1,7 @@
 (require
   simalq.macros [defdataclass])
 (import
+  textwrap [wrap]
   hy.pyops *
   simalq.color :as color
   simalq.game-state [G]
@@ -45,24 +46,37 @@
     (fg (bg c.char)))))
 
 
-(defn draw-screen [width height focus status-bar message]
+(defn draw-screen [width height focus status-bar messages]
   "Return a colorstr for the main screen."
 
-  (setv the-map (draw-map
+  (setv out (draw-map
     focus
     width
     (- height (if status-bar status-bar-lines 0))))
-  (when (and message (not-in message hide-messages))
-    ; Write the message over the last line of the map.
-    (setv message (cut (+ message " ") width))
-    (setv (cut (get the-map -1) (len message))
-      (colorstr message None color.message-bg)))
-  (setv status-bar (if status-bar
-    (lfor
+  (when status-bar
+    (+= out (lfor
       line (draw-status-bar)
-      (colorstr (cut (.ljust line width) width)))
-     []))
-  (+ #* (+ the-map status-bar)))
+      (colorstr (cut (.ljust line width) width)))))
+  (setv messages (lfor
+    m messages
+    :if (not-in m hide-messages)
+    line (wrap m width)
+    line))
+  (when messages
+    ; Write the message over the line just above the status bar
+    ; (or where it would be), and then leak into the following lines
+    ; if necessary (typically, it shouldn't be).
+    (setv max-lines (+ status-bar-lines 1))
+    (setv messages (cut messages max-lines))
+    (setv i (- height max-lines))
+    (for [[i m] (zip (range i (+ i (len messages))) messages)]
+      (when (< (len m) width)
+        ; If there's room, pad the line with one extra space of the
+        ; message color.
+        (+= m " "))
+      (setv (cut (get out i) (len m))
+        (colorstr m None color.message-bg))))
+  (+ #* out))
 
 
 (defn draw-map [focus width height]

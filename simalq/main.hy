@@ -1,7 +1,7 @@
 (import
   copy [deepcopy]
   blessed
-  simalq.util [CommandError hurt-player DamageType]
+  simalq.util [CommandError message-queue msg hurt-player DamageType]
   simalq.color :as color
   simalq.geometry [burst at]
   simalq.game-state [G Rules GameState]
@@ -108,18 +108,19 @@
 
 
 (defn main-io-loop []
-  (setv message None)
   (io-mode
 
     :draw (fn []
-      (nonlocal message)
+      ; Retrieve messages, if any.
+      (setv messages #())
+      (when message-queue
+        (setv messages (tuple message-queue))
+        (setv (cut message-queue) #()))
       ; Draw the screen.
       (print-main-screen
         :focus G.player.pos
         :status-bar T
-        :message message)
-      ; Clear the message buffer.
-      (setv message None))
+        :messages messages))
 
     :on-input (fn [key]
       (setv cmd (get-command key))
@@ -130,15 +131,14 @@
           (take-turn cmd)
           (do-command cmd))
         (except [e CommandError]
-          (nonlocal message)
-          (setv message (get e.args 0)))))))
+          (msg (get e.args 0)))))))
 
-(defn print-main-screen [focus status-bar [message None]]
+(defn print-main-screen [focus status-bar [messages #()]]
   (print
     :flush T :sep "" :end ""
     B.home B.clear
     (bless-colorstr B (draw-screen
-      B.width B.height focus status-bar message))))
+      B.width B.height focus status-bar messages))))
 
 
 (defn info-screen [t]
