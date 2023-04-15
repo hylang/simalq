@@ -2,6 +2,7 @@
   hyrule [unless]
   simalq.macros [has defn-dd])
 (import
+  simalq.color :as color
   simalq.util [CommandError GameOverException player-melee-damage DamageType]
   simalq.geometry [Pos Direction GeometryError pos+ at]
   simalq.tile [Tile deftile rm-tile replace-tile damage-tile]
@@ -18,8 +19,10 @@
       ; Block player and monster movement.
     blocks-diag F
       ; Block diagonal movement between orthogonally adjacent squares.
-    blocks-monster F)
+    blocks-monster F
       ; Block monster movement, even if `blocks-move` is false.
+    superblock F)
+      ; Resist all ordinary attempts to change or bypass the tile.
 
   (defn dod [self prefix attr-sym]
     (setv a (hy.mangle attr-sym))
@@ -43,6 +46,8 @@
         "Blocks monster movement")
       (when self.blocks-diag
         "Blocks diagonal movement around itself")
+      (when self.superblock
+        "Not subject to magical transformation or passage")
       (.dod self "Effect when bumped" 'hook-player-bump)
       (.dod self "Effect when trying to enter" 'hook-player-walk-to)
       (.dod self "Effect when stepped onto" 'hook-player-walked-into)
@@ -93,6 +98,13 @@
     "  Wall, that vile Wall which did these lovers sunder;"
     "  And through Wall's chink, poor souls, they are content"
     "  To whisper, at the which let no man wonder."]))
+
+(deftile Scenery "██" "the Void"
+  :color color.void
+  :iq-ix 17
+  :blocks-move T :blocks-diag T
+  :superblock T
+  :flavor "Unshaped matter of the realm outside time and space. Mortal magic can't so much as make a dent in it.")
 
 (deftile Scenery "| " "a pillar"
   :iq-ix 12

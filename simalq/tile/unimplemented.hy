@@ -14,7 +14,6 @@
     [13 "trap_1"]
     [14 "trapped_wall_1"]
     [16 "treasure_chest"]
-    [17 "void"]
     [20 "healing_potion"]
     [21 "unknown_potion"]
     [22 "moveable_wall"]
