@@ -1,6 +1,6 @@
 (import
   collections [Counter]
-  fractions [Fraction]
+  fractions [Fraction :as f/]
   toolz [partition]
   simalq.geometry [Pos]
   simalq.un-iq [read-quest iq-quest])
@@ -30,7 +30,7 @@
         "Shift-click to identify objects."])
       level.player-start (Pos level.map 0 15)
       level.next-level 2
-      level.poison-intensity (Fraction 1 5)
+      level.poison-intensity (f/ 1 5)
       level.time-limit 0
       level.exit-speed 10
       level.moving-exit-start None
@@ -86,3 +86,22 @@
   (setv t (get m 11 2 0))
   (assert (= t.stem "tricorn"))
   (assert (= (get t.tile-extras 1) 4)))
+
+
+(defn test-generator []
+  (setv m (.
+    (read-quest (iq-quest "New First Quest"))
+    levels [0] map data))
+  (defn check [x y generator-hp generates frequency generate-hp]
+    (setv t (get m x y 0))
+    (assert (and
+      (= t.hp generator-hp)
+      (= t.generate-class generates)
+      (= t.generate-frequency frequency)
+      (= t.generate-hp generate-hp))))
+
+  (check 12 19  2  "orc"   (f/ 2 3) 2)
+  (check  2 17  1  "ghost" (f/ 1 6) 2)
+  (check  3 16  1  "ghost" (f/ 1 6) 2)
+  (check  4 15  1  "ghost" (f/ 1 6) 2)
+  (check  6 10  3  "orc"   (f/ 1 2) 1))

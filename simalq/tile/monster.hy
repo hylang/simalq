@@ -2,6 +2,7 @@
   hyrule [unless]
   simalq.macros [defdataclass slot-defaults])
 (import
+  fractions [Fraction :as f/]
   enum [Enum]
   simalq.util [player-melee-damage DamageType hurt-player next-in-cycle]
   simalq.geometry [Direction adjacent? dir-to]
@@ -93,15 +94,47 @@
     #("Movement state" self.movement-state)]))
 
 
+(defclass Generator [Monster]
+  "An immobile structure that creates monsters nearby."
+
+  (slot-defaults
+    generate-frequency (f/ 1 4)
+      ; How often a monster is generated.
+    generate-hp 1
+      ; How many hit points each monster will be generated with.
+    generation-power 0)
+      ; A per-turn accumulator of `generate-frequency`.
+  (setv
+    mutable-slots ["generation_power"]
+    generate-class None)
+      ; The stem of the monster type to generate.
+
+  (defn [classmethod] read-tile-extras [cls _ v2]
+    (dict
+      :generate-hp (>> v2 5)
+      :generate-frequency (get
+        #(1 (f/ 1 2) (f/ 1 3) (f/ 1 4) (f/ 1 5) (f/ 1 6) (f/ 2 5) (f/ 1 10) (f/ 3 5) (+ 1 (f/ 1 3)) (+ 1 (f/ 1 2)) (+ 1 (f/ 2 3)) 2 (f/ 2 3) (f/ 3 4) (f/ 4 5) (f/ 5 6) (f/ 9 10))
+          ; These come from IQ's `SetGenFreq`.
+        (- (& v2 0b1111) 1)))))
+
 (defclass NonGen [Monster]
   "A monster that isn't produced by a generator."
 
   (setv __slots__ [])
 
-  (defn [classmethod] read-tile-extras [cls v1 v2]
-    ; I have no clue what v1 means for most monsters. It's probably
-    ; junk bits.
+  (defn [classmethod] read-tile-extras [cls _ v2]
       (dict :hp v2)))
+
+
+(deftile Generator "☉o" "an orc generator"
+  :iq-ix-mapper ["hp"
+    {40 1  61 2  62 3}]
+  :generate-class "orc")
+
+(deftile Generator "☉G" "a ghost generator"
+  :iq-ix-mapper ["hp"
+    {38 1  57 2  58 3}]
+  :generate-class "ghost")
 
 
 (deftile NonGen "K " "a Dark Knight"
