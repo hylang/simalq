@@ -32,6 +32,10 @@
       ; to do on its turn.
     damage-melee None
       ; How much damage the monster does with its basic melee attack.
+      ; This can be `None`, one number, or a tuple of numbers, with
+      ; element 0 giving damage when the monster is at 1 HP, element 1
+      ; at 2 HP, etc. (the last element being implicitly repeated as
+      ; required).
     damage-shot None)
       ; Likewise for shots.
 
@@ -43,7 +47,9 @@
   (defn act [self]
     (when (adjacent? self.pos G.player.pos)
       ; We're in melee range of the player, so bonk her.
-        (hurt-player self.damage-melee DamageType.MonsterMelee)
+        (hurt-player
+          (damage-by-hp self self.damage-melee)
+          DamageType.MonsterMelee)
         ; That uses up our action.
         (return))
     (when (!= self.ai AI.Approach)
@@ -78,21 +84,45 @@
     ; We're clear to move.
     (mv-tile self target))
 
-  (defn info-bullets [self] [
-    #("Hit points" self.hp)
-    (if self.immune
-      #("Immune to" self.immune)
-      "No immunities")
-    (if self.damage-melee
-      #("Melee damage" self.damage-melee)
-      "No melee attack")
-    (if self.damage-shot
-      #("Shot damage" self.damage-shot)
-      "No ranged attack")
-    #("Point value" self.points)
-    #("Behavior" "Approach — If the monster is adjacent to you, it makes a melee attack. Otherwise, if it can shoot you, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction.")
-    #("Movement state" self.movement-state)]))
+  (defn info-bullets [self]
+    (defn damage-array [damage]
+      (if (isinstance damage tuple)
+        (.join " / " (gfor
+          d damage
+          (if (= d (damage-by-hp self damage))
+            f"[{d}]"
+            (str d))))
+        damage))
 
+    [
+      #("Hit points" self.hp)
+      (if self.immune
+        #("Immune to" self.immune)
+        "No immunities")
+      (if self.damage-melee
+        #("Melee damage" (damage-array self.damage-melee))
+        "No melee attack")
+      (if self.damage-shot
+        #("Shot damage" (damage-array self.damage-shot))
+        "No ranged attack")
+      #("Point value" (.format "{}{}"
+        self.points
+        (if self.score-for-damaging " (scored per HP lost)" "")))
+      #("Behavior" "Approach — If the monster is adjacent to you, it makes a melee attack. Otherwise, if it can shoot you, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction.")
+      #("Movement state" self.movement-state)]))
+
+(defn damage-by-hp [monster damage]
+  (if (isinstance damage tuple)
+    (get damage (- (min monster.hp (len damage)) 1))
+    damage))
+
+
+(defclass Generated [Monster]
+  "A monster that can be produced by a generator."
+
+  (setv
+    __slots__ []
+    score-for-damaging T))
 
 (defclass Generator [Monster]
   "An immobile structure that creates monsters nearby."
@@ -106,6 +136,7 @@
       ; A per-turn accumulator of `generate-frequency`.
   (setv
     mutable-slots ["generation_power"]
+    score-for-damaging T
     generate-class None)
       ; The stem of the monster type to generate.
 
@@ -125,6 +156,15 @@
   (defn [classmethod] read-tile-extras [cls _ v2]
       (dict :hp v2)))
 
+
+(deftile Generated "o " "an orc"
+  :iq-ix-mapper ["hp"
+    {39 1  59 2  60 3}]
+  :points 3
+
+  :damage-melee #(3 6 9)
+
+  :flavor "A green-skinned, muscle-bound, porcine humanoid with a pointy spear and a bad attitude.")
 
 (deftile Generator "☉o" "an orc generator"
   :iq-ix-mapper ["hp"

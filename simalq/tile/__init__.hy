@@ -103,8 +103,13 @@
       ; Whether a tile of this kind can be hurt by the player's sword
       ; etc. To be overridden in subclasses, which, if they enable it,
       ; should include a slot `hp`.
-    immune #())
+    immune #()
       ; Damage types the tile ignores.
+    score-for-damaging F)
+      ; If true, you get the tile's point value per HP of damage you
+      ; do to it (with no points for overkill). Otherwise, you get
+      ; its point value for destroying it (or picking it up, if it's
+      ; an item).
 
   (defn [classmethod] read-tile-extras [cls v1 v2]
     "This method should return a dictionary of instance variables
@@ -212,9 +217,13 @@
     ; The tile shrugs off the attack.
     (return))
   (-= tile.hp amount)
+  (when tile.score-for-damaging
+    (+= G.score (* tile.points (min amount (+ tile.hp amount)))))
+      ; No extra points are awarded for overkill damage.
   (when (<= tile.hp 0)
     ; It's destroyed.
-    (+= G.score tile.points)
+    (unless tile.score-for-damaging
+      (+= G.score tile.points))
     (setv tile-was tile.pos)
     (rm-tile tile)
     (.hook-destroyed tile tile.pos)))

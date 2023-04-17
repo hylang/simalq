@@ -140,3 +140,45 @@
       (do
         (wait 1)
         (assert-at 'E ["Dark Knight" "pile of gold"])))))
+
+
+(defn test-orc-or-goblin []
+  (init (mk-quest
+    [:tiles [["orc" :hp 3]]]))
+
+  (assert-at 'E "orc")
+  ; Get stabbed.
+  (wait)
+  (assert (and (= G.player.hp 91) (= G.score 0)))
+  ; Hit the orc. It survives, but it now does less damage,
+  ; and we get some points.
+  (wk E)
+  (assert (and (= G.player.hp 88) (= G.score 6)))
+  ; Kill it. We only get 3 points because it only has 1 more HP to
+  ; take off.
+  (wk E)
+  (assert (and (= G.player.hp 88) (= G.score 9)))
+  (assert-at 'E 'floor))
+
+
+(defn test-generated-high-hp []
+  "A generated monster with more than 3 HP does damage as if it had
+  3 HP."
+
+  (init (mk-quest
+    [:tiles [["orc" :hp 10]]]))
+
+  (for [[orc-hp score player-hp] [
+      [10 0 100]
+      [ 8 6  91]
+      [ 6 12 82]
+      [ 4 18 73]
+      [ 2 24 67]
+      [ 0 30 67]]]
+    (assert (and
+      (= G.player.hp player-hp)
+      (= G.score score)
+      (if (= orc-hp 0)
+        (not (at (Pos G.map 1 0)))
+        (= (. (at (Pos G.map 1 0)) [0] hp) orc-hp))))
+    (wk E)))
