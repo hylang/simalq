@@ -56,9 +56,10 @@
   ; A monster stymied going west *and* northwest will take 3 turns
   ; to finally try southwest.
   (init (mk-quest
-    [:player-start #(1 1)
-      :tiles ["pillar" "orc"]]))
-  (set-square 'NE "pillar")
+    [:map "
+      . | .
+      @ | o
+      . . ."]))
   (do-n 3
     (assert-at 'SE 'floor)
     (wait))
@@ -67,14 +68,16 @@
   ; When the monster is blocked W, NW, and SW, he'll just sit there
   ; forever.
   (init (mk-quest
-    [:player-start #(1 1)
-      :tiles ["wall" "orc"]]))
-        ; A wall, unlike a pillar, blocks diagonal movement.
+    [:map "
+      . . .
+      @ ██o
+      . . ."]))
+    ; A wall, unlike a pillar, blocks diagonal movement.
   (defn assert-mon-at [x y]
     (assert (= (. (at (Pos G.map x y)) [0] stem) "orc")))
-  (assert-mon-at 3 1)
+  (assert-mon-at 2 1)
   (wait 100)
-  (assert-mon-at 3 1)
+  (assert-mon-at 2 1)
 
   ; A monster outside the reality bubble can't move.
   (setv r G.rules.reality-bubble-size)

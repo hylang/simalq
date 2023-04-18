@@ -1,13 +1,15 @@
 (require
   hyrule [do-n unless])
 (import
+  re
   fractions [Fraction]
   toolz [partition]
+  textwrap [dedent]
   simalq.geometry [Map Pos at pos+ Direction]
   simalq.quest [Quest Level]
   simalq.un-iq [read-quest iq-quest]
   simalq.game-state [G]
-  simalq.tile [add-tile rm-tile mv-tile ]
+  simalq.tile [Tile add-tile rm-tile mv-tile]
   simalq.commands [Wait]
   simalq.main [start-quest start-level take-turn])
 
@@ -40,15 +42,52 @@
     [tiles #()]
       ; The requested tiles are placed in a line east of the player
       ; start.
+    [map None]
+      ; Overrides `width`, `height`, `tiles`, and possibly
+      ; `player-start` if provided.
+    [map-marks #()]
     [title None]
     [next-level None]
     [poison-intensity (Fraction 0)]
     [time-limit None] [exit-speed None] [moving-exit-start None]]
-  (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
-  (for [[i tile-spec] (enumerate tiles)]
-    (mk-tile
-      (Pos m (+ (get player-start 0) i 1) (get player-start 1))
-      tile-spec))
+  (if map
+    (do
+      (setv map (dedent
+        (re.sub r"\A( *\n)*" "" (re.sub r"( *\n)*\Z" "" map))))
+      (setv height (+ (.count map "\n") 1))
+      (setv width (+ (// (.index map "\n") 2) 1))
+      (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
+      (for [
+          [y row] (enumerate (reversed (.split map "\n")))
+          :do (when (% (len row) 2) (setv row (+ row " ")))
+          [x mapsym] (enumerate (partition 2 row))]
+        (setv p (Pos m x y))
+        (setv mapsym (.join "" mapsym))
+        (cond
+          (in mapsym map-marks)
+            (mk-tile p (get map-marks mapsym))
+          (= mapsym "@ ")
+            (setv player-start #(x y))
+          (= mapsym ". ")
+            None
+          (= mapsym "██")
+            (mk-tile p "wall")
+          True (do
+            (setv types (lfor
+              t (.values Tile.types)
+              :if (= t.mapsym mapsym)
+              t))
+            (unless types
+              (raise (ValueError f"No match for {mapsym !r}")))
+            (when (> (len types) 1)
+              (raise (ValueError f"Ambiguous: {mapsym !r} - {types !r}")))
+            (mk-tile p (. types [0] stem))))))
+    (do
+      (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
+      (for [[i tile-spec] (enumerate tiles)]
+        (mk-tile
+          (Pos m (+ (get player-start 0) i 1) (get player-start 1))
+          tile-spec))))
   (Level
     :title title
     :n n
