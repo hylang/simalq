@@ -82,7 +82,8 @@
       'blocked-diag
     (or
         (and monster? G.rules.dainty-monsters (at target))
-        (has target Scenery it.blocks-move))
+        (has target Scenery it.blocks-move)
+        (has target hy.M.simalq/tile/monster.Monster T))
       'bump
     True
       'walk)))

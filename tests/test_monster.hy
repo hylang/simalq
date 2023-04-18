@@ -126,8 +126,7 @@
 (defn test-nondainty []
   (for [dainty [F T]]
     (init (mk-quest
-      [:tiles ["pile of gold" "Dark Knight"]]))
-    (set-square 'NE "pile of gold")
+      [:height 1 :tiles ["pile of gold" "Dark Knight" "wall" "Dark Knight" "Dark Knight"]]))
     (when (not dainty)
       (setv G.rules.dainty-monsters F))
 
@@ -139,7 +138,11 @@
       ; If dainty-monsters mode is off, they can step on e.g. items.
       (do
         (wait 1)
-        (assert-at 'E ["Dark Knight" "pile of gold"])))))
+        (assert-at 'E ["Dark Knight" "pile of gold"])))
+
+    ; Either way, monsters block each other.
+    (assert-at (Pos G.map 4 0) "Dark Knight")
+    (assert-at (Pos G.map 5 0) "Dark Knight")))
 
 
 (defn test-orc-or-goblin []
