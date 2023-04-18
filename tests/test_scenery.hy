@@ -48,7 +48,7 @@
   (assert-at 'E "door")
   (cant (wk E) "You can only go north from this one-way door.")
   ; Try attacking a monster.
-  (set-square 'E "Dark Knight")
+  (set-square 'E "orc")
   (wk E)
   (assert-at 'E 'floor)
   (cant (wk E) "You can only go north from this one-way door."))

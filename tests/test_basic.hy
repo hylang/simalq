@@ -147,7 +147,7 @@
 
 (defn test-game-state-history []
   (init (mk-quest
-    [:tiles ["handful of gems" "Dark Knight"]]))
+    [:tiles ["handful of gems" "orc"]]))
   (defn check [state turn score hp t0 t1 t2]
     (assert (and
       (= G.state-i state) (= G.turn-n turn)
@@ -157,28 +157,28 @@
     (assert-at (Pos G.map 2 0) t2))
 
   ; Take two actions.
-  (check  0 0 0 100  'player "handful of gems" "Dark Knight")
+  (check  0 0 0 100  'player "handful of gems" "orc")
   (wk E)
-  (check  1 1 250 88  'floor 'player "Dark Knight")
+  (check  1 1 250 97  'floor 'player "orc")
   (wk E)
-  (check  2 2 325 88  'floor 'player 'floor)
+  (check  2 2 253 97  'floor 'player 'floor)
   ; Undo.
   (setv G.state-i 1)
-  (check  1 1 250 88  'floor 'player "Dark Knight")
+  (check  1 1 250 97  'floor 'player "orc")
   ; Undo one more action.
   (setv G.state-i 0)
-  (check  0 0 0 100  'player "handful of gems" "Dark Knight")
+  (check  0 0 0 100  'player "handful of gems" "orc")
   ; Redo.
   (setv G.state-i 1)
-  (check  1 1 250 88  'floor 'player "Dark Knight")
+  (check  1 1 250 97  'floor 'player "orc")
   ; Undo, then do an "effective redo" where we repeat our previous
   ; action.
   (setv G.state-i 0)
   (wk E)
-  (check  1 1 250 88  'floor 'player "Dark Knight")
+  (check  1 1 250 97  'floor 'player "orc")
   ; That preserved further redo history, so we can redo again.
   (setv G.state-i 2)
-  (check  2 2 325 88  'floor 'player 'floor)
+  (check  2 2 253 97  'floor 'player 'floor)
   ; Undo, then take a new action.
   (setv G.state-i 0)
   (wk N)
@@ -188,7 +188,7 @@
   (assert (= (len G.states) 2))
   (setv G.state-i 2)
   (with [(pytest.raises IndexError)]
-    (check  2 2 325 88  'floor 'player 'floor)))
+    (check  2 2 253 97  'floor 'player 'floor)))
 
 
 (defn test-saveload [tmp-path]

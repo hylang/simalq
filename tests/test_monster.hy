@@ -36,42 +36,42 @@
 
   ; A monster can approach in a straight line.
   (init (mk-quest
-    [:tiles ['floor 'floor 'floor "Dark Knight"]]))
+    [:tiles ['floor 'floor 'floor "orc"]]))
   (assert-at 'E 'floor)
   (wait 2)
   (assert-at 'E 'floor)
   (wait)
-  (assert-at 'E "Dark Knight")
+  (assert-at 'E "orc")
   (assert (= G.player.hp 100))
   ; Now if Tris lollygags for another turn, he can hit her. Owie.
   (wait)
-  (assert (= G.player.hp 88))
+  (assert (= G.player.hp 97))
 
   ; A monster stymied when trying to go west will first try northwest.
   (init (mk-quest
-    [:tiles ["pillar" "Dark Knight"]]))
+    [:tiles ["pillar" "orc"]]))
   (wait)
-  (assert-at 'NE "Dark Knight")
+  (assert-at 'NE "orc")
 
   ; A monster stymied going west *and* northwest will take 3 turns
   ; to finally try southwest.
   (init (mk-quest
     [:player-start #(1 1)
-      :tiles ["pillar" "Dark Knight"]]))
+      :tiles ["pillar" "orc"]]))
   (set-square 'NE "pillar")
   (do-n 3
     (assert-at 'SE 'floor)
     (wait))
-  (assert-at 'SE "Dark Knight")
+  (assert-at 'SE "orc")
 
   ; When the monster is blocked W, NW, and SW, he'll just sit there
   ; forever.
   (init (mk-quest
     [:player-start #(1 1)
-      :tiles ["wall" "Dark Knight"]]))
+      :tiles ["wall" "orc"]]))
         ; A wall, unlike a pillar, blocks diagonal movement.
   (defn assert-mon-at [x y]
-    (assert (= (. (at (Pos G.map x y)) [0] stem) "Dark Knight")))
+    (assert (= (. (at (Pos G.map x y)) [0] stem) "orc")))
   (assert-mon-at 3 1)
   (wait 100)
   (assert-mon-at 3 1)
@@ -80,7 +80,7 @@
   (setv r G.rules.reality-bubble-size)
   (init (mk-quest [:tiles [
     #* (* ['floor] r)
-    "Dark Knight"]]))
+    "orc"]]))
   (assert-mon-at (+ r 1) 0)
   (wait 100)
   (assert-mon-at (+ r 1) 0)
@@ -92,10 +92,10 @@
   (init (mk-quest [
     :player-start #(4 4)
     :width 9 :height 9 :wrap-y T]))
-  (set-square 'N "Dark Knight")
+  (set-square 'N "orc")
   (do-n 100
     (wk S)
-    (assert-at 'N "Dark Knight")))
+    (assert-at 'N "orc")))
 
 
 (defn test-approach-march []
@@ -113,7 +113,7 @@
       (ray G.player.pos direction 4)))
 
   (for [arm (arms)  p (cut arm 1 None)]
-    (set-square p "Dark Knight"))
+    (set-square p "orc"))
   (assert (=
     (sfor  arm (arms)  (tuple (gfor  p arm  (len (at p)))))
     #{#(0 1 1 1)}))
@@ -126,7 +126,7 @@
 (defn test-nondainty []
   (for [dainty [F T]]
     (init (mk-quest
-      [:height 1 :tiles ["pile of gold" "Dark Knight" "wall" "Dark Knight" "Dark Knight"]]))
+      [:height 1 :tiles ["pile of gold" "orc" "wall" "orc" "orc"]]))
     (when (not dainty)
       (setv G.rules.dainty-monsters F))
 
@@ -134,15 +134,15 @@
       ; By default, normal monsters will only step on plain floor.
       (do
         (wait 10)
-        (assert (= (. (at (Pos G.map 2 0)) [0] stem) "Dark Knight")))
+        (assert (= (. (at (Pos G.map 2 0)) [0] stem) "orc")))
       ; If dainty-monsters mode is off, they can step on e.g. items.
       (do
         (wait 1)
-        (assert-at 'E ["Dark Knight" "pile of gold"])))
+        (assert-at 'E ["orc" "pile of gold"])))
 
     ; Either way, monsters block each other.
-    (assert-at (Pos G.map 4 0) "Dark Knight")
-    (assert-at (Pos G.map 5 0) "Dark Knight")))
+    (assert-at (Pos G.map 4 0) "orc")
+    (assert-at (Pos G.map 5 0) "orc")))
 
 
 (defn test-orc-or-goblin []
