@@ -48,14 +48,17 @@
       (v))))
   None)
 
-(setv dir-keys {
-  "7" Direction.NW  "8" Direction.N  "9" Direction.NE
-  "4" Direction.W   "5" 'center      "6" Direction.E
-  "1" Direction.SW  "2" Direction.S  "3" Direction.SE})
+(setv dir-keys (dfor
+  [k v] (.items {
+    "7y" Direction.NW  "8k" Direction.N  "9u" Direction.NE
+    "4h" Direction.W   "5." 'center      "6l" Direction.E
+    "1b" Direction.SW  "2j" Direction.S  "3n" Direction.SE})
+  char k
+  char v))
 
 (setv cmd-keys {
   ";" Look
-  "u" [ShiftHistory -1]  ; Undo
+  "e" [ShiftHistory -1]  ; Undo
   "r" [ShiftHistory +1]  ; Redo
   "S" SaveGame
   "L" LoadGame})
