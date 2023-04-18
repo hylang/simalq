@@ -5,7 +5,8 @@
   hy.pyops *
   simalq.color :as color
   simalq.game-state [G]
-  simalq.geometry [Pos at dist])
+  simalq.geometry [Pos at dist]
+  simalq.tile.monster [Monster])
 (setv  T True  F False)
 
 
@@ -181,4 +182,14 @@
     (ColorChar
       (get t.mapsym i)
       (if (isinstance t.color tuple) (get t.color i) t.color)
-      (if (isinstance t.color-bg tuple) (get t.color-bg i) t.color-bg))))
+      (cond
+        (isinstance t.color-bg tuple)
+          (get t.color-bg i)
+        t.color-bg
+          t.color-bg
+        (isinstance t Monster)
+          ; Monsters get an automatic background color to show how
+          ; many HP they have.
+          (.get color.monster-bg-by-hp
+            t.hp
+            (get color.monster-bg-by-hp "other"))))))

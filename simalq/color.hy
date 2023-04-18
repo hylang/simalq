@@ -11,10 +11,14 @@
       'yellow [1 1 0]
       'pale-yellow [1 1 (/ 3 4)]
       'dark-yellow [(/ 1 2) (/ 1 2) 0]
+      'pale-red [1 (/ 7 8) (/ 7 8)]
       'red [(/ 3 4) 0 0]
+      'pale-blue [(/ 7 8) (/ 7 8) 1]
       'dark-navy [0 0 (/ 3 8)]
       'navy [0 0 (/ 1 2)]
+      'pale-magenta [1 (/ 7 8) 1]
       'steel-blue [(/ 1 4) (/ 1 2) (/ 3 4)]
+      'pale-green [(/ 7 8) 1 (/ 7 8)]
       'lime [0 1 0]})
 
     k (tuple (gfor  x v  (round (* x 255)))))
@@ -26,4 +30,10 @@
   reality-fringe 'light-gray
   reality-fringe-block 'dark-gray
   focus 'yellow
-  message-bg 'pale-yellow)
+  message-bg 'pale-yellow
+
+  monster-bg-by-hp {
+    1       'pale-green
+    2       'pale-blue
+    3       'pale-red
+    "other" 'pale-magenta})
