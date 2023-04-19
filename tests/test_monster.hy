@@ -2,6 +2,7 @@
   hyrule [do-n]
   tests.lib [wk])
 (import
+  fractions [Fraction :as f/]
   tests.lib [init mk-quest locate assert-at wait set-square]
   simalq.geometry [Direction Pos ray at]
   simalq.game-state [G])
@@ -188,3 +189,93 @@
         (not (at (Pos G.map 1 0)))
         (= (. (at (Pos G.map 1 0)) [0] hp) orc-hp))))
     (wk E)))
+
+
+(defn test-generator []
+  (init (mk-quest [
+    :map "
+      @ ████. .
+      ████. G .
+      ████████. "
+    :map-marks {
+      "G " ["orc generator"
+        :generate-frequency (f/ 2 3)
+        :generate-hp 2]}]))
+
+  (defn check [power tN tNE tE tSE tW]
+    (and
+      (= (. (at (Pos G.map 3 1)) [0] generation-power) power)
+      (assert-at (Pos G.map 3 2) tN)
+      (assert-at (Pos G.map 4 2) tNE)
+      (assert-at (Pos G.map 4 1) tE)
+      (assert-at (Pos G.map 4 0) tSE)
+      (assert-at (Pos G.map 2 1) tW)))
+
+  None      (check (f/ 0 1) 'floor 'floor 'floor 'floor 'floor)
+  (wait)    (check (f/ 2 3) 'floor 'floor 'floor 'floor 'floor)
+  (wait)    (check (f/ 1 3) "orc"  'floor 'floor 'floor 'floor)
+  (wait)    (check (f/ 0 1) "orc"  "orc"  'floor 'floor 'floor)
+  (wait)    (check (f/ 2 3) "orc"  "orc"  'floor 'floor 'floor)
+  (wait)    (check (f/ 1 3) "orc"  "orc"  "orc"  'floor 'floor)
+  (wait)    (check (f/ 0 3) "orc"  "orc"  "orc"  "orc"  'floor)
+  (wait)    (check (f/ 2 3) "orc"  "orc"  "orc"  "orc"  'floor)
+  (wait)    (check (f/ 1 3) "orc"  "orc"  "orc"  "orc"  "orc")
+  (wait)    (check (f/ 0 1) "orc"  "orc"  "orc"  "orc"  "orc")
+  (wait 30) (check (f/ 0 1) "orc"  "orc"  "orc"  "orc"  "orc"))
+
+
+(defn test-generator-reality-bubble []
+  (init (mk-quest [
+    :height 1
+    :tiles [
+      'floor 'floor "wall" 'floor
+      ["orc generator" :generate-frequency (f/ 1)]
+      'floor]]))
+  (setv G.rules.reality-bubble-size 4)
+
+  ; Outside the reality bubble, generators do nothing.
+  (wait 10)
+  (assert-at (Pos G.map 4 0) 'floor)
+  (assert-at (Pos G.map 6 0) 'floor)
+  ; Once in it, they can spawn monsters into adjacent squares even
+  ; if those squares aren't in the reality bubble themselves.
+  (wk E)
+  (wait 2)
+  (assert-at (Pos G.map 4 0) "orc")
+  (assert-at (Pos G.map 6 0) "orc"))
+
+
+(defn test-generated-first-turn []
+  (for [gen-west [T F]]
+    ; Try a case with the generator nearer to the player than the
+    ; monster (`gen-west T`) and farther (`gen-west F`).
+
+    (init (mk-quest [
+      :map "
+        . . $ $
+        @ . a b
+        . . $ $"
+      :map-marks {
+        (if gen-west "a " "b ") ["orc generator"
+          :generate-frequency (f/ 1 4)]
+        (if gen-west "b " "a ") 'floor
+        "$ " "pile of gold"}]))
+    (setv G.rules.dainty-monsters F)
+
+    (defn check [orc-at-p1 orc-at-p2]
+      (setv p1 (if gen-west (Pos G.map 3 1) (Pos G.map 2 1)))
+        ; The orc's generated position.
+      (setv p2 (if gen-west (Pos G.map 2 2) (Pos G.map 1 1)))
+        ; The orc's first move.
+      (assert (and
+        (= (any (gfor  x (at p1)  (= x.stem "orc"))) orc-at-p1)
+        (= (any (gfor  x (at p2)  (= x.stem "orc"))) orc-at-p2))))
+
+    (wait 3)
+    (check F F)
+    ; Monsters don't get to act on the turn that they're generated.
+    (wait)
+    (check T F)
+    ; They do get to act on the next turn.
+    (wait)
+    (check F T)))

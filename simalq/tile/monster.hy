@@ -1,13 +1,13 @@
 (require
-  hyrule [unless]
-  simalq.macros [defdataclass slot-defaults])
+  hyrule [unless do-n]
+  simalq.macros [defdataclass slot-defaults pop-integer-part])
 (import
   fractions [Fraction :as f/]
   enum [Enum]
   simalq.util [player-melee-damage DamageType hurt-player next-in-cycle]
-  simalq.geometry [Direction adjacent? dir-to]
+  simalq.geometry [Direction GeometryError pos+ at adjacent? dir-to]
   simalq.game-state [G]
-  simalq.tile [Actor deftile rm-tile mv-tile damage-tile]
+  simalq.tile [Actor deftile rm-tile mv-tile add-tile damage-tile]
   simalq.tile.scenery [walkability])
 (setv  T True  F False)
 
@@ -45,6 +45,7 @@
     True)
 
   (defn act [self]
+    "Approach — If the monster is adjacent to you, it makes a melee attack. Otherwise, if it can shoot you, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
     (when (adjacent? self.pos G.player.pos)
       ; We're in melee range of the player, so bonk her.
         (hurt-player
@@ -84,7 +85,7 @@
     ; We're clear to move.
     (mv-tile self target))
 
-  (defn info-bullets [self]
+  (defn info-bullets [self #* extra]
     (defn damage-array [damage]
       (if (isinstance damage tuple)
         (.join " / " (gfor
@@ -105,16 +106,23 @@
       (if self.damage-shot
         #("Shot damage" (damage-array self.damage-shot))
         "No ranged attack")
+      #* extra
       #("Point value" (.format "{}{}"
         self.points
         (if self.score-for-damaging " (scored per HP lost)" "")))
-      #("Behavior" "Approach — If the monster is adjacent to you, it makes a melee attack. Otherwise, if it can shoot you, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction.")
+      #("Behavior" self.act.__doc__)
       #("Movement state" self.movement-state)]))
 
 (defn damage-by-hp [monster damage]
   (if (isinstance damage tuple)
     (get damage (- (min monster.hp (len damage)) 1))
     damage))
+
+(defn summon [pos stem #** kwargs]
+  (add-tile pos stem #** kwargs)
+  ; Newly created monsters don't get to act on the turn they come
+  ; into being.
+  (setv (. (at pos) [-1] last-acted) G.turn-n))
 
 
 (defclass Generated [Monster]
@@ -132,11 +140,12 @@
       ; How often a monster is generated.
     generate-hp 1
       ; How many hit points each monster will be generated with.
-    generation-power 0)
+    generation-power (f/ 0))
       ; A per-turn accumulator of `generate-frequency`.
   (setv
     mutable-slots ["generation_power"]
     score-for-damaging T
+    immune #(DamageType.Poison)
     generate-class None)
       ; The stem of the monster type to generate.
 
@@ -146,7 +155,37 @@
       :generate-frequency (get
         #(1 (f/ 1 2) (f/ 1 3) (f/ 1 4) (f/ 1 5) (f/ 1 6) (f/ 2 5) (f/ 1 10) (f/ 3 5) (+ 1 (f/ 1 3)) (+ 1 (f/ 1 2)) (+ 1 (f/ 2 3)) 2 (f/ 2 3) (f/ 3 4) (f/ 4 5) (f/ 5 6) (f/ 9 10))
           ; These come from IQ's `SetGenFreq`.
-        (- (& v2 0b1111) 1)))))
+        (- (& v2 0b1111) 1))))
+
+  (defn info-bullets [self #* extra]
+    (.info-bullets (super)
+      #("Generation frequency" self.generate-frequency)
+      #("Generation power" self.generation-power)
+      #("Hit points of generated monsters" self.generate-hp)
+      #* extra))
+
+  (defn act [self]
+    "Generate — The generator adds its generation frequency to its generation power. If the total is more than 1, the integer part is removed and a corresponding number of monsters are generated in adjacent empty squares. If there are no adjacent empty squares, the expended generation power is wasted. The square that the generator attempts to target rotates through the compass with each generation or failed attempt."
+
+    (+= self.generation-power self.generate-frequency)
+    (do-n (pop-integer-part self.generation-power)
+      ; Find an empty square to place the new monster.
+      (do-n (len Direction.all)
+        (setv self.movement-state
+          (next-in-cycle Direction.all self.movement-state))
+        (setv target (try
+          (pos+ self.pos self.movement-state)
+          (except [GeometryError]
+            (continue))))
+        (when (= (at target) [])
+          (break))
+        (else
+          ; We couldn't find anywhere to place this monster. Just
+          ; end generation, wasting the consumed generation power.
+          (return)))
+      ; We have a target. Place the monster.
+      (summon target self.generate-class
+        :hp self.generate-hp))))
 
 (defclass NonGen [Monster]
   "A monster that isn't produced by a generator."
@@ -169,7 +208,10 @@
 (deftile Generator "☉o" "an orc generator"
   :iq-ix-mapper ["hp"
     {40 1  61 2  62 3}]
-  :generate-class "orc")
+  :generate-class "orc"
+  :points 12
+
+  :flavor "A sort of orcish clown car, facetiously called a village.")
 
 (deftile Generator "☉G" "a ghost generator"
   :iq-ix-mapper ["hp"

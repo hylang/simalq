@@ -54,7 +54,9 @@
     :setv new (Direction (+ d1.name d2.name) (+ d1.x d2.x) (+ d1.y d2.y))
     :do (setattr Direction (.upper (+ (get d1.name 0) (get d2.name 0))) new)
     new)))
-  (setv Direction.all (+ Direction.orths Direction.diags))
+  (setv Direction.all #(
+     Direction.N Direction.NE Direction.E Direction.SE
+     Direction.S Direction.SW Direction.W Direction.NW))
   (setv Direction.from-coords (dfor
     d Direction.all
     #(d.x d.y) d))
