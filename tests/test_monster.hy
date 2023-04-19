@@ -33,6 +33,31 @@
   (assert-at 'E 'floor))
 
 
+(defn test-monster-melee-diag []
+
+  ; A monster can melee-attack diagonally around a column.
+  (init (mk-quest
+    [:map "
+      | @
+      o ."]))
+  (assert (= G.player.hp 100))
+  (assert-at 'SW "orc")
+  (wait)
+  (assert (= G.player.hp 97))
+  (assert-at 'SW "orc")
+
+  ; But not a wall. So the orc will use its first turn to walk east.
+  (init (mk-quest
+    [:map "
+      ██@
+      o ."]))
+  (assert (= G.player.hp 100))
+  (assert-at 'SW "orc")
+  (wait)
+  (assert (= G.player.hp 100))
+  (assert-at 'S "orc"))
+
+
 (defn test-approach []
 
   ; A monster can approach in a straight line.

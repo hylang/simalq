@@ -51,7 +51,17 @@
 
   (defn act [self]
     "Approach — If the monster is adjacent to you, it makes a melee attack. Otherwise, if it can shoot you, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
-    (when (adjacent? self.pos G.player.pos)
+    (when (!= self.ai AI.Approach)
+      (raise (ValueError "Other AIs are not yet implemented.")))
+
+    ; Try to get closer to the player.
+    (setv d (dir-to self.pos G.player.pos))
+    (when (is d None)
+      ; The player is in our square. Just give up.
+      (return))
+    (setv [target wly] (walkability self.pos d :monster? T))
+
+    (when (and (= target G.player.pos) (in wly ['bump 'walk]))
       ; We're in melee range of the player, so bonk her.
         (hurt-player
           (damage-by-hp self self.damage-melee)
@@ -62,16 +72,7 @@
           (.hook-destroyed self pos-was))
         ; That uses up our action.
         (return))
-    (when (!= self.ai AI.Approach)
-      (raise (ValueError "Other AIs are not yet implemented.")))
 
-    ; Try to get closer to the player.
-    (setv d (dir-to self.pos G.player.pos))
-    (when (is d None)
-      ; The player is in our square. Just give up.
-      (return))
-
-    (setv [target wly] (walkability self.pos d :monster? T))
     (unless (= wly 'walk)
       ; We can't go that way. Try a different direction.
       ; Use a non-random equivalent of IQ's `ApproachHero`.
