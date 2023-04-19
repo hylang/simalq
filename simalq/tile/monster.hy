@@ -231,6 +231,15 @@
   :flavor-mon "A green-skinned, muscle-bound, porcine humanoid with a pointy spear and a bad attitude."
   :flavor-gen "A sort of orcish clown car, facetiously called a village.")
 
+(defgenerated "g " "a goblin"
+  :iq-ix-mon [95 96 97] :iq-ix-gen [98 99 100]
+  :points-mon 2 :points-gen 8
+
+  :damage-melee #(2 4 6)
+
+  :flavor-mon "Goblins are a smaller, uglier, smellier, and worse-equipped cousin of orcs that try to make up for it with even more sadistic malice. It almost works."
+  :flavor-gen "Oops, somebody gave the goblins a bath. Now there's a lot more of them, and they still stink.")
+
 
 (deftile Generator "☉G" "a ghost generator"
   :iq-ix-mapper ["hp"
