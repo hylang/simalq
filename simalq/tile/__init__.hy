@@ -226,9 +226,9 @@
     ; It's destroyed.
     (unless tile.score-for-damaging
       (+= G.score tile.points))
-    (setv tile-was tile.pos)
+    (setv pos-was tile.pos)
     (rm-tile tile)
-    (.hook-destroyed tile tile.pos)))
+    (.hook-destroyed tile pos-was)))
 
 
 (defclass Actor [Tile]
