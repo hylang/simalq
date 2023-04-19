@@ -2,6 +2,7 @@
   hyrule [unless do-n]
   simalq.macros [defdataclass slot-defaults pop-integer-part])
 (import
+  re
   fractions [Fraction :as f/]
   enum [Enum]
   simalq.util [player-melee-damage DamageType hurt-player next-in-cycle]
@@ -187,6 +188,31 @@
       (summon target self.generate-class
         :hp self.generate-hp))))
 
+(defn defgenerated [
+    mapsym name *
+    iq-ix-mon iq-ix-gen
+    points-mon points-gen
+    flavor-mon flavor-gen
+    [immune #()]
+    #** kwargs]
+  "Shorthand for defining both a generated monster and its generator."
+
+  (deftile Generated mapsym name
+    :iq-ix-mapper ["hp"
+      (dict (zip iq-ix-mon [1 2 3]))]
+    :immune immune
+    :points points-mon
+    :flavor flavor-mon
+    #** kwargs)
+  (deftile Generator (+ "☉" (get mapsym 0)) (+ name " generator")
+    :iq-ix-mapper ["hp"
+      (dict (zip iq-ix-gen [1 2 3]))]
+    :generate-class (re.sub r"\S+\s+" "" name)
+    :immune (+ Generator.immune immune)
+    :points points-gen
+    :flavor flavor-gen))
+
+
 (defclass NonGen [Monster]
   "A monster that isn't produced by a generator."
 
@@ -196,22 +222,15 @@
       (dict :hp v2)))
 
 
-(deftile Generated "o " "an orc"
-  :iq-ix-mapper ["hp"
-    {39 1  59 2  60 3}]
-  :points 3
+(defgenerated "o " "an orc"
+  :iq-ix-mon [39 59 60] :iq-ix-gen [40 61 62]
+  :points-mon 3 :points-gen 12
 
   :damage-melee #(3 6 9)
 
-  :flavor "A green-skinned, muscle-bound, porcine humanoid with a pointy spear and a bad attitude.")
+  :flavor-mon "A green-skinned, muscle-bound, porcine humanoid with a pointy spear and a bad attitude."
+  :flavor-gen "A sort of orcish clown car, facetiously called a village.")
 
-(deftile Generator "☉o" "an orc generator"
-  :iq-ix-mapper ["hp"
-    {40 1  61 2  62 3}]
-  :generate-class "orc"
-  :points 12
-
-  :flavor "A sort of orcish clown car, facetiously called a village.")
 
 (deftile Generator "☉G" "a ghost generator"
   :iq-ix-mapper ["hp"
