@@ -279,3 +279,15 @@
     ; They do get to act on the next turn.
     (wait)
     (check F T)))
+
+
+(defn test-ghost []
+  (init (mk-quest
+    [:tiles [["ghost" :hp 3]]]))
+  (assert (and (= G.player.hp 100) (= G.score 0)))
+  (assert-at 'E "ghost")
+  ; Attack the ghost. We get 10 points for doing 2 damage.
+  ; The ghost strikes back, dying by kamikaze, which grants no points.
+  (wk E)
+  (assert (and (= G.player.hp 95) (= G.score 10)))
+  (assert-at 'E 'floor))

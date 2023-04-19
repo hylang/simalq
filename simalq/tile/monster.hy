@@ -13,6 +13,8 @@
 (setv  T True  F False)
 
 
+(setv undead-immunities #(DamageType.Poison DamageType.DeathMagic))
+
 (setv AI (Enum "AI" ["Approach"]))
 
 (defclass Monster [Actor]
@@ -37,8 +39,10 @@
       ; element 0 giving damage when the monster is at 1 HP, element 1
       ; at 2 HP, etc. (the last element being implicitly repeated as
       ; required).
-    damage-shot None)
+    damage-shot None
       ; Likewise for shots.
+    kamikaze False)
+      ; If true, the monster kills itself upon attacking.
 
   (defn hook-player-bump [self origin]
     "Attack the monster in melee."
@@ -52,6 +56,10 @@
         (hurt-player
           (damage-by-hp self self.damage-melee)
           DamageType.MonsterMelee)
+        (when self.kamikaze
+          (setv pos-was self.pos)
+          (rm-tile self)
+          (.hook-destroyed self pos-was))
         ; That uses up our action.
         (return))
     (when (!= self.ai AI.Approach)
@@ -107,6 +115,8 @@
       (if self.damage-shot
         #("Shot damage" (damage-array self.damage-shot))
         "No ranged attack")
+      (when self.kamikaze
+        #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
       #* extra
       #("Point value" (.format "{}{}"
         self.points
@@ -240,11 +250,16 @@
   :flavor-mon "Goblins are a smaller, uglier, smellier, and worse-equipped cousin of orcs that try to make up for it with even more sadistic malice. It almost works."
   :flavor-gen "Oops, somebody gave the goblins a bath. Now there's a lot more of them, and they still stink.")
 
+(defgenerated "G " "a ghost"
+  :iq-ix-mon [37 55 56] :iq-ix-gen [38 57 58]
+  :points-mon 5 :points-gen 25
 
-(deftile Generator "☉G" "a ghost generator"
-  :iq-ix-mapper ["hp"
-    {38 1  57 2  58 3}]
-  :generate-class "ghost")
+  :immune undead-immunities
+  :damage-melee #(5 10 15)
+  :kamikaze T
+
+  :flavor-mon "A spooky apparition bearing a striking resemblance to a man with a sheet draped over him. Giggle at your peril: it can discharge the negative energy that animates it to bring you closer to the grave yourself.\n\n    Lemme tell ya something: bustin' makes me feel good!"
+  :flavor-gen "This big heap of human bones raises several questions, but sadly it appears you must treat the dead with even less respect in order to get rid of those ghosts.")
 
 
 (deftile NonGen "K " "a Dark Knight"
