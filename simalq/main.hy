@@ -1,3 +1,5 @@
+(require
+  simalq.macros [pop-integer-part])
 (import
   copy [deepcopy]
   blessed
@@ -69,10 +71,9 @@
   ; Dose the player with ambient poison, and convert an accumulated
   ; dose ≥1 into damage.
   (+= G.player.poison-dose G.level.poison-intensity)
-  (setv dose-integer (.__floor__ G.player.poison-dose))
-  (when dose-integer
-    (hurt-player dose-integer DamageType.Poison)
-    (-= G.player.poison-dose dose-integer))
+  (hurt-player
+    (pop-integer-part G.player.poison-dose)
+    DamageType.Poison)
 
   ; Advance the turn counter last.
   (+= G.turn-n 1))

@@ -211,6 +211,8 @@
 
 
 (defn damage-tile [tile amount damage-type]
+  (when (= amount 0)
+    (return))
   (unless tile.damageable
     (raise TypeError))
   (when (in damage-type tile.immune)

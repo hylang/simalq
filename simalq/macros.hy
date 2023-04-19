@@ -60,3 +60,12 @@
   [
     `(defn ~fname ~params ~@body)
     `(setv (. ~fname dynadoc) (fn [it] ~@(cut doc-form 1 None)))])
+
+
+(defmacro pop-integer-part [x]
+  "Subtract any integer part from `x` and return it."
+  (setv n (hy.gensym))
+  `(do
+    (setv ~n (.__floor__ ~x))
+    (-= ~x ~n)
+    ~n))
