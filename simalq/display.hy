@@ -5,8 +5,7 @@
   hy.pyops *
   simalq.color :as color
   simalq.game-state [G]
-  simalq.geometry [Pos at dist]
-  simalq.tile.monster [Monster])
+  simalq.geometry [Pos at dist])
 (setv  T True  F False)
 
 
@@ -187,9 +186,9 @@
           (get t.color-bg i)
         t.color-bg
           t.color-bg
-        (isinstance t Monster)
-          ; Monsters get an automatic background color to show how
-          ; many HP they have.
-          (.get color.monster-bg-by-hp
+        t.damageable
+          ; Monsters etc. get an automatic background color to show
+          ; how many HP they have.
+          (.get color.tile-bg-by-hp
             t.hp
-            (get color.monster-bg-by-hp "other"))))))
+            (get color.tile-bg-by-hp "other"))))))

@@ -32,7 +32,7 @@
   focus 'yellow
   message-bg 'pale-yellow
 
-  monster-bg-by-hp {
+  tile-bg-by-hp {
     1       'pale-green
     2       'pale-blue
     3       'pale-red
