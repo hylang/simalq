@@ -29,6 +29,8 @@
   [direction]
   :frozen T)
 
+(defdataclass GonnaShoot [Command]
+  "Prepare to take a direction key for shooting.")
 (defdataclass Look [Command]
   "Move the cursor around the level.")
 (defdataclass ShiftHistory [Command]
@@ -61,6 +63,7 @@
   char v))
 
 (setv cmd-keys {
+  "f" GonnaShoot
   ";" Look
   "e" [ShiftHistory -1]  ; Undo
   "r" [ShiftHistory +1]  ; Redo
@@ -72,9 +75,16 @@
   "This function is only for commands that aren't actions; see
   `do-action` for actions."
   (import
-    simalq.main [io-mode print-main-screen info-screen])
+    simalq.main [io-mode print-main-screen info-screen inkey take-turn])
 
   (ecase (type cmd)
+
+    GonnaShoot (do
+      ; A direction key causes Tris to shoot in that direction.
+      ; Any other key just cancels out of shooting mode.
+      (setv v (.get dir-keys (str (inkey))))
+      (when (isinstance v Direction)
+        (take-turn (Shoot v))))
 
     Look (do
       (setv focus G.player.pos)

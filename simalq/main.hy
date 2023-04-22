@@ -142,6 +142,10 @@
       B.width B.height focus status-bar messages))))
 
 
+(defn inkey []
+  (B.inkey))
+
+
 (defn info-screen [t]
   "Enter an `io-mode` for showing information about the tile `t`."
 
