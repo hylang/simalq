@@ -95,6 +95,8 @@
   (defn __hash__ [self]
     (hash #(self.x self.y (id self.map)))))
 
+(hy.repr-register Pos str)
+
 (defn pos+ [pos direction]
   (Pos pos.map (+ direction.x pos.x) (+ direction.y pos.y)))
 

@@ -188,7 +188,12 @@
     (for [[iq-ix slot-value] (.items d)]
       (assert (not-in iq-ix Tile.types-by-iq-ix))
       (setv (get Tile.types-by-iq-ix iq-ix)
-        (dict :cls cls :slot slot :value slot-value)))))
+        (dict :cls cls :slot slot :value slot-value))))
+
+  (hy.repr-register cls (fn [x]
+    (.format "(<{}> {})" stem (.join " " (gfor
+      [_ s] (.all-slots x)
+      (.format ":{} {}" (hy.unmangle s) (hy.repr (getattr x s)))))))))
 
 
 (defn add-tile [pos stem #** kwargs]
