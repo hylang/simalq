@@ -49,6 +49,10 @@
   "Return how much damage the player does with her sword."
   G.rules.base-player-melee-damage)
 
+(defn player-shot-damage []
+  "Return how much damage the player does with her bow."
+  G.rules.base-player-shot-damage)
+
 
 (setv DamageType (Enum "DamageType" (list (map str '[
   PlayerMelee MonsterMelee

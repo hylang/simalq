@@ -99,6 +99,8 @@
         ; How many keys the player can carry at once.
       base-player-melee-damage 2
         ; How much damage the player does with her sword normally.
+      base-player-shot-damage 1
+        ; How much damage the player does with her bow normally.
       dainty-monsters T))
         ; Whether monsters will only step on empty floor (with some
         ; exceptions, like spiders walking on webs). Otherwise,

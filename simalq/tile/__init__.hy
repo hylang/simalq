@@ -105,11 +105,16 @@
       ; should include a slot `hp`.
     immune #()
       ; Damage types the tile ignores.
-    score-for-damaging F)
+    score-for-damaging F
       ; If true, you get the tile's point value per HP of damage you
       ; do to it (with no points for overkill). Otherwise, you get
       ; its point value for destroying it (or picking it up, if it's
       ; an item).
+    blocks-player-shots T
+      ; Whether the player's arrows are stopped by this tile.
+      ; If `damageable` is true, it overrides this.
+    blocks-monster-shots T)
+      ; Whether monsters are prevented from shooting by this tile.
 
   (defn [classmethod] read-tile-extras [cls v1 v2]
     "This method should return a dictionary of instance variables

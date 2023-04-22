@@ -46,6 +46,13 @@
         "Blocks monster movement")
       (when self.blocks-diag
         "Blocks diagonal movement around itself")
+      (cond
+        (and self.blocks-player-shots self.blocks-monster-shots)
+          "Blocks all shots"
+        self.blocks-player-shots
+          "Blocks your shots, but not monsters' shots"
+        self.blocks-monster-shots
+          "Blocks monsters' shots, but not your shots")
       (when self.superblock
         "Not subject to magical transformation or passage")
       (.dod self "Effect when bumped" 'hook-player-bump)

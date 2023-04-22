@@ -1,12 +1,12 @@
 (require
-  hyrule [ecase]
+  hyrule [ecase do-n]
   simalq.macros [defdataclass])
 (import
   copy [deepcopy]
-  simalq.util [CommandError save-game-path msg]
+  simalq.util [CommandError DamageType save-game-path msg player-shot-damage]
   simalq.geometry [Direction GeometryError pos+ at]
   simalq.game-state [G save-game load-game]
-  simalq.tile [mv-tile]
+  simalq.tile [mv-tile damage-tile]
   simalq.tile.scenery [walkability])
 (setv  T True  F False)
 
@@ -22,6 +22,10 @@
 (defdataclass Walk [Action]
   "Try to walk one step in the given direction, or attack something
   that's in the way with your sword."
+  [direction]
+  :frozen T)
+(defdataclass Shoot [Action]
+  "Fire an arrow in the given direction."
   [direction]
   :frozen T)
 
@@ -170,4 +174,27 @@
       (mv-tile G.player target)
       (for [tile (at target)]
         (when (.hook-player-walked-into tile)
-          (return))))))
+          (return))))
+
+    Shoot (do
+      (setv d action.direction)
+      (setv target G.player.pos)
+      (do-n G.rules.reality-bubble-size
+        (setv target (try
+          (pos+ target d)
+          (except [GeometryError]
+            ; An arrow that hits the level border stops.
+            (return))))
+        (when (= target G.player.pos)
+          ; An arrow that wraps around the map all the way back to the
+          ; player stops there, rather than looping.
+          (return))
+        (for [tile (at target)]
+          (cond
+            tile.damageable (do
+              ; The arrow damages the tile and stops.
+              (damage-tile tile (player-shot-damage) DamageType.MundaneArrow)
+              (return))
+            tile.blocks-player-shots
+              ; The arrow stops without doing anything more.
+              (return)))))))

@@ -6,10 +6,11 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init assert-at wait mk-quest mv-player]
+  tests.lib [init assert-at wait mk-quest mv-player shoot mk-tile]
   simalq.util [GameOverException]
   simalq.game-state [G save-game load-game]
-  simalq.geometry [Pos])
+  simalq.geometry [Pos at])
+(setv  T True  F False)
 
 
 (defn test-bootcamp-level1 []
@@ -57,6 +58,42 @@
   (assert (= G.player.pos (Pos G.map 4 2))))
 
 
+(defn test-shoot []
+  (init (mk-quest
+    [:tiles ['floor 'floor 'floor 'floor ["orc" :hp 2]]]))
+  (setv G.rules.reality-bubble-size 4)
+  (defn check [x y orc-hp]
+    (assert (= (. (at (Pos G.map x y)) [0] hp) orc-hp)))
+
+  (assert (= G.turn-n 0))
+  (shoot 'E)
+  (assert (= G.turn-n 1))
+  ; The orc is out of range and thus unharmed.
+  (check  5 0  2)
+  ; Walk east. The orc is now in the reality bubble, and advances.
+  (wk E)
+  (check  4 0  2)
+  ; Now shoot and hit it for 1 damage.
+  (assert (= G.score 0))
+  (shoot 'E)
+  (assert (= G.score 3))
+  (check  3 0  1)
+  ; Finish it off with another shot.
+  (shoot 'E)
+  (assert (= G.score 6))
+  (for [x (range (+ G.player.pos.x 1) G.map.width)]
+    (assert (not (at (Pos G.map x 0)))))
+  ; Shooting the level border is allowed (but has no effect).
+  (shoot 'W)
+
+  ; Shots are blocked by walls.
+  (init (mk-quest
+    [:tiles ["wall" "orc"]]))
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1))
+  (shoot 'E)
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1)))
+
+
 (defn test-walk-wrapping []
   (init (mk-quest
     [:width 20 :height 20 :wrap-y True
@@ -78,6 +115,23 @@
   (assert (= G.player.pos (Pos G.map 19 19)))
   (wk NE)
   (assert (= G.player.pos (Pos G.map 0 0))))
+
+
+(defn test-shoot-wrapping []
+  (init (mk-quest [
+    :map "
+      . o . . @ ."
+    :wrap-x T]))
+  ; We can shoot an arrow that wraps around the level to kill the orc.
+  (assert-at (Pos G.map 1 0) "orc")
+  (shoot 'E)
+  (for [x [0 1 2]]
+     (assert-at (Pos G.map x 0) 'floor))
+  ; A wrapped arrow stops just before it reaches the player's square,
+  ; without hitting anything in it.
+  (mk-tile G.player.pos "orc")
+  (shoot 'E)
+  (assert-at 'here ["orc" 'player]))
 
 
 (defn test-ambient-poison []

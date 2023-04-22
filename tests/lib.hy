@@ -10,7 +10,7 @@
   simalq.un-iq [read-quest iq-quest]
   simalq.game-state [G]
   simalq.tile [Tile add-tile rm-tile mv-tile]
-  simalq.commands [Wait]
+  simalq.commands [Wait Shoot]
   simalq.main [start-quest start-level take-turn])
 
 
@@ -54,8 +54,10 @@
     (do
       (setv map (dedent
         (re.sub r"\A( *\n)*" "" (re.sub r"( *\n)*\Z" "" map))))
-      (setv height (+ (.count map "\n") 1))
-      (setv width (+ (// (.index map "\n") 2) 1))
+      (setv height (+ 1 (.count map "\n")))
+      (setv width (+ 1 (//
+        (try (.index map "\n") (except [ValueError] (len map)))
+        2)))
       (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
       (for [
           [y row] (enumerate (reversed (.split map "\n")))
@@ -165,3 +167,7 @@
 (defn wait [[n-times 1]]
   (do-n n-times
     (take-turn (Wait))))
+
+(defn shoot [direction-abbr [n-times 1]]
+  (do-n n-times
+    (take-turn (Shoot (getattr Direction (str direction-abbr))))))
