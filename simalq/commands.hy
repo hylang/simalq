@@ -201,6 +201,9 @@
           (return))
         (for [tile (at target)]
           (cond
+            (.hook-player-shot tile)
+              ; The arrow stops without doing anything more.
+              (return)
             tile.damageable (do
               ; The arrow damages the tile and stops.
               (damage-tile tile (player-shot-damage) DamageType.MundaneArrow)

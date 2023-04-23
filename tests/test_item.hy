@@ -1,7 +1,7 @@
 (require
   tests.lib [cant wk])
 (import
-  tests.lib [init mk-quest assert-at set-square mv-player]
+  tests.lib [init mk-quest assert-at set-square mv-player shoot]
   simalq.geometry [Pos Direction pos+ at]
   simalq.game-state [G])
 
@@ -60,3 +60,34 @@
   (assert (= G.player.hp 225))
   (wk E)
   (assert (= G.player.hp 175)))
+
+
+(defn test-food-shoot []
+  (init (mk-quest [
+    :map "
+      @ % ☠ ██o o
+      ████████G ██
+      ████o ██████"
+    :map-marks {
+      "% " "snack"
+      "o " ["orc" :hp 4]}]))
+  ; Shooting a snack (or most other foods) just destroys it.
+  (assert-at 'E "snack")
+  (shoot 'E)
+  (assert-at 'E 'floor)
+  ; Shooting a jar of poison creates a 5 × 5 cloud of poison, which
+  ; can damage both the player and monsters. It goes through walls.
+  (wk E)
+  (assert-at 'E "jar of poison")
+  (assert (= G.player.hp 100))
+  (shoot 'E)
+  (assert-at 'E 'floor)
+  ; The player takes 20 damage.
+  (assert (= G.player.hp 80))
+  ; The two orcs in the blast radius take 3 damage each.
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1))
+  (assert (= (. (at (Pos G.map 4 2)) [0] hp) 1))
+  ; The ghost, being undead, takes no damage from poison.
+  (assert (= (. (at (Pos G.map 4 1)) [0] hp) 1))
+  ; The third orc is outside of the blast radius.
+  (assert (= (. (at (Pos G.map 5 2)) [0] hp) 4)))

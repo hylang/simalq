@@ -5,7 +5,8 @@
   simalq.util [CommandError]
   simalq.game-state [G]
   simalq.tile [Tile deftile destroy-tile]
-  simalq.util [DamageType hurt-player msg])
+  simalq.util [DamageType hurt-player msg burst-damage])
+(setv  T True  F False)
 
 
 (defclass Item [Tile]
@@ -24,7 +25,11 @@
     (when (is-not (. (type self) pick-up) Item.pick-up)
       #("Pickup effect" (or
         self.pick-up.__doc__
-        (self.pick-up.dynadoc self))))]))
+        (self.pick-up.dynadoc self))))
+    (when (is-not (. (type self) hook-player-shot) Item.hook-player-shot)
+      #("Effect when you shoot it" (or
+        self.hook-player-shot.__doc__
+        (self.hook-player-shot.dynadoc self))))]))
 
 
 (deftile Item "$ " "a pile of gold"
@@ -49,6 +54,12 @@
     eat-messages #())
       ; Messages that can print when you eat the food. A pseudorandom
       ; one is chosen.
+
+  (defn hook-player-shot [self]
+    "The item is destroyed."
+    (destroy-tile self)
+    (msg "Someone shot the food.")
+    T)
 
   (defn-dd pick-up [self]
     (doc (if (< it.hp-effect 0)
@@ -91,7 +102,20 @@
   :hp-effect -50
   :eat-messages #("You drink a jar of poison. It tastes pretty bad.")
 
+  :hook-player-shot (fn-dd [self]
+    (doc #[f[Explodes in a size-{(get poison-burst "size")} burst of poison, which does {(get poison-burst "dmg_monster")} poison damage to monsters and {(get poison-burst "dmg_player")} to you.]f])
+    (burst-damage self.pos :damage-type DamageType.Poison
+      :size (get poison-burst "size")
+      :amount (get poison-burst "dmg_monster")
+      :player-amount (get poison-burst "dmg_player"))
+    (destroy-tile self)
+    T)
+
   :flavor "I think you're not supposed to drink this.")
+(setv poison-burst (dict
+  :size 2
+  :dmg-player 20
+  :dmg-monster 3))
 
 
 (deftile Item "⚷ " "a key"

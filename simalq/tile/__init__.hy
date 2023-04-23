@@ -142,6 +142,11 @@
     "Called when the player successfully walks into this tile. Return
     true to end her turn."
     None)
+  (defn hook-player-shot [self]
+    "Called when the player hits this tile with an arrow. Return true
+    to indicate a hit, and halt further processing of this arrow
+    against this tile. (A magic arrow might still keep going.)"
+    None)
   (defn hook-destroyed [self pos]
     "Called when the tile is destroyed by damage. The tile has already
     been removed, but its previous position is given by `pos`."

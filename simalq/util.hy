@@ -67,3 +67,17 @@
   (hy.M.simalq/tile.damage-tile G.player amount damage-type)
   (when (chainc G.player.hp <= hp-warning-threshold < hp-was)
     (msg "Princess needs food badly!")))
+
+
+(defn burst-damage [center size amount damage-type [player-amount 0]]
+  "Damage every tile in the specified burst. Notice that `amount`
+  damage is only done to non-player tiles. The player gets the
+  separate value `player-amount`."
+  (import
+    simalq.geometry [burst at]
+    simalq.tile [damage-tile])
+
+  (for [p (burst center size)  tile (at p)  :if tile.damageable]
+    (if (is tile G.player)
+      (hurt-player player-amount damage-type)
+      (damage-tile tile amount damage-type))))
