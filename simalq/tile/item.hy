@@ -51,9 +51,14 @@
     hp-effect None
       ; How much you're healed (or damaged, for negative values)
       ; by the food.
-    eat-messages #())
+    hp-set-min None
+      ; If set, the food sets your HP to at least this value, and
+      ; `hp-effect` is ignored.
+    eat-messages #()
       ; Messages that can print when you eat the food. A pseudorandom
       ; one is chosen.
+    waste-message None)
+      ; A message for when you eat the food but it has no effect.
 
   (defn hook-player-shot [self]
     "The item is destroyed."
@@ -62,18 +67,28 @@
     T)
 
   (defn-dd pick-up [self]
-    (doc (if (< it.hp-effect 0)
-      f"Deals {(- it.hp-effect)} poison damage to you."
-      f"Grants {it.hp-effect} hit points."))
-    (msg (get self.eat-messages (%
-      ; Food at the same position on the same level number will have
-      ; the same message. Nearby pieces of food will typically have
-      ; different messages.
-      (+ (* G.level-n 10,000) self.pos.x (* G.map.width self.pos.y))
-      (len self.eat-messages))))
-    (if (< self.hp-effect 0)
-      (hurt-player (- self.hp-effect) DamageType.Poison)
-      (+= G.player.hp self.hp-effect))))
+    (doc (cond
+      it.hp-set-min
+        f"Sets your hit points to at least {it.hp-set-min}. If you already have that many, the effect is wasted."
+      (< it.hp-effect 0)
+        f"Deals {(- it.hp-effect)} poison damage to you."
+      T
+        f"Grants {it.hp-effect} hit points."))
+    (msg (if (and self.hp-set-min (>= G.player.hp self.hp-set-min))
+      self.waste-message
+      (get self.eat-messages (%
+        ; Food at the same position on the same level number will have
+        ; the same message. Nearby pieces of food will typically have
+        ; different messages.
+        (+ (* G.level-n 10,000) self.pos.x (* G.map.width self.pos.y))
+        (len self.eat-messages)))))
+    (cond
+      self.hp-set-min
+        (setv G.player.hp (max self.hp-set-min G.player.hp))
+      (< self.hp-effect 0)
+        (hurt-player (- self.hp-effect) DamageType.Poison)
+      T
+        (+= G.player.hp self.hp-effect))))
 
 (deftile Food "% " "a meal"
   :color 'red
@@ -94,6 +109,17 @@
   :eat-messages simalq.strings.snack-messages
 
   :flavor "A little something to tide you over.")
+
+(deftile Food "% " "some dessert"
+  :color 'rose
+  :iq-ix 155  ; super-healing potion
+  :points 0
+
+  :hp-set-min 500
+  :eat-messages simalq.strings.dessert-messages
+  :waste-message "You don't have room for dessert. It goes to waste."
+
+  :flavor "In the gustatory tradition of Tris's kingdom, saving room for dessert became so highly valued that there arose a practice of eating dessert as the first course.")
 
 (deftile Food "☠ " "a jar of poison"
   :iq-ix 86

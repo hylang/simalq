@@ -125,7 +125,6 @@
     [152 "random_gate"]
     [153 "amulet_of_sight"]
     [154 "wand_of_flame"]
-    [155 "super_healing_potion"]
     [156 "wand_of_death"]
     [157 "earthquake_bomb"]
     [158 "ring_of_protection"]

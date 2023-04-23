@@ -51,15 +51,22 @@
 
 
 (defn test-food-eat []
-  (init (mk-quest
-    [:tiles ["snack" "meal" "jar of poison"]]))
+  (init (mk-quest [:tiles
+    ["snack" "meal" "jar of poison" "dessert" "snack" "dessert"]]))
   (assert (= G.player.hp 100))
   (wk E)
   (assert (= G.player.hp 125))
   (wk E)
   (assert (= G.player.hp 225))
   (wk E)
-  (assert (= G.player.hp 175)))
+  (assert (= G.player.hp 175))
+  (wk E)
+  (assert (= G.player.hp 500))
+  (wk E)
+  (assert (= G.player.hp 525))
+  ; The second dessert has no effect, because we're already at 500 HP.
+  (wk E)
+  (assert (= G.player.hp 525)))
 
 
 (defn test-food-shoot []

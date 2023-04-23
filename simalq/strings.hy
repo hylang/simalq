@@ -20,3 +20,13 @@
   "You enjoy some curry puffs."
   "You have some mixed nuts. They're mostly peanuts."
   "You have some tortilla chips and salsa."))
+
+(setv dessert-messages #(
+  #[["C" is for "cookie". That's good enough for me.]]
+  "That beautiful cinnamon roll was too good for this world."
+  "You eat a slice of birthday cake. Whose birthday is it?"
+  "You eat some funnel cake. How festive."
+  "You have some chocolate babka, just like Bubbe used to make."
+  "You have some peppermint-stick ice cream. My favorite!"
+  "You have some refreshing lemon sorbet."
+  "You scarf down some brownies."))

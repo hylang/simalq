@@ -159,7 +159,7 @@
   `defclass`."
 
   (setv article None)
-  (setv stem (re.sub r"\A(a|an|the) "
+  (setv stem (re.sub r"\A(a|an|the|some) "
     (fn [m] (nonlocal article) (setv article (.group m 1)) "")
     name))
   (assert (= (len mapsym) 2))
