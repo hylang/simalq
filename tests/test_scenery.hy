@@ -100,10 +100,17 @@
   ; Exit from level 1.
   (mv-player 0 1)
   (assert (= G.level-n 1))
+  (assert (= G.score 0))
   (setv map-was G.map)
   (assert-at 'N "exit")
   (wk N)
   (assert (= G.level-n 2))
+  (assert (= G.score 0))
+    ; In IQ, there was apparently an intention at some point to grant
+    ; 100 points when using an exit (see `SetScorePlus`), but it's not
+    ; fully implemented. I don't implement it because I think it would
+    ; be a bit weird, compared to how points are otherwise scored in
+    ; the game.
   (assert (!= G.map map-was))
 
   ; Exit from the penultimate level.
