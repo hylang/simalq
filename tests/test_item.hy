@@ -48,3 +48,15 @@
   (assert (= G.player.keys (- G.rules.max-keys 1)))
   (wk E)
   (assert-at 'here ['player "door"]))
+
+
+(defn test-food-eat []
+  (init (mk-quest
+    [:tiles ["snack" "meal" "jar of poison"]]))
+  (assert (= G.player.hp 100))
+  (wk E)
+  (assert (= G.player.hp 125))
+  (wk E)
+  (assert (= G.player.hp 225))
+  (wk E)
+  (assert (= G.player.hp 175)))
