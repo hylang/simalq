@@ -4,7 +4,7 @@
   simalq.strings
   simalq.util [CommandError]
   simalq.game-state [G]
-  simalq.tile [Tile deftile rm-tile]
+  simalq.tile [Tile deftile destroy-tile]
   simalq.util [DamageType hurt-player msg])
 
 
@@ -16,7 +16,7 @@
   (defn hook-player-walked-into [self]
     (+= G.score self.points)
     (.pick-up self)
-    (rm-tile self))
+    (destroy-tile self))
   (defn pick-up [self])
 
   (defn info-bullets [self] [

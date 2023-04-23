@@ -209,6 +209,11 @@
     (.remove (at tile.pos) tile)
     (object.__setattr__ tile "pos" None)))
 
+(defn destroy-tile [tile]
+  (setv pos-was tile.pos)
+  (rm-tile tile)
+  (.hook-destroyed tile pos-was))
+
 (defn mv-tile [tile pos]
   (rm-tile tile)
   (.insert (at pos) 0 tile)
@@ -236,9 +241,7 @@
     ; It's destroyed.
     (unless tile.score-for-damaging
       (+= G.score tile.points))
-    (setv pos-was tile.pos)
-    (rm-tile tile)
-    (.hook-destroyed tile pos-was)))
+    (destroy-tile tile)))
 
 
 (defclass Actor [Tile]

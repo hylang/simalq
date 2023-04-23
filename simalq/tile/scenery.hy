@@ -5,7 +5,7 @@
   simalq.color :as color
   simalq.util [CommandError GameOverException player-melee-damage DamageType]
   simalq.geometry [Pos Direction GeometryError pos+ at]
-  simalq.tile [Tile deftile rm-tile replace-tile damage-tile]
+  simalq.tile [Tile deftile replace-tile damage-tile destroy-tile]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -142,7 +142,7 @@
     (-= G.player.keys 1)
     (if self.result-when-opened
       (replace-tile self self.result-when-opened)
-      (rm-tile self))
+      (destroy-tile self))
     True))
 
 (deftile LockedDoor "++" "a locked door"

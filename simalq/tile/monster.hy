@@ -8,7 +8,7 @@
   simalq.util [player-melee-damage DamageType hurt-player next-in-cycle]
   simalq.geometry [Direction GeometryError pos+ at adjacent? dir-to]
   simalq.game-state [G]
-  simalq.tile [Actor deftile rm-tile mv-tile add-tile damage-tile]
+  simalq.tile [Actor deftile mv-tile add-tile damage-tile destroy-tile]
   simalq.tile.scenery [walkability])
 (setv  T True  F False)
 
@@ -67,9 +67,7 @@
           (damage-by-hp self self.damage-melee)
           DamageType.MonsterMelee)
         (when self.kamikaze
-          (setv pos-was self.pos)
-          (rm-tile self)
-          (.hook-destroyed self pos-was))
+          (destroy-tile self))
         ; That uses up our action.
         (return))
 
