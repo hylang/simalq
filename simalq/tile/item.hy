@@ -80,7 +80,12 @@
         ; Food at the same position on the same level number will have
         ; the same message. Nearby pieces of food will typically have
         ; different messages.
-        (+ (* G.level-n 10,000) self.pos.x (* G.map.width self.pos.y))
+        (+
+          (* G.level-n 1,000,003)
+            ; The multiplier is chosen to be (a) prime and (b) bigger
+            ; than the area of most levels.
+          self.pos.x
+          (* G.map.width self.pos.y))
         (len self.eat-messages)))))
     (cond
       self.hp-set-min
