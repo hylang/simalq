@@ -26,7 +26,7 @@
       #("Pickup effect" (or
         self.pick-up.__doc__
         (self.pick-up.dynadoc self))))
-    (when (is-not (. (type self) hook-player-shot) Item.hook-player-shot)
+    (when self.hook-player-shot
       #("Effect when you shoot it" (or
         self.hook-player-shot.__doc__
         (self.hook-player-shot.dynadoc self))))]))
@@ -63,8 +63,7 @@
   (defn hook-player-shot [self]
     "The item is destroyed."
     (destroy-tile self)
-    (msg "Someone shot the food.")
-    T)
+    (msg "Someone shot the food."))
 
   (defn-dd pick-up [self]
     (doc (cond
@@ -139,8 +138,7 @@
       :size (get poison-burst "size")
       :amount (get poison-burst "dmg_monster")
       :player-amount (get poison-burst "dmg_player"))
-    (destroy-tile self)
-    T)
+    (destroy-tile self))
 
   :flavor "I think you're not supposed to drink this.")
 (setv poison-burst (dict

@@ -3,7 +3,8 @@
   simalq.macros [defdataclass])
 (import
   copy [deepcopy]
-  simalq.util [CommandError DamageType save-game-path msg player-shot-damage]
+  simalq.color :as color
+  simalq.util [CommandError DamageType save-game-path msg player-shot-damage flash-map]
   simalq.geometry [Direction GeometryError pos+ at]
   simalq.game-state [G save-game load-game]
   simalq.tile [mv-tile damage-tile]
@@ -187,27 +188,42 @@
           (return))))
 
     Shoot (do
-      (setv d action.direction)
-      (setv target G.player.pos)
+      (setv
+        d action.direction
+        target G.player.pos
+        targets [])
+      (defn animate []
+        (flash-map :flash-time-s .1
+          G.player.pos
+          color.flash-player-shot targets
+          {}))
       (do-n G.rules.reality-bubble-size
         (setv target (try
           (pos+ target d)
           (except [GeometryError]
             ; An arrow that hits the level border stops.
+            (animate)
             (return))))
+        (.append targets target)
         (when (= target G.player.pos)
           ; An arrow that wraps around the map all the way back to the
           ; player stops there, rather than looping.
+          (animate)
           (return))
         (for [tile (at target)]
           (cond
-            (.hook-player-shot tile)
-              ; The arrow stops without doing anything more.
-              (return)
+            tile.hook-player-shot (do
+              ; The arrow stops after the hook is called.
+              (animate)
+              (.hook-player-shot tile)
+              (return))
             tile.damageable (do
               ; The arrow damages the tile and stops.
+              (animate)
               (damage-tile tile (player-shot-damage) DamageType.MundaneArrow)
               (return))
-            tile.blocks-player-shots
+            tile.blocks-player-shots (do
               ; The arrow stops without doing anything more.
-              (return)))))))
+              (animate)
+              (return)))))
+      (animate))))

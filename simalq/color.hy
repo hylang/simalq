@@ -18,6 +18,7 @@
       'navy [0 0 (/ 1 2)]
       'rose [1 0 (/ 1 2)]
       'pale-magenta [1 (/ 7 8) 1]
+      'blue [0 0 1]
       'steel-blue [(/ 1 4) (/ 1 2) (/ 3 4)]
       'pale-green [(/ 7 8) 1 (/ 7 8)]
       'lime [0 1 0]})
@@ -35,6 +36,7 @@
 
   flash-label 'white
   flash-player-damaged 'red
+  flash-player-shot 'blue
 
   tile-bg-by-hp {
     1       'pale-green
