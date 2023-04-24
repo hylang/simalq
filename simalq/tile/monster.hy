@@ -63,7 +63,7 @@
 
     (when (and (= target G.player.pos) (in wly ['bump 'walk]))
       ; We're in melee range of the player, so bonk her.
-        (hurt-player
+        (hurt-player :attacker self
           (damage-by-hp self self.damage-melee)
           DamageType.MonsterMelee)
         (when self.kamikaze

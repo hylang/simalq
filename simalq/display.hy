@@ -46,13 +46,14 @@
     (fg (bg c.char)))))
 
 
-(defn draw-screen [width height focus status-bar messages]
+(defn draw-screen [width height focus status-bar messages [overmarks None]]
   "Return a colorstr for the main screen."
 
   (setv out (draw-map
     focus
     width
-    (- height (if status-bar status-bar-lines 0))))
+    (- height (if status-bar status-bar-lines 0))
+    (or overmarks {})))
   (when status-bar
     (+= out (lfor
       line (draw-status-bar)
@@ -79,9 +80,12 @@
   (+ #* out))
 
 
-(defn draw-map [focus width height]
+(defn draw-map [focus width height overmarks]
   "Return a list of colorstrs, one per line. The map is centered on
-  `focus`, a `Pos`."
+  `focus`, a `Pos`. `overmarks` should be a dictionary mapping
+  `Pos`es to pairs of `ColorChar`s to display over them. The `char`
+  attribute of these `ColorChar`s can be `None` to indicate that the
+  map character should be preserved."
 
   (lfor
     ; Loop over the screen coordinates `sy` and `sx`. I number `sy`
@@ -98,12 +102,23 @@
       (if (and
           (or G.map.wrap-x (<= 0 mx (- G.map.width 1)))
           (or G.map.wrap-y (<= 0 my (- G.map.height 1))))
-        ; We're on the map. Draw this square.
-        (mapsym-at-pos (Pos G.map mx my))
+        ; We're on the map. Draw this square, or an overmark if there
+        ; is one for this position.
+        (do
+          (setv p (Pos G.map mx my))
+          (setv cs (mapsym-at-pos p))
+          (for [[i c] (enumerate cs)] (cond
+            (in p overmarks) (do
+              (setv o (get overmarks p i))
+              (setv c.bg o.bg)
+              (when o.char
+                (setv c.fg o.fg)
+                (setv c.char o.char)))
+            (= [mx my] [focus.x focus.y])
+              (setv c.bg color.focus)))
+           cs)
         ; Otherwise, we're off the map. Draw border.
         (colorstr "██" color.void)))
-    :do (when (= [mx my] [focus.x focus.y])
-      (setv c.bg color.focus))
     ; If the screen has an odd width, we can only draw the first
     ; character of the rightmost mapsym.
     :if (not (and (% width 2) (= sx (- width 1)) i))

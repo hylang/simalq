@@ -1,11 +1,13 @@
 "Utility functions and other frequently imported components."
 
-
 (import
+  time [sleep]
   os
   pathlib [Path]
   enum [Enum]
-  simalq.game-state [G])
+  simalq.game-state [G]
+  simalq.color :as color)
+(setv  T True  F False)
 
 
 (setv save-game-path (/
@@ -45,6 +47,31 @@
   (.append message-queue (.join " " (map str args))))
 
 
+(defn flash-map [focus the-color ps labels flash-time-s]
+  "Animate the map by briefly flashing some positions a certain color,
+  optionally with a text label replacing the map character. `focus`
+  should be a `Pos`, `ps` an iterable of `Pos` to flash, and
+  `labels` a dictionary mapping a subset of positions in `ps` to
+  2-character `str`s."
+
+  (import
+    simalq.main [print-main-screen displaying]
+    simalq.display [ColorChar])
+
+  (when (not (displaying))
+    (return))
+
+  (print-main-screen focus
+    :status-bar T
+    :messages message-queue
+    :overmarks (dfor  p ps  p (lfor  i (range 2)
+      (ColorChar
+        :char (when (in p labels) (get labels p i))
+        :fg color.flash-label
+        :bg the-color))))
+  (sleep flash-time-s))
+
+
 (defn player-melee-damage []
   "Return how much damage the player does with her sword."
   G.rules.base-player-melee-damage)
@@ -62,7 +89,14 @@
 
 (setv hp-warning-threshold 100)
 
-(defn hurt-player [amount damage-type]
+(defn hurt-player [amount damage-type [animate T] [attacker None]]
+  (when animate
+    (flash-map
+      G.player.pos
+      color.flash-player-damaged
+      #(G.player.pos #* (if attacker [attacker.pos] []))
+      {G.player.pos (if (> amount 99) "OW" (format amount "2"))}
+      :flash-time-s .2))
   (setv hp-was G.player.hp)
   (hy.M.simalq/tile.damage-tile G.player amount damage-type)
   (when (chainc G.player.hp <= hp-warning-threshold < hp-was)

@@ -33,6 +33,9 @@
   focus 'yellow
   message-bg 'pale-yellow
 
+  flash-label 'white
+  flash-player-damaged 'red
+
   tile-bg-by-hp {
     1       'pale-green
     2       'pale-blue

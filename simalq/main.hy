@@ -71,7 +71,7 @@
   ; Dose the player with ambient poison, and convert an accumulated
   ; dose ≥1 into damage.
   (+= G.player.poison-dose G.level.poison-intensity)
-  (hurt-player
+  (hurt-player :animate F
     (pop-integer-part G.player.poison-dose)
     DamageType.Poison)
 
@@ -80,6 +80,9 @@
 
 
 (setv B None)
+
+(defn displaying []
+  (bool B))
 
 (defn io-mode [draw on-input]
   "Enter a modal interface that alternates between the callbacks
@@ -112,18 +115,13 @@
   (io-mode
 
     :draw (fn []
-      ; Retrieve messages, if any.
-      (setv messages #())
-      (when message-queue
-        (setv messages (tuple message-queue))
-        (setv (cut message-queue) #()))
-      ; Draw the screen.
       (print-main-screen
         :focus G.player.pos
         :status-bar T
-        :messages messages))
+        :messages (tuple message-queue)))
 
     :on-input (fn [key]
+      (setv (cut message-queue) #())
       (setv cmd (get-command key))
       (when (is cmd None)
         (return))
@@ -134,12 +132,12 @@
         (except [e CommandError]
           (msg (get e.args 0)))))))
 
-(defn print-main-screen [focus status-bar [messages #()]]
+(defn print-main-screen [focus status-bar [messages #()] [overmarks None]]
   (print
     :flush T :sep "" :end ""
     B.home B.clear
     (bless-colorstr B (draw-screen
-      B.width B.height focus status-bar messages))))
+      B.width B.height focus status-bar messages overmarks))))
 
 
 (defn inkey []
