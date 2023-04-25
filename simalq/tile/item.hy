@@ -137,6 +137,7 @@
     (burst-damage self.pos :damage-type DamageType.Poison
       :size (get poison-burst "size")
       :amount (get poison-burst "dmg_monster")
+      :color 'moss-green
       :player-amount (get poison-burst "dmg_player"))
     (destroy-tile self))
 

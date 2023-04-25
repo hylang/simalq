@@ -6,7 +6,7 @@
   pathlib [Path]
   enum [Enum]
   simalq.game-state [G]
-  simalq.color :as color)
+  simalq.color :as colors)
 (setv  T True  F False)
 
 
@@ -47,7 +47,7 @@
   (.append message-queue (.join " " (map str args))))
 
 
-(defn flash-map [focus the-color ps labels flash-time-s]
+(defn flash-map [focus color ps labels flash-time-s]
   "Animate the map by briefly flashing some positions a certain color,
   optionally with a text label replacing the map character. `focus`
   should be a `Pos`, `ps` an iterable of `Pos` to flash, and
@@ -67,8 +67,8 @@
     :overmarks (dfor  p ps  p (lfor  i (range 2)
       (ColorChar
         :char (when (in p labels) (get labels p i))
-        :fg color.flash-label
-        :bg the-color))))
+        :fg colors.flash-label
+        :bg color))))
   (sleep flash-time-s))
 
 
@@ -93,7 +93,7 @@
   (when animate
     (flash-map
       G.player.pos
-      color.flash-player-damaged
+      colors.flash-player-damaged
       #(G.player.pos #* (if attacker [attacker.pos] []))
       {G.player.pos (if (> amount 99) "OW" (format amount "2"))}
       :flash-time-s .2))
@@ -103,7 +103,8 @@
     (msg "Princess needs food badly!")))
 
 
-(defn burst-damage [center size amount damage-type [player-amount 0]]
+(defn burst-damage [
+    center size color amount damage-type [player-amount 0]]
   "Damage every tile in the specified burst. Notice that `amount`
   damage is only done to non-player tiles. The player gets the
   separate value `player-amount`."
@@ -111,7 +112,15 @@
     simalq.geometry [burst at]
     simalq.tile [damage-tile])
 
-  (for [p (burst center size)  tile (at p)  :if tile.damageable]
+  (setv b (tuple (burst center size)))
+  (flash-map
+    G.player.pos
+    color
+    :ps b
+    :labels {}
+    :flash-time-s .5)
+
+  (for [p b  tile (at p)  :if tile.damageable]
     (if (is tile G.player)
       (hurt-player player-amount damage-type)
       (damage-tile tile amount damage-type))))

@@ -21,6 +21,7 @@
       'blue [0 0 1]
       'steel-blue [(/ 1 4) (/ 1 2) (/ 3 4)]
       'pale-green [(/ 7 8) 1 (/ 7 8)]
+      'moss-green [(/ 1 2) (/ 3 4) (/ 1 2)]
       'lime [0 1 0]})
 
     k (tuple (gfor  x v  (round (* x 255)))))
