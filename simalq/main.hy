@@ -144,7 +144,7 @@
   ; of queued for input.
   (import sys termios)
   (termios.tcflush sys.stdin termios.TCIFLUSH)
-  (B.inkey))
+  (B.inkey :esc-delay .01))
 
 
 (defn info-screen [t]
