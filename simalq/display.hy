@@ -1,7 +1,8 @@
 (require
   simalq.macros [defdataclass])
 (import
-  textwrap [wrap]
+  math [ceil]
+  textwrap
   hy.pyops *
   simalq.color :as color
   simalq.game-state [G]
@@ -61,7 +62,7 @@
   (setv messages (lfor
     m messages
     :if (not-in m hide-messages)
-    line (wrap m width)
+    line (textwrap.wrap m width)
     line))
   (when messages
     ; Write the message over the line just above the status bar
@@ -81,21 +82,18 @@
 
 
 (defn draw-map [focus width height overmarks]
-  "Return a list of colorstrs, one per line. The map is centered on
-  `focus`, a `Pos`. `overmarks` should be a dictionary mapping
-  `Pos`es to pairs of `ColorChar`s to display over them. The `char`
-  attribute of these `ColorChar`s can be `None` to indicate that the
-  map character should be preserved."
+  "Return a list of colorstrs, one per line. The map will include
+  (typically, is centered on) `focus`, a `Pos`. `overmarks` should be
+  a dictionary mapping `Pos`es to pairs of `ColorChar`s to display
+  over them. The `char` attribute of these `ColorChar`s can be `None`
+  to indicate that the map character should be preserved."
+
+  (setv xlim (map-limits (ceil (/ width 2)) G.map.width focus.x G.map.wrap-x))
+  (setv ylim (map-limits height G.map.height focus.y G.map.wrap-y))
 
   (lfor
-    ; Loop over the screen coordinates `sy` and `sx`. I number `sy`
-    ; bottom-to-top, although it's returned top-to-bottom, for
-    ; similarity with `Pos`.
-    sy (reversed (range height))
-    (lfor sx (range 0 width 2)
-    ; Find the map coordinates `mx` and `my`.
-    :setv mx (+ focus.x (- (// sx 2) (// width 4)))
-    :setv my (+ focus.y (- sy (// height 2)))
+    my (reversed (range (get ylim 0) (+ (get ylim 1) 1)))
+    (lfor mx (range (get xlim 0) (+ (get xlim 1) 1))
     ; Get the two characters and their colors for the corresponding
     ; mapsym.
     [i c] (enumerate
@@ -121,9 +119,41 @@
         (colorstr "██" color.void)))
     ; If the screen has an odd width, we can only draw the first
     ; character of the rightmost mapsym.
-    :if (not (and (% width 2) (= sx (- width 1)) i))
+    :if (not (and (% width 2) (= mx (get xlim 1)) i))
     ; Yield one `ColorChar` at a time.
     c)))
+
+(defn map-limits [sdim mdim fc wrap]
+  "Return (inclusive) bounds for drawing a map. The idea here is to
+  center the map on the focus so long as that doesn't show a lot of
+  off-map squares. If it would, try to scroll the screen so that more
+  map is shown.
+
+  - `sdim` - length of the screen (actually, drawing window) on this
+             dimension
+  - `mdim` - length of the map on this dimension
+  - `fc`   - coordinate of the focus
+  - `wrap` - Boolean indicating whether this dimension is wrapped"
+
+  (setv border 2)
+    ; Don't show more than this number of off-map squares, if there
+    ; are other map squares we could fit on the screen by scrolling in
+    ; the other direction.
+
+  (setv adj (if (% sdim 2) 0 -1))
+  (when (and (not wrap) (>= sdim (+ mdim (* 2 border))))
+    (return #((- (// mdim 2) (// sdim 2)) (+ (// mdim 2) (// sdim 2) adj))))
+  (setv lo (- fc (// sdim 2)))
+  (setv hi (+ fc (// sdim 2) adj))
+  (when wrap
+    (return #(lo hi)))
+  (cond
+    (< lo (- border))
+      #((- border) (- sdim border 1))
+    (>= hi (+ mdim border))
+      #((- mdim (- sdim border)) (+ mdim border -1))
+    T
+      #(lo hi)))
 
 
 (setv status-bar-lines 2)
