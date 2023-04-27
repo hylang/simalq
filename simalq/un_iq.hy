@@ -7,6 +7,7 @@
 (require
   hyrule [unless])
 (import
+  types [FunctionType]
   fractions [Fraction]
   os
   pathlib [Path]
@@ -154,13 +155,26 @@
           ; bottom row.
         (unless (= iq-ix FLOOR)
           (setv p (Pos m x y))
-          (setv cls (get Tile.types-by-iq-ix iq-ix))
+          (setv result (get Tile.types-by-iq-ix iq-ix))
           (setv d {})
-          (when (is (type cls) dict)
-            (setv d {(get cls "slot") (get cls "value")})
-            (setv cls (get cls "cls")))
+          (cond
+            (is (type result) type) (setv
+              ; The usual case: the `iq-ix` specifies the type, and no
+              ; more.
+              cls result)
+            (is (type result) dict) (setv
+              ; This `iq-ix` specifies the type and a certain value of
+              ; a slot.
+              cls (get result "cls")
+              d {(get result "slot") (get result "value")})
+            (is (type result) FunctionType) (setv
+              ; A special case where tile extras are used to determine
+              ; the type.
+              cls (get Tile.types (result #* (get tile-extras p))))
+            T
+              (raise (ValueError (+ "Bad `Tile.types-by-iq-ix` entry: " (repr result)))))
           (.append (get m.data x y) (cls :pos p #** d #**
-            (if (in p tile-extras)
+            (if (and (in p tile-extras) (is-not (type result) FunctionType))
               (.read-tile-extras cls #* (get tile-extras p))
               {})))))
       (Level

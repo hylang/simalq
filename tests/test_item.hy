@@ -51,8 +51,9 @@
 
 
 (defn test-food-eat []
-  (init (mk-quest [:tiles
-    ["snack" "meal" "jar of poison" "dessert" "snack" "dessert"]]))
+  (init (mk-quest [:tiles [
+     "snack" "meal" "jar of poison" "rotten food" "empty platter"
+     "dessert" "snack" "dessert"]]))
   (assert (= G.player.hp 100))
   (wk E)
   (assert (= G.player.hp 125))
@@ -60,6 +61,10 @@
   (assert (= G.player.hp 225))
   (wk E)
   (assert (= G.player.hp 175))
+  (wk E)
+  (assert (= G.player.hp  75))
+  (wk E)
+  (assert (= G.player.hp  75))
   (wk E)
   (assert (= G.player.hp 500))
   (wk E)
@@ -77,6 +82,7 @@
       ████o ██████"
     :map-marks {
       "% " "snack"
+      "☠ " "jar of poison"
       "o " ["orc" :hp 4]}]))
   ; Shooting a snack (or most other foods) just destroys it.
   (assert-at 'E "snack")

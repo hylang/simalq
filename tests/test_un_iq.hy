@@ -105,3 +105,18 @@
   (check  3 16  1  "ghost" (f/ 1 6) 2)
   (check  4 15  1  "ghost" (f/ 1 6) 2)
   (check  6 10  3  "orc"   (f/ 1 2) 1))
+
+
+(defn test-healing-potions []
+  (setv m (.
+    (read-quest (iq-quest "Boot Camp 2"))
+    levels [8] map data))
+  (defn check [x y stem]
+    (assert (= (. m [x] [y] [0] stem) stem)))
+
+  (check  1 14 "snack")  ; healing salve
+  (check  1 10 "meal")  ; healing potion
+  (check  1  6 "meal")  ; unknown potion, good
+  (check  6  1 "empty platter")  ; unknown potion, neutral
+  (check 10  1 "rotten food")  ; unknown potion, bad
+  (check 14  1 "dessert"))  ; super-healing potion

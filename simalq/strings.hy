@@ -30,3 +30,15 @@
   "You have some peppermint-stick ice cream. My favorite!"
   "You have some refreshing lemon sorbet."
   "You scarf down some brownies."))
+
+(setv rotten-food-messages #(
+  "I think you misread the expiration date on those cookies."
+  "Maybe you shouldn't have gone with the steak tartare."
+  "Rotten meat! Kids, you gotta keep your meat ice cold."
+  "Spoiled milk was a bad choice."
+  "This kobold corpse tastes terrible!"
+  "This peach is subpar."
+  "This wall chicken is unsanitary."
+  "You eat a century egg, but you don't enjoy it."
+  "You eat a poison apple. Hey, that was for a different princess."
+  "You eat some blue cheese. Blue cheese has mold in it."))

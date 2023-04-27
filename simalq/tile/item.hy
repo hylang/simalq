@@ -94,6 +94,11 @@
       T
         (+= G.player.hp self.hp-effect))))
 
+(setv (get Tile.types-by-iq-ix 21) (fn [_ v2]
+  ; IQ's three types of unknown potion are mapped to items with fixed
+  ; HP effects equal to the mean HP effect of the given type.
+  (get ["meal" "empty platter" "rotten food"] (- v2 1))))
+
 (deftile Food "% " "a meal"
   :color 'red
   :iq-ix 20  ; healing potion
@@ -114,6 +119,26 @@
 
   :flavor "A little something to tide you over.")
 
+(deftile Food "☠ " "some rotten food"
+  :color 'red
+  :iq-ix None  ; subtype of unknown potion
+  :points 0
+
+  :hp-effect -100
+  :eat-messages simalq.strings.rotten-food-messages
+
+  :flavor #[[Idok was hoping to fool you with this, but he forgot to take off the label that says "POISON: Do Not Eat".]])
+
+(deftile Food "% " "an empty platter"
+  :color 'black
+  :iq-ix None  ; subtype of unknown potion
+  :points 0
+
+  :hp-effect 0
+  :eat-messages #("There's nothing to eat here. Rats.")
+
+  :flavor #[[It looks like one of the monsters got to this food first.]])
+
 (deftile Food "% " "some dessert"
   :color 'rose
   :iq-ix 155  ; super-healing potion
@@ -126,6 +151,7 @@
   :flavor "In the gustatory tradition of Tris's kingdom, saving room for dessert became so highly valued that there arose a practice of eating dessert as the first course.")
 
 (deftile Food "☠ " "a jar of poison"
+  :color 'dark-green
   :iq-ix 86
   :points 0
 
