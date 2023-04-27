@@ -95,7 +95,6 @@
       ;   ["hp" {1 2  3 4  5 6}]
       ; where the first element is a slot name and the second is a
       ; dictionary mapping IQ values to values for the slot.
-     ; Attributes to be overriden in subclasses.
     points 0
       ; Points awarded for picking up an object, killing a monster,
       ; etc.
