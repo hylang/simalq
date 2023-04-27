@@ -2,7 +2,6 @@
   simalq.macros [pop-integer-part])
 (import
   copy [deepcopy]
-  blessed
   simalq.util [CommandError message-queue msg hurt-player DamageType]
   simalq.color :as color
   simalq.geometry [burst at]
@@ -86,20 +85,19 @@
 
 (defn io-mode [draw on-input]
   "Enter a modal interface that alternates between the callbacks
-  `draw` (nullary) and `on-input` (unary, taking a key from
-  `blessed.Terminal.inkey`. `on-input` can return the symbol `done`
-  to exit the mode."
+  `draw` (nullary) and `on-input` (unary, taking a key from `inkey`).
+  `on-input` can return the symbol `done` to exit the mode."
 
   (global B)
   (setv top-io-mode F)
   (when (is B None)
-    (setv B (blessed.Terminal))
+    (setv B (hy.M.blessed.Terminal))
     (setv top-io-mode T))
 
   (defn f []
     (while True
       (draw)
-      (when (= (on-input (B.inkey)) 'done)
+      (when (= (on-input (inkey)) 'done)
         (break))))
 
   (if top-io-mode
@@ -141,6 +139,11 @@
 
 
 (defn inkey []
+  ; Before checking for a key, flush standard input, so any keys
+  ; pressed during an animation or slow processing are ignored instead
+  ; of queued for input.
+  (import sys termios)
+  (termios.tcflush sys.stdin termios.TCIFLUSH)
   (B.inkey))
 
 
