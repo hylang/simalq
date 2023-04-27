@@ -17,8 +17,12 @@
 (setv  T True  F False)
 
 
-(defn main [iq-quest-name]
+(defn main [iq-quest-name [level-n "1"]]
+  (setv level-n (int level-n))
+
   (start-quest (read-quest (iq-quest iq-quest-name)))
+  (when (!= level-n 1)
+    (start-level level-n))
   (main-io-loop))
 
 
