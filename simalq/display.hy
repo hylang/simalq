@@ -78,7 +78,7 @@
         (+= m " "))
       (setv (cut (get out i) (len m))
         (colorstr m None color.message-bg))))
-  (+ #* out))
+  out)
 
 
 (defn draw-map [focus width height overmarks]

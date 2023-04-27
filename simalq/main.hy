@@ -134,8 +134,8 @@
   (print
     :flush T :sep "" :end ""
     B.home B.clear
-    (bless-colorstr B (draw-screen
-      B.width B.height focus status-bar messages overmarks))))
+    (.join "\n" (map (fn [x] (bless-colorstr B x)) (draw-screen
+      B.width B.height focus status-bar messages overmarks)))))
 
 
 (defn inkey []
