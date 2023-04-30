@@ -218,7 +218,7 @@
   :iq-ix-mapper ["hp"
     {3 4  4 2  15 6}]
 
-  :blocks-move T :blocks-diag T
+  :blocks-move T :blocks-diag T :blocks-player-shots F
   :damageable T
   :hook-player-bump (fn [self origin]
     "You attack the wall with your sword."
