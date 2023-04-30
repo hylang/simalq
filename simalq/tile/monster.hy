@@ -6,7 +6,7 @@
   fractions [Fraction :as f/]
   enum [Enum]
   simalq.util [player-melee-damage DamageType hurt-player next-in-cycle]
-  simalq.geometry [Direction GeometryError pos+ at adjacent? dir-to]
+  simalq.geometry [Direction GeometryError pos+ at dist adjacent? dir-to pos-seed]
   simalq.game-state [G]
   simalq.tile [Actor deftile mv-tile add-tile damage-tile destroy-tile]
   simalq.tile.scenery [walkability])
@@ -50,9 +50,12 @@
     True)
 
   (defn act [self]
-    "Approach — If the monster is adjacent to you, it makes a melee attack. Otherwise, if it can shoot you, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
+    "Approach — If the monster can attack, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
     (when (!= self.ai AI.Approach)
       (raise (ValueError "Other AIs are not yet implemented.")))
+
+    (when (try-to-attack-player self)
+      (return))
 
     ; Try to get closer to the player.
     (setv d (dir-to self.pos G.player.pos))
@@ -60,17 +63,6 @@
       ; The player is in our square. Just give up.
       (return))
     (setv [target wly] (walkability self.pos d :monster? T))
-
-    (when (and (= target G.player.pos) (in wly ['bump 'walk]))
-      ; We're in melee range of the player, so bonk her.
-        (hurt-player :attacker self
-          (damage-by-hp self self.damage-melee)
-          DamageType.MonsterMelee)
-        (when self.kamikaze
-          (destroy-tile self))
-        ; That uses up our action.
-        (return))
-
     (unless (= wly 'walk)
       ; We can't go that way. Try a different direction.
       ; Use a non-random equivalent of IQ's `ApproachHero`.
@@ -89,7 +81,6 @@
         ; Per IQ, we make only one attempt to find a new direction.
         ; Give up.
         (return)))
-
     ; We're clear to move.
     (mv-tile self target))
 
@@ -133,6 +124,47 @@
   ; Newly created monsters don't get to act on the turn they come
   ; into being.
   (setv (. (at pos) [-1] last-acted) G.turn-n))
+
+(defn try-to-attack-player [mon]
+ ; Hit the player with a melee attack, if the monster can. Return true
+ ; if it succeeded.
+ (setv p mon.pos)
+ (unless (and
+     (adjacent? p G.player.pos)
+     (in (get (walkability p (dir-to p G.player.pos) :monster? T) 1)
+       ['bump 'walk]))
+   (return F))
+ (hurt-player :attacker mon
+   (damage-by-hp mon mon.damage-melee)
+   DamageType.MonsterMelee)
+ (when mon.kamikaze
+   (destroy-tile mon))
+ T)
+
+(defn wander [mon]
+  "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
+
+  (when (try-to-attack-player mon)
+    (return))
+
+  ; Use a linear congruential generator. Each seed should have a
+  ; decent period coprime to the number of options (9)—long enough
+  ; to look randomish, but not long.
+  (setv  m (** 8 3)  c 1  a (+ 2 1))
+  (when (= mon.movement-state None)
+    ; Seed the RNG.
+    (setv mon.movement-state (% (pos-seed mon.pos) m)))
+  (setv options (+ Direction.all #(None)))
+  (setv d (get options (% mon.movement-state (len options))))
+  (setv mon.movement-state (% (+ (* a mon.movement-state) c) m))
+  (unless d
+    (return))
+  (setv [target wly] (walkability mon.pos d :monster? T))
+  (unless (= wly 'walk)
+    (return))
+  (when (> (dist G.player.pos target) G.rules.reality-bubble-size)
+    (return))
+  (mv-tile mon target))
 
 
 (defclass Generated [Monster]
@@ -206,17 +238,17 @@
     #** kwargs]
   "Shorthand for defining both a generated monster and its generator."
 
-  (deftile Generated mapsym name
+  (setv mon-cls (deftile Generated mapsym name
     :iq-ix-mapper ["hp"
       (dict (zip iq-ix-mon [1 2 3]))]
     :immune immune
     :points points-mon
     :flavor flavor-mon
-    #** kwargs)
+    #** kwargs))
   (deftile Generator (+ "☉" (get mapsym 0)) (+ name " generator")
     :iq-ix-mapper ["hp"
       (dict (zip iq-ix-gen [1 2 3]))]
-    :generate-class (re.sub r"\S+\s+" "" name)
+    :generate-class mon-cls.stem
     :immune (+ Generator.immune immune)
     :points points-gen
     :flavor flavor-gen))
@@ -259,6 +291,26 @@
 
   :flavor-mon "A spooky apparition bearing a striking resemblance to a man with a sheet draped over him. Giggle at your peril: it can discharge the negative energy that animates it to bring you closer to the grave yourself.\n\n    Lemme tell ya something: bustin' makes me feel good!"
   :flavor-gen "This big heap of human bones raises several questions, but sadly it appears you must treat the dead with even less respect in order to get rid of those ghosts.")
+
+(defgenerated "b " "a bat"
+  :iq-ix-mon [45 71 72] :iq-ix-gen [46 73 74]
+  :points-mon 1 :points-gen 3
+
+  :damage-melee #(1 2 3)
+  :act wander
+
+  :flavor-mon "Dusk! With a creepy, tingling sensation, you hear the fluttering of leathery wings! Bats! With glowing red eyes and glistening fangs, these unspeakable giant bugs drop onto… wait. These aren't my lecture notes."
+  :flavor-gen #[[A faint singing echoes out of the depths of this cave. They sound like they're saying "na na na".]])
+
+(defgenerated "B " "a giant bee"
+  :iq-ix-mon [123 124 125] :iq-ix-gen [126 127 128]
+  :points-mon 5 :points-gen 15
+
+  :damage-melee #(5 7 9)
+  :act wander
+
+  :flavor-mon "Bees bafflingly being bigger'n bats. This is the kind that can survive stinging you. You might not be so lucky."
+  :flavor-gen #[[The ancients call this place "the Plounge".]])
 
 
 (deftile NonGen "K " "a Dark Knight"

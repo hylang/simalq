@@ -4,7 +4,8 @@
 (import
   itertools [chain]
   toolz [unique]
-  simalq.util [seq sign])
+  simalq.util [seq sign]
+  simalq.game-state [G])
 (setv  T True  F False)
 
 
@@ -152,6 +153,16 @@
   (when (and m.wrap-y (> (abs dy) (/ m.height 2)))
     (*= dy -1))
   (get Direction.from-coords #((sign dx) (sign dy))))
+
+(defn pos-seed [pos]
+  "Using a `Pos`, get a number you could use as an RNG seed. Nearby
+  `Pos`es should return different values."
+  (+
+    (* G.level-n 1,000,003)
+      ; The multiplier is chosen to be (a) prime and (b) bigger
+      ; than the area of most levels.
+    pos.x
+    (* G.map.width pos.y)))
 
 
 (defn burst [center size]

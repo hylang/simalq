@@ -154,9 +154,9 @@
 
 
 (defn deftile [superclass mapsym name #** kwargs]
-  "Declare a new concrete and final tile type. Superclasses of tiles
-  not meant to themselves be instantiated should be declared with
-  `defclass`."
+  "Declare and return a new concrete and final tile type. Superclasses
+  of tiles not meant to themselves be instantiated should be declared
+  with `defclass`."
 
   (setv article None)
   (setv stem (re.sub r"\A(a|an|the|some) "
@@ -203,7 +203,9 @@
   (hy.repr-register cls (fn [x]
     (.format "(<{}> {})" stem (.join " " (gfor
       [_ s] (.all-slots x)
-      (.format ":{} {}" (hy.unmangle s) (hy.repr (getattr x s)))))))))
+      (.format ":{} {}" (hy.unmangle s) (hy.repr (getattr x s))))))))
+
+  cls)
 
 
 (defn add-tile [pos stem #** kwargs]

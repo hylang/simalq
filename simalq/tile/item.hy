@@ -4,6 +4,7 @@
   simalq.strings
   simalq.util [CommandError]
   simalq.game-state [G]
+  simalq.geometry [pos-seed]
   simalq.tile [Tile deftile destroy-tile]
   simalq.util [DamageType hurt-player msg burst-damage])
 (setv  T True  F False)
@@ -79,12 +80,7 @@
         ; Food at the same position on the same level number will have
         ; the same message. Nearby pieces of food will typically have
         ; different messages.
-        (+
-          (* G.level-n 1,000,003)
-            ; The multiplier is chosen to be (a) prime and (b) bigger
-            ; than the area of most levels.
-          self.pos.x
-          (* G.map.width self.pos.y))
+        (pos-seed self.pos)
         (len self.eat-messages)))))
     (cond
       self.hp-set-min

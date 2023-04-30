@@ -316,3 +316,43 @@
   (wk E)
   (assert (and (= G.player.hp 95) (= G.score 10)))
   (assert-at 'E 'floor))
+
+
+(defn test-bat-or-bee []
+
+  ; A bat that's next to Tris just chews on her instead of moving.
+  (init (mk-quest
+    [:tiles ["bat"]]))
+  (assert (= G.player.hp 100))
+  (wait)
+  (assert (= G.player.hp 99))
+  (wait)
+  (assert (= G.player.hp 98))
+  (wait)
+  (assert (= G.player.hp 97))
+
+  ; A wandering bat will eventually cover the reality bubble, if
+  ; it can't attack the player. It can't leave the reality bubble
+  ; on its own.
+  (init (mk-quest
+    [:map "
+        . . . . .
+        . . b . .
+        ██. . . .
+        @ ██. . ."]))
+  (setv G.rules.reality-bubble-size 3)
+  (assert (= G.player.hp 100))
+  (setv seen-at (dfor
+    x (range G.map.width)
+    y (range G.map.height)
+    #(x y) F))
+  (do-n 200
+    (wait)
+    (for [[x y] (list (.keys seen-at))]
+      (when (any (gfor  tile (at (Pos G.map x y))  (= tile.stem "bat")))
+        (setv (get seen-at #(x y)) T)
+        (break))))
+  (assert (= G.player.hp 100))
+  (assert (all (gfor
+    [[x y] seen] (.items seen-at)
+    (= seen (and (!= x 4) (not-in [x y] [[0 0] [1 0] [0 1]])))))))
