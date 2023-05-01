@@ -103,4 +103,6 @@
   ; The ghost, being undead, takes no damage from poison.
   (assert (= (. (at (Pos G.map 4 1)) [0] hp) 1))
   ; The third orc is outside of the blast radius.
-  (assert (= (. (at (Pos G.map 5 2)) [0] hp) 4)))
+  (assert (= (. (at (Pos G.map 5 2)) [0] hp) 4))
+  ; Points are earned for all damage dealt.
+  (assert (= G.score (py "3*3 + 3*3"))))
