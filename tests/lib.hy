@@ -1,6 +1,7 @@
 (require
   hyrule [do-n unless])
 (import
+  math [ceil]
   re
   fractions [Fraction]
   toolz [partition]
@@ -55,7 +56,7 @@
       (setv map (dedent
         (re.sub r"\A( *\n)*" "" (re.sub r"( *\n)*\Z" "" map))))
       (setv height (+ 1 (.count map "\n")))
-      (setv width (+ 1 (//
+      (setv width (ceil (/
         (try (.index map "\n") (except [ValueError] (len map)))
         2)))
       (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))

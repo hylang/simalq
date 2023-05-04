@@ -1,4 +1,5 @@
 (require
+  hyrule [ecase]
   tests.lib [cant wk])
 (import
   pytest
@@ -158,3 +159,48 @@
   (wk E)
   (assert-at 'E 'floor)
   (assert (= G.player.pos (Pos G.map 0 0))))
+
+
+(defn test-wallfall-trap []
+  (init (mk-quest [
+    :map "
+      @ t1t0t2
+      . t1t0t2
+      . W1W0W2"
+    :map-marks {
+      "t0" ["wallfall trap" :wallnum 0]
+      "t1" ["wallfall trap" :wallnum 1]
+      "t2" ["wallfall trap" :wallnum 2]
+      "W0" ["trapped wall" :wallnum 0]
+      "W1" ["trapped wall" :wallnum 1]
+      "W2" ["trapped wall" :wallnum 2]}]))
+  (setv G.rules.reality-bubble-size 0)
+    ; Wallfall traps are unaffected by the reality bubble.
+  (defn check [#* ts]
+    (for [[t [x y]] (zip ts (lfor
+        y (reversed (range G.map.height))
+        x (range G.map.width)
+        [x y]))]
+      (assert-at (Pos G.map x y) (ecase t
+        "." 'floor
+        "@" 'player
+        "t" "wallfall trap"
+        "W" "trapped wall"))))
+
+  (check
+    "@" "t" "t" "t"
+    "." "t" "t" "t"
+    "." "W" "W" "W")
+  ; Traps of type 1 destroy matching walls, type-0 walls, and other
+  ; traps of type 1.
+  (wk E)
+  (check
+    "." "@" "t" "t"
+    "." "." "t" "t"
+    "." "." "." "W")
+  ; Traps of type 0 destroy all wallfall traps and walls.
+  (wk E)
+  (check
+    "." "." "@" "."
+    "." "." "." "."
+    "." "." "." "."))

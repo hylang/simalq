@@ -1,6 +1,6 @@
 (require
   hyrule [unless]
-  simalq.macros [has defn-dd])
+  simalq.macros [has defn-dd fn-dd])
 (import
   simalq.color :as color
   simalq.util [CommandError GameOverException player-melee-damage DamageType]
@@ -31,7 +31,7 @@
         (. (getattr self a) __doc__)
         ((. (getattr self a) dynadoc) self)))))
 
-  (defn info-bullets [self]
+  (defn info-bullets [self #* extra]
     (setv blocks-monster (or self.blocks-monster self.blocks-move))
     [
       (when self.damageable
@@ -42,7 +42,9 @@
           "No immunities"))
       (when self.blocks-move
         "Blocks all movement")
-      (when (and (not self.blocks-move) (or self.blocks-monster G.dainty-monsters))
+      (when (and
+          (not self.blocks-move)
+          (or self.blocks-monster G.rules.dainty-monsters))
         "Blocks monster movement")
       (when self.blocks-diag
         "Blocks diagonal movement around itself")
@@ -55,6 +57,7 @@
           "Blocks monsters' shots, but not your shots")
       (when self.superblock
         "Not subject to magical transformation or passage")
+      #* extra
       (.dod self "Effect when bumped" 'hook-player-bump)
       (.dod self "Effect when trying to enter" 'hook-player-walk-to)
       (.dod self "Effect when stepped onto" 'hook-player-walked-into)
@@ -226,3 +229,48 @@
     True)
 
   :flavor "I think this dungeon might not be up to code.")
+
+
+(defclass Trap [Scenery]
+  (setv
+    __slots__ []
+    blocks-move F
+    blocks-player-shots F
+    blocks-monster-shots F))
+
+(deftile Trap "<>" "a wallfall trap"
+  :color 'dark-yellow
+  :slot-defaults (dict
+    :wallnum 1)
+  :iq-ix-mapper ["wallnum" (do
+    (setv x [115 13 75 76 77 111 112 113 114])
+    (dict (zip x (range (len x)))))]
+
+  :hook-player-walked-into (fn-dd [self]
+    (doc (if (= it.wallnum 0)
+      "Destroys all trapped walls and other wallfall traps on the level, regardless of type."
+      f"Destroys all trapped walls on the level of type {it.wallnum} or 0, along with all other wallfall traps of type {it.wallnum}."))
+    (for [col G.map.data  stack col  tile stack]
+      (when (or
+          (and (= tile.stem "trapped wall")
+            (or (= self.wallnum 0) (in tile.wallnum [0 self.wallnum])))
+          (and (= tile.stem "wallfall trap")
+            (or (= self.wallnum 0) (= tile.wallnum self.wallnum))))
+        (destroy-tile tile))))
+
+  :flavor #[[Easy there, Admiral Ackbar. This kind of trap isn't necessarily dangerous. Well, admittedly, the key word here is "necessarily".]])
+
+(deftile Scenery "██" "a trapped wall"
+  :color 'dark-yellow
+  :slot-defaults (dict
+    :wallnum 1)
+  :iq-ix-mapper ["wallnum" (do
+    (setv x [120 14 78 79 80 116 117 118 119])
+    (dict (zip x (range (len x)))))]
+
+  :blocks-move T :blocks-diag T
+  :info-bullets (fn [self #* extra]
+    (Scenery.info-bullets self
+      #("Wallfall type" self.wallnum)))
+
+  :flavor "The special thing about this wall is that it can be destroyed by wallfall traps of the corresponding type.\n\nWhat's the deal with monster closets? Monsters are proud of who they are, am I right? I'll be here all week.")
