@@ -76,7 +76,7 @@
       ; The main part of the name.
     mapsym "� "
       ; A two-character symbol to represent the tile on screen.
-      ; The first character may be a space, but the first shouldn't
+      ; The second character may be a space, but the first shouldn't
       ; be.
     color color.default-fg
       ; A foreground color for the mapsym. It can be a single color
