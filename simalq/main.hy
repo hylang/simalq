@@ -1,16 +1,14 @@
 (require
   simalq.macros [pop-integer-part])
 (import
-  copy [deepcopy]
   simalq.util [CommandError message-queue msg hurt-player DamageType]
   simalq.color :as color
   simalq.geometry [burst at]
-  simalq.game-state [G Rules GameState]
-  simalq.tile [Tile mv-tile]
-  simalq.tile.player [Player]
+  simalq.game-state [G]
   simalq.tile.scenery [Scenery]
   simalq.tile.item [Item]
   simalq.tile.monster [Monster]
+  simalq.quest [start-quest start-level]
   simalq.un-iq [read-quest iq-quest]
   simalq.commands [Action get-command do-command do-action]
   simalq.display [draw-screen bless-colorstr])
@@ -23,30 +21,6 @@
   (start-quest (read-quest (iq-quest iq-quest-name)))
   (start-level level-n)
   (main-io-loop))
-
-
-(defn start-quest [quest]
-  (setv
-    G.rules (Rules)
-    G.quest quest
-    G.states []
-    state (GameState))
-  (for [thing [G.rules state] [k v] (.items thing.slot-defaults)]
-    (setattr thing k v))
-  (setv
-    state.player (Player :pos None)
-    state.player.hp quest.starting-hp)
-  (.append G.states state)
-  (setv G.state-i 0))
-
-
-(defn start-level [level-n]
-  (setv
-    G.level-n level-n
-    G.level (deepcopy (get G.quest.levels (- level-n 1))))
-      ; The default behavior of `deepcopy` is smart enough to make all
-      ; the references to `G.level.map` in tiles point to the new map.
-  (mv-tile G.player G.level.player-start))
 
 
 (defn take-turn [action]

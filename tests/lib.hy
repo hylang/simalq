@@ -12,7 +12,8 @@
   simalq.game-state [G]
   simalq.tile [Tile add-tile rm-tile mv-tile]
   simalq.commands [Wait Shoot]
-  simalq.main [start-quest start-level take-turn])
+  simalq.quest [start-quest start-level]
+  simalq.main [take-turn])
 
 
 (defn kwdict [iterable]
