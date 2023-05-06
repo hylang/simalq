@@ -12,14 +12,14 @@
   (assert (= (len d) 7)))
 
 
-(defn test-read-bootcamp []
+(defn test-bootcamp []
   (setv quest (read-quest (iq-quest "Boot Camp 2")))
   (assert (= quest.title "Boot Camp will teach you how to play Infinity Quest II"))
   (assert (= quest.starting-hp 500))
   (assert (= (len quest.levels) 26)))
 
 
-(defn test-read-bootcamp-level1 []
+(defn test-bootcamp-level1 []
   (setv level (. (read-quest (iq-quest "Boot Camp 2")) levels [0]))
 
   ; Check the level attributes.
@@ -75,7 +75,7 @@
   (assert (= (. level map data [15] [15] [0] hp) 2)))
 
 
-(defn test-read-varlife []
+(defn test-varlife []
   (setv m (. (read-quest (iq-quest "New First Quest"))
     levels [2] map data))
   (setv t (get m 11 11 0))
