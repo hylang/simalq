@@ -102,13 +102,7 @@
 (deftile Scenery "██" "a wall"
   :iq-ix 2
   :blocks-move T :blocks-diag T
-  :flavor (.join "\n" [
-    "Among the most numerous and persistent of the obstacles that stand in the way of your inevitable victory."
-    ""
-    "  This man, with lime and rough-cast, doth present"
-    "  Wall, that vile Wall which did these lovers sunder;"
-    "  And through Wall's chink, poor souls, they are content"
-    "  To whisper, at the which let no man wonder."]))
+  :flavor "Among the most numerous and persistent of the obstacles that stand in the way of your inevitable victory.\n\n    This man, with lime and rough-cast, doth present\n    Wall, that vile Wall which did these lovers sunder;\n    And through Wall's chink, poor souls, they are content\n    To whisper, at the which let no man wonder.")
 
 (deftile Scenery "██" "the Void"
   :color color.void
