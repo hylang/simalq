@@ -21,8 +21,7 @@
   (setv level-n (int level-n))
 
   (start-quest (read-quest (iq-quest iq-quest-name)))
-  (when (!= level-n 1)
-    (start-level level-n))
+  (start-level level-n)
   (main-io-loop))
 
 
@@ -38,8 +37,7 @@
     state.player (Player :pos None)
     state.player.hp quest.starting-hp)
   (.append G.states state)
-  (setv G.state-i 0)
-  (start-level 1))
+  (setv G.state-i 0))
 
 
 (defn start-level [level-n]

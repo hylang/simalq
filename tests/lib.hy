@@ -25,8 +25,7 @@
   (start-quest (if (isinstance quest str)
     (read-quest (iq-quest quest))
     quest))
-  (when (!= level-n 1)
-    (start-level level-n)))
+  (start-level level-n))
 
 (defn mk-quest [
     #* levels
