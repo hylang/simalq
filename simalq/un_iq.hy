@@ -156,27 +156,27 @@
         (unless (= iq-ix FLOOR)
           (setv p (Pos m x y))
           (setv result (get Tile.types-by-iq-ix iq-ix))
-          (setv d {})
-          (cond
-            (is (type result) type) (setv
+          (defn te [cls]
+            (if (in p tile-extras)
+              (.read-tile-extras cls #* (get tile-extras p))
+              {}))
+          (.extend (get m.data x y) (cond
+            (is (type result) type)
               ; The usual case: the `iq-ix` specifies the type, and no
               ; more.
-              cls result)
-            (is (type result) dict) (setv
+              [(result :pos p #** (te result))]
+            (is (type result) dict)
               ; This `iq-ix` specifies the type and a certain value of
               ; a slot.
-              cls (get result "cls")
-              d {(get result "slot") (get result "value")})
-            (is (type result) FunctionType) (setv
-              ; A special case where tile extras are used to determine
-              ; the type.
-              cls (get Tile.types (result #* (get tile-extras p))))
+              [((get result "cls") :pos p
+                #** {(get result "slot") (get result "value")}
+                #** (te (get result "cls")))]
+            (callable (type result))
+              ; A special case where a callback makes the tiles
+              ; itself. It can return any number of them.
+              (result p #* (get tile-extras p))
             T
-              (raise (ValueError (+ "Bad `Tile.types-by-iq-ix` entry: " (repr result)))))
-          (.append (get m.data x y) (cls :pos p #** d #**
-            (if (and (in p tile-extras) (is-not (type result) FunctionType))
-              (.read-tile-extras cls #* (get tile-extras p))
-              {})))))
+              (raise (ValueError (+ "Bad `Tile.types-by-iq-ix` entry: " (repr result))))))))
       (Level
         :n (+ i 1)
         :title l.title

@@ -90,10 +90,13 @@
       T
         (+= G.player.hp self.hp-effect))))
 
-(setv (get Tile.types-by-iq-ix 21) (fn [_ v2]
+(setv (get Tile.types-by-iq-ix 21) (fn [pos _ te-v2]
   ; IQ's three types of unknown potion are mapped to items with fixed
   ; HP effects equal to the mean HP effect of the given type.
-  (get ["meal" "empty platter" "rotten food"] (- v2 1))))
+  [(
+    (get Tile.types
+      (get ["meal" "empty platter" "rotten food"] (- te-v2 1)))
+    :pos pos)]))
 
 (deftile Food "% " "a meal"
   :color 'red
