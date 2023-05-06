@@ -84,6 +84,13 @@
     (when (= (on-input (inkey)) 'done)
       (break))))
 
+(defn inkey []
+  ; Before checking for a key, flush standard input, so any keys
+  ; pressed during an animation or slow processing are ignored instead
+  ; of queued for input.
+  (import sys termios)
+  (termios.tcflush sys.stdin termios.TCIFLUSH)
+  (B.inkey :esc-delay .01))
 
 
 (defn main-io-loop []
@@ -113,15 +120,6 @@
     B.home B.clear
     (.join "\n" (map (fn [x] (bless-colorstr B x)) (draw-screen
       B.width B.height focus status-bar messages overmarks)))))
-
-
-(defn inkey []
-  ; Before checking for a key, flush standard input, so any keys
-  ; pressed during an animation or slow processing are ignored instead
-  ; of queued for input.
-  (import sys termios)
-  (termios.tcflush sys.stdin termios.TCIFLUSH)
-  (B.inkey :esc-delay .01))
 
 
 (setv max-wrap-cols 75)
