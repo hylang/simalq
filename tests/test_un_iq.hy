@@ -6,6 +6,12 @@
   simalq.un-iq [read-quest iq-quest])
 
 
+(defn get-level-map [quest-name level-n]
+  (.
+    (read-quest (iq-quest quest-name))
+    levels [(- level-n 1)] map data))
+
+
 (defn test-get-all []
   (setv d (iq-quest 'all))
   (assert (is (type d) dict))
@@ -76,8 +82,7 @@
 
 
 (defn test-varlife []
-  (setv m (. (read-quest (iq-quest "New First Quest"))
-    levels [2] map data))
+  (setv m (get-level-map "New First Quest" 3))
   (setv t (get m 11 11 0))
   (assert (= t.stem "Dark Knight"))
   (assert (= t.hp 1))
@@ -89,9 +94,7 @@
 
 
 (defn test-generator []
-  (setv m (.
-    (read-quest (iq-quest "New First Quest"))
-    levels [0] map data))
+  (setv m (get-level-map "New First Quest" 1))
   (defn check [x y generator-hp generates frequency generate-hp]
     (setv t (get m x y 0))
     (assert (and
@@ -108,9 +111,7 @@
 
 
 (defn test-healing-potions []
-  (setv m (.
-    (read-quest (iq-quest "Boot Camp 2"))
-    levels [8] map data))
+  (setv m (get-level-map "Boot Camp 2" 9))
   (defn check [x y stem]
     (assert (= (. m [x] [y] [0] stem) stem)))
 
@@ -123,9 +124,7 @@
 
 
 (defn test-wallfall []
-  (setv m (.
-    (read-quest (iq-quest "New DeathQuest"))
-    levels [1] map data))
+  (setv m (get-level-map "New DeathQuest" 2))
   (defn check [x y stem wallnum]
     (setv [tile] (get m x y))
     (assert (and (= tile.stem stem) (= tile.wallnum wallnum))))
