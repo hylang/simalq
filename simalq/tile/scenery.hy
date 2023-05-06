@@ -238,7 +238,7 @@
     blocks-player-shots F
     blocks-monster-shots F))
 
-(deftile Trap "<>" "a wallfall trap"
+(deftile Trap :name "a wallfall trap"
   :color 'dark-yellow
   :slot-defaults (dict
     :wallnum 1)
@@ -246,6 +246,8 @@
     (setv x [115 13 75 76 77 111 112 113 114])
     (dict (zip x (range (len x)))))]
 
+  :mapsym (property (fn [self]
+    (+ "<" (if (< self.wallnum 10) (str self.wallnum) "^"))))
   :hook-player-walked-into (fn-dd [self]
     (doc (if (= it.wallnum 0)
       "Destroys all trapped walls and other wallfall traps on the level, regardless of type."
@@ -260,7 +262,7 @@
 
   :flavor #[[Easy there, Admiral Ackbar. This kind of trap isn't necessarily dangerous. Well, admittedly, the key word here is "necessarily".]])
 
-(deftile Scenery "██" "a trapped wall"
+(deftile Scenery :name "a trapped wall"
   :color 'dark-yellow
   :slot-defaults (dict
     :wallnum 1)
@@ -268,6 +270,8 @@
     (setv x [120 14 78 79 80 116 117 118 119])
     (dict (zip x (range (len x)))))]
 
+  :mapsym (property (fn [self]
+    (+ "█" (if (< self.wallnum 10) (str self.wallnum) "^"))))
   :blocks-move T :blocks-diag T
   :info-bullets (fn [self #* extra]
     (Scenery.info-bullets self

@@ -162,7 +162,7 @@
   (setv stem (re.sub r"\A(a|an|the|some) "
     (fn [m] (nonlocal article) (setv article (.group m 1)) "")
     name))
-  (assert (= (len mapsym) 2))
+  (assert (or (isinstance mapsym property) (= (len mapsym) 2)))
 
   (setv new-attrs (lfor  k kwargs  :if (not (hasattr superclass k))  k))
   (when new-attrs
