@@ -33,6 +33,7 @@
   void 'dark-navy
   reality-fringe 'light-gray
   reality-fringe-block 'dark-gray
+  overwrapped 'dark-gray
   focus 'yellow
   message-bg 'pale-yellow
 

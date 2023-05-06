@@ -1,4 +1,5 @@
 (require
+  hyrule [unless]
   simalq.macros [defdataclass])
 (import
   math [ceil]
@@ -101,11 +102,17 @@
           (or G.map.wrap-x (<= 0 mx (- G.map.width 1)))
           (or G.map.wrap-y (<= 0 my (- G.map.height 1))))
         ; We're on the map. Draw this square, or an overmark if there
-        ; is one for this position.
+        ; is one for this position. If the square is ovewrapped, mark
+        ; it specially and ignore any overmark.
         (do
           (setv p (Pos G.map mx my))
           (setv cs (mapsym-at-pos p))
           (for [[i c] (enumerate cs)] (cond
+            (or
+                (overwrapped G.map.wrap-x mx focus.x G.map.width)
+                (overwrapped G.map.wrap-y my focus.y G.map.height)) (do
+              (setv c.fg color.overwrapped)
+              (setv c.bg color.default-bg))
             (in p overmarks) (do
               (setv o (get overmarks p i))
               (setv c.bg o.bg)
@@ -154,6 +161,17 @@
       #((- mdim (- sdim border)) (+ mdim border -1))
     T
       #(lo hi)))
+
+(defn overwrapped [wraps? mc fc mdim]
+  (unless wraps?
+    (return F))
+  (setv d (abs (- mc fc)))
+  (or
+    (> d (// mdim 2))
+    (and (= d (// mdim 2)) (< fc mc))))
+      ; When `(= d (// mdim 2))`, we only consider the greater-
+      ; coordinate case to be overwapped. Thus, each `Pos` has exactly
+      ; one (x, y) pair that is considered not to be overwrapped.
 
 
 (setv status-bar-lines 2)
