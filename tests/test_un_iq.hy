@@ -120,3 +120,21 @@
   (check  6  1 "empty platter")  ; unknown potion, neutral
   (check 10  1 "rotten food")  ; unknown potion, bad
   (check 14  1 "dessert"))  ; super-healing potion
+
+
+(defn test-wallfall []
+  (setv m (.
+    (read-quest (iq-quest "New DeathQuest"))
+    levels [1] map data))
+  (defn check [x y stem wallnum]
+    (setv [tile] (get m x y))
+    (assert (and (= tile.stem stem) (= tile.wallnum wallnum))))
+
+  (check 10 4  "wallfall trap" 1)
+  (check  5 0  "wallfall trap" 2)
+  (check  0 4  "wallfall trap" 3)
+  (check  5 8  "wallfall trap" 4)
+  (check  8 4  "trapped wall" 1)
+  (check  5 2  "trapped wall" 2)
+  (check  5 6  "trapped wall" 3)
+  (check  2 4  "trapped wall" 4))
