@@ -1,6 +1,8 @@
 (require
+  hyrule [unless]
   simalq.macros [pop-integer-part])
 (import
+  contextlib [contextmanager]
   simalq.util [CommandError message-queue msg hurt-player DamageType]
   simalq.color :as color
   simalq.geometry [burst at]
@@ -15,12 +17,16 @@
 (setv  T True  F False)
 
 
-(defn main [iq-quest-name [level-n "1"]]
-  (setv level-n (int level-n))
-
-  (start-quest (read-quest (iq-quest iq-quest-name)))
-  (start-level level-n)
-  (main-io-loop))
+(defn main [iq-quest-name [skip-to-level None]]
+  ; `skip-to-level` is used for debugging, so for convenience, don't
+  ; show titles when it's provided.
+  (with [(player-io)]
+    (start-quest (read-quest (iq-quest iq-quest-name))
+      :show-title (not skip-to-level))
+    (start-level
+      :level-n (if skip-to-level (int skip-to-level) 1)
+      :show-title (not skip-to-level))
+    (main-io-loop)))
 
 
 (defn take-turn [action]
@@ -56,6 +62,15 @@
 
 (setv B None)
 
+(defn [contextmanager] player-io []
+  (global B)
+  (setv B (hy.M.blessed.Terminal))
+  (try
+    (with [_ (B.cbreak)  _ (B.fullscreen)  _ (B.hidden-cursor)]
+      (yield))
+    (finally
+      (setv B None))))
+
 (defn displaying []
   (bool B))
 
@@ -64,25 +79,11 @@
   `draw` (nullary) and `on-input` (unary, taking a key from `inkey`).
   `on-input` can return the symbol `done` to exit the mode."
 
-  (global B)
-  (setv top-io-mode F)
-  (when (is B None)
-    (setv B (hy.M.blessed.Terminal))
-    (setv top-io-mode T))
+  (while True
+    (draw)
+    (when (= (on-input (inkey)) 'done)
+      (break))))
 
-  (defn f []
-    (while True
-      (draw)
-      (when (= (on-input (inkey)) 'done)
-        (break))))
-
-  (if top-io-mode
-    (with [_ (B.cbreak)  _ (B.fullscreen)  _ (B.hidden-cursor)]
-      (f))
-    (f))
-
-  (when top-io-mode
-    (del B)))
 
 
 (defn main-io-loop []
@@ -123,12 +124,32 @@
   (B.inkey :esc-delay .01))
 
 
+(setv max-wrap-cols 75)
+
+(defn text-screen [text]
+  (setv y-margin 2)
+
+  (unless (displaying)
+    (return))
+  (io-mode
+    :draw (fn []
+      (print
+        :flush T :sep "" :end ""
+        B.home B.clear
+        (* "\n" y-margin)
+        (.join "\n" (lfor
+          line (B.wrap
+            text
+            (min max-wrap-cols B.width))
+          (.center line B.width)))))
+    :on-input (fn [key]
+      'done)))
+
 (defn info-screen [t]
   "Enter an `io-mode` for showing information about the tile `t`."
 
   (setv x-margin (* 2 " "))
   (setv y-margin 1)
-  (setv max-wrap-cols 75)
 
   (import
     re
