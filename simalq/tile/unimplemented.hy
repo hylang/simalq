@@ -11,7 +11,6 @@
 
 (for [[iq-ix stem] [
 
-    [16 "treasure_chest"]
     [22 "moveable_wall"]
     [23 "teleporter"]
     [24 "gate"]

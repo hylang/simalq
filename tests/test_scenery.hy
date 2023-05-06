@@ -3,7 +3,7 @@
   tests.lib [cant wk])
 (import
   pytest
-  tests.lib [init mk-quest assert-at set-square mv-player xy]
+  tests.lib [init mk-quest assert-at set-square mv-player xy shoot mk-tile]
   simalq.util [GameOverException]
   simalq.geometry [at Pos]
   simalq.game-state [G])
@@ -93,6 +93,37 @@
   (assert-at 'E 'floor)
   (assert (= G.turn-n 4))
   (assert (= G.player.keys 0)))
+
+
+(defn test-chest []
+  (init (mk-quest []))
+  (mk-tile (Pos G.map 1 0) "pile of gold")
+  (mk-tile (Pos G.map 1 0) "treasure chest")
+  (mk-tile (Pos G.map 2 0) "meal")
+  (mk-tile (Pos G.map 2 0) "treasure chest")
+
+  ; Fail to unlock the chest.
+  (cant (wk E) "It's locked, and you're keyless at the moment.")
+  ; Open the chest.
+  (setv G.player.keys 2)
+  (print G.map.data)
+  (wk E)
+  (print G.map.data)
+  ; Take the gold that was in the chest.
+  (assert (= G.score 0))
+  (wk E)
+  (print G.map.data)
+  (assert (= G.score 100))
+  ; Fire an arrow. The meal isn't destroyed because the chest blocks
+  ; the shot.
+  (shoot 'E)
+  (assert-at 'E ["treasure chest" "meal"])
+  ; Open the chest.
+  (wk E)
+  ; And take the meal.
+  (assert (= G.player.hp 100))
+  (wk E)
+  (assert (= G.player.hp 200)))
 
 
 (defn test-exit []

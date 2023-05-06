@@ -154,6 +154,20 @@
   :result-when-opened None
   :flavor "This advanced door destroys not only the key used to unlock it, but also itself. A true marvel of engineering.")
 
+(deftile LockedDoor " +" "a treasure chest"
+  :color 'steel-blue
+  :result-when-opened None
+  :flavor "This locked strongbox is too tough to smash apart, but its boards are so warped that you can peek at what's inside before you decide to spend a key on it.\n\n    We'll dig up the box.\n    We know it's full of precious booty.\n    Burst open the locks.\n    And then we'll say \"Hooray!\"")
+(setv (get Tile.types-by-iq-ix 16) (fn [pos te-v1 te-v2]
+  ; We represent an IQ treasure chest as two tiles: the treasure chest
+  ; on top of the item contained within.
+  [
+    ((get Tile.types "treasure chest") :pos pos)
+    #* (if (= te-v1 21) ; An unknown potion
+         ((get Tile.types-by-iq-ix te-v1) pos None te-v2)
+         [((get Tile.types-by-iq-ix te-v1) :pos pos)])]))
+
+
 ((fn []
 
   (defn safe-pos+ [pos direction]

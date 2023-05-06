@@ -137,3 +137,19 @@
   (check  5 2  "trapped wall" 2)
   (check  5 6  "trapped wall" 3)
   (check  2 4  "trapped wall" 4))
+
+
+(defn test-chest []
+  (defn check [x y contents]
+    (assert (=
+      (lfor  tile (get m x y)  tile.stem)
+      ["treasure chest" contents])))
+
+  (setv m (get-level-map "Boot Camp 2" 25))
+  (check 27 0 "pile of gold")
+  (check 27 17 "snack")
+
+  ; Chests containing unknown potions have a slightly more complex
+  ; internal structure.
+  (setv m (get-level-map "New First Quest" 11))
+  (check 3 16 "meal"))
