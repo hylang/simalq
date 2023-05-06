@@ -15,8 +15,6 @@
 
 (setv undead-immunities #(DamageType.Poison DamageType.DeathMagic))
 
-(setv AI (Enum "AI" ["Approach"]))
-
 (defclass Monster [Actor]
   "A non-player character, typically out to kill the player."
 
@@ -30,9 +28,6 @@
   (setv
     mutable-slots #("hp" "movement_state")
     damageable T
-    ai AI.Approach
-      ; The monster's basic artificial intelligence for deciding what
-      ; to do on its turn.
     damage-melee None
       ; How much damage the monster does with its basic melee attack.
       ; This can be `None`, one number, or a tuple of numbers, with
@@ -51,8 +46,6 @@
 
   (defn act [self]
     "Approach — If the monster can attack, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
-    (when (!= self.ai AI.Approach)
-      (raise (ValueError "Other AIs are not yet implemented.")))
 
     (when (try-to-attack-player self)
       (return))
