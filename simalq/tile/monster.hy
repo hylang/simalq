@@ -5,7 +5,7 @@
   re
   fractions [Fraction :as f/]
   enum [Enum]
-  simalq.util [player-melee-damage DamageType hurt-player next-in-cycle]
+  simalq.util [player-melee-damage DamageType hurt-player next-in-cycle mixed-number]
   simalq.geometry [Direction GeometryError pos+ at dist adjacent? dir-to pos-seed]
   simalq.game-state [G]
   simalq.tile [Actor deftile mv-tile add-tile damage-tile destroy-tile]
@@ -195,8 +195,8 @@
 
   (defn info-bullets [self #* extra]
     (.info-bullets (super)
-      #("Generation frequency" self.generate-frequency)
-      #("Generation power" self.generation-power)
+      #("Generation frequency" (mixed-number self.generate-frequency))
+      #("Generation power" (mixed-number self.generation-power))
       #("Hit points of generated monsters" self.generate-hp)
       #* extra))
 

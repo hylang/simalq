@@ -7,6 +7,7 @@
   hy.pyops *
   simalq.color :as color
   simalq.game-state [G]
+  simalq.util [mixed-number]
   simalq.geometry [Pos at dist])
 (setv  T True  F False)
 
@@ -187,7 +188,7 @@
       (.format "HP {:,}"
         G.player.hp)
       (when G.level.poison-intensity
-        (+ "☠ " (str G.level.poison-intensity)))
+        (+ "☠ " (mixed-number G.level.poison-intensity)))
       None ; Reserved for time limits, like "Tm 1,000"
       (when G.player.keys
         (.format "⚷ {}" G.player.keys))

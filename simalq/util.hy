@@ -1,5 +1,7 @@
 "Utility functions and other frequently imported components."
 
+(require
+  simalq.macros [pop-integer-part])
 (import
   time [sleep]
   os
@@ -25,6 +27,12 @@
     (> x 0)  1
     (= x 0)  0
     True     (raise TypeError)))
+
+(defn mixed-number [fraction]
+  (setv n (pop-integer-part fraction))
+  (or
+    (.join " " (lfor  x [n fraction]  :if x  (str x)))
+    "0"))
 
 (defn next-in-cycle [sequence e]
   (when (is e None)

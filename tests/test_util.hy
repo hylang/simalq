@@ -1,7 +1,8 @@
 (require
   simalq.macros [pop-integer-part])
 (import
-  fractions [Fraction :as f/])
+  fractions [Fraction :as f/]
+  simalq.util [mixed-number])
 
 
 (defn test-pop-integer-part []
@@ -20,3 +21,9 @@
   ; I'm leaving the negative case unspecified now because I'm not
   ; sure how it should work.
   )
+
+
+(defn test-mixed-number []
+  (assert (=
+    (lfor  n (range 7) (mixed-number (f/ n 3)))
+    ["0" "1/3" "2/3" "1" "1 1/3" "1 2/3" "2"])))
