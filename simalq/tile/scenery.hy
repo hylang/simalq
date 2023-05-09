@@ -155,6 +155,8 @@
   :flavor "This advanced door destroys not only the key used to unlock it, but also itself. A true marvel of engineering.")
 
 (deftile LockedDoor " +" "a treasure chest"
+  ; This unusual mapsym, having a space on the left but not the right,
+  ; allows one character of the contained item to be visible.
   :color 'steel-blue
   :result-when-opened None
   :flavor "This locked strongbox is too tough to smash apart, but its boards are so warped that you can peek at what's inside before you decide to spend a key on it.\n\n    We'll dig up the box.\n    We know it's full of precious booty.\n    Burst open the locks.\n    And then we'll say \"Hooray!\"")

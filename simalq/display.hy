@@ -209,25 +209,15 @@
   "Get a length-2 colorstr to represent the given `Pos`."
 
   (setv floor-mapsym ". ")
-  (setv multiple-tile-mapsym "&&")
 
   (setv stack (at p))
-  (setv player-on-top F)
-  (when (and stack (is (get stack 0) G.player))
-    (setv stack (cut stack 1 None))
-    (setv player-on-top T))
-  (setv out (cond
-    (not stack)
-      (colorstr floor-mapsym)
-    (= (len stack) 1)
-      (color-tile (get stack 0))
-    True
-      (colorstr multiple-tile-mapsym)))
-  (when player-on-top
-    (setv (get out 0) (ColorChar
-      (get G.player.mapsym 0)
-      G.player.color
-      G.player.color-bg)))
+  (setv out (colorstr floor-mapsym))
+  (for [tile (reversed stack)]
+    (setv out (lfor
+      [below above] (zip out (color-tile tile))
+      (if (= above.char " ")
+        (ColorChar below.char below.fg above.bg)
+        above))))
   (when (=
       (dist p G.player.pos)
       (+ G.rules.reality-bubble-size 1))
