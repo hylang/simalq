@@ -337,6 +337,16 @@
   :flavor-mon "A crimson-skinned, vaguely humanoid monster. Its eyes glow with the malevolent fires of hell, which it can hurl at you from a distance. Its claws are sharp, but don't hurt quite as much as getting roasted."
   :flavor-gen "A tunnel that goes all the way down to the Bad Place. It stinks of sulfur and invites the innumerable ill-spirited inhabitants of the inferno to ruin your day.")
 
+(defgenerated "w " "a wizard"
+  :iq-ix-mon [87 88 89] :iq-ix-gen [90 91 92]
+  :points-mon 5 :points-gen 25
+
+  :damage-melee 4
+  :damage-shot #(4 8 12)
+
+  :flavor-mon "This fresh-faced would-be scholar has finished sewing the stars onto his robe and is starting to grow a beard. Idok has told the whole class that whoever kills you gets tenure. Considering what the rest of the academic job market is like, the offer has proven irresistible to many."
+  :flavor-gen "The Pigpimples Institute of Thaumaturgy and Dweomercraft: a shameless diploma mill that happily takes students' money to teach them one spell, then sends them on a suicide mission against a much smarter and tougher opponent.")
+
 
 (deftile NonGen "K " "a Dark Knight"
   :iq-ix 53

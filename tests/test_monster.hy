@@ -3,7 +3,7 @@
   tests.lib [wk])
 (import
   fractions [Fraction :as f/]
-  tests.lib [init mk-quest locate assert-at wait set-square]
+  tests.lib [init mk-quest locate assert-at wait set-square shoot]
   simalq.geometry [Direction Pos ray at]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -398,3 +398,19 @@
   (assert-at (Pos G.map 4 0) "devil")
   (shoot 'W)
   (assert-at (Pos G.map 4 0) 'floor))
+
+
+(defn test-wizard []
+  (init (mk-quest
+    [:player-start #(5 0) :tiles [["wizard" :hp 3]]]))
+
+  (assert (= G.player.hp 100))
+  ; Wizards always melee for 4 damage.
+  (wait)
+  (assert (= G.player.hp 96))
+  ; A 3-HP wizard shoots for 12 damage.
+  (wk W)
+  (assert (= G.player.hp 84))
+  ; At 2 HP, its shot damage drops to 8.
+  (shoot 'E)
+  (assert (= G.player.hp 76)))
