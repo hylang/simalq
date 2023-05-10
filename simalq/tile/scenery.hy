@@ -210,6 +210,7 @@
   :color-bg 'lime
   :iq-ix 7
   :blocks-monster T
+  :blocks-player-shots F :blocks-monster-shots F
 
   :hook-player-walked-into (fn [self]
     "Takes you to the next dungeon level. If there is no such level,
