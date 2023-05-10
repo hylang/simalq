@@ -98,11 +98,17 @@
 (setv hp-warning-threshold 100)
 
 (defn hurt-player [amount damage-type [animate T] [attacker None]]
+  (import simalq.geometry [ray dir-to dist])
+
   (when animate
     (flash-map
       G.player.pos
       colors.flash-player-damaged
-      #(G.player.pos #* (if attacker [attacker.pos] []))
+      (if attacker
+        (+ #(attacker.pos) (ray attacker.pos
+          (dir-to attacker.pos G.player.pos)
+          (dist attacker.pos G.player.pos)))
+        #(G.player.pos))
       {G.player.pos (if (> amount 99) "OW" (format amount "2"))}
       :flash-time-s .2))
   (setv hp-was G.player.hp)

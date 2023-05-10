@@ -1,12 +1,12 @@
 (require
-  hyrule [unless do-n]
+  hyrule [unless do-n block]
   simalq.macros [defdataclass slot-defaults pop-integer-part])
 (import
   re
   fractions [Fraction :as f/]
   enum [Enum]
   simalq.util [player-melee-damage DamageType hurt-player next-in-cycle mixed-number]
-  simalq.geometry [Direction GeometryError pos+ at dist adjacent? dir-to pos-seed]
+  simalq.geometry [Direction GeometryError pos+ at dist adjacent? dir-to pos-seed ray]
   simalq.game-state [G]
   simalq.tile [Actor deftile mv-tile add-tile damage-tile destroy-tile]
   simalq.tile.scenery [walkability])
@@ -119,20 +119,41 @@
   (setv (. (at pos) [-1] last-acted) G.turn-n))
 
 (defn try-to-attack-player [mon]
- ; Hit the player with a melee attack, if the monster can. Return true
- ; if it succeeded.
- (setv p mon.pos)
- (unless (and
-     (adjacent? p G.player.pos)
-     (in (get (walkability p (dir-to p G.player.pos) :monster? T) 1)
-       ['bump 'walk]))
-   (return F))
- (hurt-player :attacker mon
-   (damage-by-hp mon mon.damage-melee)
-   DamageType.MonsterMelee)
- (when mon.kamikaze
-   (destroy-tile mon))
- T)
+  "Try to melee or shoot the player, if the monster can. Return true
+  if it succeeded."
+
+  (setv p mon.pos)
+  (setv d (dir-to p G.player.pos))
+  (setv attack None)
+
+  ; Try a melee attack first.
+  (when (and
+      mon.damage-melee
+      (adjacent? p G.player.pos)
+      (in (get (walkability p d :monster? T) 1)
+        ['bump 'walk]))
+    (setv attack 'melee))
+
+  ; Otherwise, try a ranged attack.
+  (when (and (not attack) mon.damage-shot)
+    (block (for [target (ray p d G.rules.reality-bubble-size)  tile (at target)]
+      (when (is tile G.player)
+        (setv attack 'shot)
+        (block-ret))
+      (when tile.blocks-monster-shots
+        (block-ret)))))
+
+  ; If we can't attack, bail out.
+  (unless attack
+    (return F))
+
+  ; Execute the attack.
+  (hurt-player :attacker mon
+    (damage-by-hp mon (if (= attack 'shot) mon.damage-shot mon.damage-melee))
+    (if (= attack 'shot) DamageType.MonsterShot DamageType.MonsterMelee))
+  (when mon.kamikaze
+    (destroy-tile mon))
+  T)
 
 (defn wander [mon]
   "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
@@ -305,6 +326,16 @@
 
   :flavor-mon "Bees bafflingly being bigger'n bats. This is the kind that can survive stinging you. You might not be so lucky."
   :flavor-gen #[[The ancients call this place "the Plounge".]])
+
+(defgenerated "d " "a devil"
+  :iq-ix-mon [41 63 64] :iq-ix-gen [42 65 66]
+  :points-mon 5 :points-gen 25
+
+  :damage-melee #(3 6 9)
+  :damage-shot 10
+
+  :flavor-mon "A crimson-skinned, vaguely humanoid monster. Its eyes glow with the malevolent fires of hell, which it can hurl at you from a distance. Its claws are sharp, but don't hurt quite as much as getting roasted."
+  :flavor-gen "A tunnel that goes all the way down to the Bad Place. It stinks of sulfur and invites the innumerable ill-spirited inhabitants of the inferno to ruin your day.")
 
 
 (deftile NonGen "K " "a Dark Knight"

@@ -356,3 +356,25 @@
   (assert (all (gfor
     [[x y] seen] (.items seen-at)
     (= seen (and (!= x 4) (not-in [x y] [[0 0] [1 0] [0 1]])))))))
+
+
+(defn test-devil []
+
+  ; At range, a devil shoots for 10 damage.
+  (init (mk-quest
+    [:tiles ['floor "devil"]]))
+  (assert (= G.player.hp 100))
+  (wait)
+  (assert (= G.player.hp 90))
+  ; Close up, a 1-HP devil melees for 3 damage.
+  (wk E)
+  (assert (= G.player.hp 87))
+
+  ; A diagonally blocked devil can't melee, so it shoots.
+  (init (mk-quest
+    [:map "
+      . d
+      @ ██"]))
+  (assert (= G.player.hp 100))
+  (wait)
+  (assert (= G.player.hp 90)))
