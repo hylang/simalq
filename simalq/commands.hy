@@ -66,8 +66,10 @@
 (setv cmd-keys {
   "f" GonnaShoot
   ";" Look
-  "e" [ShiftHistory -1]  ; Undo
-  "r" [ShiftHistory +1]  ; Redo
+  "e" [ShiftHistory  -1]  ; Undo
+  "E" [ShiftHistory -10]
+  "r" [ShiftHistory  +1]  ; Redo
+  "R" [ShiftHistory +10]
   "S" SaveGame
   "L" LoadGame})
 
@@ -107,12 +109,12 @@
               'done))))
 
     ShiftHistory (do
-      (setv target (+ G.state-i cmd.steps))
-      (when (>= target (len G.states))
-        (raise (CommandError "Nothing to redo.")))
-      (when (< target 0)
+      (when (and (< cmd.steps 0) (= G.state-i 0))
         (raise (CommandError "Nothing to undo.")))
-      (setv G.state-i target))
+      (when (and (> cmd.steps 0) (= G.state-i (- (len G.states) 1)))
+        (raise (CommandError "Nothing to redo.")))
+      (setv G.state-i (max 0 (min (- (len G.states) 1)
+        (+ G.state-i cmd.steps)))))
 
     SaveGame
       (try
