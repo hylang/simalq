@@ -377,4 +377,24 @@
       @ ██"]))
   (assert (= G.player.hp 100))
   (wait)
-  (assert (= G.player.hp 90)))
+  (assert (= G.player.hp 90))
+
+  ; Monster shots can wrap around.
+  (init (mk-quest [:wrap-x T
+    :map ". @ ████████d ."]))
+  (assert (= G.player.hp 100))
+  (wait)
+  (assert (= G.player.hp 90))
+
+  ; However, monsters only consider one direction for shooting. If the
+  ; shortest path to the player (as the xorn phases) is blocked, they
+  ; won't consider another valid direction.
+  (init (mk-quest [:wrap-x T
+    :map ". . @ ██d . ."]))
+  (assert (= G.player.hp 100))
+  (wait)
+  (assert (= G.player.hp 100))
+  ; The player can shoot in that other direction.
+  (assert-at (Pos G.map 4 0) "devil")
+  (shoot 'W)
+  (assert-at (Pos G.map 4 0) 'floor))
