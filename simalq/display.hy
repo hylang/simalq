@@ -240,7 +240,7 @@
           (get t.color-bg i)
         t.color-bg
           t.color-bg
-        t.damageable
+        (and t.damageable (is-not t G.player))
           ; Monsters etc. get an automatic background color to show
           ; how many HP they have.
           (.get color.tile-bg-by-hp
