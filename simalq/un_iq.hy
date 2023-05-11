@@ -130,12 +130,12 @@
   "Parse `bytes` into a `Quest`."
 
   (setv data (.parse quest-fmt inp))
-
   (Quest
     :title data.title
     :starting-hp data.starting-hp
     :levels (tuple (gfor
       [i l] (enumerate data.levels)
+
       :setv m (Map.make l.wrap-x l.wrap-y l.width l.height)
       :setv mk-pos (fn [xy]
         "Convert from IQ coordinates (1-based indices, y = 1 on top, 0
@@ -147,6 +147,7 @@
       :setv tile-extras (dfor
         c l.tile-extras
         (mk-pos c.pos) (tuple c.data))
+
       :do (for [x (range l.width)  y (range l.height)]
         ; Fill in `m`.
         (setv iq-ix (get l.map (+ (* x l.height) (- l.height y 1))))
@@ -177,6 +178,7 @@
               (result p #* (get tile-extras p))
             T
               (raise (ValueError (+ "Bad `Tile.types-by-iq-ix` entry: " (repr result))))))))
+
       (Level
         :n (+ i 1)
         :title l.title
