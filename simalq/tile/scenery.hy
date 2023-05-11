@@ -38,7 +38,7 @@
         #("Hit points" self.hp))
       (when self.damageable
         (if self.immune
-          #("Immune to" self.immune)
+          #("Immune to" (.join ", " (gfor  x self.immune  x.value)))
           "No immunities"))
       (when self.blocks-move
         "Blocks all movement")

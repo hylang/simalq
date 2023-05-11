@@ -89,10 +89,16 @@
   G.rules.base-player-shot-damage)
 
 
-(setv DamageType (Enum "DamageType" (list (map str '[
-  PlayerMelee MonsterMelee
-  MundaneArrow MagicArrow MonsterShot
-  Poison Trap Fire DeathMagic]))))
+(defclass DamageType [Enum] (setv
+  PlayerMelee   "sword attacks"
+  MonsterMelee  "monsters' melee attacks"
+  MundaneArrow  "mundane arrows"
+  MagicArrow    "magic arrows"
+  MonsterShot   "monsters' shots"
+  Poison        "poison"
+  Trap          "traps"
+  Fire          "fire"
+  DeathMagic    "death magic"))
 
 
 (setv hp-warning-threshold 100)

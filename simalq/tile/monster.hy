@@ -90,7 +90,7 @@
     [
       #("Hit points" self.hp)
       (if self.immune
-        #("Immune to" self.immune)
+        #("Immune to" (.join ", " (gfor  x self.immune  x.value)))
         "No immunities")
       (if self.damage-melee
         #("Melee damage" (damage-array self.damage-melee))
