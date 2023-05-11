@@ -36,6 +36,9 @@
       ; required).
     damage-shot None
       ; Likewise for shots.
+    shot-range None
+      ; If set to an integer, it limits the distance at which the
+      ; monster can shoot.
     kamikaze False)
       ; If true, the monster kills itself upon attacking.
 
@@ -98,6 +101,8 @@
       (if self.damage-shot
         #("Shot damage" (damage-array self.damage-shot))
         "No ranged attack")
+      (when self.shot-range
+        #("Shot range" self.shot-range))
       (when self.kamikaze
         #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
       #* extra
@@ -136,7 +141,10 @@
 
   ; Otherwise, try a ranged attack.
   (when (and (not attack) mon.damage-shot)
-    (block (for [target (ray p d G.rules.reality-bubble-size)  tile (at target)]
+    (block (for [
+        target (ray :pos p :direction d :length
+          (min (or mon.shot-range Inf) G.rules.reality-bubble-size))
+        tile (at target)]
       (when (is tile G.player)
         (setv attack 'shot)
         (block-ret))
@@ -371,3 +379,13 @@
   :damage-melee 12
 
   :flavor "This dread warrior wears ink-black armor and carries a heavy chain mace. His devotion to the powers of evil (not to mention his willingness, nay, eagerness to kill you) makes his appropriation of Batman's epithet questionable at best. When you get down to it, he's just trying to distract you from the fact that he's the most basic enemy in the whole dungeon.")
+
+(deftile NonGen "t " "a Tricorn"
+  :iq-ix 54
+  :points 10
+
+  :damage-melee 5
+  :damage-shot 6
+  :shot-range 3
+
+  :flavor "Named not for a hat, but for the three horns projecting from their equine heads, Tricorns spend decades mediating while cocooned in woolen blankets. Their richly cultivated spirituality allows them to unleash a spark of static electricity from a fair distance, albeit still not as far as your arrows can fly. Up close, they can poke you with their horns for slightly less damage.")

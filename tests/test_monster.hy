@@ -436,3 +436,16 @@
   (assert (= (. (at (Pos G.map 2 0)) [0] hp) 3))
   (wk E)
   (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1)))
+
+
+(defn test-tricorn []
+  (init (mk-quest
+    [:tiles ['floor 'floor 'floor "Tricorn"]]))
+
+  ; Tricorns can't shoot from more than 3 squares away. When they
+  ; can't shoot, they approach as normal.
+  (assert (= G.player.hp 100))
+  (wait)
+  (assert (= G.player.hp 100))
+  (wait)
+  (assert (= G.player.hp 94)))

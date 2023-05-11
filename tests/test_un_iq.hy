@@ -86,11 +86,9 @@
   (setv t (get m 11 11 0))
   (assert (= t.stem "Dark Knight"))
   (assert (= t.hp 1))
-  ; The life of variable-life monsters is stored in the second byte
-  ; of their tile extras.
   (setv t (get m 11 2 0))
-  (assert (= t.stem "tricorn"))
-  (assert (= (get t.tile-extras 1) 4)))
+  (assert (= t.stem "Tricorn"))
+  (assert (= t.hp 4)))
 
 
 (defn test-generator []

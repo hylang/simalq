@@ -32,7 +32,6 @@
     [49 "death"]
     [50 "specter"]
     [52 "negaton"]
-    [54 "tricorn"]
     [67 "imp_2"]
     [68 "imp_3"]
     [69 "imp_generator_2"]
