@@ -31,7 +31,6 @@
     [48 "blob"]
     [49 "death"]
     [50 "specter"]
-    [51 "thorn_tree"]
     [52 "negaton"]
     [54 "tricorn"]
     [67 "imp_2"]

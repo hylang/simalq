@@ -155,6 +155,10 @@
     (destroy-tile mon))
   T)
 
+(defn stationary [mon]
+  "Stationary — The monster attacks if it can, but is otherwise immobile."
+  (try-to-attack-player mon))
+
 (defn wander [mon]
   "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
 
@@ -347,6 +351,18 @@
   :flavor-mon "This fresh-faced would-be scholar has finished sewing the stars onto his robe and is starting to grow a beard. Idok has told the whole class that whoever kills you gets tenure. Considering what the rest of the academic job market is like, the offer has proven irresistible to many."
   :flavor-gen "The Pigpimples Institute of Thaumaturgy and Dweomercraft: a shameless diploma mill that happily takes students' money to teach them one spell, then sends them on a suicide mission against a much smarter and tougher opponent.")
 
+
+(deftile NonGen "T " "a thorn tree"
+  :iq-ix 51
+  :points 10
+
+  :immune #(DamageType.MundaneArrow DamageType.MagicArrow DamageType.Poison)
+    ; We follow IQ in making thorn trees immune to poison, although
+    ; the IQ manual suggests otherwise.
+  :damage-melee 4
+  :act stationary
+
+  :flavor "From a distance, you can safely giggle at the ghostly. Up close, this arboreal abomination will rake you with its twisted, spiny boughs. Arrows snag in its branches and glance off its gnarled bark, so an intimate encounter may be unavoidable.")
 
 (deftile NonGen "K " "a Dark Knight"
   :iq-ix 53

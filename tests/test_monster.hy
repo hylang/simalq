@@ -414,3 +414,25 @@
   ; At 2 HP, its shot damage drops to 8.
   (shoot 'E)
   (assert (= G.player.hp 76)))
+
+
+(defn test-thorn-tree []
+  (init (mk-quest
+    [:tiles ['floor ["thorn tree" :hp 3]]]))
+
+  ; Thorn trees are immobile.
+  (assert-at (Pos G.map 2 0) "thorn tree")
+  (wait)
+  (assert-at (Pos G.map 2 0) "thorn tree")
+  ; They're immune to arrows.
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 3))
+  (shoot 'E)
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 3))
+  ; Up close, they scratch for 4 damage.
+  (assert (= G.player.hp 100))
+  (wk E)
+  (assert (= G.player.hp 96))
+  ; They're damaged normally by Tris's sword.
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 3))
+  (wk E)
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1)))
