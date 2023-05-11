@@ -206,7 +206,7 @@
     generate-class None)
       ; The stem of the monster type to generate.
 
-  (defn [classmethod] read-tile-extras [cls _ v2]
+  (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
     (dict
       :generate-hp (>> v2 5)
       :generate-frequency (get
@@ -274,7 +274,7 @@
 
   (setv __slots__ [])
 
-  (defn [classmethod] read-tile-extras [cls _ v2]
+  (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
       (dict :hp v2)))
 
 

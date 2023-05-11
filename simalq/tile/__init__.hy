@@ -115,7 +115,7 @@
     blocks-monster-shots T)
       ; Whether monsters are prevented from shooting by this tile.
 
-  (defn [classmethod] read-tile-extras [cls v1 v2]
+  (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
     "This method should return a dictionary of instance variables
     to set for a new instance."
     (raise (TypeError (+ "Tile extras not implemented: " cls.stem))))

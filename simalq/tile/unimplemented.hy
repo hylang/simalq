@@ -148,7 +148,7 @@
         (object.__setattr__ self "pos" pos)
         (object.__setattr__ self "tile_extras" tile-extras))
       :stem stem
-      :read-tile-extras (classmethod (fn [cls a b]
+      :read-tile-extras (classmethod (fn [cls mk-pos a b]
         (dict :tile-extras #(a b)))))))
   (setv (get Tile.types-by-iq-ix iq-ix) cls)
   ; Add a global variable for the class so `pickle` can find it.

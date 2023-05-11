@@ -131,23 +131,22 @@
 
   (setv data (.parse quest-fmt inp))
 
-  (defn mk-pos [m xy]
-    "Convert from IQ coordinates (1-based indices, y = 1 on top, 0
-    means missing) to SQ coordinates (0-based indices with y = 0 on
-    bottom, None means missing)."
-    (if (and #* xy)
-      (Pos m (- (get xy 0) 1) (- m.height (get xy 1)))
-      None))
-
   (Quest
     :title data.title
     :starting-hp data.starting-hp
     :levels (tuple (gfor
       [i l] (enumerate data.levels)
       :setv m (Map.make l.wrap-x l.wrap-y l.width l.height)
+      :setv mk-pos (fn [xy]
+        "Convert from IQ coordinates (1-based indices, y = 1 on top, 0
+        means missing) to SQ coordinates (0-based indices with y = 0 on
+        bottom, None means missing)."
+        (if (and #* xy)
+          (Pos m (- (get xy 0) 1) (- m.height (get xy 1)))
+          None))
       :setv tile-extras (dfor
         c l.tile-extras
-        (mk-pos m c.pos) (tuple c.data))
+        (mk-pos c.pos) (tuple c.data))
       :do (for [x (range l.width)  y (range l.height)]
         ; Fill in `m`.
         (setv iq-ix (get l.map (+ (* x l.height) (- l.height y 1))))
@@ -158,7 +157,8 @@
           (setv result (get Tile.types-by-iq-ix iq-ix))
           (defn te [cls]
             (if (in p tile-extras)
-              (.read-tile-extras cls #* (get tile-extras p))
+              (.read-tile-extras cls mk-pos
+                #* (get tile-extras p))
               {}))
           (.extend (get m.data x y) (cond
             (is (type result) type)
@@ -180,14 +180,14 @@
       (Level
         :n (+ i 1)
         :title l.title
-        :player-start (mk-pos m l.player-start)
+        :player-start (mk-pos l.player-start)
         :next-level l.next-level
         :poison-intensity (if (= l.poison-interval 0)
           (Fraction 0)
           (Fraction 1 l.poison-interval))
         :time-limit l.time-limit
         :exit-speed l.exit-speed
-        :moving-exit-start (mk-pos m l.moving-exit-start)
+        :moving-exit-start (mk-pos l.moving-exit-start)
         :map m)))))
 
 
