@@ -153,3 +153,15 @@
   ; internal structure.
   (setv m (get-level-map "New First Quest" 11))
   (check 3 16 "meal"))
+
+
+(defn test-gate []
+  (defn check [gate-x gate-y target-x target-y]
+    (setv [tile] (get m gate-x gate-y))
+    (assert (= tile.stem "gate"))
+    (assert (= tile.target.x target-x))
+    (assert (= tile.target.y target-y)))
+
+  (setv m (get-level-map "Boot Camp 2" 8))
+  (check  3 12  5 15)
+  (check  0 10  30 12))

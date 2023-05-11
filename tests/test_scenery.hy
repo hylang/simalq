@@ -192,6 +192,23 @@
   (assert (= G.player.pos (Pos G.map 0 0))))
 
 
+(defn test-gate []
+  (init (mk-quest []))
+  (defn t [] (Pos G.map 5 5))
+
+  (mk-tile (Pos G.map 1 0) ["gate" :target (t)])
+  (mk-tile (t) "exit")
+  (mk-tile (t) "pile of gold")
+  (mk-tile (t) "orc")
+  (assert (and (= G.turn-n 0) (= G.player.pos (Pos G.map 0 0))))
+  ; Walking into the gate warps us to the target square, but
+  ; preserves what's there, and doesn't trigger any tile effects
+  ; for walking into the target.
+  (wk E)
+  (assert (and (= G.turn-n 1) (= G.player.pos (t))))
+  (assert-at 'here ['player "orc" "pile of gold" "exit"]))
+
+
 (defn test-wallfall-trap []
   (init (mk-quest [
     :map "

@@ -5,7 +5,7 @@
   simalq.color :as color
   simalq.util [CommandError GameOverException player-melee-damage DamageType]
   simalq.geometry [Pos Direction GeometryError pos+ at]
-  simalq.tile [Tile deftile replace-tile damage-tile destroy-tile]
+  simalq.tile [Tile deftile replace-tile damage-tile mv-tile destroy-tile]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -240,6 +240,23 @@
     True)
 
   :flavor "I think this dungeon might not be up to code.")
+
+
+(deftile Scenery "{}" "a gate"
+  :color 'purple
+  :slot-defaults (dict
+    :target None)
+  :iq-ix 24
+
+  :read-tile-extras (classmethod (fn [cls mk-pos v1 v2]
+    (dict :target (mk-pos #(v1 v2)))))
+
+  :hook-player-walked-into (fn-dd [self]
+    (doc f"Teleports you to ({it.target.x}, {it.target.y}). Anything already there is unaffected.")
+    (mv-tile G.player self.target)
+    T)
+
+  :flavor "A small stone arch containing a rippling, sparkling sheet of violet light. It functions as a magic portal that can send you elsewhere on this level. Sadly, arrows in flight won't survive the trip.")
 
 
 (defclass Trap [Scenery]
