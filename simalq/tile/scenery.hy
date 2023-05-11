@@ -234,6 +234,7 @@
 
   :blocks-move T :blocks-diag T :blocks-player-shots F
   :damageable T
+  :immune #(DamageType.Poison DamageType.Fire DamageType.DeathMagic)
   :hook-player-bump (fn [self origin]
     "You attack the wall with your sword."
     (damage-tile self (player-melee-damage) DamageType.PlayerMelee)

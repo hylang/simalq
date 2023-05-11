@@ -78,11 +78,12 @@
   (init (mk-quest [
     :map "
       @ % ☠ ██o o
-      ████████G ██
+      ████##██G ██
       ████o ██████"
     :map-marks {
       "% " "snack"
       "☠ " "jar of poison"
+      "##" ["cracked wall" :hp 2]
       "o " ["orc" :hp 4]}]))
   ; Shooting a snack (or most other foods) just destroys it.
   (assert-at 'E "snack")
@@ -102,6 +103,8 @@
   (assert (= (. (at (Pos G.map 4 2)) [0] hp) 1))
   ; The ghost, being undead, takes no damage from poison.
   (assert (= (. (at (Pos G.map 4 1)) [0] hp) 1))
+  ; Cracked walls are also immune to poison.
+  (assert (= (. (at (Pos G.map 2 1)) [0] hp) 2))
   ; The third orc is outside of the blast radius.
   (assert (= (. (at (Pos G.map 5 2)) [0] hp) 4))
   ; Points are earned for all damage dealt.
