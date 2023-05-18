@@ -48,38 +48,7 @@
     (damage-tile self (player-melee-damage) DamageType.PlayerMelee)
     True)
 
-  (defn act [self]
-    "Approach — If the monster can attack, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
-
-    (when (try-to-attack-player self)
-      (return))
-
-    ; Try to get closer to the player.
-    (setv d (dir-to self.pos G.player.pos))
-    (when (is d None)
-      ; The player is in our square. Just give up.
-      (return))
-    (setv [target wly] (walkability self.pos d :monster? T))
-    (unless (= wly 'walk)
-      ; We can't go that way. Try a different direction.
-      ; Use a non-random equivalent of IQ's `ApproachHero`.
-      (setv self.movement-state
-        (next-in-cycle Direction.orths self.movement-state))
-      (setv d (tuple (gfor c ["x" "y"]
-        (if (getattr self.movement-state c)
-          (if (getattr d c)
-            0
-            (getattr self.movement-state c))
-          (getattr d c)))))
-      (unless (= d #(0 0))
-        (setv d (get Direction.from-coords d))
-        (setv [target wly] (walkability self.pos d :monster? T)))
-      (unless (= wly 'walk)
-        ; Per IQ, we make only one attempt to find a new direction.
-        ; Give up.
-        (return)))
-    ; We're clear to move.
-    (mv-tile self target))
+  (setv act 'approach)
 
   (defn info-bullets [self #* extra]
     (defn damage-array [damage]
@@ -167,6 +136,40 @@
 (defn stationary [mon]
   "Stationary — The monster attacks if it can, but is otherwise immobile."
   (try-to-attack-player mon))
+
+(defn approach [mon]
+  "Approach — If the monster can attack, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
+
+  (when (try-to-attack-player mon)
+    (return))
+
+  ; Try to get closer to the player.
+  (setv d (dir-to mon.pos G.player.pos))
+  (when (is d None)
+    ; The player is in our square. Just give up.
+    (return))
+  (setv [target wly] (walkability mon.pos d :monster? T))
+  (unless (= wly 'walk)
+    ; We can't go that way. Try a different direction.
+    ; Use a non-random equivalent of IQ's `ApproachHero`.
+    (setv mon.movement-state
+      (next-in-cycle Direction.orths mon.movement-state))
+    (setv d (tuple (gfor c ["x" "y"]
+      (if (getattr mon.movement-state c)
+        (if (getattr d c)
+          0
+          (getattr mon.movement-state c))
+        (getattr d c)))))
+    (unless (= d #(0 0))
+      (setv d (get Direction.from-coords d))
+      (setv [target wly] (walkability mon.pos d :monster? T)))
+    (unless (= wly 'walk)
+      ; Per IQ, we make only one attempt to find a new direction.
+      ; Give up.
+      (return)))
+  ; We're clear to move.
+  (mv-tile mon target))
+(setv Monster.act approach)
 
 (defn wander [mon]
   "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
