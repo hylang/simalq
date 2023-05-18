@@ -1,6 +1,6 @@
 (require
   hyrule [unless do-n block]
-  simalq.macros [defdataclass slot-defaults pop-integer-part])
+  simalq.macros [defdataclass slot-defaults pop-integer-part fn-dd])
 (import
   re
   fractions [Fraction :as f/]
@@ -79,7 +79,9 @@
       #("Point value" (.format "{}{}"
         self.points
         (if self.score-for-damaging " (scored per HP lost)" "")))
-      #("Behavior" self.act.__doc__)
+      #("Behavior" (or
+        self.act.__doc__
+        (self.act.dynadoc self)))
       #("Movement state" self.movement-state)]))
 
 (defn damage-by-hp [monster damage]
@@ -93,9 +95,10 @@
   ; into being.
   (setv (. (at pos) [-1] last-acted) G.turn-n))
 
-(defn try-to-attack-player [mon]
+(defn try-to-attack-player [mon [dry-run F] [shots-ignore-obstacles F]]
   "Try to melee or shoot the player, if the monster can. Return true
-  if it succeeded."
+  if it succeeded. If `dry-run` is true, the attack isn't actually
+  made."
 
   (setv p mon.pos)
   (setv d (dir-to p G.player.pos))
@@ -118,7 +121,8 @@
       (when (is tile G.player)
         (setv attack 'shot)
         (block-ret))
-      (when tile.blocks-monster-shots
+      (when (or tile.superblock
+          (and tile.blocks-monster-shots (not shots-ignore-obstacles)))
         (block-ret)))))
 
   ; If we can't attack, bail out.
@@ -126,6 +130,8 @@
     (return F))
 
   ; Execute the attack.
+  (when dry-run
+    (return T))
   (hurt-player :attacker mon
     (damage-by-hp mon (if (= attack 'shot) mon.damage-shot mon.damage-melee))
     (if (= attack 'shot) DamageType.MonsterShot DamageType.MonsterMelee))
@@ -137,10 +143,10 @@
   "Stationary — The monster attacks if it can, but is otherwise immobile."
   (try-to-attack-player mon))
 
-(defn approach [mon]
+(defn approach [mon [implicit-attack T] [reverse F]]
   "Approach — If the monster can attack, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
 
-  (when (try-to-attack-player mon)
+  (when (and implicit-attack (try-to-attack-player mon))
     (return))
 
   ; Try to get closer to the player.
@@ -148,6 +154,8 @@
   (when (is d None)
     ; The player is in our square. Just give up.
     (return))
+  (when reverse
+    (setv d d.opposite))
   (setv [target wly] (walkability mon.pos d :monster? T))
   (unless (= wly 'walk)
     ; We can't go that way. Try a different direction.
@@ -171,10 +179,10 @@
   (mv-tile mon target))
 (setv Monster.act approach)
 
-(defn wander [mon]
+(defn wander [mon [state-slot "movement_state"] [implicit-attack T]]
   "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
 
-  (when (try-to-attack-player mon)
+  (when (and implicit-attack (try-to-attack-player mon))
     (return))
 
   ; Use a linear congruential generator. Each seed should have a
@@ -182,12 +190,12 @@
   ; to look randomish, but not long.
   ; https://en.wikipedia.org/w/index.php?title=Linear_congruential_generator&oldid=1140372972#c_%E2%89%A0_0
   (setv  m (** 8 3)  c 1  a (+ 2 1))
-  (when (= mon.movement-state None)
+  (when (= (getattr mon state-slot) None)
     ; Seed the RNG.
-    (setv mon.movement-state (% (pos-seed mon.pos) m)))
+    (setattr mon state-slot (% (pos-seed mon.pos) m)))
   (setv options (+ Direction.all #(None)))
-  (setv d (get options (% mon.movement-state (len options))))
-  (setv mon.movement-state (% (+ (* a mon.movement-state) c) m))
+  (setv d (get options (% (getattr mon state-slot) (len options))))
+  (setattr mon state-slot (% (+ (* a (getattr mon state-slot)) c) m))
   (unless d
     (return))
   (setv [target wly] (walkability mon.pos d :monster? T))
@@ -362,6 +370,38 @@
 
   :flavor-mon "This fresh-faced would-be scholar has finished sewing the stars onto his robe and is starting to grow a beard. Idok has told the whole class that whoever kills you gets tenure. Considering what the rest of the academic job market is like, the offer has proven irresistible to many."
   :flavor-gen "The Pigpimples Institute of Thaumaturgy and Dweomercraft: a shameless diploma mill that happily takes students' money to teach them one spell, then sends them on a suicide mission against a much smarter and tougher opponent.")
+
+(defgenerated "i " "an imp"
+  :iq-ix-mon [43 67 68] :iq-ix-gen [44 69 70]
+  :points-mon 4 :points-gen 15
+
+  :slot-defaults (dict
+    :shot-power (f/ 0)
+    :wander-state None)
+  :mutable-slots #("shot_power" "wander_state")
+
+  :damage-shot #(1 2 3)
+  :act (fn-dd [self]
+    (doc f"Coward — If the monster is within {imp-flee-range} squares of you, it flees (per `Approach` in reverse). Otherwise, if it has line of sight to you (ignoring all obstacles) it adds {imp-shot-charge} to its shot power. If this is ≥1, it subtracts 1 to shoot you. Otherwise, it wanders (per `Wander`).")
+
+    (when (<= (dist G.player.pos self.pos) imp-flee-range)
+      (return (approach self :reverse T :implicit-attack F)))
+    (when (try-to-attack-player self :dry-run T :shots-ignore-obstacles T)
+      (+= self.shot-power imp-shot-charge)
+      (when (pop-integer-part self.shot-power)
+        (try-to-attack-player self :shots-ignore-obstacles T)
+        (return)))
+    (wander self "wander_state" :implicit-attack F))
+
+  :info-bullets (fn [self #* extra]
+    (Generated.info-bullets self
+      #("Shot power" self.shot-power)
+      #("Wandering state" self.wander-state)))
+
+  :flavor-mon #[[Weak but incredibly annoying, this snickering little fiend is called a "lobber" in the tongue of the ancients. It throws hellstones, cursed missiles that can pierce most any obstacle. In close quarters, it resorts to cowering helplessly and begging for mercy, but, being a literal demon, it has no compunctions about getting right back to firing at you the moment it feels safe.]]
+  :flavor-gen "They don't make ziggurats like they used to.")
+(setv imp-flee-range 2)
+(setv imp-shot-charge (f/ 4 5))
 
 
 (deftile NonGen "T " "a thorn tree"

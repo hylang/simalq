@@ -2,8 +2,9 @@
   hyrule [do-n]
   tests.lib [wk])
 (import
+  collections [Counter]
   fractions [Fraction :as f/]
-  tests.lib [init mk-quest locate assert-at wait set-square shoot]
+  tests.lib [init mk-quest locate assert-at wait set-square shoot mv-player]
   simalq.geometry [Direction Pos ray at]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -414,6 +415,48 @@
   ; At 2 HP, its shot damage drops to 8.
   (shoot 'E)
   (assert (= G.player.hp 76)))
+
+
+(defn test-imp []
+
+  (init (mk-quest
+    [:height 1 :tiles ["wall" "wall" "imp"]]))
+  (assert (= G.player.hp 100))
+  ; An imp initially needs to gain some shot power before it can
+  ; shoot.
+  (wait)
+  (assert (= G.player.hp 100))
+  ; Now it can shoot (and is left with 3/5 power). Walls are no
+  ; obstacle to imp shots.
+  (wait)
+  (assert (= G.player.hp 99))
+  (assert (= (. (at (Pos G.map 3 0)) [0] shot-power) (f/ 3 5)))
+  ; The void blocks imp shots. Since the imp can't shoot, it gains
+  ; no shot power.
+  (set-square (Pos G.map 2 0) "Void")
+  (wait)
+  (assert (= G.player.hp 99))
+  (assert (= (. (at (Pos G.map 3 0)) [0] shot-power) (f/ 3 5)))
+  ; At ranges of 2 or less, an imp flees.
+  (mv-player 1 0)
+  (wait)
+  (assert-at (Pos G.map 4 0) "imp")
+
+  ; On a turn that an imp isn't shooting or fleeing (even if it's
+  ; gaining shot power), it wanders.
+  (init (mk-quest
+    [:map "
+      . . . . .
+      @ . . i .
+      . . . . ."]))
+   (wait)
+   (assert (=
+     (Counter (gfor
+       x [2 3 4]
+       y [0 1 2]
+       :if (!= [x y] [3 1])
+       (tuple (gfor  t (at (Pos G.map x y))  t.stem))))
+     {#() 7  #("imp") 1})))
 
 
 (defn test-thorn-tree []

@@ -112,8 +112,10 @@
     blocks-player-shots T
       ; Whether the player's arrows are stopped by this tile.
       ; If `damageable` is true, it overrides this.
-    blocks-monster-shots T)
+    blocks-monster-shots T
       ; Whether monsters are prevented from shooting by this tile.
+    superblock F)
+      ; Resist all ordinary attempts to change or bypass the tile.
 
   (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
     "This method should return a dictionary of instance variables

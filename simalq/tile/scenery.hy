@@ -19,10 +19,8 @@
       ; Block player and monster movement.
     blocks-diag F
       ; Block diagonal movement between orthogonally adjacent squares.
-    blocks-monster F
+    blocks-monster F)
       ; Block monster movement, even if `blocks-move` is false.
-    superblock F)
-      ; Resist all ordinary attempts to change or bypass the tile.
 
   (defn dod [self prefix attr-sym]
     (setv a (hy.mangle attr-sym))
