@@ -5,6 +5,7 @@
   re
   fractions [Fraction :as f/]
   enum [Enum]
+  toolz [unique]
   simalq.util [player-melee-damage DamageType hurt-player next-in-cycle mixed-number]
   simalq.geometry [Direction GeometryError pos+ at dist adjacent? dir-to pos-seed ray]
   simalq.game-state [G]
@@ -276,7 +277,7 @@
     :iq-ix-mapper ["hp"
       (dict (zip iq-ix-gen [1 2 3]))]
     :generate-class mon-cls.stem
-    :immune (+ Generator.immune immune)
+    :immune (tuple (unique (+ Generator.immune immune)))
     :points points-gen
     :flavor flavor-gen))
 
