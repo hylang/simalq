@@ -97,6 +97,8 @@
         ; with the player in the center.
       max-keys 8
         ; How many keys the player can carry at once.
+      max-usables 3
+        ; How many inventory slots the player has for wands etc.
       base-player-melee-damage 2
         ; How much damage the player does with her sword normally.
       base-player-shot-damage 1

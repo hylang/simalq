@@ -1,11 +1,11 @@
 (require
-  simalq.macros [defn-dd fn-dd])
+  simalq.macros [defn-dd fn-dd unless])
 (import
   simalq.strings
   simalq.util [CommandError]
   simalq.game-state [G]
   simalq.geometry [pos-seed]
-  simalq.tile [Tile deftile destroy-tile]
+  simalq.tile [Tile deftile destroy-tile rm-tile]
   simalq.util [DamageType hurt-player msg burst-damage])
 (setv  T True  F False)
 
@@ -13,12 +13,15 @@
 (defclass Item [Tile]
   "An object the player can pick up."
 
-  (setv __slots__ [])
+  (setv
+    __slots__ []
+    destroy-after-pickup T)
 
   (defn hook-player-walked-into [self]
     (+= G.score self.points)
     (.pick-up self)
-    (destroy-tile self))
+    (when self.destroy-after-pickup
+      (destroy-tile self)))
   (defn pick-up [self])
 
   (defn info-bullets [self] [
@@ -188,3 +191,53 @@
     (assert (<= G.player.keys G.rules.max-keys)))
 
   :flavor "Idok uses only the worst locks and keys that money can buy. The keys are bulky and heavy, yet immediately snap into pieces on being used once, and every lock can be opened by any old key.")
+
+
+(defclass Usable [Item]
+  "An item that's added to your inventory and can thereafter be
+  consumed as an action."
+
+  (setv
+    __slots__ []
+    destroy-on-pickup F)
+
+  (defn hook-player-walk-to [self origin]
+    (unless (any (gfor  x G.player.inventory  (is x None)))
+      (raise (CommandError "Your inventory is full."))))
+
+  (defn-dd pick-up [self]
+    (doc f"Adds the item to your inventory. If you're at the maximum number
+      of usable items ({G.rules.max-usables}), you can't step on its square.")
+    (rm-tile self)
+    (setv
+      (get G.player.inventory (next (gfor
+        [ix item] (enumerate G.player.inventory)
+        :if (is item None)
+        ix)))
+      self))
+
+  (defn use [self]
+    "Called when the player applies the item for use. The caller
+    will destroy the item afterwards."))
+
+
+(deftile Usable "/ " "a wand of shielding"
+  :color 'orange
+  :iq-ix 200
+  :points 100
+
+  :flavor "STUB")
+
+(deftile Usable "/ " "a wall-making wand"
+  :color 'red
+  :iq-ix 33
+  :points 150
+
+  :flavor "STUB")
+
+(deftile Usable "0 " "a standard bomb"
+  :color 'red
+  :iq-ix 31
+  :points 100
+
+  :flavor "STUB")

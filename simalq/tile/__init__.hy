@@ -26,7 +26,7 @@
        (object.__setattr__ self slot
          (if (in slot kwargs)
            (.pop kwargs slot)
-           (get cls.slot-defaults slot))))
+           (deepcopy (get cls.slot-defaults slot)))))
     (when kwargs
       (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}"))))
 

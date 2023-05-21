@@ -13,6 +13,7 @@
       'dark-yellow [(/ 1 2) (/ 1 2) 0]
       'pale-red [1 (/ 7 8) (/ 7 8)]
       'red [(/ 3 4) 0 0]
+      'orange [(/ 3 4) (/ 1 2) 0]
       'pale-blue [(/ 7 8) (/ 7 8) 1]
       'dark-navy [0 0 (/ 3 8)]
       'navy [0 0 (/ 1 2)]

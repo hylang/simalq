@@ -109,3 +109,30 @@
   (assert (= (. (at (Pos G.map 5 2)) [0] hp) 4))
   ; Points are earned for all damage dealt.
   (assert (= G.score (py "3*3 + 3*3"))))
+
+
+(defn test-inventory []
+  (init (mk-quest [:tiles [
+     "wand of shielding" "wall-making wand"
+     "standard bomb" "standard bomb"]]))
+
+  (defn check [#* args]
+    (assert (all (gfor
+      [got expected] (zip G.player.inventory args)
+      (if (is expected None) (is got None) (= got.stem expected))))))
+
+  ; Inventory slots fill from the top.
+  (check None None None)
+  (wk E)
+  (check "wand of shielding" None None)
+  (wk E)
+  (check "wand of shielding" "wall-making wand" None)
+  (setv
+    [(get G.player.inventory 0) (get G.player.inventory 2)]
+    [(get G.player.inventory 2) (get G.player.inventory 0)])
+  (check None "wall-making wand" "wand of shielding")
+  (wk E)
+  (check "standard bomb" "wall-making wand" "wand of shielding")
+  (cant (wk E) "Your inventory is full.")
+  (assert-at 'E "standard bomb")
+  (assert-at 'W 'floor))

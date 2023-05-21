@@ -18,9 +18,12 @@
       ; ≥ 1 get converted to damage.
     :just-exited F
       ; Did you just use an exit?
-    :keys 0)
+    :keys 0
       ; How many (regular, and not yet used) keys you're carrying.
+    :inventory [])
+      ; Single-use (`Usable`) items being carried.
   :mutable-slots #("hp" "poison_dose" "just_exited" "keys")
+    ; `inventory` should be mutated directly rather than assigned to.
 
   :damageable T
   :hook-destroyed (fn [self pos]

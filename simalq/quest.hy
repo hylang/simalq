@@ -25,7 +25,8 @@
     (setattr thing k v))
   (setv
     state.player (Player :pos None)
-    state.player.hp quest.starting-hp)
+    state.player.hp quest.starting-hp
+    (cut state.player.inventory) (* [None] G.rules.max-usables))
   (.append G.states state)
   (setv G.state-i 0))
 
