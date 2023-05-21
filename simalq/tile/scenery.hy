@@ -270,6 +270,7 @@
   :slot-defaults (dict
     :wallnum 1)
   :iq-ix-mapper ["wallnum" (do
+    ; These are just called "traps" in IQ.
     (setv x [115 13 75 76 77 111 112 113 114])
     (dict (zip x (range (len x)))))]
 
