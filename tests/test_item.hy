@@ -1,9 +1,11 @@
 (require
+  hyrule [do-n]
   tests.lib [cant wk])
 (import
-  tests.lib [init mk-quest assert-at set-square mv-player shoot]
+  tests.lib [init mk-quest assert-at set-square mv-player shoot wait use-item mk-tile]
   simalq.geometry [Pos Direction pos+ at]
   simalq.game-state [G])
+(setv  T True  F False)
 
 
 (defn test-treasure []
@@ -123,8 +125,10 @@
 
   ; Inventory slots fill from the top.
   (check None None None)
+  (cant (use-item 0) "That inventory slot is empty.")
   (wk E)
   (check "wand of shielding" None None)
+  (cant (use-item 1) "That inventory slot is empty.")
   (wk E)
   (check "wand of shielding" "wall-making wand" None)
   (setv
@@ -136,3 +140,66 @@
   (cant (wk E) "Your inventory is full.")
   (assert-at 'E "standard bomb")
   (assert-at 'W 'floor))
+
+
+(defn add-usable [stem [n 1]]
+  (do-n n
+    (.pick-up (mk-tile None stem))))
+
+
+(defn test-wand-shielding []
+  (init (mk-quest [
+    :map "
+      . o . .
+      ██. . .
+      $ @ . d"
+    :map-marks {
+      "$ " "pile of gold"}]))
+  (add-usable "wand of shielding" 2)
+
+  ; A wand of shielding creates a shield on each adjacent square (even
+  ; if something else is there, unlike IQ). Monsters can't move onto
+  ; or shoot through the shields.
+  (assert (= G.player.hp 100))
+  (use-item 0)
+  (wait 5)
+  (assert (= G.player.hp 100))
+  (assert-at 'W ["magical energy shield" "pile of gold"])
+  (assert-at 'NW ["magical energy shield" "wall"])
+  (assert-at 'N "magical energy shield")
+  (assert-at 'NE "magical energy shield")
+  (assert-at 'E "magical energy shield")
+  ; But Tris can shoot through them.
+  (assert-at (Pos G.map 1 2) "orc")
+  (shoot 'N)
+  (assert-at (Pos G.map 1 2) 'floor)
+  ; And Tris can walk through them. Since this puts her on top of the
+  ; shield tiles rather than under them, they no longer protect her.
+  (assert (= G.player.hp 100))
+  (wk E)
+  (assert (= G.player.hp 97))
+
+  ; Unlike IQ, creating new shields don't affect existing ones, which
+  ; keep their own timers.
+  (defn check [turn-n old new]
+    (assert (= G.turn-n turn-n))
+    (setv old (if old ["magical energy shield"] []))
+    (setv new (if new ["magical energy shield"] []))
+    (assert-at 'here ['player #* old])
+    (assert-at 'NE [#* new])
+    (assert-at 'N [#* old #* new]))
+  (use-item 1)
+  (check 9 T T)
+  ; Shields protect for 12 turns, so the first set (created on turn 0,
+  ; and therefore providing its first turn of protection on turn 0)
+  ; disappates at the end of turn 11, soon before `G.turn-i` becomes
+  ; 12.
+  (wait 2)
+  (check 11 T T)
+  (wait)
+  (check 12 F T)
+  ; The second set disspiates just before turn 8 + 12 = 20.
+  (wait 7)
+  (check 19 F T)
+  (wait)
+  (check 20 F F))

@@ -22,7 +22,7 @@
     G.states []
     state (GameState))
   (for [thing [G.rules state] [k v] (.items thing.slot-defaults)]
-    (setattr thing k v))
+    (setattr thing k (deepcopy v)))
   (setv
     state.player (Player :pos None)
     state.player.hp quest.starting-hp

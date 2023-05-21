@@ -4,8 +4,8 @@
   simalq.strings
   simalq.util [CommandError]
   simalq.game-state [G]
-  simalq.geometry [pos-seed]
-  simalq.tile [Tile deftile destroy-tile rm-tile]
+  simalq.geometry [pos-seed burst]
+  simalq.tile [Tile deftile destroy-tile rm-tile add-tile]
   simalq.util [DamageType hurt-player msg burst-damage])
 (setv  T True  F False)
 
@@ -24,7 +24,7 @@
       (destroy-tile self)))
   (defn pick-up [self])
 
-  (defn info-bullets [self] [
+  (defn info-bullets [self #* extra] [
     #("Point value" self.points)
     (when (is-not (. (type self) pick-up) Item.pick-up)
       #("Pickup effect" (or
@@ -33,7 +33,8 @@
     (when self.hook-player-shot
       #("Effect when you shoot it" (or
         self.hook-player-shot.__doc__
-        (self.hook-player-shot.dynadoc self))))]))
+        (self.hook-player-shot.dynadoc self))))
+     #*extra]))
 
 
 (deftile Item "$ " "a pile of gold"
@@ -218,7 +219,12 @@
 
   (defn use [self]
     "Called when the player applies the item for use. The caller
-    will destroy the item afterwards."))
+    will destroy the item afterwards.")
+
+  (defn info-bullets [self #* extra]
+    (.info-bullets (super)
+      #("Effect when applied" self.use.__doc__)
+      #* extra)))
 
 
 (deftile Usable "/ " "a wand of shielding"
@@ -226,7 +232,12 @@
   :iq-ix 200
   :points 100
 
-  :flavor "STUB")
+  :use (fn [self]
+    "Creates a magical energy shield in each square adjacent to you. These shield tiles block monsters and their shots, but not you or your shots."
+    (for [p (burst G.player.pos 1)  :if (!= p G.player.pos)]
+      (add-tile p "magical energy shield")))
+
+  :flavor "Cowardice is the better part of valor.")
 
 (deftile Usable "/ " "a wall-making wand"
   :color 'red

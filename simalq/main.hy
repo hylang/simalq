@@ -56,6 +56,14 @@
     (pop-integer-part G.player.poison-dose)
     DamageType.Poison)
 
+  ; Run each-turn hooks. Unless the object is neither on this level
+  ; nor in the player's inventory, in which case, kick the object off
+  ; the list.
+  (for [o (list G.each-turn)]
+    (unless (or (in o G.player.inventory) (and o.pos (is o.pos.map G.map)))
+      (.remove G.each-turn o))
+    (.each-turn o))
+
   ; Advance the turn counter last.
   (+= G.turn-n 1))
 

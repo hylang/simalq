@@ -28,7 +28,9 @@
            (.pop kwargs slot)
            (deepcopy (get cls.slot-defaults slot)))))
     (when kwargs
-      (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}"))))
+      (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}")))
+    (when self.each-turn
+      (.append G.each-turn self)))
 
   (defn __setattr__ [self name value]
     (if (in name (.all-mutable-slots self))
@@ -37,9 +39,10 @@
 
   (defn __deepcopy__ [self memo]
     ; We provide this to avoid triggering `__setattr__` in `deepcopy`.
-    ((type self) #** (dfor
-      [cls slot] (.all-slots self)
-      slot (deepcopy (getattr self slot) memo))))
+    (setv t (.__new__ self (type self)))
+    (for [[_ slot] (.all-slots self)]
+      (object.__setattr__ t slot (deepcopy (getattr self slot) memo)))
+    t)
 
   (defn __setstate__ [self state]
     ; We provide this to avoid triggering `__setattr__` in
@@ -114,8 +117,11 @@
       ; If `damageable` is true, it overrides this.
     blocks-monster-shots T
       ; Whether monsters are prevented from shooting by this tile.
-    superblock F)
+    superblock F
       ; Resist all ordinary attempts to change or bypass the tile.
+    each-turn None)
+      ; Set this to a method to get instances added to `G.each-turn`
+      ; upon creation. The method will be called in the main turn loop.
 
   (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
     "This method should return a dictionary of instance variables
@@ -211,7 +217,10 @@
 
 
 (defn add-tile [pos stem #** kwargs]
-  (.insert (at pos) 0 ((get Tile.types stem) :pos pos #** kwargs)))
+  (setv t ((get Tile.types stem) :pos pos #** kwargs))
+  (when pos
+    (.insert (at pos) 0 t))
+  t)
 
 (defn rm-tile [tile]
   (when (is-not tile.pos None)

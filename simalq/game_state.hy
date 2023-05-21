@@ -76,6 +76,8 @@
     level-n None
       ; An integer indicating the level we're currently playing.
       ; Numbered starting from 1.
+    each-turn []
+      ; Objects on which to call `.each-turn` at the end of each turn.
     score 0
       ; How many points the player has accumulated.
     turn-n 0

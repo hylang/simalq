@@ -11,7 +11,7 @@
   simalq.un-iq [read-quest iq-quest]
   simalq.game-state [G]
   simalq.tile [Tile add-tile rm-tile mv-tile]
-  simalq.commands [Wait Shoot]
+  simalq.commands [Wait Shoot UseItem]
   simalq.quest [start-quest start-level]
   simalq.main [take-turn])
 
@@ -172,3 +172,6 @@
 (defn shoot [direction-abbr [n-times 1]]
   (do-n n-times
     (take-turn (Shoot (getattr Direction (str direction-abbr))))))
+
+(defn use-item [item-ix]
+  (take-turn (UseItem item-ix)))

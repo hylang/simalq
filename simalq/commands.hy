@@ -1,5 +1,5 @@
 (require
-  hyrule [ecase do-n]
+  hyrule [ecase do-n unless]
   simalq.macros [defdataclass])
 (import
   copy [deepcopy]
@@ -7,7 +7,7 @@
   simalq.util [CommandError DamageType save-game-path msg player-shot-damage flash-map]
   simalq.geometry [Direction GeometryError pos+ at]
   simalq.game-state [G save-game load-game]
-  simalq.tile [mv-tile damage-tile]
+  simalq.tile [mv-tile damage-tile destroy-tile]
   simalq.tile.scenery [walkability])
 (setv  T True  F False)
 
@@ -28,6 +28,10 @@
 (defdataclass Shoot [Action]
   "Fire an arrow in the given direction."
   [direction]
+  :frozen T)
+(defdataclass UseItem [Action]
+  "Apply an item from your inventory."
+  [item-ix]
   :frozen T)
 
 (defdataclass GonnaShoot [Command]
@@ -228,4 +232,12 @@
               ; The arrow stops without doing anything more.
               (animate)
               (return)))))
-      (animate))))
+      (animate))
+
+    UseItem (do
+      (setv item (get G.player.inventory action.item-ix))
+      (unless item
+        (raise (CommandError "That inventory slot is empty.")))
+      (.use item)
+      (setv (get G.player.inventory action.item-ix) None)
+      (destroy-tile item))))

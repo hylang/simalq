@@ -306,3 +306,26 @@
       #("Wallfall type" self.wallnum)))
 
   :flavor "The special thing about this wall is that it can be destroyed by wallfall traps of the corresponding type.\n\nWhat's the deal with monster closets? Monsters are proud of who they are, am I right? I'll be here all week.")
+
+
+(deftile Scenery "()" "a magical energy shield"
+  :color 'orange
+  :slot-defaults (dict
+    :time-remaining 12)
+  :mutable-slots #("time_remaining")
+  :iq-ix None
+    ; In IQ, tiles of this type can only be created mid-game.
+
+  :blocks-move F :blocks-monster T
+  :blocks-player-shots F :blocks-monster-shots T
+
+  :each-turn (fn [self]
+    (-= self.time-remaining 1)
+    (unless self.time-remaining
+      (destroy-tile self)))
+
+  :info-bullets (fn [self #* extra]
+    (Scenery.info-bullets self
+      #("Turns remaining" self.time-remaining)))
+
+  :flavor "These glittering barriers of orange plasma offer you plenty of protection and monsters none at all. Enjoy 'em while they last.")
