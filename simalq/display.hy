@@ -52,28 +52,26 @@
 (defn draw-screen [width height focus status-bar messages [overmarks None]]
   "Return a colorstr for the main screen."
 
-  (setv out (draw-map
-    focus
-    width
-    (- height (if status-bar status-bar-lines 0))
-    (or overmarks {})))
+  (setv out [])
   (when status-bar
     (+= out (lfor
       line (draw-status-bar)
       (colorstr (cut (.ljust line width) width)))))
+  (+= out (draw-map
+    focus
+    width
+    (- height (if status-bar status-bar-lines 0))
+    (or overmarks {})))
   (setv messages (lfor
     m messages
     :if (not-in m hide-messages)
     line (textwrap.wrap m width)
     line))
   (when messages
-    ; Write the message over the line just above the status bar
-    ; (or where it would be), and then leak into the following lines
-    ; if necessary (typically, it shouldn't be).
-    (setv max-lines (+ status-bar-lines 1))
-    (setv messages (cut messages max-lines))
-    (setv i (- height max-lines))
-    (for [[i m] (zip (range i (+ i (len messages))) messages)]
+    ; Write messages over the map, just under the status bar.
+    (for [[i m] (enumerate messages)]
+      (when status-bar
+        (+= i status-bar-lines))
       (when (< (len m) width)
         ; If there's room, pad the line with one extra space of the
         ; message color.
