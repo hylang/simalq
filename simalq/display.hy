@@ -8,7 +8,7 @@
   hy.pyops *
   simalq.color :as color
   simalq.game-state [G]
-  simalq.util [mixed-number]
+  simalq.util [mixed-number invlets]
   simalq.geometry [Pos at dist])
 (setv  T True  F False)
 
@@ -53,7 +53,7 @@
   (cut (+ x (colorstr (* " " (max 0 (- w (len x)))))) w))
 
 
-(defn draw-screen [width height focus status-bar messages [overmarks None]]
+(defn draw-screen [width height focus status-bar inventory messages [overmarks None]]
   "Return a colorstr for the main screen."
 
   (setv out [])
@@ -66,6 +66,12 @@
     width
     (- height (if status-bar status-bar-lines 0))
     (or overmarks {})))
+  (when inventory
+    ; Write the inventory list over the map, just under the status bar.
+    (for [[i line] (enumerate (draw-inventory))]
+      (when status-bar
+        (+= i status-bar-lines))
+      (setv (cut (get out i) (len line)) line)))
   (setv messages (lfor
     m messages
     :if (not-in m hide-messages)
@@ -214,6 +220,23 @@
       (.format "Score {:,}"
         G.score)
       None))) ; Reserved for status-effect indicators
+
+
+(defn draw-inventory []
+  "Return a list of colorstrs."
+  ; Create the text for each line.
+  (setv lines (lfor
+    [i item] (enumerate G.player.inventory)
+    (.format " ({}) � {}  "
+      (get invlets i)
+      (if item item.full-name "---"))))
+  ; Pad out short lines and replace the "�"s with colored mapsyms.
+  (lfor
+    [line item] (zip lines G.player.inventory)
+    :setv cs (colorstr-to-width (colorstr line) (max (map len lines)))
+    :setv (cut cs (.index line "�") (+ (.index line "�") 1))
+      (if item (color-tile item) (colorstr "  "))
+    cs))
 
 
 (defn mapsym-at-pos [p]

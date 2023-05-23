@@ -107,7 +107,6 @@
     :draw (fn []
       (print-main-screen
         :focus G.player.pos
-        :status-bar T
         :messages (tuple message-queue)))
 
     :on-input (fn [key]
@@ -122,12 +121,12 @@
         (except [e CommandError]
           (msg (get e.args 0)))))))
 
-(defn print-main-screen [focus status-bar [messages #()] [overmarks None]]
+(defn print-main-screen [focus [status-bar T] [inventory F] [messages #()] [overmarks None]]
   (print
     :flush T :sep "" :end ""
     B.home B.clear
     (.join "\n" (map (fn [x] (bless-colorstr B x)) (draw-screen
-      B.width B.height focus status-bar messages overmarks)))))
+      B.width B.height focus status-bar inventory messages overmarks)))))
 
 
 (setv max-wrap-cols 75)

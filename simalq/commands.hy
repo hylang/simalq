@@ -4,7 +4,7 @@
 (import
   copy [deepcopy]
   simalq.color :as color
-  simalq.util [CommandError DamageType save-game-path msg player-shot-damage flash-map]
+  simalq.util [CommandError DamageType save-game-path msg player-shot-damage flash-map invlets]
   simalq.geometry [Direction GeometryError pos+ at]
   simalq.game-state [G save-game load-game]
   simalq.tile [mv-tile damage-tile destroy-tile]
@@ -36,6 +36,9 @@
 
 (defdataclass GonnaShoot [Command]
   "Prepare to take a direction key for shooting.")
+(defdataclass GonnaUseItem [Command]
+  "Show your inventory, and prepare to take a key indicating
+  the item to use.")
 (defdataclass Look [Command]
   "Move the cursor around the level.")
 (defdataclass ShiftHistory [Command]
@@ -68,6 +71,7 @@
   char v))
 
 (setv cmd-keys {
+  "a" GonnaUseItem
   "f" GonnaShoot
   ";" Look
   "e" [ShiftHistory  -1]  ; Undo
@@ -92,6 +96,21 @@
       (setv v (.get dir-keys (str (inkey))))
       (when (isinstance v Direction)
         (take-turn (Shoot v))))
+
+    GonnaUseItem (do
+      (setv item-ix None)
+      (io-mode
+        :draw (fn []
+          (print-main-screen G.player.pos :inventory T))
+        :on-input (fn [key]
+          (nonlocal item-ix)
+          (when (and
+              (in key invlets)
+              (< (.index invlets key) G.rules.max-usables))
+            (setv item-ix (.index invlets key)))
+          'done))
+      (when (is-not item-ix None)
+        (take-turn (UseItem item-ix))))
 
     Look (do
       (setv focus G.player.pos)

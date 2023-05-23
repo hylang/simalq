@@ -80,6 +80,10 @@
   (sleep flash-time-s))
 
 
+(setv invlets "asdfzxcvqwer")
+  ; Letters assigned to inventory slots, in order.
+
+
 (defn player-melee-damage []
   "Return how much damage the player does with her sword."
   G.rules.base-player-melee-damage)
