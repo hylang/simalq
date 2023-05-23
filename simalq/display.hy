@@ -3,6 +3,7 @@
   simalq.macros [defdataclass])
 (import
   math [ceil]
+  functools [reduce]
   textwrap
   hy.pyops *
   simalq.color :as color
@@ -48,6 +49,9 @@
       (fn [x] x))
     (fg (bg c.char)))))
 
+(defn colorstr-to-width [x w]
+  (cut (+ x (colorstr (* " " (max 0 (- w (len x)))))) w))
+
 
 (defn draw-screen [width height focus status-bar messages [overmarks None]]
   "Return a colorstr for the main screen."
@@ -56,7 +60,7 @@
   (when status-bar
     (+= out (lfor
       line (draw-status-bar)
-      (colorstr (cut (.ljust line width) width)))))
+      (colorstr-to-width line width))))
   (+= out (draw-map
     focus
     width
@@ -176,10 +180,15 @@
 (setv status-bar-lines 2)
 
 (defn draw-status-bar []
-  "Return each line of status bar, as a string."
+  "Return each line of status bar, as a colorstr."
 
   (defn j [#* xs]
-    (.join "  " (gfor  x xs  :if (is-not x None)  x)))
+    (reduce
+      (fn [a b] (+ a (colorstr "  ") b))
+      (gfor
+        x xs
+        :if (is-not x None)
+        (if (is (type x) str) (colorstr x) x))))
 
   #(
     (j
@@ -190,6 +199,9 @@
       None ; Reserved for time limits, like "Tm 1,000"
       (when G.player.keys
         (.format "⚷ {}" G.player.keys))
+      (+ #* (gfor
+        item G.player.inventory
+        (if item (color-tile item) (colorstr "  "))))
       None) ; Reserved for inventory items (2 characters apiece)
     (j
       (.format "DL {:,}"
