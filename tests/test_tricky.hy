@@ -41,7 +41,6 @@
   (assert (= G.level-n 1))
   ; The monster and the item are back now.
   (wk E 4)
-  (print G.player.hp G.player.keys)
   (assert (and (= G.player.hp 94) (= G.player.keys 2))))
 
 
