@@ -64,6 +64,8 @@
   (check "door"            F F)
   (check "exit"            T T)
   (check "wallfall trap"   T T)
+  (check "magical energy shield"
+                           T F)
   (check "pile of gold"    F F)
   (check "key"             F F))
     ; In IQ, keys (including magical keys) are unlike all other

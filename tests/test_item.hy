@@ -150,33 +150,26 @@
 (defn test-wand-shielding []
   (init (mk-quest [
     :map "
-      . o . .
-      ██. . .
-      $ @ . d"
+      . o .
+      ██. .
+      $ @ ."
     :map-marks {
       "$ " "pile of gold"}]))
   (add-usable "wand of shielding" 2)
 
   ; A wand of shielding creates a shield on each adjacent square (even
   ; if something else is there, unlike IQ). Monsters can't move onto
-  ; or shoot through the shields.
-  (assert (= G.player.hp 100))
+  ; the shields.
   (use-item 0)
-  (wait 5)
-  (assert (= G.player.hp 100))
   (assert-at 'W ["magical energy shield" "pile of gold"])
   (assert-at 'NW ["magical energy shield" "wall"])
   (assert-at 'N "magical energy shield")
   (assert-at 'NE "magical energy shield")
   (assert-at 'E "magical energy shield")
-  ; But Tris can shoot through them.
-  (assert-at (Pos G.map 1 2) "orc")
-  (shoot 'N)
-  (assert-at (Pos G.map 1 2) 'floor)
-  ; And Tris can walk through them. Since this puts her on top of the
+  ; But Tris can walk onto them. Since this puts her on top of the
   ; shield tiles rather than under them, they no longer protect her.
   (assert (= G.player.hp 100))
-  (wk E)
+  (wk N)
   (assert (= G.player.hp 97))
 
   ; Unlike IQ, creating new shields don't affect existing ones, which
@@ -187,19 +180,19 @@
     (setv new (if new ["magical energy shield"] []))
     (assert-at 'here ['player #* old])
     (assert-at 'NE [#* new])
-    (assert-at 'N [#* old #* new]))
+    (assert-at 'E [#* old #* new]))
   (use-item 1)
-  (check 9 T T)
+  (check 3 T T)
   ; Shields protect for 12 turns, so the first set (created on turn 0,
   ; and therefore providing its first turn of protection on turn 0)
   ; disappates at the end of turn 11, soon before `G.turn-i` becomes
   ; 12.
-  (wait 2)
+  (wait 8)
   (check 11 T T)
   (wait)
   (check 12 F T)
-  ; The second set disspiates just before turn 8 + 12 = 20.
-  (wait 7)
-  (check 19 F T)
+  ; The second set disspiates just before turn 2 + 12 = 14.
   (wait)
-  (check 20 F F))
+  (check 13 F T)
+  (wait)
+  (check 14 F F))
