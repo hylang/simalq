@@ -60,6 +60,7 @@
 
   (check 'floor            T T)
   (check "wall"            F F)
+  (check "Void"            F F)
   (check ["orc" :hp 2]     F F)
   (check "door"            F F)
   (check "exit"            T T)
