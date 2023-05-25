@@ -5,7 +5,7 @@
   copy [deepcopy]
   simalq.color :as color
   simalq.util [CommandError DamageType save-game-path msg player-shot-damage flash-map invlets]
-  simalq.geometry [Direction GeometryError pos+ at]
+  simalq.geometry [Direction GeometryError Pos pos+ at dist]
   simalq.game-state [G save-game load-game]
   simalq.tile [mv-tile damage-tile destroy-tile]
   simalq.tile.scenery [walkability])
@@ -31,7 +31,7 @@
   :frozen T)
 (defdataclass UseItem [Action]
   "Apply an item from your inventory."
-  [item-ix]
+  [item-ix target-x target-y]
   :frozen T)
 
 (defdataclass GonnaShoot [Command]
@@ -110,7 +110,7 @@
             (setv item-ix (.index invlets key)))
           'done))
       (when (is-not item-ix None)
-        (take-turn (UseItem item-ix))))
+        (take-turn (UseItem item-ix None None))))
 
     Look (do
       (setv focus G.player.pos)
@@ -257,6 +257,18 @@
       (setv item (get G.player.inventory action.item-ix))
       (unless item
         (raise (CommandError "That inventory slot is empty.")))
-      (.use item)
+      (setv target (when (is-not action.target-x None)
+        (Pos G.map action.target-x action.target-y)))
+      (if item.targeted
+        (do
+          (unless target
+            (raise (CommandError "That item requires a target.")))
+          (unless (<= (dist G.player.pos target) G.rules.reality-bubble-size)
+            (raise (CommandError "Item targets must lie inside the reality bubble.")))
+          (.use item target))
+        (do
+          (when target
+            (raise (CommandError "That item can't use a target.")))
+          (.use item)))
       (setv (get G.player.inventory action.item-ix) None)
       (destroy-tile item))))

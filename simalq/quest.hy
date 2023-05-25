@@ -13,7 +13,7 @@
   [title starting-hp levels]
   :frozen T)
 
-(defn start-quest [quest [show-title T]]
+(defn start-quest [quest [show-title T] [rules None]]
   (when show-title
     (hy.M.simalq/main.text-screen quest.title))
   (setv
@@ -23,6 +23,9 @@
     state (GameState))
   (for [thing [G.rules state] [k v] (.items thing.slot-defaults)]
     (setattr thing k (deepcopy v)))
+  (when rules
+    (for [[k v] (.items rules)]
+      (setattr G.rules k v)))
   (setv
     state.player (Player :pos None)
     state.player.hp quest.starting-hp

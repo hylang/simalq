@@ -22,10 +22,12 @@
     (hy.mangle k.name) v))
 
 
-(defn init [quest [level-n 1]]
-  (start-quest (if (isinstance quest str)
-    (read-quest (iq-quest quest))
-    quest))
+(defn init [quest [level-n 1] #** rules]
+  (start-quest
+    :quest (if (isinstance quest str)
+      (read-quest (iq-quest quest))
+      quest)
+    :rules rules)
   (start-level level-n))
 
 (defn mk-quest [
@@ -173,5 +175,5 @@
   (do-n n-times
     (take-turn (Shoot (getattr Direction (str direction-abbr))))))
 
-(defn use-item [item-ix]
-  (take-turn (UseItem item-ix)))
+(defn use-item [item-ix [target-x None] [target-y None]]
+  (take-turn (UseItem item-ix target-x target-y)))

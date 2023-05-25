@@ -196,3 +196,20 @@
   (check 13 F T)
   (wait)
   (check 14 F F))
+
+
+(defn test-wand-wall-making []
+  (init :max-usables 4 :quest (mk-quest
+    [:tiles ["orc" "wall"]]))
+  (add-usable "wall-making wand" 4)
+
+  ; Unlike IQ, walls can be added regardless of what's already on the
+  ; target square.
+  (use-item 0  0 0)
+  (assert-at (Pos G.map 0 0) ["wall" 'player])
+  (use-item 1  1 0)
+  (assert-at (Pos G.map 1 0) ["wall" "orc"])
+  (use-item 2  2 0)
+  (assert-at (Pos G.map 2 0) ["wall" "wall"])
+  (use-item 3  3 0)
+  (assert-at (Pos G.map 3 0) "wall"))

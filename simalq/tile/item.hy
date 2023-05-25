@@ -200,7 +200,10 @@
 
   (setv
     __slots__ []
-    destroy-on-pickup F)
+    destroy-on-pickup F
+    targeted T)
+      ; Whether the item should be used with a target. The argument
+      ; `target` is provided to `use` only if this is true.
 
   (defn hook-player-walk-to [self origin]
     (unless (any (gfor  x G.player.inventory  (is x None)))
@@ -217,13 +220,15 @@
         ix)))
       self))
 
-  (defn use [self]
+  (defn use [self target]
     "Called when the player applies the item for use. The caller
-    will destroy the item afterwards.")
+    will destroy the item afterwards."
+    (raise NotImplementedError))
 
   (defn info-bullets [self #* extra]
     (.info-bullets (super)
-      #("Effect when applied" self.use.__doc__)
+      #(f"Effect when applied ({(if self.targeted "" "un")}targeted)"
+        self.use.__doc__)
       #* extra)))
 
 
@@ -232,6 +237,7 @@
   :iq-ix 200
   :points 100
 
+  :targeted F
   :use (fn [self]
     "Creates a magical energy shield in each square adjacent to you. These shield tiles block monsters and their shots, but not you or your shots."
     (for [p (burst G.player.pos 1)  :if (!= p G.player.pos)]
@@ -244,7 +250,11 @@
   :iq-ix 33
   :points 150
 
-  :flavor "STUB")
+  :use (fn [self target]
+    "Creates one tile of ordinary wall."
+    (add-tile target "wall"))
+
+  :flavor "This device is detested by the stonemason's union, but valued by homeowners and combat engineers, not to mention tyrants who desire vast dungeons.")
 
 (deftile Usable "0 " "a standard bomb"
   :color 'red
