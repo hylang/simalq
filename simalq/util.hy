@@ -94,14 +94,17 @@
 
 
 (defclass DamageType [Enum] (setv
+  ; These only apply to damage against monsters
   PlayerMelee   "sword attacks"
-  MonsterMelee  "monsters' melee attacks"
   MundaneArrow  "mundane arrows"
   MagicArrow    "magic arrows"
-  MonsterShot   "monsters' shots"
-  Poison        "poison"
-  Trap          "traps"
   Fire          "fire"
+  ; These only apply to damage against the player
+  MonsterMelee  "monsters' melee attacks"
+  MonsterShot   "monsters' shots"
+  Trap          "traps"
+  ; These are equal-opportunity
+  Poison        "poison"
   DeathMagic    "death magic"))
 
 
