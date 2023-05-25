@@ -4,7 +4,7 @@
 (import
   collections [Counter]
   fractions [Fraction :as f/]
-  tests.lib [init mk-quest locate assert-at wait set-square shoot mv-player]
+  tests.lib [init mk-quest locate assert-at wait set-square shoot mv-player add-usable use-item]
   simalq.geometry [Direction Pos ray at]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -461,7 +461,7 @@
 
 (defn test-thorn-tree []
   (init (mk-quest
-    [:tiles ['floor ["thorn tree" :hp 3]]]))
+    [:tiles ['floor ["thorn tree" :hp 3] ["thorn tree" :hp 10]]]))
 
   ; Thorn trees are immobile.
   (assert-at (Pos G.map 2 0) "thorn tree")
@@ -478,7 +478,15 @@
   ; They're damaged normally by Tris's sword.
   (assert (= (. (at (Pos G.map 2 0)) [0] hp) 3))
   (wk E)
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1)))
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1))
+  ; They're weak against fire: if they take 1 or more fire damage,
+  ; they die instantly.
+  (assert-at (Pos G.map 2 0) "thorn tree")
+  (assert-at (Pos G.map 3 0) "thorn tree")
+  (add-usable "standard bomb")
+  (use-item 0  2 0)
+  (assert-at (Pos G.map 2 0) 'floor)
+  (assert-at (Pos G.map 3 0) 'floor))
 
 
 (defn test-tricorn []

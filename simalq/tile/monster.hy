@@ -65,6 +65,8 @@
       (if self.immune
         #("Immune to" (.join ", " (gfor  x self.immune  x.value)))
         "No immunities")
+      (when self.weaknesses
+        #("Instantly destroyed by" (.join ", " (gfor  x self.weaknesses  x.value))))
       (if self.damage-melee
         #("Melee damage" (damage-array self.damage-melee))
         "No melee attack")
@@ -411,10 +413,11 @@
   :immune #(DamageType.MundaneArrow DamageType.MagicArrow DamageType.Poison)
     ; We follow IQ in making thorn trees immune to poison, although
     ; the IQ manual suggests otherwise.
+  :weaknesses #(DamageType.Fire)
   :damage-melee 4
   :act stationary
 
-  :flavor "From a distance, you can safely giggle at the ghostly. Up close, this arboreal abomination will rake you with its twisted, spiny boughs. Arrows snag in its branches and glance off its gnarled bark, so an intimate encounter may be unavoidable.")
+  :flavor "From a distance, you can safely giggle at the ghostly. Up close, this arboreal abomination will rake you with its twisted, spiny boughs. Arrows snag in its branches and glance off its gnarled bark, so an intimate encounter may be unavoidable. On the other hand, it's rather flammable. Remember, only you can start forest fires.")
 
 (deftile NonGen "K " "a Dark Knight"
   :iq-ix 53

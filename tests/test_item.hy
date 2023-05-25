@@ -2,7 +2,7 @@
   hyrule [do-n ecase]
   tests.lib [cant wk])
 (import
-  tests.lib [init mk-quest assert-at set-square mv-player shoot wait use-item mk-tile]
+  tests.lib [init mk-quest assert-at set-square mv-player shoot wait use-item mk-tile add-usable]
   simalq.geometry [Pos Direction pos+ at]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -140,11 +140,6 @@
   (cant (wk E) "Your inventory is full.")
   (assert-at 'E "standard bomb")
   (assert-at 'W 'floor))
-
-
-(defn add-usable [stem [n 1]]
-  (do-n n
-    (.pick-up (mk-tile None stem))))
 
 
 (defn test-wand-shielding []

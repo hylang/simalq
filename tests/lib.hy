@@ -177,3 +177,7 @@
 
 (defn use-item [item-ix [target-x None] [target-y None]]
   (take-turn (UseItem item-ix target-x target-y)))
+
+(defn add-usable [stem [n 1]]
+  (do-n n
+    (.pick-up (mk-tile None stem))))
