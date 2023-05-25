@@ -1,6 +1,7 @@
 "Utility functions and other frequently imported components."
 
 (require
+  hyrule [unless]
   simalq.macros [pop-integer-part])
 (import
   time [sleep]
@@ -113,6 +114,9 @@
 (defn hurt-player [amount damage-type [animate T] [attacker None]]
   (import simalq.geometry [ray dir-to dist])
 
+  (unless amount
+    (return))
+
   (when animate
     (flash-map
       G.player.pos
@@ -131,15 +135,18 @@
 
 
 (defn burst-damage [
-    center size color amount damage-type [player-amount 0]]
-  "Damage every tile in the specified burst. Notice that `amount`
-  damage is only done to non-player tiles. The player gets the
-  separate value `player-amount`."
+    center color amount damage-type [player-amount 0]]
+  "Damage every tile in a burst. `amount` should be a list like `[3 2
+  1]`, which means that 3 damage is dealt at the center, 2 damage is
+  dealt at distance 1 from the center, and so on. But note that this
+  damage is only dealt to non-player tiles. The player gets the
+  separate number `player-amount`, regardless of distance."
+
   (import
-    simalq.geometry [burst at]
+    simalq.geometry [burst at dist]
     simalq.tile [damage-tile])
 
-  (setv b (tuple (burst center size)))
+  (setv b (tuple (burst center (- (len amount) 1))))
   (flash-map
     G.player.pos
     color
@@ -150,4 +157,7 @@
   (for [p b  tile (at p)  :if tile.damageable]
     (if (is tile G.player)
       (hurt-player player-amount damage-type)
-      (damage-tile tile amount damage-type))))
+      (damage-tile
+        tile
+        (get amount (dist center p))
+        damage-type))))

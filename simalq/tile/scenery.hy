@@ -309,7 +309,7 @@
 
 
 (deftile Scenery "()" "a magical energy shield"
-  :color 'orange
+  :color 'dark-orange
   :slot-defaults (dict
     :time-remaining 12)
   :mutable-slots #("time_remaining")

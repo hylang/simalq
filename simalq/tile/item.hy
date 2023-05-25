@@ -30,11 +30,11 @@
       #("Pickup effect" (or
         self.pick-up.__doc__
         (self.pick-up.dynadoc self))))
+    #*extra
     (when self.hook-player-shot
       #("Effect when you shoot it" (or
         self.hook-player-shot.__doc__
-        (self.hook-player-shot.dynadoc self))))
-     #*extra]))
+        (self.hook-player-shot.dynadoc self))))]))
 
 
 (deftile Item "$ " "a pile of gold"
@@ -164,8 +164,9 @@
   :hook-player-shot (fn-dd [self]
     (doc #[f[Explodes in a size-{(get poison-burst "size")} burst of poison, which does {(get poison-burst "dmg_monster")} poison damage to monsters and {(get poison-burst "dmg_player")} to you.]f])
     (burst-damage self.pos :damage-type DamageType.Poison
-      :size (get poison-burst "size")
-      :amount (get poison-burst "dmg_monster")
+      :amount (*
+        [(get poison-burst "dmg_monster")]
+        (+ 1 (get poison-burst "size")))
       :color 'moss-green
       :player-amount (get poison-burst "dmg_player"))
     (destroy-tile self))
@@ -227,8 +228,9 @@
 
   (defn info-bullets [self #* extra]
     (.info-bullets (super)
-      #(f"Effect when applied ({(if self.targeted "" "un")}targeted)"
-        self.use.__doc__)
+      #(f"Effect when applied ({(if self.targeted "" "un")}targeted)" (or
+        self.use.__doc__
+        (self.use.dynadoc self)))
       #* extra)))
 
 
@@ -256,9 +258,53 @@
 
   :flavor "This device is detested by the stonemason's union, but valued by homeowners and combat engineers, not to mention tyrants who desire vast dungeons.")
 
-(deftile Usable "0 " "a standard bomb"
-  :color 'red
-  :iq-ix 31
+
+(defclass FireBomb [Usable]
+  (setv
+    __slots__ []
+    use-blast-damage None
+    shot-blast-damage None)
+
+  (defn bomb-burst [self target amount]
+    (burst-damage target :damage-type DamageType.Fire
+      :amount amount
+      :color 'orange))
+
+  (defn-dd use [self target]
+    (doc f"Explodes in a size-{(- (len it.use-blast-damage) 1)} burst of fire, damaging monsters according to their distance from the center. The amounts of damage at the center and each successive distance are: {(.join ", " (map str it.use-blast-damage))}. You take no damage.")
+    (.bomb-burst self target self.use-blast-damage))
+
+  (defn-dd hook-player-shot [self]
+    (doc f"Explodes in a weaker size-{(- (len it.shot-blast-damage) 1)} burst, with these damages: {(.join ", " (map str it.shot-blast-damage))}.")
+    (.bomb-burst self self.pos self.shot-blast-damage)
+    (destroy-tile self)))
+
+(deftile FireBomb "0 " "a standard bomb"
+  :color 'dark-green
+  :iq-ix 31  ; Just called a "bomb" in IQ
   :points 100
 
-  :flavor "STUB")
+  :use-blast-damage #(3 2 1)
+  :shot-blast-damage #(2 1)
+
+  :flavor "Medieval-esque swordsmen tossing the occasional explosive has been a tradition since 1986. But you shouldn't expect to find a lot of these, so make 'em count.")
+
+(deftile FireBomb "0 " "a strong bomb"
+  :color 'blue
+  :iq-ix 84
+  :points 150
+
+  :use-blast-damage #(3 3 2 1)
+  :shot-blast-damage #(3 2 1)
+
+  :flavor "A bigger bomb for the discerning bomber.")
+
+(deftile FireBomb "0 " "a super-bomb"
+  :color 'red
+  :iq-ix 85
+  :points 200
+
+  :use-blast-damage #(3 3 2 2 1 1)
+  :shot-blast-damage #(3 3 2 1)
+
+  :flavor "Heavy ordnance. Kills monsters dead, with a bomb pattern that would put a feather in Colonel Cathcart's cap.\n\n    \"Kaboom?\"\n    \"Yes, Rico. Kaboom.\"")

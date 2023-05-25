@@ -1,5 +1,5 @@
 (require
-  hyrule [do-n]
+  hyrule [do-n ecase]
   tests.lib [cant wk])
 (import
   tests.lib [init mk-quest assert-at set-square mv-player shoot wait use-item mk-tile]
@@ -213,3 +213,34 @@
   (assert-at (Pos G.map 2 0) ["wall" "wall"])
   (use-item 3  3 0)
   (assert-at (Pos G.map 3 0) "wall"))
+
+
+(defn test-fire-bomb []
+  "Put some orcs in a line and check how much damage is done to each."
+
+  (defn check [item-stem usage #* damages]
+    (setv starting-orc-hp 10)
+    (init (mk-quest [
+      :height 1
+      :tiles (lfor  _ damages  ["orc" :hp starting-orc-hp])]))
+    (ecase usage
+      'use (do
+        ; Actually use the bomb.
+        (add-usable item-stem)
+        (use-item 0 1 0))
+      'shoot (do
+        ; Shoot the bomb while it's on the floor. This creates a
+        ; less impressive explosion.
+        (mk-tile (Pos G.map 1 0) item-stem)
+        (shoot 'E)))
+     (for [[i dmg] (enumerate damages)]
+       (assert (=
+         (. (at (Pos G.map (+ i 1) 0)) [0] hp)
+         (- starting-orc-hp dmg)))))
+
+  (check  "standard bomb" 'shoot  2 1 0 0 0 0 0)
+  (check  "standard bomb" 'use    3 2 1 0 0 0 0)
+  (check  "strong bomb"   'shoot  3 2 1 0 0 0 0)
+  (check  "strong bomb"   'use    3 3 2 1 0 0 0)
+  (check  "super-bomb"    'shoot  3 3 2 1 0 0 0)
+  (check  "super-bomb"    'use    3 3 2 2 1 1 0))
