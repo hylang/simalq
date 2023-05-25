@@ -88,6 +88,33 @@
   (import
     simalq.main [io-mode print-main-screen info-screen inkey take-turn])
 
+  (defn targeting-mode [target-callback]
+    "Allow the user to select a target square with the direction keys.
+    `target-callback` is called on the targeted `Pos` when the user
+    presses a selection key. It should return true if targeting mode
+    should then end.
+
+    Return a selected `Pos` or `None`."
+    (setv focus G.player.pos)
+    (io-mode
+      :draw (fn []
+        (print-main-screen focus :status-bar F))
+      :on-input (fn [key]
+        (nonlocal focus)
+        (setv dir-v (.get dir-keys (str key)))
+        (cond
+          (and dir-v (!= dir-v 'center))
+            (try
+              (setv focus (pos+ focus dir-v))
+              (except [GeometryError]))
+          (or (= dir-v 'center) (= (str key) ";"))
+            (when (target-callback focus)
+              'done)
+          True (do
+            (setv focus None)
+            'done))))
+    focus)
+
   (ecase (type cmd)
 
     GonnaShoot (do
@@ -110,26 +137,20 @@
             (setv item-ix (.index invlets key)))
           'done))
       (when (is-not item-ix None)
-        (take-turn (UseItem item-ix None None))))
+        (if (and
+            (setx item (get G.player.inventory item-ix))
+            item.targeted)
+          (do
+            (setv target (targeting-mode (fn [target] T)))
+            (when target
+              (take-turn (UseItem item-ix target.x target.y))))
+          (take-turn (UseItem item-ix None None)))))
 
-    Look (do
-      (setv focus G.player.pos)
-      (io-mode
-        :draw (fn []
-          (print-main-screen focus :status-bar F))
-        :on-input (fn [key]
-          (setv dir-v (.get dir-keys (str key)))
-          (cond
-            (and dir-v (!= dir-v 'center))
-              (try
-                (nonlocal focus)
-                (setv focus (pos+ focus dir-v))
-                (except [GeometryError]))
-            (or (= dir-v 'center) (= (str key) ";"))
-              (when (at focus)
-                (info-screen (get (at focus) 0)))
-            True
-              'done))))
+    Look
+      (targeting-mode (fn [target]
+        (when (at target)
+          (info-screen (get (at target) 0)))
+        F))
 
     ShiftHistory (do
       (when (and (< cmd.steps 0) (= G.state-i 0))
