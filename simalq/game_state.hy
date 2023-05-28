@@ -3,7 +3,8 @@
 (import
   pathlib [Path]
   pickle
-  zlib)
+  zlib
+  fractions [Fraction :as f/])
 (eval-and-compile (setv  T True  F False))
 
 
@@ -109,6 +110,8 @@
         ; How much damage the player does with her bow normally.
       player-shot-damage-artifact 2
         ; How much with the relevant artifact.
+      artifact-shield-factor (f/ 3 4)
+        ; How much the artifact shield multiplies incoming damage by.
       dainty-monsters T))
         ; Whether monsters will only step on empty floor (with some
         ; exceptions, like spiders walking on webs). Otherwise,

@@ -322,6 +322,14 @@
     (doc (.help it))
     (setv (get G.player.artifacts self.stem) T)))
 
+(deftile Artifact "[ " "the Magic Shield"
+  :iq-ix 28
+  :points 3,000
+
+  :help (fn [self]
+    f"Permanently reduces all damage from monsters' attacks to {G.rules.artifact-shield-factor} the normal value, rounded up. Damage from other sources is unaffected.")
+  :flavor "The best defense is a good defense.")
+
 (deftile Artifact "( " "the Elven Bow"
   :iq-ix 29
   :points 4,000

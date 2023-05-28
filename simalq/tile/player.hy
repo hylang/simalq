@@ -24,6 +24,7 @@
       ; Single-use (`Usable`) items being carried.
     :artifacts {
       ; Boolean flags indicating which artifacts have been obtained.
+        "Magic Shield" F
         "Elven Bow" F
         "Holy Sword" F})
   :mutable-slots #("hp" "poison_dose" "just_exited" "keys")

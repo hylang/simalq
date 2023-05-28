@@ -121,6 +121,12 @@
   (unless amount
     (return))
 
+  (when (and
+      (get G.player.artifacts "Magic Shield")
+      (in damage-type #(DamageType.MonsterMelee DamageType.MonsterShot)))
+    (setv amount (int (.__ceil__
+      (* G.rules.artifact-shield-factor amount)))))
+
   (when animate
     (flash-map
       G.player.pos
