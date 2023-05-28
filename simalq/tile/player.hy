@@ -20,10 +20,15 @@
       ; Did you just use an exit?
     :keys 0
       ; How many (regular, and not yet used) keys you're carrying.
-    :inventory [])
+    :inventory []
       ; Single-use (`Usable`) items being carried.
+    :artifacts {
+      ; Boolean flags indicating which artifacts have been obtained.
+        "Elven Bow" F
+        "Holy Sword" F})
   :mutable-slots #("hp" "poison_dose" "just_exited" "keys")
-    ; `inventory` should be mutated directly rather than assigned to.
+    ; `inventory` and `artifacts` should be mutated directly rather
+    ; reassigned.
 
   :damageable T
   :hook-destroyed (fn [self pos]

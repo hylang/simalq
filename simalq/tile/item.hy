@@ -25,7 +25,7 @@
   (defn pick-up [self])
 
   (defn info-bullets [self #* extra] [
-    #("Point value" self.points)
+    #("Point value" (format self.points ","))
     (when (is-not (. (type self) pick-up) Item.pick-up)
       #("Pickup effect" (or
         self.pick-up.__doc__
@@ -308,3 +308,32 @@
   :shot-blast-damage #(3 3 2 1)
 
   :flavor "Heavy ordnance. Kills monsters dead, with a bomb pattern that would put a feather in Colonel Cathcart's cap.\n\n    \"Kaboom?\"\n    \"Yes, Rico. Kaboom.\"")
+
+
+(defclass Artifact [Item]
+  (setv
+    __slots__ []
+    color-bg 'magenta)
+
+  (defn help [self]
+    None)
+
+  (defn-dd pick-up [self]
+    (doc (.help it))
+    (setv (get G.player.artifacts self.stem) T)))
+
+(deftile Artifact "( " "the Elven Bow"
+  :iq-ix 29
+  :points 4,000
+
+  :help (fn [self]
+    f"Permanently increases your shot damage (with mundane arrows) to {G.rules.player-shot-damage-artifact}.")
+  :flavor "A mighty weapon carved from sacred wood in the realm of maple syrup and free healthcare.")
+
+(deftile Artifact ") " "the Holy Sword"
+  :iq-ix 30
+  :points 5,000
+
+  :help (fn [self]
+    f"Permanently increases your melee damage to {G.rules.player-melee-damage-artifact}.")
+  :flavor "A weapon blessed by the vaguely defined divine personages that may or may not watch over you. What it lacks in lore, in makes up for in murderyness.\n\n    I came not to send peace, but a sword.")

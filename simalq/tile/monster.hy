@@ -78,7 +78,7 @@
       (when self.kamikaze
         #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
       #* extra
-      #("Point value" (.format "{}{}"
+      #("Point value" (.format "{:,}{}"
         self.points
         (if self.score-for-damaging " (scored per HP lost)" "")))
       #("Behavior" (or

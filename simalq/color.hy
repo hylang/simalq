@@ -20,6 +20,7 @@
       'navy [0 0 (/ 1 2)]
       'rose [1 0 (/ 1 2)]
       'pale-magenta [1 (/ 7 8) 1]
+      'magenta [1 (/ 1 4) 1]
       'purple [(/ 1 2) 0 (/ 1 2)]
       'blue [0 0 1]
       'steel-blue [(/ 1 4) (/ 1 2) (/ 3 4)]

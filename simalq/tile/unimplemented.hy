@@ -17,8 +17,6 @@
     [26 "amulet_of_invulnerability"]
     [27 "magic_arrows"]
     [28 "magic_shield"]
-    [29 "elven_bow"]
-    [30 "holy_sword"]
     [32 "passwall_wand"]
     [34 "potion_of_speed"]
     [35 "damage_causing_trap"]

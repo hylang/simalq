@@ -239,3 +239,21 @@
   (check  "strong bomb"   'use    3 3 2 1 0 0 0)
   (check  "super-bomb"    'shoot  3 3 2 1 0 0 0)
   (check  "super-bomb"    'use    3 3 2 2 1 1 0))
+
+
+(defn test-artifact-weapon []
+
+  ; The sword artifact increases melee damage to 3. Multiple copies
+  ; don't stack.
+  (init (mk-quest [
+    :height 1
+    :tiles ["Holy Sword" "Holy Sword" ["orc" :hp 4]]]))
+  (wk E 3)
+  (assert (= (. (at (Pos G.map 3 0)) [0] hp) 1))
+
+  ; The bow artifact is similar, but increases ranged damage to 2.
+  (init (mk-quest
+    [:tiles ["Elven Bow" ["orc" :hp 4]]]))
+  (wk E)
+  (shoot 'E)
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 2)))

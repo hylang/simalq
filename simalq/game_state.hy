@@ -101,10 +101,14 @@
         ; How many keys the player can carry at once.
       max-usables 3
         ; How many inventory slots the player has for wands etc.
-      base-player-melee-damage 2
+      player-melee-damage-base 2
         ; How much damage the player does with her sword normally.
-      base-player-shot-damage 1
+      player-melee-damage-artifact 3
+        ; How much with the relevant artifact.
+      player-shot-damage-base 1
         ; How much damage the player does with her bow normally.
+      player-shot-damage-artifact 2
+        ; How much with the relevant artifact.
       dainty-monsters T))
         ; Whether monsters will only step on empty floor (with some
         ; exceptions, like spiders walking on webs). Otherwise,

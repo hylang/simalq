@@ -87,11 +87,15 @@
 
 (defn player-melee-damage []
   "Return how much damage the player does with her sword."
-  G.rules.base-player-melee-damage)
+  (if (get G.player.artifacts "Holy Sword")
+    G.rules.player-melee-damage-artifact
+    G.rules.player-melee-damage-base))
 
 (defn player-shot-damage []
   "Return how much damage the player does with her bow."
-  G.rules.base-player-shot-damage)
+  (if (get G.player.artifacts "Elven Bow")
+    G.rules.player-shot-damage-artifact
+    G.rules.player-shot-damage-base))
 
 
 (defclass DamageType [Enum] (setv
