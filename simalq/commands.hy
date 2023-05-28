@@ -256,6 +256,7 @@
           ; player stops there, rather than looping.
           (animate)
           (return))
+        (setv blocked F)
         (for [tile (at target)]
           (cond
             tile.hook-player-shot (do
@@ -268,10 +269,13 @@
               (animate)
               (damage-tile tile (player-shot-damage) DamageType.MundaneArrow)
               (return))
-            tile.blocks-player-shots (do
-              ; The arrow stops without doing anything more.
-              (animate)
-              (return)))))
+            tile.blocks-player-shots
+              ; The arrow won't be able to leave this square, although
+              ; it can affect other tiles in the square.
+              (setv blocked T)))
+        (when blocked
+          (animate)
+          (return)))
       (animate))
 
     UseItem (do

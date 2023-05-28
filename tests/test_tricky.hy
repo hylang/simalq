@@ -4,7 +4,7 @@
 (require
   tests.lib [wk])
 (import
-  tests.lib [init mk-quest assert-at shoot]
+  tests.lib [init mk-quest assert-at shoot mk-tile]
   simalq.game-state [G]
   simalq.geometry [Pos at])
 (setv  T True  F False)
@@ -72,3 +72,29 @@
     ; pickups in that the player can shoot through them. The
     ; motivation for this exception is mysterious to me, so I decided
     ; to omit it.
+
+
+(defn test-attackability-stacks []
+  "Monsters and the player can attack either other, by melee or by
+  shots, even when sharing a map stack with a wall tile. Although
+  obstacles like wall tiles can block shots from entering another
+  square (as tested elsewhere), they don't protect other tiles at the
+  same `Pos`. The motivation here is to prevent the player from
+  getting asymmetrical shot-blocking by just using a wall-making wand
+  on her own position."
+
+  (defn mon-p []
+    (Pos G.map (if ranged 2 1) 0))
+
+  (for [wall-on-top [F T]  ranged [F T]]
+    (init (mk-quest []))
+    (mk-tile (mon-p) ["devil" :hp 3])
+    (for [p [G.player.pos (mon-p)]]
+      (mk-tile p "wall")
+      (when (not wall-on-top)
+        (setv (cut (at p)) (reversed (at p)))))
+    (if ranged
+      (shoot 'E)
+      (wk E))
+    (assert (= (. (at (mon-p)) [wall-on-top] hp) (- 3 (if ranged 1 2))))
+    (assert (= G.player.hp (- 100 (if ranged 10 3))))))

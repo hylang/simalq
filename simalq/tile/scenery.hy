@@ -157,7 +157,7 @@
   ; allows one character of the contained item to be visible.
   :color 'steel-blue
   :result-when-opened None
-  :flavor "This locked strongbox is too tough to smash apart, but its boards are so warped that you can peek at what's inside before you decide to spend a key on it.\n\n    We'll dig up the box.\n    We know it's full of precious booty.\n    Burst open the locks.\n    And then we'll say \"Hooray!\"")
+  :flavor "This locked strongbox is too tough to smash apart, but its boards are so warped that you can peek (or even shoot) at what's inside before you decide to spend a key on it.\n\n    We'll dig up the box.\n    We know it's full of precious booty.\n    Burst open the locks.\n    And then we'll say \"Hooray!\"")
 (setv (get Tile.types-by-iq-ix 16) (fn [pos te-v1 te-v2]
   ; We represent an IQ treasure chest as two tiles: the treasure chest
   ; on top of the item contained within.

@@ -1,5 +1,5 @@
 (require
-  hyrule [unless do-n block]
+  hyrule [unless do-n]
   simalq.macros [defdataclass slot-defaults pop-integer-part fn-dd])
 (import
   re
@@ -116,16 +116,17 @@
 
   ; Otherwise, try a ranged attack.
   (when (and (not attack) mon.damage-shot)
-    (block (for [
-        target (ray :pos p :direction d :length
-          (min (or mon.shot-range Inf) G.rules.reality-bubble-size))
-        tile (at target)]
-      (when (is tile G.player)
+    (for [target (ray :pos p :direction d :length
+        (min (or mon.shot-range Inf) G.rules.reality-bubble-size))]
+      (when (= target G.player.pos)
         (setv attack 'shot)
-        (block-ret))
-      (when (or tile.superblock
-          (and tile.blocks-monster-shots (not shots-ignore-obstacles)))
-        (block-ret)))))
+        (break))
+      (when (any (gfor
+          tile (at target)
+          (or tile.superblock (and
+            tile.blocks-monster-shots
+            (not shots-ignore-obstacles)))))
+        (break))))
 
   ; If we can't attack, bail out.
   (unless attack

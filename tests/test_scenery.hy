@@ -111,16 +111,11 @@
   (assert (= G.score 0))
   (wk E)
   (assert (= G.score 100))
-  ; Fire an arrow. The meal isn't destroyed because the chest blocks
-  ; the shot.
-  (shoot 'E)
+  ; Fire an arrow. Contra IQ, chests don't protect their contents
+  ; from arrows.
   (assert-at 'E ["treasure chest" "meal"])
-  ; Open the chest.
-  (wk E)
-  ; And take the meal.
-  (assert (= G.player.hp 100))
-  (wk E)
-  (assert (= G.player.hp 200)))
+  (shoot 'E)
+  (assert-at 'E "treasure chest"))
 
 
 (defn test-exit []
