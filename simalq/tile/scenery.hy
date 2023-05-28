@@ -114,6 +114,11 @@
   :blocks-move T
   :flavor "A structure of vaguely Roman style.")
 
+(deftile Scenery "╷ " "a broken pillar"
+  :iq-ix 82
+  :blocks-move T :blocks-player-shots F
+  :flavor "It's just a chest-high half of a pillar now. Good thing it wasn't load-bearing, huh? It makes for good cover against enemy shots.")
+
 (deftile Scenery "++" "a door"
   :color 'brown
   :iq-ix 5
