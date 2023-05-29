@@ -207,8 +207,7 @@
         (.format "⚷ {}" G.player.keys))
       (+ #* (gfor
         item G.player.inventory
-        (if item (color-tile item) (colorstr "  "))))
-      None) ; Reserved for inventory items (2 characters apiece)
+        (if item (color-tile item) (colorstr "  ")))))
     (j
       (.format "DL {:,}"
         G.level-n)
