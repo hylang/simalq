@@ -164,7 +164,7 @@
     (* G.map.width pos.y)))
 
 
-(defn burst [center size]
+(defn burst [center size [exclude-center False]]
   "Return a generator of all distinct points within distance `size` of
   `center`. Thus the points form a square that's `2 * size + 1`
   squares wide. The order in which they're generated spirals outwards
@@ -179,7 +179,9 @@
   This follows `SpiralX` and `SpiralY` in IQ (but upside-down). An
   important property of it is that activating monsters in this order
   allows monsters closer to the player to move first, so a line of
-  monsters can march toward the player without creating gaps."
+  monsters can march toward the player without creating gaps.
+
+  If `exclude-center` is true, the center position isn't returned."
 
   (unique (gfor
     c (seq 0 (min size (max center.map.width center.map.height)))
@@ -191,7 +193,7 @@
     :setv p (try
       (Pos center.map (+ center.x x) (+ center.y y))
       (except [GeometryError]))
-    :if p
+    :if (and p (not (and exclude-center (= p center))))
     p)))
 
 
