@@ -189,9 +189,7 @@
   (defn t [] (Pos G.map 5 5))
 
   (mk-tile (Pos G.map 1 0) ["gate" :target (t)])
-  (mk-tile (t) "exit")
-  (mk-tile (t) "pile of gold")
-  (mk-tile (t) "orc")
+  (set-square (t) "orc" "pile of gold" "exit")
   (assert (and (= G.turn-n 0) (= G.player.pos (Pos G.map 0 0))))
   ; Walking into the gate warps us to the target square, but
   ; preserves what's there, and doesn't trigger any tile effects
