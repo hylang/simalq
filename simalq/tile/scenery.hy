@@ -4,7 +4,7 @@
 (import
   simalq.color :as color
   simalq.util [CommandError GameOverException player-melee-damage DamageType next-in-cycle]
-  simalq.geometry [Pos Direction pos+ at burst dist]
+  simalq.geometry [Pos Direction pos+ at burst dist dir-to]
   simalq.tile [Tile deftile replace-tile damage-tile mv-tile destroy-tile]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -23,11 +23,14 @@
       ; Block monster movement, even if `blocks-move` is false.
 
   (defn dod [self prefix attr-sym]
-    (setv a (hy.mangle attr-sym))
-    (when (is-not (getattr (type self) a) (getattr Tile a))
-      #(prefix (or
-        (. (getattr self a) __doc__)
-        ((. (getattr self a) dynadoc) self)))))
+    (setv m (getattr (type self) (hy.mangle attr-sym)))
+    (setv r None)
+    (when (is-not m (getattr Tile (hy.mangle attr-sym)))
+      (setv r (if (hasattr m "dynadoc")
+        (.dynadoc m self)
+        m.__doc__)))
+    (when r
+      #(prefix r)))
 
   (defn info-bullets [self #* extra]
     (setv blocks-monster (or self.blocks-monster self.blocks-move))
@@ -238,6 +241,25 @@
     True)
 
   :flavor "I think this dungeon might not be up to code.")
+
+
+(deftile Scenery "■ " "a pushblock"
+  :iq-ix 22
+    ; Called a "moveable wall" in IQ. I think "wall" is misleading
+    ; because it's not a diagonal blocker.
+
+  :hook-player-walk-to (fn [self origin]
+    (setv target (pos+ self.pos (dir-to origin self.pos)))
+    (when (or (not target) (at target))
+      (raise (CommandError "There's no room to push the block there."))))
+
+  :hook-player-walked-into (fn [self]
+    "You push the block in the same direction that you entered the square. The destination square must be empty, or else you won't be able to step on the original square."
+    (setv target (pos+ self.pos G.action.direction))
+    (mv-tile self target)
+    F)
+
+  :flavor "Where do video games get all their crates from? There must be entire warehouses full of 'em, am I right?")
 
 
 (deftile Scenery "{}" "a gate"

@@ -184,6 +184,21 @@
   (assert (= G.player.pos (Pos G.map 0 0))))
 
 
+(defn test-pushblock []
+  (init (mk-quest
+    [:tiles ["pushblock" "pile of gold"]]))
+
+  ; Anything in the target square will block a pushblock.
+  (cant (wk E) "There's no room to push the block there.")
+  ; Walk around to the east side of the block and push it back to
+  ; our starting position.
+  (wk NE)
+  (wk SE)
+  (wk W)
+  (assert-at (Pos G.map 0 0) "pushblock")
+  (assert-at (Pos G.map 1 0) 'player))
+
+
 (defn test-gate []
   (init (mk-quest []))
   (defn t [] (Pos G.map 5 5))
