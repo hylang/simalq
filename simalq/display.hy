@@ -9,7 +9,8 @@
   simalq.color :as color
   simalq.game-state [G]
   simalq.util [mixed-number invlets]
-  simalq.geometry [Pos at dist])
+  simalq.geometry [Pos at dist]
+  simalq.tile [Tile])
 (setv  T True  F False)
 
 
@@ -218,7 +219,11 @@
           (.format " ({})" (- G.turn-n (. G.states [-1] turn-n)))))
       (.format "Score {:,}"
         G.score)
-      None))) ; Reserved for status-effect indicators
+      (+ #* (gfor
+        [stem has-artifact] (.items G.player.artifacts)
+        (if has-artifact
+          (color-tile (get Tile.types stem))
+          (colorstr "  ")))))))
 
 
 (defn draw-inventory []
