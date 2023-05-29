@@ -12,7 +12,6 @@
 (for [[iq-ix stem] [
 
     [22 "moveable_wall"]
-    [23 "teleporter"]
     [25 "cloak_of_invisibility"]
     [26 "amulet_of_invulnerability"]
     [27 "magic_arrows"]

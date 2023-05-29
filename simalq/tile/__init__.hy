@@ -248,6 +248,9 @@
 
 
 (defn damage-tile [tile amount damage-type]
+  "`amount` can be `Inf` or a nonnegative `int`. `damage-type` can be
+  `None` for non-modifiable pure damage."
+
   (when (= amount 0)
     (return))
   (unless tile.damageable
@@ -255,7 +258,8 @@
   (when (in damage-type tile.immune)
     ; The tile shrugs off the attack.
     (return))
-  (when (in damage-type tile.weaknesses)
+  (when (or (= amount Inf) (in damage-type tile.weaknesses))
+    ; This will be a one-hit kill.
     (setv amount tile.hp))
   (-= tile.hp amount)
   (when tile.score-for-damaging

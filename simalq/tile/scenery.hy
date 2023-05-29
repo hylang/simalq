@@ -3,8 +3,8 @@
   simalq.macros [has defn-dd fn-dd])
 (import
   simalq.color :as color
-  simalq.util [CommandError GameOverException player-melee-damage DamageType]
-  simalq.geometry [Pos Direction pos+ at]
+  simalq.util [CommandError GameOverException player-melee-damage DamageType next-in-cycle]
+  simalq.geometry [Pos Direction pos+ at burst dist]
   simalq.tile [Tile deftile replace-tile damage-tile mv-tile destroy-tile]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -255,6 +255,77 @@
     T)
 
   :flavor "A small stone arch containing a rippling, sparkling sheet of violet light. It functions as a magic portal that can send you elsewhere on this level. Sadly, arrows in flight won't survive the trip.")
+
+
+(deftile Scenery "┣┫" "a teleporter"
+  :color 'purple
+  :slot-defaults (dict
+    :times-entered 0
+    :output-dir None)
+  :mutable-slots #("times_entered" "output_dir")
+  :iq-ix 23
+  :blocks-diag T :blocks-monster T
+
+  :hook-player-walked-into (fn [self]
+    "Teleports you to a free square adjacent to the nearest other teleporter in the reality bubble. If there is no eligible destination teleporter, no teleportation occurs; if there are several tied for the nearest, you'll cycle through them when you re-enter this teleporter. Squares are considered to be free even if they contain monsters, which are slain instantly if you teleport into them. The free square that you appear on is cycled each time you re-exit a teleporter."
+
+    (import simalq.tile.monster [Monster])
+
+    ; Find a set of teleporters we can go to and their free adjacent
+    ; positions.
+    (setv candidate-dist Inf)
+    (setv candidates [])
+    (for [p (burst G.player.pos G.rules.reality-bubble-size :exclude-center T)]
+      (when (> (dist p self.pos) candidate-dist)
+        ; When multiple teleporters are in range, we consider only
+        ; the subset that's as close as possible.
+        (break))
+      (for [tile (at p)]
+        (when (= tile.stem "teleporter")
+          ; This position can be a candidate if it has at least one
+          ; free adjacent position.
+          (when (setx neighbors (tuple (gfor
+              n-p (burst p 1 :exclude-center T)
+              :if (all (gfor
+                n-tile (at n-p)
+                (isinstance n-tile Monster)))
+              n-p)))
+            (.append candidates #(tile neighbors))
+            (setv candidate-dist (dist p self.pos)))
+          (break))))
+
+    ; Choose the other teleporter to use.
+    (unless candidates
+      (return F))
+    (setv [other-porter neighbors] (get
+      candidates
+      (% self.times-entered (len candidates))))
+    (+= self.times-entered 1)
+    ; Choose the specific target square.
+    (while True
+      (setv other-porter.output-dir
+        (next-in-cycle Direction.all other-porter.output-dir))
+      (when (in
+          (setx target (pos+ other-porter.pos other-porter.output-dir))
+          neighbors)
+        (break)))
+
+    ; At the target, tele-frag all tiles, which we already know must
+    ; be monsters.
+    (for [tile (at target)]
+      (damage-tile tile Inf None))
+
+    ; Now actually move the player.
+    (mv-tile G.player target)
+
+    T)
+
+  :info-bullets (fn [self #* extra]
+    (Scenery.info-bullets self
+      #("Times entered" self.times-entered)
+      #("Output direction" self.output-dir)))
+
+  :flavor "A bulky cubic device representing an early attempt at teleportation technology. Its operation is a bit convoluted. The fun part is, you can tele-frag with it.")
 
 
 (defclass Trap [Scenery]

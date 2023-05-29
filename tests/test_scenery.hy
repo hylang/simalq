@@ -1,5 +1,5 @@
 (require
-  hyrule [ecase]
+  hyrule [ecase do-n]
   tests.lib [cant wk])
 (import
   pytest
@@ -199,6 +199,77 @@
   (wk E)
   (assert (and (= G.turn-n 1) (= G.player.pos (t))))
   (assert-at 'here ['player "orc" "pile of gold" "exit"]))
+
+
+(defn test-teleporter []
+
+  ; With no other teleporters in range, nothing happens when you walk
+  ; into a teleporter.
+  (init (mk-quest
+    [:tiles ["teleporter"]]))
+  (wk E)
+  (assert-at 'here ['player "teleporter"])
+  ; Teleporters can't be walked past diagonally.
+  (wk E)
+  (cant (wk NW) "That diagonal is blocked by a neighbor.")
+
+  ; With multiple porters in range, you get sent to one of the
+  ; nearest. Re-entering the original sends you to different nearest
+  ; porters in sequence.
+  (init (mk-quest
+    [:map "
+      ██┣┫████. . .
+      ██. ██████┣┫.
+      @ ┣┫. ┣┫██. ."]))
+  (wk E)
+  (assert (= G.player.pos (Pos G.map 2 0)))
+  (mv-player 0 0)
+  (wk E)
+  (assert (= G.player.pos (Pos G.map 1 1)))
+  (mv-player 0 0)
+  (wk E)
+  (assert (= G.player.pos (Pos G.map 2 0)))
+
+  ; The destination porter needs to be in the reality bubble, but the
+  ; target square need not be.
+  (for [size [2 3]]
+    (init (mk-quest [
+      :height 1
+      :tiles ["teleporter" "wall" "wall" "teleporter"]]))
+    (setv G.rules.reality-bubble-size size)
+    (wk E)
+    (assert (= G.player.pos (Pos G.map :y 0 :x
+      (if (= size 2) 1 5)))))
+
+  ; If you come out of the same teleporter several times, you'll
+  ; arrive at its various adjacent free squares in a loop (north
+  ; first, per `Direction.all`).
+  (init (mk-quest [
+    :tiles ["teleporter" "wall" "teleporter"]]))
+  (setv targets [])
+  (do-n 5
+    (mv-player 0 0)
+    (wk E)
+    (.append targets G.player.pos.xy))
+  (assert (= targets (list (map tuple [
+    [3 1] [4 1] [4 0] [2 1] [3 1]]))))
+
+  ; Squares with items or scenery aren't eligible targets, but squares
+  ; with monsters are. The monsters die (with all the normal
+  ; consequences of monsters dying, contra IQ).
+  (init (mk-quest [
+    :map "
+      ████d 0 ┣┫
+      @ ┣┫$ ┣┫++"
+    :map-marks {
+      "$ " "pile of gold"
+      "d " ["devil" :hp 3]
+      "0 " "standard bomb"
+      "++" "door"}]))
+   (wk E)
+   (assert (= G.player.pos (Pos G.map 2 1)))
+   (assert-at 'here 'player)
+   (assert (= G.score 15)))
 
 
 (defn test-wallfall-trap []
