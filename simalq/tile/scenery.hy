@@ -4,7 +4,7 @@
 (import
   simalq.color :as color
   simalq.util [CommandError GameOverException player-melee-damage DamageType]
-  simalq.geometry [Pos Direction GeometryError pos+ at]
+  simalq.geometry [Pos Direction pos+ at]
   simalq.tile [Tile deftile replace-tile damage-tile mv-tile destroy-tile]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -75,10 +75,9 @@
   - 'bump (you can bump something there, but not go there)
   - 'walk (you can walk there)"
 
-  (setv target (try
-    (pos+ p direction)
-    (except [e GeometryError]
-      (return #(None 'out-of-bounds)))))
+  (setv target (pos+ p direction))
+  (unless target
+    (return #(None 'out-of-bounds)))
   #(target (cond
     (and
         direction.x direction.y
@@ -175,11 +174,6 @@
 
 ((fn []
 
-  (defn safe-pos+ [pos direction]
-    (try
-      (pos+ pos direction)
-      (except [GeometryError])))
-
   (defclass OneWayDoor [Scenery]
 
     (setv
@@ -190,12 +184,12 @@
 
     (defn-dd hook-player-walk-from [self target]
       (doc f"Only allows you to walk {it.direction.name}.")
-      (unless (= (safe-pos+ self.pos self.direction) target)
+      (unless (= (pos+ self.pos self.direction) target)
         (raise (CommandError f"You can only go {self.direction.name} from this one-way door."))))
     (defn-dd hook-player-walk-to [self origin]
       (doc f"Only allows you to enter from the
         {it.direction.opposite.name}.")
-      (unless (= (safe-pos+ origin self.direction) self.pos)
+      (unless (= (pos+ origin self.direction) self.pos)
         (raise (CommandError (.format "That one-way door must be entered from the {}."
           self.direction.opposite.name)))))
 

@@ -5,7 +5,7 @@
   copy [deepcopy]
   simalq.color :as color
   simalq.util [CommandError DamageType save-game-path msg player-shot-damage flash-map invlets]
-  simalq.geometry [Direction GeometryError Pos pos+ at dist]
+  simalq.geometry [Direction Pos pos+ at dist]
   simalq.game-state [G save-game load-game]
   simalq.tile [mv-tile damage-tile destroy-tile]
   simalq.tile.scenery [walkability])
@@ -104,9 +104,7 @@
         (setv dir-v (.get dir-keys (str key)))
         (cond
           (and dir-v (!= dir-v 'center))
-            (try
-              (setv focus (pos+ focus dir-v))
-              (except [GeometryError]))
+            (setv focus (or (pos+ focus dir-v) focus))
           (or (= dir-v 'center) (= (str key) ";"))
             (when (target-callback focus)
               'done)
@@ -244,12 +242,11 @@
           color.flash-player-shot targets
           {}))
       (do-n G.rules.reality-bubble-size
-        (setv target (try
-          (pos+ target d)
-          (except [GeometryError]
-            ; An arrow that hits the level border stops.
-            (animate)
-            (return))))
+        (setv target (pos+ target d))
+        (unless target
+          ; An arrow that hits the level border stops.
+          (animate)
+          (return))
         (.append targets target)
         (when (= target G.player.pos)
           ; An arrow that wraps around the map all the way back to the

@@ -3,7 +3,7 @@
   tests.lib [cant wk])
 (import
   tests.lib [init mk-quest assert-at set-square mv-player shoot wait use-item mk-tile add-usable]
-  simalq.geometry [Pos Direction pos+ at]
+  simalq.geometry [Pos Direction at]
   simalq.game-state [G])
 (setv  T True  F False)
 

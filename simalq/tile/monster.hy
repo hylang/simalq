@@ -7,7 +7,7 @@
   enum [Enum]
   toolz [unique]
   simalq.util [player-melee-damage DamageType hurt-player next-in-cycle mixed-number]
-  simalq.geometry [Direction GeometryError pos+ at dist adjacent? dir-to pos-seed ray]
+  simalq.geometry [Direction pos+ at dist adjacent? dir-to pos-seed ray]
   simalq.game-state [G]
   simalq.tile [Actor deftile mv-tile add-tile damage-tile destroy-tile]
   simalq.tile.scenery [walkability])
@@ -257,10 +257,9 @@
       (do-n (len Direction.all)
         (setv self.movement-state
           (next-in-cycle Direction.all self.movement-state))
-        (setv target (try
-          (pos+ self.pos self.movement-state)
-          (except [GeometryError]
-            (continue))))
+        (setv target (pos+ self.pos self.movement-state))
+        (unless target
+          (continue))
         (when (= (at target) [])
           (break))
         (else

@@ -73,8 +73,9 @@
   (assert (=
     (pos+ (Pos m 0 0) Direction.NE)
     (Pos m 1 1)))
-  (with [(pytest.raises GeometryError)]
-    (pos+ (Pos m 0 0) Direction.W))
+  (assert (is
+    (pos+ (Pos m 0 0) Direction.W)
+    None))
 
   (setv m (Map :data map-data :wrap-x T :wrap-y F))
   (assert (=
@@ -83,8 +84,9 @@
   (assert (=
     (pos+ (Pos m 4 0) Direction.E)
     (Pos m 0 0)))
-  (with [(pytest.raises GeometryError)]
-    (pos+ (Pos m 0 0) Direction.S)))
+  (assert (is
+    (pos+ (Pos m 0 0) Direction.S)
+    None)))
 
 
 (defn test-ray []

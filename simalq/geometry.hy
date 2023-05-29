@@ -99,7 +99,9 @@
 (hy.repr-register Pos str)
 
 (defn pos+ [pos direction]
-  (Pos pos.map (+ direction.x pos.x) (+ direction.y pos.y)))
+  (try
+    (Pos pos.map (+ direction.x pos.x) (+ direction.y pos.y))
+    (except [GeometryError])))
 
 (defn ray [pos direction length]
   "Return a line of `length` points in `direction` from `pos`, not
@@ -108,11 +110,8 @@
 
   (setv out [pos])
   (do-n length
-    (try
-      (setv new (pos+ (get out -1) direction))
-      (except [GeometryError]
-        (break)))
-    (when (= new pos)
+    (setv new (pos+ (get out -1) direction))
+    (when (or (is new None) (= new pos))
       (break))
     (.append out new))
   (tuple (cut out 1 None)))
