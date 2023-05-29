@@ -91,7 +91,7 @@
 
 (defn test-ray []
   (defn r [direction length]
-    (lfor  p (ray p0 direction length)  c [p.x p.y]  c))
+    (lfor  p (ray p0 direction length)  c p.xy  c))
 
   (setv p0 (Pos :x 3 :y 2
     :map (Map.make :wrap-x F :wrap-y F :width 10 :height 10)))

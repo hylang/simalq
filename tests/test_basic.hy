@@ -251,7 +251,7 @@
     (assert (and
       (= G.state-i i) (= G.turn-n i) (= (len G.states) n-states)
       (= G.score score) (= G.player.keys keys)
-      (= G.player.pos.x px) (= G.player.pos.y py)))
+      (= G.player.pos.xy #(px py))))
     (assert-at (Pos G.map 10 2) thing))
 
   ; Pick up a key, open a locked disappering door, and step there.

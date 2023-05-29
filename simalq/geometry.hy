@@ -94,7 +94,10 @@
     f"<Pos {self.x},{self.y}>")
 
   (defn __hash__ [self]
-    (hash #(self.x self.y (id self.map)))))
+    (hash #(self.x self.y (id self.map))))
+
+  (defn [property] xy [self]
+    #(self.x self.y)))
 
 (hy.repr-register Pos str)
 

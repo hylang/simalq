@@ -3,7 +3,7 @@
   tests.lib [cant wk])
 (import
   pytest
-  tests.lib [init mk-quest assert-at set-square mv-player xy shoot mk-tile]
+  tests.lib [init mk-quest assert-at set-square mv-player shoot mk-tile]
   simalq.util [GameOverException]
   simalq.geometry [at Pos]
   simalq.game-state [G])
@@ -62,21 +62,21 @@
   ; Unlocked a locked door.
   (mv-player 13 6)
   (assert-at 'S "locked door")
-  (setv p (xy G.player.pos))
+  (setv p G.player.pos.xy)
   (assert (= G.turn-n 0))
   (wk S)  ; This just unlocks the door, without moving us.
   (assert-at 'S "door")
-  (assert (= (xy G.player.pos) p))
+  (assert (= G.player.pos.xy p))
   (assert (= G.player.keys 1))
   (assert (= G.turn-n 1))  ; But it still takes a turn to do this.
 
   ; Unlocked a locked disappearing door.
   (mv-player 11 2)
   (assert-at 'W "locked disappearing door")
-  (setv p (xy G.player.pos))
+  (setv p G.player.pos.xy)
   (wk W)
   (assert-at 'W 'floor)
-  (assert (= (xy G.player.pos) p))
+  (assert (= G.player.pos.xy p))
   (assert (= G.player.keys 0))
   (assert (= G.turn-n 2))
 
