@@ -20,6 +20,8 @@
       ; Did you just use an exit?
     :keys 0
       ; How many (regular, and not yet used) keys you're carrying.
+    :magic-arrows 0
+      ; How many magic arrows you have.
     :inventory []
       ; Single-use (`Usable`) items being carried.
     :artifacts {
@@ -27,7 +29,7 @@
         "Magic Shield" F
         "Elven Bow" F
         "Holy Sword" F})
-  :mutable-slots #("hp" "poison_dose" "just_exited" "keys")
+  :mutable-slots #("hp" "poison_dose" "just_exited" "keys" "magic_arrows")
     ; `inventory` and `artifacts` should be mutated directly rather
     ; reassigned.
 

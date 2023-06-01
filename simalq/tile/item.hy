@@ -195,6 +195,18 @@
   :flavor "Idok uses only the worst locks and keys that money can buy. The keys are bulky and heavy, yet immediately snap into pieces on being used once, and every lock can be opened by any old key.")
 
 
+(deftile Item "↑ " "some magic arrows"
+  :color 'purple
+  :iq-ix 27
+  :points 100
+
+  :pick-up (fn-dd [self]
+    (doc f"Gives you {G.rules.magic-arrows-pickup-size} magic arrows. Magic arrows are fired in place of regular arrows. They do {G.rules.player-shot-damage-magic} damage, and hurt some monsters that are immune to mundane arrows. If a magic arrow destroys a monster or object, it continues on its path and can keep doing damage.")
+    (+= G.player.magic-arrows G.rules.magic-arrows-pickup-size))
+
+  :flavor "Now we're talkin'! These missiles engraved with mystical runes hit hard and keep on going. Sadly, Tris is so excited to use them that she can't shoot mundane arrows until she's used them all up.")
+
+
 (defclass Usable [Item]
   "An item that's added to your inventory and can thereafter be
   consumed as an action."

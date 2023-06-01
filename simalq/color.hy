@@ -43,7 +43,8 @@
 
   flash-label 'white
   flash-player-damaged 'red
-  flash-player-shot 'blue
+  flash-player-shot-mundane 'blue
+  flash-player-shot-magic 'purple
 
   tile-bg-by-hp {
     1       'pale-green

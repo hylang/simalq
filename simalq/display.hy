@@ -206,6 +206,9 @@
       None ; Reserved for time limits, like "Tm 1,000"
       (when G.player.keys
         (.format "⚷ {}" G.player.keys))
+      (when G.player.magic-arrows (+
+        (color-tile (get Tile.types "magic arrows"))
+        (colorstr (format G.player.magic-arrows ","))))
       (+ #* (gfor
         item G.player.inventory
         (if item (color-tile item) (colorstr "  ")))))

@@ -235,11 +235,18 @@
       (setv
         d action.direction
         target G.player.pos
-        targets [])
+        targets []
+        magic F)
+      (when G.player.magic-arrows
+       (setv magic T)
+       (-= G.player.magic-arrows 1))
       (defn animate []
         (flash-map :flash-time-s .1
           G.player.pos
-          color.flash-player-shot targets
+          (if magic
+            color.flash-player-shot-magic
+            color.flash-player-shot-mundane)
+          targets
           {}))
       (do-n G.rules.reality-bubble-size
         (setv target (pos+ target d))
@@ -257,15 +264,19 @@
         (for [tile (at target)]
           (cond
             tile.hook-player-shot (do
-              ; The arrow stops after the hook is called.
+              ; The arrow may stop after the hook is called.
               (animate)
               (.hook-player-shot tile)
-              (return))
+              (unless (and magic (!= tile.pos target))
+                (return)))
             tile.damageable (do
-              ; The arrow damages the tile and stops.
+              ; The arrow damages the tile and may stop.
               (animate)
-              (damage-tile tile (player-shot-damage) DamageType.MundaneArrow)
-              (return))
+              (damage-tile tile (player-shot-damage magic) (if magic
+                DamageType.MagicArrow
+                DamageType.MundaneArrow))
+              (unless (and magic (!= tile.pos target))
+                (return)))
             tile.blocks-player-shots
               ; The arrow won't be able to leave this square, although
               ; it can affect other tiles in the square.

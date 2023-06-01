@@ -109,7 +109,11 @@
       player-shot-damage-base 1
         ; How much damage the player does with her bow normally.
       player-shot-damage-artifact 2
-        ; How much with the relevant artifact.
+        ; How much with the relevant artifact (and no magic arrows).
+      player-shot-damage-magic 3
+        ; How much damage the player does with magic arrows.
+      magic-arrows-pickup-size 10
+        ; How many magic arrows come in a pickup.
       artifact-shield-factor (f/ 3 4)
         ; How much the artifact shield multiplies incoming damage by.
       dainty-monsters T))

@@ -52,6 +52,38 @@
   (assert-at 'here ['player "door"]))
 
 
+(defn test-magic-arrow []
+  (init (mk-quest [
+    :map "
+      ████████d ████
+      @ ↑ o d ☠ ##G "
+    :map-marks {
+      "o " ["orc" :hp 4]
+      "☠ " "jar of poison"
+      "##" ["cracked wall" :hp 3]}]))
+
+  ; Pick up some magic arrows.
+  (assert (= G.player.magic-arrows 0))
+  (wk E)
+  (assert (= G.player.magic-arrows 10))
+  (assert-at 'E "orc")
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 4))
+  ; Shoot at the orc. That does 3 damage to it. The devil is unhurt.
+  (shoot 'E)
+  (assert-at 'E "orc")
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1))
+  (assert-at (Pos G.map 3 0) "devil")
+  ; Shoot again. This kills the orc, so the magic arrow penetrates
+  ; and continues along the whole line, smashing the jar of poison
+  ; and hitting the ghost. Unlike IQ, a magic arrow can continue
+  ; after destroying an object.
+  (shoot 'E)
+  (assert-at 'E 'floor)
+  (assert-at (Pos G.map 3 0) 'floor)
+  (assert-at (Pos G.map 4 1) 'floor)
+  (assert-at (Pos G.map 6 0) 'floor))
+
+
 (defn test-food-eat []
   (init (mk-quest [:tiles [
      "snack" "meal" "jar of poison" "rotten food" "empty platter"
@@ -253,10 +285,15 @@
 
   ; The bow artifact is similar, but increases ranged damage to 2.
   (init (mk-quest
-    [:tiles ["Elven Bow" ["orc" :hp 4]]]))
+    [:tiles ["Elven Bow" ["orc" :hp 10]]]))
   (wk E)
   (shoot 'E)
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 2)))
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 8))
+  ; The Elven Bow has no effect on magic arrows. They still do 3
+  ; damage.
+  (+= G.player.magic-arrows 10)
+  (shoot 'E)
+  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 5)))
 
 
 (defn test-artifact-shield []
