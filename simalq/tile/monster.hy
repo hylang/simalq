@@ -65,6 +65,8 @@
       (if self.immune
         #("Immune to" (.join ", " (gfor  x self.immune  x.value)))
         "No immunities")
+      (when self.resists
+        #("Takes no more than 1 damage from" (.join ", " (gfor  x self.resists  x.value))))
       (when self.weaknesses
         #("Instantly destroyed by" (.join ", " (gfor  x self.weaknesses  x.value))))
       (if self.damage-melee
@@ -436,3 +438,13 @@
   :shot-range 3
 
   :flavor "Named not for a hat, but for the three horns projecting from their equine heads, Tricorns spend decades mediating while cocooned in woolen blankets. Their richly cultivated spirituality allows them to unleash a spark of static electricity from a fair distance, albeit still not as far as your arrows can fly. Up close, they can poke you with their horns for slightly less damage.")
+
+(deftile NonGen "D " "Death"
+  :iq-ix 49
+  :points 200
+
+  :immune #(DamageType.MundaneArrow DamageType.Fire #* undead-immunities)
+  :resists #(DamageType.MagicArrow)
+  :damage-melee 20
+
+  :flavor "A shadowy hooded figure bearing a wicked scythe that speaks in all capital letters. It can be destroyed, but don't expect that to be easy.")

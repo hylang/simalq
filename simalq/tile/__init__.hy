@@ -107,10 +107,13 @@
       ; should include a slot `hp`.
     immune #()
       ; Damage types the tile ignores.
-    weaknesses #()
-      ; Damage types that can instantly destroy the tile. Immunities
+    resists #()
+      ; Damage types the tile can only take 1 damage from. Immunities
       ; apply first (but you should avoid having the same damage type
       ; in each).
+    weaknesses #()
+      ; Damage types that can instantly destroy the tile. Immunities
+      ; apply first.
     score-for-damaging F
       ; If true, you get the tile's point value per HP of damage you
       ; do to it (with no points for overkill). Otherwise, you get
@@ -258,6 +261,9 @@
   (when (in damage-type tile.immune)
     ; The tile shrugs off the attack.
     (return))
+  (when (in damage-type tile.resists)
+    ; The tile can't take more than 1 damage.
+    (setv amount 1))
   (when (or (= amount Inf) (in damage-type tile.weaknesses))
     ; This will be a one-hit kill.
     (setv amount tile.hp))

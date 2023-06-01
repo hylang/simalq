@@ -19,7 +19,6 @@
     [36 "paralysis_trap"]
     [47 "floater"]
     [48 "blob"]
-    [49 "death"]
     [50 "specter"]
     [52 "negaton"]
     [93 "false_exit"]

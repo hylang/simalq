@@ -500,3 +500,20 @@
   (assert (= G.player.hp 100))
   (wait)
   (assert (= G.player.hp 94)))
+
+
+(defn test-death []
+  (init (mk-quest
+    [:tiles [["Death" :hp 10]]]))
+
+  (assert (= (. (at (Pos G.map 1 0)) [0] hp) 10))
+  ; Deaths are immune to mundane arrows.
+  (shoot 'E)
+  (assert (= (. (at (Pos G.map 1 0)) [0] hp) 10))
+  ; They take only 1 damage from magic arrows.
+  (+= G.player.magic-arrows 10)
+  (shoot 'E)
+  (assert (= (. (at (Pos G.map 1 0)) [0] hp) 9))
+  ; They take normal damage from sword attacks.
+  (wk E)
+  (assert (= (. (at (Pos G.map 1 0)) [0] hp) 7)))
