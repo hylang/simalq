@@ -147,6 +147,9 @@
 (defn mv-player [x y]
   (mv-tile G.player (Pos G.map x y)))
 
+(defn assert-player-at [x y]
+  (assert (= G.player.pos (Pos G.map x y))))
+
 
 (defmacro cant [form msg-check]
   (setv e (hy.gensym))

@@ -3,7 +3,7 @@
   tests.lib [cant wk])
 (import
   pytest
-  tests.lib [init mk-quest assert-at set-square mv-player shoot mk-tile]
+  tests.lib [init mk-quest assert-at set-square mv-player assert-player-at shoot mk-tile]
   simalq.util [GameOverException]
   simalq.geometry [at Pos]
   simalq.game-state [G])
@@ -139,12 +139,12 @@
 
   ; Exit from the penultimate level.
   (init "Boot Camp 2" 25)
-  (assert (= G.player.pos (Pos G.map 9 21)))
+  (assert-player-at 9 21)
   (mv-player 26 9)
   (assert-at 'NE "exit")
   (wk NE)
   (assert (= G.level-n 26))
-  (assert (= G.player.pos (Pos G.map 0 9)))
+  (assert-player-at 0 9)
 
   ; Exit from the last level, winning the game.
   (wk E 14)
@@ -171,7 +171,7 @@
   (assert-at 'N "cracked wall")
   (wk N)
   (assert-at 'N 'floor)
-  (assert (= G.player.pos (Pos G.map 7 7)))
+  (assert-player-at 7 7)
 
   ; Destroy a wall with 10 HP.
   (init (mk-quest
@@ -181,7 +181,7 @@
   (assert-at 'E "cracked wall")
   (wk E)
   (assert-at 'E 'floor)
-  (assert (= G.player.pos (Pos G.map 0 0))))
+  (assert-player-at 0 0))
 
 
 (defn test-pushblock []
@@ -235,13 +235,13 @@
       ██. ██████┣┫.
       @ ┣┫. ┣┫██. ."]))
   (wk E)
-  (assert (= G.player.pos (Pos G.map 2 0)))
+  (assert-player-at 2 0)
   (mv-player 0 0)
   (wk E)
-  (assert (= G.player.pos (Pos G.map 1 1)))
+  (assert-player-at 1 1)
   (mv-player 0 0)
   (wk E)
-  (assert (= G.player.pos (Pos G.map 2 0)))
+  (assert-player-at 2 0)
 
   ; The destination porter needs to be in the reality bubble, but the
   ; target square need not be.
@@ -251,8 +251,7 @@
       :tiles ["teleporter" "wall" "wall" "teleporter"]]))
     (setv G.rules.reality-bubble-size size)
     (wk E)
-    (assert (= G.player.pos (Pos G.map :y 0 :x
-      (if (= size 2) 1 5)))))
+    (assert-player-at (if (= size 2) 1 5) 0))
 
   ; If you come out of the same teleporter several times, you'll
   ; arrive at its various adjacent free squares in a loop (north
@@ -280,7 +279,7 @@
       "0 " "standard bomb"
       "++" "door"}]))
    (wk E)
-   (assert (= G.player.pos (Pos G.map 2 1)))
+   (assert-player-at 2 1)
    (assert-at 'here 'player)
    (assert (= G.score 15)))
 

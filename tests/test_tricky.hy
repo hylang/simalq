@@ -4,7 +4,7 @@
 (require
   tests.lib [wk])
 (import
-  tests.lib [init mk-quest assert-at shoot mk-tile]
+  tests.lib [init mk-quest assert-at assert-player-at shoot mk-tile]
   simalq.game-state [G]
   simalq.geometry [Pos at])
 (setv  T True  F False)
@@ -32,12 +32,12 @@
   (init (mk-quest [
     :next-level 1 :tiles [["orc" :hp 3] "key" "exit"]]))
 
-  (assert (= G.player.pos (Pos G.map 0 0)))
+  (assert-player-at 0 0)
   (assert (= G.level-n 1))
   (wk E 4)
   (assert (and (= G.player.hp 97) (= G.player.keys 1)))
   (wk E)
-  (assert (= G.player.pos (Pos G.map 0 0)))
+  (assert-player-at 0 0)
   (assert (= G.level-n 1))
   ; The monster and the item are back now.
   (wk E 4)

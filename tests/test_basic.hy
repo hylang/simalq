@@ -6,7 +6,7 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init assert-at wait mk-quest mv-player shoot mk-tile]
+  tests.lib [init assert-at wait mk-quest mv-player shoot mk-tile assert-player-at]
   simalq.util [GameOverException]
   simalq.game-state [G save-game load-game]
   simalq.geometry [Pos at])
@@ -20,17 +20,17 @@
   (assert (= G.level-n 1)) ; The level counter is 1-based.
 
   ; We start at the extreme northwest.
-  (assert (= G.player.pos (Pos G.map 0 15)))
+  (assert-player-at 0 15)
   (assert (= G.state-i 0)) ; The state index is 0-based.
   (assert (= G.turn-n 0)) ; Likewise the turn counter.
   ; Walk south 1 step.
   (wk S)
-  (assert (= G.player.pos (Pos G.map 0 14)))
+  (assert-player-at 0 14)
   (assert (= G.state-i 1))
   (assert (= G.turn-n 1))
   ; Wait 1 turn.
   (wait)
-  (assert (= G.player.pos (Pos G.map 0 14)))
+  (assert-player-at 0 14)
   (assert (= G.state-i 2))
   (assert (= G.turn-n 2))
   ; Try going west, bumping into the level border.
@@ -55,7 +55,7 @@
   (assert-at 'N "pillar")
   (assert-at 'E "pillar")
   (wk NE)
-  (assert (= G.player.pos (Pos G.map 4 2))))
+  (assert-player-at 4 2))
 
 
 (defn test-shoot []
@@ -100,21 +100,21 @@
       :tiles ["exit"]]
     [:width 20 :height 20 :wrap-x True :wrap-y True]))
 
-  (assert (= G.player.pos (Pos G.map 0 0)))
+  (assert-player-at 0 0)
   (wk S)
-  (assert (= G.player.pos (Pos G.map 0 19)))
+  (assert-player-at 0 19)
   (wk S 19)
-  (assert (= G.player.pos (Pos G.map 0 0)))
+  (assert-player-at 0 0)
   (cant (wk W) "The border of the dungeon blocks your movement.")
   (wk E)
 
   (assert (= G.level-n 2))
   (wk W)
-  (assert (= G.player.pos (Pos G.map 19 0)))
+  (assert-player-at 19 0)
   (wk S)
-  (assert (= G.player.pos (Pos G.map 19 19)))
+  (assert-player-at 19 19)
   (wk NE)
-  (assert (= G.player.pos (Pos G.map 0 0))))
+  (assert-player-at 0 0))
 
 
 (defn test-shoot-wrapping []
