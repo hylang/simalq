@@ -4,7 +4,7 @@
 (require
   tests.lib [wk])
 (import
-  tests.lib [init mk-quest assert-at assert-player-at shoot mk-tile]
+  tests.lib [init mk-quest assert-at assert-hp assert-player-at shoot mk-tile]
   simalq.game-state [G]
   simalq.geometry [Pos at])
 (setv  T True  F False)
@@ -52,9 +52,9 @@
       [:tiles ['floor tile 'floor ["devil" :hp 2]]]))
     (assert (= G.player.hp 100))
     (shoot 'E)
-    (assert (=
-      (. (at (Pos G.map (+ 3 mon-can-shoot-through) 0)) [0] hp)
-      (if player-can-shoot-through 1 2)))
+    (assert-hp
+      [(+ 3 mon-can-shoot-through) 0]
+      (if player-can-shoot-through 1 2))
     (assert (= G.player.hp (if mon-can-shoot-through 90 100))))
 
   (check 'floor            T T)

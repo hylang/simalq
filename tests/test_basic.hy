@@ -6,7 +6,7 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init assert-at wait mk-quest mv-player shoot mk-tile assert-player-at]
+  tests.lib [init assert-at wait mk-quest mv-player shoot mk-tile assert-player-at assert-hp]
   simalq.util [GameOverException]
   simalq.game-state [G save-game load-game]
   simalq.geometry [Pos at])
@@ -62,22 +62,20 @@
   (init (mk-quest
     [:tiles ['floor 'floor 'floor 'floor ["orc" :hp 2]]]))
   (setv G.rules.reality-bubble-size 4)
-  (defn check [x y orc-hp]
-    (assert (= (. (at (Pos G.map x y)) [0] hp) orc-hp)))
 
   (assert (= G.turn-n 0))
   (shoot 'E)
   (assert (= G.turn-n 1))
   ; The orc is out of range and thus unharmed.
-  (check  5 0  2)
+  (assert-hp [5 0] 2)
   ; Walk east. The orc is now in the reality bubble, and advances.
   (wk E)
-  (check  4 0  2)
+  (assert-hp [4 0] 2)
   ; Now shoot and hit it for 1 damage.
   (assert (= G.score 0))
   (shoot 'E)
   (assert (= G.score 3))
-  (check  3 0  1)
+  (assert-hp [3 0] 1)
   ; Finish it off with another shot.
   (shoot 'E)
   (assert (= G.score 6))
@@ -89,9 +87,9 @@
   ; Shots are blocked by walls.
   (init (mk-quest
     [:tiles ["wall" "orc"]]))
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1))
+  (assert-hp [2 0] 1)
   (shoot 'E)
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1)))
+  (assert-hp [2 0] 1))
 
 
 (defn test-walk-wrapping []

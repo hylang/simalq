@@ -4,7 +4,7 @@
 (import
   collections [Counter]
   fractions [Fraction :as f/]
-  tests.lib [init mk-quest assert-at wait set-square shoot mv-player add-usable use-item top]
+  tests.lib [init mk-quest assert-at assert-hp wait set-square shoot mv-player add-usable use-item top]
   simalq.geometry [Direction Pos ray at]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -14,9 +14,11 @@
   (init (mk-quest
     [:tiles [["Dark Knight" :hp 5]]]))
   (defn check [turn score tris mon]
-    (assert (and
-      (= G.turn-n turn) (= G.score score)
-      (= G.player.hp tris) (or (is mon None) (= (. (top 'E) hp) mon)))))
+    (assert (and (= G.turn-n turn) (= G.score score)))
+    (assert (= G.player.hp tris))
+    (if (is mon None)
+      (assert-at 'E 'floor)
+      (assert-hp 'E mon)))
 
   (check :turn 0 :score 0 :tris 100 :mon 5)
   ; Attack the monster, doing 2 damage. We get hit for 12 damage.
@@ -29,8 +31,7 @@
     ; The monster's still there.
   ; Finish the monster off. We take no damage this time.
   (wk E)
-  (check :turn 3 :score 75 :tris 76 :mon None)
-  (assert-at 'E 'floor))
+  (check :turn 3 :score 75 :tris 76 :mon None))
 
 
 (defn test-monster-melee-diag []
@@ -209,7 +210,7 @@
     (assert (= G.score score))
     (if (= orc-hp 0)
       (assert-at [1 0] 'floor)
-      (assert (= (. (at (Pos G.map 1 0)) [0] hp) orc-hp)))
+      (assert-hp [1 0] orc-hp))
     (wk E)))
 
 
@@ -463,17 +464,17 @@
   (wait)
   (assert-at [2 0] "thorn tree")
   ; They're immune to arrows.
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 3))
+  (assert-hp [2 0] 3)
   (shoot 'E)
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 3))
+  (assert-hp [2 0] 3)
   ; Up close, they scratch for 4 damage.
   (assert (= G.player.hp 100))
   (wk E)
   (assert (= G.player.hp 96))
   ; They're damaged normally by Tris's sword.
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 3))
+  (assert-hp [2 0] 3)
   (wk E)
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1))
+  (assert-hp [2 0] 1)
   ; They're weak against fire: if they take 1 or more fire damage,
   ; they die instantly.
   (assert-at [2 0] "thorn tree")
@@ -501,14 +502,14 @@
   (init (mk-quest
     [:tiles [["Death" :hp 10]]]))
 
-  (assert (= (. (at (Pos G.map 1 0)) [0] hp) 10))
+  (assert-hp 'E 10)
   ; Deaths are immune to mundane arrows.
   (shoot 'E)
-  (assert (= (. (at (Pos G.map 1 0)) [0] hp) 10))
+  (assert-hp 'E 10)
   ; They take only 1 damage from magic arrows.
   (+= G.player.magic-arrows 10)
   (shoot 'E)
-  (assert (= (. (at (Pos G.map 1 0)) [0] hp) 9))
+  (assert-hp 'E 9)
   ; They take normal damage from sword attacks.
   (wk E)
-  (assert (= (. (at (Pos G.map 1 0)) [0] hp) 7)))
+  (assert-hp 'E 7))

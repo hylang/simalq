@@ -2,7 +2,7 @@
   hyrule [do-n ecase]
   tests.lib [cant wk])
 (import
-  tests.lib [init mk-quest assert-at set-square mv-player shoot wait use-item mk-tile add-usable]
+  tests.lib [init mk-quest assert-at assert-hp set-square mv-player shoot wait use-item mk-tile add-usable]
   simalq.geometry [Pos Direction at]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -67,11 +67,11 @@
   (wk E)
   (assert (= G.player.magic-arrows 10))
   (assert-at 'E "orc")
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 4))
+  (assert-hp 'E 4)
   ; Shoot at the orc. That does 3 damage to it. The devil is unhurt.
   (shoot 'E)
   (assert-at 'E "orc")
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1))
+  (assert-hp 'E 1)
   (assert-at [3 0] "devil")
   ; Shoot again. This kills the orc, so the magic arrow penetrates
   ; and continues along the whole line, smashing the jar of poison
@@ -133,14 +133,14 @@
   ; The player takes 20 damage.
   (assert (= G.player.hp 80))
   ; The two orcs in the blast radius take 3 damage each.
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1))
-  (assert (= (. (at (Pos G.map 4 2)) [0] hp) 1))
+  (assert-hp [2 0] 1)
+  (assert-hp [4 2] 1)
   ; The ghost, being undead, takes no damage from poison.
-  (assert (= (. (at (Pos G.map 4 1)) [0] hp) 1))
+  (assert-hp [4 1] 1)
   ; Cracked walls are also immune to poison.
-  (assert (= (. (at (Pos G.map 2 1)) [0] hp) 2))
+  (assert-hp [2 1] 2)
   ; The third orc is outside of the blast radius.
-  (assert (= (. (at (Pos G.map 5 2)) [0] hp) 4))
+  (assert-hp [5 2] 4)
   ; Points are earned for all damage dealt.
   (assert (= G.score (py "3*3 + 3*3"))))
 
@@ -261,9 +261,7 @@
         (mk-tile [1 0] item-stem)
         (shoot 'E)))
      (for [[i dmg] (enumerate damages)]
-       (assert (=
-         (. (at (Pos G.map (+ i 1) 0)) [0] hp)
-         (- starting-orc-hp dmg)))))
+       (assert-hp [(+ i 1) 0] (- starting-orc-hp dmg))))
 
   (check  "standard bomb" 'shoot  2 1 0 0 0 0 0)
   (check  "standard bomb" 'use    3 2 1 0 0 0 0)
@@ -281,19 +279,19 @@
     :height 1
     :tiles ["Holy Sword" "Holy Sword" ["orc" :hp 4]]]))
   (wk E 3)
-  (assert (= (. (at (Pos G.map 3 0)) [0] hp) 1))
+  (assert-hp 'E 1)
 
   ; The bow artifact is similar, but increases ranged damage to 2.
   (init (mk-quest
     [:tiles ["Elven Bow" ["orc" :hp 10]]]))
   (wk E)
   (shoot 'E)
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 8))
+  (assert-hp 'E 8)
   ; The Elven Bow has no effect on magic arrows. They still do 3
   ; damage.
   (+= G.player.magic-arrows 10)
   (shoot 'E)
-  (assert (= (. (at (Pos G.map 2 0)) [0] hp) 5)))
+  (assert-hp 'E 5))
 
 
 (defn test-artifact-shield []

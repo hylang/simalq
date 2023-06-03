@@ -122,6 +122,9 @@
     (getattr x (hy.mangle attribute))
     x))
 
+(defn assert-hp [locator value]
+  (assert (= (top locator 'hp) value)))
+
 (defn mk-tile [locator tile-spec]
   (when (= tile-spec 'floor)
     (return))
