@@ -11,7 +11,7 @@
   simalq.un-iq [read-quest iq-quest]
   simalq.game-state [G]
   simalq.tile [Tile add-tile rm-tile mv-tile]
-  simalq.commands [Wait Shoot UseItem]
+  simalq.commands [Walk Wait Shoot UseItem]
   simalq.quest [start-quest start-level]
   simalq.main [take-turn])
 
@@ -170,11 +170,9 @@
     (assert (= (. ~e value args [0]) ~msg-check))))
 
 
-(defmacro wk [direction-abbr [n-steps 1]]
-  `(for [_ (range ~n-steps)]
-    (hy.M.simalq/main.take-turn
-      (hy.M.simalq/commands.Walk
-        (. hy.M.simalq/geometry.Direction ~direction-abbr)))))
+(defn wk [direction-abbr [n-times 1]]
+  (do-n n-times
+    (take-turn (Walk (getattr Direction (str direction-abbr))))))
 
 (defn wait [[n-times 1]]
   (do-n n-times

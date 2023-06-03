@@ -1,10 +1,8 @@
 "Tests of finicky interactions not associated with a specific tile."
 
 
-(require
-  tests.lib [wk])
 (import
-  tests.lib [init mk-quest assert-at assert-hp assert-player-at shoot mk-tile]
+  tests.lib [init mk-quest assert-at assert-hp assert-player-at wk shoot mk-tile]
   simalq.game-state [G]
   simalq.geometry [Pos at])
 (setv  T True  F False)
@@ -15,14 +13,14 @@
   (init (mk-quest
     [:tiles [["orc" :hp 3] "exit"]]
     [:tiles [["orc" :hp 1]]]))
-  (wk E 2)
+  (wk 'E 2)
   (assert (and (= G.player.hp 97)))
-  (wk E 2)
+  (wk 'E 2)
   ; We're now on level 2, but the second monster won't get a hit in.
   (assert (and (= G.level-n 2)))
   (assert (and (= G.player.hp 97)))
   (assert-at 'E "orc")
-  (wk E)
+  (wk 'E)
   (assert (and (= G.player.hp 97)))
   (assert-at 'E 'floor))
 
@@ -34,13 +32,13 @@
 
   (assert-player-at 0 0)
   (assert (= G.level-n 1))
-  (wk E 4)
+  (wk 'E 4)
   (assert (and (= G.player.hp 97) (= G.player.keys 1)))
-  (wk E)
+  (wk 'E)
   (assert-player-at 0 0)
   (assert (= G.level-n 1))
   ; The monster and the item are back now.
-  (wk E 4)
+  (wk 'E 4)
   (assert (and (= G.player.hp 94) (= G.player.keys 2))))
 
 
@@ -96,6 +94,6 @@
         (setv (cut (at p)) (reversed (at p)))))
     (if ranged
       (shoot 'E)
-      (wk E))
+      (wk 'E))
     (assert (= (. (at (mon-p)) [wall-on-top] hp) (- 3 (if ranged 1 2))))
     (assert (= G.player.hp (- 100 (if ranged 10 3))))))

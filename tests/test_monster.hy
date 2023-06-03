@@ -1,10 +1,9 @@
 (require
-  hyrule [do-n]
-  tests.lib [wk])
+  hyrule [do-n])
 (import
   collections [Counter]
   fractions [Fraction :as f/]
-  tests.lib [init mk-quest assert-at assert-hp wait set-square shoot mv-player add-usable use-item top]
+  tests.lib [init mk-quest assert-at assert-hp wait set-square wk shoot mv-player add-usable use-item top]
   simalq.geometry [Direction Pos ray at]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -22,15 +21,15 @@
 
   (check :turn 0 :score 0 :tris 100 :mon 5)
   ; Attack the monster, doing 2 damage. We get hit for 12 damage.
-  (wk E)
+  (wk 'E)
   (check :turn 1 :score 0 :tris 88 :mon 3)
   ; And again.
-  (wk E)
+  (wk 'E)
   (check :turn 2 :score 0 :tris 76 :mon 1)
   (assert-at 'E "Dark Knight")
     ; The monster's still there.
   ; Finish the monster off. We take no damage this time.
-  (wk E)
+  (wk 'E)
   (check :turn 3 :score 75 :tris 76 :mon None))
 
 
@@ -112,7 +111,7 @@
   (assert-at [(+ r 1) 0] "orc")
   (wait 100)
   (assert-at [(+ r 1) 0] "orc")
-  (wk E)
+  (wk 'E)
   (assert-at [r 0] "orc")
 
   ; A monster can chase Tris around a wrapped map.
@@ -122,7 +121,7 @@
     :width 9 :height 9 :wrap-y T]))
   (set-square 'N "orc")
   (do-n 100
-    (wk S)
+    (wk 'S)
     (assert-at 'N "orc")))
 
 
@@ -183,11 +182,11 @@
   (assert (and (= G.player.hp 91) (= G.score 0)))
   ; Hit the orc. It survives, but it now does less damage,
   ; and we get some points.
-  (wk E)
+  (wk 'E)
   (assert (and (= G.player.hp 88) (= G.score 6)))
   ; Kill it. We only get 3 points because it only has 1 more HP to
   ; take off.
-  (wk E)
+  (wk 'E)
   (assert (and (= G.player.hp 88) (= G.score 9)))
   (assert-at 'E 'floor))
 
@@ -211,7 +210,7 @@
     (if (= orc-hp 0)
       (assert-at [1 0] 'floor)
       (assert-hp [1 0] orc-hp))
-    (wk E)))
+    (wk 'E)))
 
 
 (defn test-generator []
@@ -261,7 +260,7 @@
   (assert-at [6 0] 'floor)
   ; Once in it, they can spawn monsters into adjacent squares even
   ; if those squares aren't in the reality bubble themselves.
-  (wk E)
+  (wk 'E)
   (wait 2)
   (assert-at [4 0] "orc")
   (assert-at [6 0] "orc"))
@@ -310,7 +309,7 @@
   (assert-at 'E "ghost")
   ; Attack the ghost. We get 10 points for doing 2 damage.
   ; The ghost strikes back, dying by kamikaze, which grants no points.
-  (wk E)
+  (wk 'E)
   (assert (and (= G.player.hp 95) (= G.score 10)))
   (assert-at 'E 'floor))
 
@@ -364,7 +363,7 @@
   (wait)
   (assert (= G.player.hp 90))
   ; Close up, a 1-HP devil melees for 3 damage.
-  (wk E)
+  (wk 'E)
   (assert (= G.player.hp 87))
 
   ; A diagonally blocked devil can't melee, so it shoots.
@@ -406,7 +405,7 @@
   (wait)
   (assert (= G.player.hp 96))
   ; A 3-HP wizard shoots for 12 damage.
-  (wk W)
+  (wk 'W)
   (assert (= G.player.hp 84))
   ; At 2 HP, its shot damage drops to 8.
   (shoot 'E)
@@ -469,11 +468,11 @@
   (assert-hp [2 0] 3)
   ; Up close, they scratch for 4 damage.
   (assert (= G.player.hp 100))
-  (wk E)
+  (wk 'E)
   (assert (= G.player.hp 96))
   ; They're damaged normally by Tris's sword.
   (assert-hp [2 0] 3)
-  (wk E)
+  (wk 'E)
   (assert-hp [2 0] 1)
   ; They're weak against fire: if they take 1 or more fire damage,
   ; they die instantly.
@@ -511,5 +510,5 @@
   (shoot 'E)
   (assert-hp 'E 9)
   ; They take normal damage from sword attacks.
-  (wk E)
+  (wk 'E)
   (assert-hp 'E 7))

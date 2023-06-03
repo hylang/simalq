@@ -1,8 +1,8 @@
 (require
   hyrule [do-n ecase]
-  tests.lib [cant wk])
+  tests.lib [cant])
 (import
-  tests.lib [init mk-quest assert-at assert-hp set-square mv-player shoot wait use-item mk-tile add-usable]
+  tests.lib [init mk-quest assert-at assert-hp set-square mv-player wk shoot wait use-item mk-tile add-usable]
   simalq.geometry [Pos Direction at]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -14,13 +14,13 @@
   (mv-player 6 14)
   (assert (= G.score 0))
   (assert-at 'E "pile of gold")
-  (wk E)
+  (wk 'E)
   (assert (= G.score 100))
   (assert-at 'here 'player)
 
   (mv-player 5 10)
   (assert-at 'N "handful of gems")
-  (wk N)
+  (wk 'N)
   (assert (= G.score 350))
   (assert-at 'here 'player))
 
@@ -29,14 +29,14 @@
   (init "Boot Camp 2")
   (mv-player 13 10)
   (assert (and (= G.player.keys 0) (= G.score 0)))
-  (wk S)
+  (wk 'S)
   (assert (and (= G.player.keys 1) (= G.score 50)))
 
   (init "Boot Camp 2")
   (mv-player 13 10)
   (setv G.player.keys G.rules.max-keys)
   (assert (and (= G.player.keys G.rules.max-keys) (= G.score 0)))
-  (cant (wk S) "Your keyring has no room for another key.")
+  (cant (wk 'S) "Your keyring has no room for another key.")
   (assert (and (= G.player.keys G.rules.max-keys) (= G.score 0)))
 
   ; Being maxed out on keys doesn't prevent you from unlocking a door
@@ -45,10 +45,10 @@
   (set-square 'E "key" "locked door")
   (assert-at 'E ["key" "locked door"])
   (setv G.player.keys G.rules.max-keys)
-  (wk E)
+  (wk 'E)
   (assert-at 'E ["key" "door"])
   (assert (= G.player.keys (- G.rules.max-keys 1)))
-  (wk E)
+  (wk 'E)
   (assert-at 'here ['player "door"]))
 
 
@@ -64,7 +64,7 @@
 
   ; Pick up some magic arrows.
   (assert (= G.player.magic-arrows 0))
-  (wk E)
+  (wk 'E)
   (assert (= G.player.magic-arrows 10))
   (assert-at 'E "orc")
   (assert-hp 'E 4)
@@ -89,22 +89,22 @@
      "snack" "meal" "jar of poison" "rotten food" "empty platter"
      "dessert" "snack" "dessert"]]))
   (assert (= G.player.hp 100))
-  (wk E)
+  (wk 'E)
   (assert (= G.player.hp 125))
-  (wk E)
+  (wk 'E)
   (assert (= G.player.hp 225))
-  (wk E)
+  (wk 'E)
   (assert (= G.player.hp 175))
-  (wk E)
+  (wk 'E)
   (assert (= G.player.hp  75))
-  (wk E)
+  (wk 'E)
   (assert (= G.player.hp  75))
-  (wk E)
+  (wk 'E)
   (assert (= G.player.hp 500))
-  (wk E)
+  (wk 'E)
   (assert (= G.player.hp 525))
   ; The second dessert has no effect, because we're already at 500 HP.
-  (wk E)
+  (wk 'E)
   (assert (= G.player.hp 525)))
 
 
@@ -125,7 +125,7 @@
   (assert-at 'E 'floor)
   ; Shooting a jar of poison creates a 5 × 5 cloud of poison, which
   ; can damage both the player and monsters. It goes through walls.
-  (wk E)
+  (wk 'E)
   (assert-at 'E "jar of poison")
   (assert (= G.player.hp 100))
   (shoot 'E)
@@ -158,18 +158,18 @@
   ; Inventory slots fill from the top.
   (check None None None)
   (cant (use-item 0) "That inventory slot is empty.")
-  (wk E)
+  (wk 'E)
   (check "wand of shielding" None None)
   (cant (use-item 1) "That inventory slot is empty.")
-  (wk E)
+  (wk 'E)
   (check "wand of shielding" "wall-making wand" None)
   (setv
     [(get G.player.inventory 0) (get G.player.inventory 2)]
     [(get G.player.inventory 2) (get G.player.inventory 0)])
   (check None "wall-making wand" "wand of shielding")
-  (wk E)
+  (wk 'E)
   (check "standard bomb" "wall-making wand" "wand of shielding")
-  (cant (wk E) "Your inventory is full.")
+  (cant (wk 'E) "Your inventory is full.")
   (assert-at 'E "standard bomb")
   (assert-at 'W 'floor))
 
@@ -196,7 +196,7 @@
   ; But Tris can walk onto them. Since this puts her on top of the
   ; shield tiles rather than under them, they no longer protect her.
   (assert (= G.player.hp 100))
-  (wk N)
+  (wk 'N)
   (assert (= G.player.hp 97))
 
   ; Unlike IQ, creating new shields don't affect existing ones, which
@@ -278,13 +278,13 @@
   (init (mk-quest [
     :height 1
     :tiles ["Holy Sword" "Holy Sword" ["orc" :hp 4]]]))
-  (wk E 3)
+  (wk 'E 3)
   (assert-hp 'E 1)
 
   ; The bow artifact is similar, but increases ranged damage to 2.
   (init (mk-quest
     [:tiles ["Elven Bow" ["orc" :hp 10]]]))
-  (wk E)
+  (wk 'E)
   (shoot 'E)
   (assert-hp 'E 8)
   ; The Elven Bow has no effect on magic arrows. They still do 3
@@ -302,12 +302,12 @@
   ; A devil's shot normally does 10 damage, but now does
   ;     ceil(.75 * 10) = ceil(7.5) = 8.
   (assert (= G.player.hp 100))
-  (wk E)
+  (wk 'E)
   (assert (= G.player.hp 92))
   ; The shield only protects against monster attacks, so the 20
   ; poison damage we take from shooting the jar of poison is
   ; unreduced.
   (shoot 'E)
-  (wk E)
+  (wk 'E)
   (shoot 'E)
   (assert (= G.player.hp 72)))

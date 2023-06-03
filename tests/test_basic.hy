@@ -2,11 +2,11 @@
 
 
 (require
-  tests.lib [cant wk])
+  tests.lib [cant])
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init assert-at wait mk-quest mv-player shoot mk-tile assert-player-at assert-hp]
+  tests.lib [init assert-at wait mk-quest mv-player wk shoot mk-tile assert-player-at assert-hp]
   simalq.util [GameOverException]
   simalq.game-state [G save-game load-game]
   simalq.geometry [Pos at])
@@ -24,7 +24,7 @@
   (assert (= G.state-i 0)) ; The state index is 0-based.
   (assert (= G.turn-n 0)) ; Likewise the turn counter.
   ; Walk south 1 step.
-  (wk S)
+  (wk 'S)
   (assert-player-at 0 14)
   (assert (= G.state-i 1))
   (assert (= G.turn-n 1))
@@ -34,27 +34,27 @@
   (assert (= G.state-i 2))
   (assert (= G.turn-n 2))
   ; Try going west, bumping into the level border.
-  (cant (wk W) "The border of the dungeon blocks your movement.")
+  (cant (wk 'W) "The border of the dungeon blocks your movement.")
   (assert (= G.state-i 2))
     ; Failed attempts at actions don't advance the game-state index.
   (assert (= G.turn-n 2))
     ; Nor take turns.
   ; Try walking into a wall tile.
-  (wk S)
+  (wk 'S)
   (assert (= G.turn-n 3))
-  (cant (wk S) "Your way is blocked.")
+  (cant (wk 'S) "Your way is blocked.")
   ; Walk into the (plain) door to the east.
-  (wk NE)
-  (wk E 3)
+  (wk 'NE)
+  (wk 'E 3)
   (assert-at 'here ['player "door"])
   ; Try walking diagonally past the wall to the north.
-  (cant (wk NE) "That diagonal is blocked by a neighbor.")
+  (cant (wk 'NE) "That diagonal is blocked by a neighbor.")
 
   ; Walk diagonally between some pillars.
   (mv-player 3 1)
   (assert-at 'N "pillar")
   (assert-at 'E "pillar")
-  (wk NE)
+  (wk 'NE)
   (assert-player-at 4 2))
 
 
@@ -69,7 +69,7 @@
   ; The orc is out of range and thus unharmed.
   (assert-hp [5 0] 2)
   ; Walk east. The orc is now in the reality bubble, and advances.
-  (wk E)
+  (wk 'E)
   (assert-hp [4 0] 2)
   ; Now shoot and hit it for 1 damage.
   (assert (= G.score 0))
@@ -99,19 +99,19 @@
     [:width 20 :height 20 :wrap-x True :wrap-y True]))
 
   (assert-player-at 0 0)
-  (wk S)
+  (wk 'S)
   (assert-player-at 0 19)
-  (wk S 19)
+  (wk 'S 19)
   (assert-player-at 0 0)
-  (cant (wk W) "The border of the dungeon blocks your movement.")
-  (wk E)
+  (cant (wk 'W) "The border of the dungeon blocks your movement.")
+  (wk 'E)
 
   (assert (= G.level-n 2))
-  (wk W)
+  (wk 'W)
   (assert-player-at 19 0)
-  (wk S)
+  (wk 'S)
   (assert-player-at 19 19)
-  (wk NE)
+  (wk 'NE)
   (assert-player-at 0 0))
 
 
@@ -168,7 +168,7 @@
   (check (f/  0  3)  99)
   (wait 2)
   (check (f/  2  3)  99)
-  (wk E)
+  (wk 'E)
   (assert (= G.level-n 2))
   ; Since the player always gets the first move on each level, she
   ; hasn't yet breathed in any of the new poison.
@@ -210,9 +210,9 @@
 
   ; Take two actions.
   (check  0 0 0 100  'player "handful of gems" "orc")
-  (wk E)
+  (wk 'E)
   (check  1 1 250 97  'floor 'player "orc")
-  (wk E)
+  (wk 'E)
   (check  2 2 253 97  'floor 'player 'floor)
   ; Undo.
   (setv G.state-i 1)
@@ -226,14 +226,14 @@
   ; Undo, then do an "effective redo" where we repeat our previous
   ; action.
   (setv G.state-i 0)
-  (wk E)
+  (wk 'E)
   (check  1 1 250 97  'floor 'player "orc")
   ; That preserved further redo history, so we can redo again.
   (setv G.state-i 2)
   (check  2 2 253 97  'floor 'player 'floor)
   ; Undo, then take a new action.
   (setv G.state-i 0)
-  (wk N)
+  (wk 'N)
   (check  1 1 0 100  'floor "handful of gems" 'floor)
   ; We can no longer redo to the old state 2, since we branched off
   ; the history.
@@ -254,9 +254,9 @@
 
   ; Pick up a key, open a locked disappering door, and step there.
   (mv-player 13 10)
-  (wk S)
+  (wk 'S)
   (mv-player 11 2)
-  (wk W 2)
+  (wk 'W 2)
   (check  3 4  50 0  'player  10 2)
   ; Undo the last two actions.
   (setv G.state-i 1)
@@ -264,7 +264,7 @@
   ; Save.
   (save-game (/ tmp-path "mygame"))
   ; Take a new action, discarding the redo history.
-  (wk E)
+  (wk 'E)
   (check  2 3  50 1  "locked disappearing door"  12 2)
   ; Load, restoring the previous state and the previous history.
   (load-game (/ tmp-path "mygame"))
