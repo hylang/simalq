@@ -111,16 +111,24 @@
       G.player.pos
     (isinstance locator hy.models.Symbol)
       (pos+ G.player.pos (getattr Direction (str locator)))
+    (isinstance locator list)
+      (Pos G.map #* locator)
     (isinstance locator Pos)
       locator))
 
-(defn mk-tile [p tile-spec]
+(defn top [locator [attribute None]]
+  (setv x (get (at (locate locator)) 0))
+  (if attribute
+    (getattr x (hy.mangle attribute))
+    x))
+
+(defn mk-tile [locator tile-spec]
   (when (= tile-spec 'floor)
     (return))
   (if (isinstance tile-spec str)
     (setv  d {}  stem tile-spec)
     (setv  [stem #* d] tile-spec  d (kwdict d)))
-  (add-tile p stem #** d))
+  (add-tile (locate locator) stem #** d))
 
 (defn set-square [locator #* tile-specs]
   "Remove all tiles at the given square, then add new ones as

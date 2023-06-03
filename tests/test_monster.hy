@@ -4,7 +4,7 @@
 (import
   collections [Counter]
   fractions [Fraction :as f/]
-  tests.lib [init mk-quest locate assert-at wait set-square shoot mv-player add-usable use-item]
+  tests.lib [init mk-quest assert-at wait set-square shoot mv-player add-usable use-item top]
   simalq.geometry [Direction Pos ray at]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -13,11 +13,10 @@
 (defn test-simple-melee-combat []
   (init (mk-quest
     [:tiles [["Dark Knight" :hp 5]]]))
-  (defn monster [] (get (at (locate 'E)) 0))
   (defn check [turn score tris mon]
     (assert (and
       (= G.turn-n turn) (= G.score score)
-      (= G.player.hp tris) (or (is mon None) (= (. (monster) hp) mon)))))
+      (= G.player.hp tris) (or (is mon None) (= (. (top 'E) hp) mon)))))
 
   (check :turn 0 :score 0 :tris 100 :mon 5)
   ; Attack the monster, doing 2 damage. We get hit for 12 damage.
@@ -26,7 +25,7 @@
   ; And again.
   (wk E)
   (check :turn 2 :score 0 :tris 76 :mon 1)
-  (assert (= (. (monster) stem) "Dark Knight"))
+  (assert-at 'E "Dark Knight")
     ; The monster's still there.
   ; Finish the monster off. We take no damage this time.
   (wk E)
@@ -100,22 +99,20 @@
       @ ██o
       . . ."]))
     ; A wall, unlike a pillar, blocks diagonal movement.
-  (defn assert-mon-at [x y]
-    (assert (= (. (at (Pos G.map x y)) [0] stem) "orc")))
-  (assert-mon-at 2 1)
+  (assert-at [2 1] "orc")
   (wait 100)
-  (assert-mon-at 2 1)
+  (assert-at [2 1] "orc")
 
   ; A monster outside the reality bubble can't move.
   (setv r G.rules.reality-bubble-size)
   (init (mk-quest [:tiles [
     #* (* ['floor] r)
     "orc"]]))
-  (assert-mon-at (+ r 1) 0)
+  (assert-at [(+ r 1) 0] "orc")
   (wait 100)
-  (assert-mon-at (+ r 1) 0)
+  (assert-at [(+ r 1) 0] "orc")
   (wk E)
-  (assert-mon-at r 0)
+  (assert-at [r 0] "orc")
 
   ; A monster can chase Tris around a wrapped map.
   ; (Accompanied by "Yakety Sax", one imagines.)
@@ -164,15 +161,15 @@
       ; By default, normal monsters will only step on plain floor.
       (do
         (wait 10)
-        (assert (= (. (at (Pos G.map 2 0)) [0] stem) "orc")))
+        (assert-at [2 0] "orc"))
       ; If dainty-monsters mode is off, they can step on e.g. items.
       (do
         (wait 1)
         (assert-at 'E ["orc" "pile of gold"])))
 
     ; Either way, monsters block each other.
-    (assert-at (Pos G.map 4 0) "orc")
-    (assert-at (Pos G.map 5 0) "orc")))
+    (assert-at [4 0] "orc")
+    (assert-at [5 0] "orc")))
 
 
 (defn test-orc-or-goblin []
@@ -208,12 +205,11 @@
       [ 4 18 73]
       [ 2 24 67]
       [ 0 30 67]]]
-    (assert (and
-      (= G.player.hp player-hp)
-      (= G.score score)
-      (if (= orc-hp 0)
-        (not (at (Pos G.map 1 0)))
-        (= (. (at (Pos G.map 1 0)) [0] hp) orc-hp))))
+    (assert (= G.player.hp player-hp))
+    (assert (= G.score score))
+    (if (= orc-hp 0)
+      (assert-at [1 0] 'floor)
+      (assert (= (. (at (Pos G.map 1 0)) [0] hp) orc-hp)))
     (wk E)))
 
 
@@ -229,13 +225,12 @@
         :generate-hp 2]}]))
 
   (defn check [power tN tNE tE tSE tW]
-    (and
-      (= (. (at (Pos G.map 3 1)) [0] generation-power) power)
-      (assert-at (Pos G.map 3 2) tN)
-      (assert-at (Pos G.map 4 2) tNE)
-      (assert-at (Pos G.map 4 1) tE)
-      (assert-at (Pos G.map 4 0) tSE)
-      (assert-at (Pos G.map 2 1) tW)))
+    (assert (= (top [3 1] 'generation-power) power))
+    (assert-at [3 2] tN)
+    (assert-at [4 2] tNE)
+    (assert-at [4 1] tE)
+    (assert-at [4 0] tSE)
+    (assert-at [2 1] tW))
 
   None      (check (f/ 0 1) 'floor 'floor 'floor 'floor 'floor)
   (wait)    (check (f/ 2 3) 'floor 'floor 'floor 'floor 'floor)
@@ -261,14 +256,14 @@
 
   ; Outside the reality bubble, generators do nothing.
   (wait 10)
-  (assert-at (Pos G.map 4 0) 'floor)
-  (assert-at (Pos G.map 6 0) 'floor)
+  (assert-at [4 0] 'floor)
+  (assert-at [6 0] 'floor)
   ; Once in it, they can spawn monsters into adjacent squares even
   ; if those squares aren't in the reality bubble themselves.
   (wk E)
   (wait 2)
-  (assert-at (Pos G.map 4 0) "orc")
-  (assert-at (Pos G.map 6 0) "orc"))
+  (assert-at [4 0] "orc")
+  (assert-at [6 0] "orc"))
 
 
 (defn test-generated-first-turn []
@@ -396,9 +391,9 @@
   (wait)
   (assert (= G.player.hp 100))
   ; The player can shoot in that other direction.
-  (assert-at (Pos G.map 4 0) "devil")
+  (assert-at [4 0] "devil")
   (shoot 'W)
-  (assert-at (Pos G.map 4 0) 'floor))
+  (assert-at [4 0] 'floor))
 
 
 (defn test-wizard []
@@ -430,17 +425,17 @@
   ; obstacle to imp shots.
   (wait)
   (assert (= G.player.hp 99))
-  (assert (= (. (at (Pos G.map 3 0)) [0] shot-power) (f/ 3 5)))
+  (assert (= (top [3 0] 'shot-power) (f/ 3 5)))
   ; The void blocks imp shots. Since the imp can't shoot, it gains
   ; no shot power.
-  (set-square (Pos G.map 2 0) "Void")
+  (set-square [2 0] "Void")
   (wait)
   (assert (= G.player.hp 99))
-  (assert (= (. (at (Pos G.map 3 0)) [0] shot-power) (f/ 3 5)))
+  (assert (= (top [3 0] 'shot-power) (f/ 3 5)))
   ; At ranges of 2 or less, an imp flees.
   (mv-player 1 0)
   (wait)
-  (assert-at (Pos G.map 4 0) "imp")
+  (assert-at [4 0] "imp")
 
   ; On a turn that an imp isn't shooting or fleeing (even if it's
   ; gaining shot power), it wanders.
@@ -464,9 +459,9 @@
     [:tiles ['floor ["thorn tree" :hp 3] ["thorn tree" :hp 10]]]))
 
   ; Thorn trees are immobile.
-  (assert-at (Pos G.map 2 0) "thorn tree")
+  (assert-at [2 0] "thorn tree")
   (wait)
-  (assert-at (Pos G.map 2 0) "thorn tree")
+  (assert-at [2 0] "thorn tree")
   ; They're immune to arrows.
   (assert (= (. (at (Pos G.map 2 0)) [0] hp) 3))
   (shoot 'E)
@@ -481,12 +476,12 @@
   (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1))
   ; They're weak against fire: if they take 1 or more fire damage,
   ; they die instantly.
-  (assert-at (Pos G.map 2 0) "thorn tree")
-  (assert-at (Pos G.map 3 0) "thorn tree")
+  (assert-at [2 0] "thorn tree")
+  (assert-at [3 0] "thorn tree")
   (add-usable "standard bomb")
   (use-item 0  2 0)
-  (assert-at (Pos G.map 2 0) 'floor)
-  (assert-at (Pos G.map 3 0) 'floor))
+  (assert-at [2 0] 'floor)
+  (assert-at [3 0] 'floor))
 
 
 (defn test-tricorn []

@@ -72,16 +72,16 @@
   (shoot 'E)
   (assert-at 'E "orc")
   (assert (= (. (at (Pos G.map 2 0)) [0] hp) 1))
-  (assert-at (Pos G.map 3 0) "devil")
+  (assert-at [3 0] "devil")
   ; Shoot again. This kills the orc, so the magic arrow penetrates
   ; and continues along the whole line, smashing the jar of poison
   ; and hitting the ghost. Unlike IQ, a magic arrow can continue
   ; after destroying an object.
   (shoot 'E)
   (assert-at 'E 'floor)
-  (assert-at (Pos G.map 3 0) 'floor)
-  (assert-at (Pos G.map 4 1) 'floor)
-  (assert-at (Pos G.map 6 0) 'floor))
+  (assert-at [3 0] 'floor)
+  (assert-at [4 1] 'floor)
+  (assert-at [6 0] 'floor))
 
 
 (defn test-food-eat []
@@ -233,13 +233,13 @@
   ; Unlike IQ, walls can be added regardless of what's already on the
   ; target square.
   (use-item 0  0 0)
-  (assert-at (Pos G.map 0 0) ["wall" 'player])
+  (assert-at [0 0] ["wall" 'player])
   (use-item 1  1 0)
-  (assert-at (Pos G.map 1 0) ["wall" "orc"])
+  (assert-at [1 0] ["wall" "orc"])
   (use-item 2  2 0)
-  (assert-at (Pos G.map 2 0) ["wall" "wall"])
+  (assert-at [2 0] ["wall" "wall"])
   (use-item 3  3 0)
-  (assert-at (Pos G.map 3 0) "wall"))
+  (assert-at [3 0] "wall"))
 
 
 (defn test-fire-bomb []
@@ -258,7 +258,7 @@
       'shoot (do
         ; Shoot the bomb while it's on the floor. This creates a
         ; less impressive explosion.
-        (mk-tile (Pos G.map 1 0) item-stem)
+        (mk-tile [1 0] item-stem)
         (shoot 'E)))
      (for [[i dmg] (enumerate damages)]
        (assert (=

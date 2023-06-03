@@ -82,7 +82,7 @@
   (shoot 'E)
   (assert (= G.score 6))
   (for [x (range (+ G.player.pos.x 1) G.map.width)]
-    (assert (not (at (Pos G.map x 0)))))
+    (assert-at [x 0] 'floor))
   ; Shooting the level border is allowed (but has no effect).
   (shoot 'W)
 
@@ -123,10 +123,10 @@
       . o . . @ ."
     :wrap-x T]))
   ; We can shoot an arrow that wraps around the level to kill the orc.
-  (assert-at (Pos G.map 1 0) "orc")
+  (assert-at [1 0] "orc")
   (shoot 'E)
   (for [x [0 1 2]]
-     (assert-at (Pos G.map x 0) 'floor))
+     (assert-at [x 0] 'floor))
   ; A wrapped arrow stops just before it reaches the player's square,
   ; without hitting anything in it.
   (mk-tile G.player.pos "orc")
@@ -206,9 +206,9 @@
     (assert (and
       (= G.state-i state) (= G.turn-n turn)
       (= G.score score) (= G.player.hp hp)))
-    (assert-at (Pos G.map 0 0) t0)
-    (assert-at (Pos G.map 1 0) t1)
-    (assert-at (Pos G.map 2 0) t2))
+    (assert-at [0 0] t0)
+    (assert-at [1 0] t1)
+    (assert-at [2 0] t2))
 
   ; Take two actions.
   (check  0 0 0 100  'player "handful of gems" "orc")
@@ -252,7 +252,7 @@
       (= G.state-i i) (= G.turn-n i) (= (len G.states) n-states)
       (= G.score score) (= G.player.keys keys)
       (= G.player.pos.xy #(px py))))
-    (assert-at (Pos G.map 10 2) thing))
+    (assert-at [10 2] thing))
 
   ; Pick up a key, open a locked disappering door, and step there.
   (mv-player 13 10)

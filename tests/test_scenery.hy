@@ -97,10 +97,8 @@
 
 (defn test-chest []
   (init (mk-quest []))
-  (mk-tile (Pos G.map 1 0) "pile of gold")
-  (mk-tile (Pos G.map 1 0) "treasure chest")
-  (mk-tile (Pos G.map 2 0) "meal")
-  (mk-tile (Pos G.map 2 0) "treasure chest")
+  (set-square [1 0] "treasure chest" "pile of gold")
+  (set-square [2 0] "treasure chest" "meal")
 
   ; Fail to unlock the chest.
   (cant (wk E) "It's locked, and you're keyless at the moment.")
@@ -195,15 +193,15 @@
   (wk NE)
   (wk SE)
   (wk W)
-  (assert-at (Pos G.map 0 0) "pushblock")
-  (assert-at (Pos G.map 1 0) 'player))
+  (assert-at [0 0] "pushblock")
+  (assert-at [1 0] 'player))
 
 
 (defn test-gate []
   (init (mk-quest []))
   (defn t [] (Pos G.map 5 5))
 
-  (mk-tile (Pos G.map 1 0) ["gate" :target (t)])
+  (mk-tile [1 0] ["gate" :target (t)])
   (set-square (t) "orc" "pile of gold" "exit")
   (assert (and (= G.turn-n 0) (= G.player.pos (Pos G.map 0 0))))
   ; Walking into the gate warps us to the target square, but
@@ -304,7 +302,7 @@
         y (reversed (range G.map.height))
         x (range G.map.width)
         [x y]))]
-      (assert-at (Pos G.map x y) (ecase t
+      (assert-at [x y] (ecase t
         "." 'floor
         "@" 'player
         "t" "wallfall trap"
