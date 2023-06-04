@@ -3,7 +3,7 @@
   tests.lib [cant])
 (import
   pytest
-  tests.lib [init mk-quest assert-at set-square mv-player assert-player-at wk shoot mk-tile]
+  tests.lib [init mk-quest assert-at set-square mv-player assert-player-at wk wait shoot mk-tile]
   simalq.util [GameOverException]
   simalq.geometry [at Pos]
   simalq.game-state [G])
@@ -325,3 +325,22 @@
     "." "." "@" "."
     "." "." "." "."
     "." "." "." "."))
+
+
+(defn test-paralysis-trap []
+  (init (mk-quest
+    [:tiles ["paralysis trap" "orc"]]))
+  (setv para-msg "You're paralyzed. You can only wait for it to pass.")
+
+  ; Per IQ, after Tris gets paralyzed, monsters get 3 actions before
+  ; she can act again.
+  (wk 'E)
+  (assert (= G.player.hp 97))
+  (cant (wk 'E) para-msg)
+  (wait)
+  (assert (= G.player.hp 94))
+  (cant (wk 'E) para-msg)
+  (wait)
+  (assert (= G.player.hp 91))
+  (wk 'E)
+  (assert (= G.player.hp 91)))

@@ -15,7 +15,6 @@
     [32 "passwall_wand"]
     [34 "potion_of_speed"]
     [35 "damage_causing_trap"]
-    [36 "paralysis_trap"]
     [47 "floater"]
     [48 "blob"]
     [50 "specter"]

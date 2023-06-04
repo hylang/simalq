@@ -4,7 +4,7 @@
 (import
   copy [deepcopy]
   simalq.color :as color
-  simalq.util [CommandError DamageType save-game-path msg player-shot-damage flash-map invlets]
+  simalq.util [CommandError DamageType save-game-path msg player-shot-damage flash-map invlets player-status]
   simalq.geometry [Direction Pos pos+ at dist]
   simalq.game-state [G save-game load-game]
   simalq.tile [mv-tile damage-tile destroy-tile]
@@ -203,6 +203,9 @@
       (raise))))
 
 (defn _execute-action [action]
+  (when (and (player-status 'Para) (is-not (type action) Wait))
+    (raise (CommandError "You're paralyzed. You can only wait for it to pass.")))
+
   (ecase (type action)
 
     Wait

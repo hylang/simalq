@@ -3,7 +3,7 @@
   simalq.macros [has defn-dd fn-dd])
 (import
   simalq.color :as color
-  simalq.util [CommandError GameOverException player-melee-damage DamageType next-in-cycle]
+  simalq.util [CommandError GameOverException player-melee-damage DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction pos+ at burst dist dir-to]
   simalq.tile [Tile deftile replace-tile damage-tile mv-tile destroy-tile]
   simalq.game-state [G])
@@ -398,6 +398,17 @@
       #("Wallfall type" self.wallnum)))
 
   :flavor "The special thing about this wall is that it can be destroyed by wallfall traps of the corresponding type.\n\nWhat's the deal with monster closets? Monsters are proud of who they are, am I right? I'll be here all week.")
+
+(deftile Trap "<>" "a paralysis trap"
+  :color 'purple
+  :iq-ix 36
+
+  :hook-player-walked-into (fn-dd [self]
+    (doc f"Paralyzes you for {paralysis-duration} turns. While paralyzed, waiting is the only action you can take.")
+    (+= (get G.player.status-effects StatusEffect.Para) paralysis-duration))
+
+  :flavor "A magical field that causes you to vividly remember something embarrassing that you did as a teenager, forcing you to briefly freeze in horror. The problem with being royalty is that awkward adolescent moments all too easily become international incidents.")
+(setv paralysis-duration 3)
 
 
 (deftile Scenery "()" "a magical energy shield"
