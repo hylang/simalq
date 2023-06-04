@@ -8,7 +8,7 @@
   hy.pyops *
   simalq.color :as color
   simalq.game-state [G]
-  simalq.util [mixed-number invlets]
+  simalq.util [mixed-number invlets StatusEffect]
   simalq.geometry [Pos at dist]
   simalq.tile [Tile])
 (setv  T True  F False)
@@ -197,6 +197,13 @@
         :if (is-not x None)
         (if (is (type x) str) (colorstr x) x))))
 
+  (defn status-effects [bad]
+    (gfor
+      se StatusEffect
+      :if (= se.bad bad)
+      :if (get G.player.status-effects se)
+      (.format "{} {}" se.name (get G.player.status-effects se))))
+
   #(
     (j
       (.format "HP {:,}"
@@ -211,7 +218,8 @@
         (colorstr (format G.player.magic-arrows ","))))
       (+ #* (gfor
         item G.player.inventory
-        (if item (color-tile item) (colorstr "  ")))))
+        (if item (color-tile item) (colorstr "  "))))
+      #* (status-effects :bad T))
     (j
       (.format "DL {:,}"
         G.level-n)
@@ -226,7 +234,8 @@
         [stem has-artifact] (.items G.player.artifacts)
         (if has-artifact
           (color-tile (get Tile.types stem))
-          (colorstr "  ")))))))
+          (colorstr "  "))))
+      #* (status-effects :bad F))))
 
 
 (defn draw-inventory []
