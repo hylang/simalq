@@ -6,7 +6,7 @@
   simalq.game-state [G]
   simalq.geometry [pos-seed burst]
   simalq.tile [Tile deftile destroy-tile rm-tile add-tile]
-  simalq.util [DamageType hurt-player msg burst-damage])
+  simalq.util [DamageType StatusEffect hurt-player msg burst-damage])
 (setv  T True  F False)
 
 
@@ -205,6 +205,34 @@
     (+= G.player.magic-arrows G.rules.magic-arrows-pickup-size))
 
   :flavor "Now we're talkin'! These missiles engraved with mystical runes hit hard and keep on going. Sadly, Tris is so excited to use them that she can't shoot mundane arrows until she's used them all up.")
+
+
+(defclass StatusEffectItem [Item]
+  (setv
+    __slots__ []
+    effect None
+    duration None)
+
+  (defn help [self])
+
+  (defn-dd pick-up [self]
+    (doc (.help it))
+    (+=
+      (get G.player.status-effects
+        (getattr StatusEffect (str self.effect)))
+      self.duration)))
+
+(deftile StatusEffectItem "! " "an amulet of invulnerability"
+  :color 'dark-yellow
+  :iq-ix 26
+  :points 100
+
+  :effect 'Ivln
+  :duration 20
+
+  :help (fn [self]
+    f"Makes you invulnerable for {self.duration} more turns, protecting you from all damage and ambient poison, but not harmful status effects or disenchantment.")
+  :flavor "A star-shaped pendant with two black spots in the center. Its magic is short-lived but potent indeed.")
 
 
 (defclass Usable [Item]

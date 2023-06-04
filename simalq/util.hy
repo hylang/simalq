@@ -67,7 +67,7 @@
     simalq.main [print-main-screen displaying]
     simalq.display [ColorChar])
 
-  (when (not (displaying))
+  (unless (and ps (displaying))
     (return))
 
   (print-main-screen focus
@@ -117,6 +117,26 @@
   DeathMagic    "death magic"))
 
 
+(defclass StatusEffect [Enum]
+  (setv
+    Para  "paralysis"
+    Weak  "weakness"
+    Ivln  "invulnerability"
+    Ivis  "invisibility"
+    Fast  "haste"
+    Pois  "poisonous touch"
+    MKey  "magical key"
+    Prot  "protection")
+  (defn [property] bad [self]
+    (in self [StatusEffect.Para StatusEffect.Weak])))
+
+(defn player-status [abbreviation]
+  "Does the player have the given status effect?"
+  (bool (get
+    G.player.status-effects
+    (getattr StatusEffect (str abbreviation)))))
+
+
 (setv hp-warning-threshold 100)
 
 (defn hurt-player [amount damage-type [animate T] [attacker None]]
@@ -135,15 +155,21 @@
     (flash-map
       G.player.pos
       colors.flash-player-damaged
-      (if attacker
-        (+ #(attacker.pos) (ray attacker.pos
-          (dir-to attacker.pos G.player.pos)
-          (dist attacker.pos G.player.pos)))
-        #(G.player.pos))
+      (+
+        (if attacker
+          (ray G.player.pos
+            (dir-to G.player.pos attacker.pos)
+            (dist G.player.pos attacker.pos))
+          #())
+        (if (player-status 'Ivln)
+          #()
+          #(G.player.pos)))
       {G.player.pos (if (> amount 99) "OW" (format amount "2"))}
       :flash-time-s .2))
+
   (setv hp-was G.player.hp)
-  (hy.M.simalq/tile.damage-tile G.player amount damage-type)
+  (unless (player-status 'Ivln)
+    (hy.M.simalq/tile.damage-tile G.player amount damage-type))
   (when (chainc G.player.hp <= hp-warning-threshold < hp-was)
     (msg "Princess needs food badly!")))
 

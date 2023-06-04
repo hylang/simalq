@@ -12,7 +12,6 @@
 (for [[iq-ix stem] [
 
     [25 "cloak_of_invisibility"]
-    [26 "amulet_of_invulnerability"]
     [32 "passwall_wand"]
     [34 "potion_of_speed"]
     [35 "damage_causing_trap"]

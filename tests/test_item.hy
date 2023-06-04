@@ -2,6 +2,7 @@
   hyrule [do-n ecase]
   tests.lib [cant])
 (import
+  fractions [Fraction :as f/]
   tests.lib [init mk-quest assert-at assert-hp set-square mv-player wk shoot wait use-item mk-tile add-usable]
   simalq.geometry [Pos Direction at]
   simalq.game-state [G])
@@ -143,6 +144,39 @@
   (assert-hp [5 2] 4)
   ; Points are earned for all damage dealt.
   (assert (= G.score (py "3*3 + 3*3"))))
+
+
+(defn test-amulet-invulnerability []
+  (init (mk-quest [
+    :poison-intensity (f/ 1 3)
+    :tiles ["amulet of invulnerability" "orc"]]))
+  (defn check [turn-n player-hp [poison-dose None]]
+    (assert (and (= G.turn-n turn-n)) (= G.player.hp player-hp))
+    (when (is-not poison-dose None)
+      (= G.player.poison-dose poison-dose)))
+
+  (check 0 100 (f/ 0))
+  ; Get hit by the orc and breathe in some poison.
+  (wk 'NE)
+  (check 1 97 (f/ 1 3))
+  ; Pick up the amulet.
+  (wk 'S)
+  (check 2 97 (f/ 1 3))
+  ; The amulet provides 20 turns of protection, including the turn we
+  ; got it. (This is 1 more turn than you effectively get in IQ.)
+  (wait 19)
+  (check 21 97 (f/ 1 3))
+  (wait)
+  (check 22 94 (f/ 2 3))
+
+  ; If you get multiple status-effect items, the durations are summed.
+  (init (mk-quest [
+    :tiles [#* (* ["amulet of invulnerability"] 2) "orc"]]))
+  (wk 'E 2)
+  (wait 38)
+  (check 40 100)
+  (wait)
+  (check 41 97))
 
 
 (defn test-inventory []

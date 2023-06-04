@@ -3,7 +3,7 @@
   simalq.macros [pop-integer-part])
 (import
   contextlib [contextmanager]
-  simalq.util [CommandError message-queue msg hurt-player DamageType]
+  simalq.util [CommandError message-queue msg hurt-player DamageType player-status]
   simalq.color :as color
   simalq.geometry [burst at]
   simalq.game-state [G]
@@ -51,10 +51,11 @@
 
   ; Dose the player with ambient poison, and convert an accumulated
   ; dose ≥1 into damage.
-  (+= G.player.poison-dose G.level.poison-intensity)
-  (hurt-player :animate F
-    (pop-integer-part G.player.poison-dose)
-    DamageType.Poison)
+  (unless (player-status 'Ivln)
+    (+= G.player.poison-dose G.level.poison-intensity)
+    (hurt-player :animate F
+      (pop-integer-part G.player.poison-dose)
+      DamageType.Poison))
 
   ; Run each-turn hooks. Unless the object is neither on this level
   ; nor in the player's inventory, in which case, kick the object off
@@ -63,6 +64,11 @@
     (unless (or (in o G.player.inventory) (and o.pos (is o.pos.map G.map)))
       (.remove G.each-turn o))
     (.each-turn o))
+
+  ; Tick down status effects.
+  (for [se (list G.player.status-effects)]
+    (when (get G.player.status-effects se)
+      (-= (get G.player.status-effects se) 1)))
 
   ; Advance the turn counter last.
   (+= G.turn-n 1))

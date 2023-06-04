@@ -18,6 +18,9 @@
       ; ≥ 1 get converted to damage.
     :just-exited F
       ; Did you just use an exit?
+    :status-effects {}
+      ; Time remaining for each `StatusEffect` (0 for not having the
+      ; effect).
     :keys 0
       ; How many (regular, and not yet used) keys you're carrying.
     :magic-arrows 0
