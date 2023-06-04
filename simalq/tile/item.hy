@@ -355,8 +355,7 @@
     __slots__ []
     color-bg 'magenta)
 
-  (defn help [self]
-    None)
+  (defn help [self])
 
   (defn-dd pick-up [self]
     (doc (.help it))
