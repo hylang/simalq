@@ -330,7 +330,7 @@
 
 (defn test-artifact-shield []
   (init (mk-quest [
-    :tiles ["Magic Shield" 'floor ["devil" :hp 1] "jar of poison"]]))
+    :tiles ["Magic Shield" "fixed damaging trap" "devil"]]))
 
   ; The shield makes you take 3/4 damage, rounded up.
   ; A devil's shot normally does 10 damage, but now does
@@ -338,10 +338,9 @@
   (assert (= G.player.hp 100))
   (wk 'E)
   (assert (= G.player.hp 92))
-  ; The shield only protects against monster attacks, so the 20
-  ; poison damage we take from shooting the jar of poison is
-  ; unreduced.
+  ; Kill the devil.
   (shoot 'E)
+  ; Walk into the trap. The shield only protects against monster
+  ; attacks, so this damage is unreduced.
   (wk 'E)
-  (shoot 'E)
-  (assert (= G.player.hp 72)))
+  (assert (= G.player.hp 87)))

@@ -327,6 +327,21 @@
     "." "." "." "."))
 
 
+(defn test-damaging-trap []
+  (init (mk-quest
+    [:tiles ["fixed damaging trap"]]))
+
+  (assert (= G.player.hp 100))
+  ; Step on the trap, taking 5 damage.
+  (wk 'E)
+  (assert (= G.player.hp 95))
+  ; We don't take further damage just for hanging around, but the
+  ; trap remains.
+  (wait)
+  (assert (= G.player.hp 95))
+  (assert-at 'here ['player "fixed damaging trap"]))
+
+
 (defn test-paralysis-trap []
   (init (mk-quest
     [:tiles ["paralysis trap" "orc"]]))

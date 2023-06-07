@@ -14,7 +14,6 @@
     [25 "cloak_of_invisibility"]
     [32 "passwall_wand"]
     [34 "potion_of_speed"]
-    [35 "damage_causing_trap"]
     [48 "blob"]
     [50 "specter"]
     [52 "negaton"]
