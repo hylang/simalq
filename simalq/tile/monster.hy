@@ -110,6 +110,10 @@
   (setv d (dir-to p G.player.pos))
   (setv attack None)
 
+  (when (= p G.player.pos)
+    ; If we're on the player's square, we can't attack her.
+    (return F))
+
   ; Try a melee attack first.
   (when (and
       mon.damage-melee

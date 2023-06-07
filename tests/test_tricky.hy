@@ -2,7 +2,7 @@
 
 
 (import
-  tests.lib [init mk-quest assert-at assert-hp assert-player-at wk shoot mk-tile]
+  tests.lib [init mk-quest assert-at assert-hp assert-player-at wk wait shoot mk-tile mv-player]
   simalq.game-state [G]
   simalq.geometry [Pos at])
 (setv  T True  F False)
@@ -97,3 +97,18 @@
       (wk 'E))
     (assert (= (. (at (mon-p)) [wall-on-top] hp) (- 3 (if ranged 1 2))))
     (assert (= G.player.hp (- 100 (if ranged 10 3))))))
+
+
+(defn test-no-instack-attack []
+  "Monsters on your square can't attack you."
+
+  (init (mk-quest
+    [:tiles ["devil"]]))
+  (mv-player 1 0)
+  (assert (= G.player.hp 100))
+  ; We wait. The devil can't attack. It doesn't move, either, since
+  ; its behavior is `Approach`.
+  (wait)
+  (assert (= G.player.hp 100))
+  (wk 'E)
+  (assert (= G.player.hp 97)))
