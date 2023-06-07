@@ -512,3 +512,55 @@
   ; They take normal damage from sword attacks.
   (wk 'E)
   (assert-hp 'E 7))
+
+
+(defn test-floater []
+
+  (init (mk-quest [
+    :height 1
+    :tiles ["wall" "floater" "wall"]]))
+  ; If a floater activates while adjacent to us, we gain 1/5 floater
+  ; disturbance.
+  (assert (= G.player.floater-disturbance (f/ 0)))
+  (wait)
+  (assert (= G.player.floater-disturbance (f/ 0)))
+  (mv-player 1 0)
+  (wait)
+  (assert (= G.player.floater-disturbance (f/ 1 5)))
+  (wait)
+  (assert (= G.player.floater-disturbance (f/ 2 5)))
+  ; Hit the floater. It explodes and we take 10 damage.
+  (assert (= G.player.hp 100))
+  (wk 'E)
+  (assert (= G.player.hp 90))
+  (assert-at 'E 'floor)
+  (assert (= G.player.floater-disturbance (f/ 2 5)))
+  ; Waiting next to another floater increases disturbance some more.
+  (set-square 'E "floater")
+  (wait)
+  (assert (= G.player.floater-disturbance (f/ 3 5)))
+  (wait)
+  (assert (= G.player.floater-disturbance (f/ 4 5)))
+  ; When disturbance reaches 1, it's cleared and the floater explodes
+  ; spontaneously.
+  (wait)
+  (assert (= G.player.hp 80))
+  (assert-at 'E 'floor)
+  (assert (= G.player.floater-disturbance (f/ 0)))
+
+  ; Contra IQ, floaters can explode on death regardless of how
+  ; they're killed.
+  (init (mk-quest [
+    :map "
+      ██f ██.
+      @ > . ☠"
+    :map-marks {
+      "☠ " "jar of poison"}]))
+  (assert (= G.player.hp 100))
+  (assert-at 'NE "floater")
+  (assert-at [3 0] "jar of poison")
+  ; Shoot the jar of poison, killing the floater.
+  (shoot 'E)
+  (assert (= G.player.hp 90))
+  (assert-at 'NE 'floor)
+  (assert-at [3 0] 'floor))

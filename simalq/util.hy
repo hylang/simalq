@@ -156,7 +156,7 @@
       G.player.pos
       colors.flash-player-damaged
       (+
-        (if attacker
+        (if (and attacker attacker.pos)
           (ray G.player.pos
             (dir-to G.player.pos attacker.pos)
             (dist G.player.pos attacker.pos))

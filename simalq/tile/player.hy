@@ -31,8 +31,10 @@
       ; Boolean flags indicating which artifacts have been obtained.
         "Magic Shield" F
         "Elven Bow" F
-        "Holy Sword" F})
-  :mutable-slots #("hp" "poison_dose" "just_exited" "keys" "magic_arrows")
+        "Holy Sword" F}
+    :floater-disturbance (Fraction 0))
+      ; A measure of how much time you've spent adjacent to floaters.
+  :mutable-slots (tuple (map hy.mangle '(hp poison-dose just-exited keys magic-arrows floater-disturbance)))
     ; `inventory` and `artifacts` should be mutated directly rather
     ; reassigned.
 

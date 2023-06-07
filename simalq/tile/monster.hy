@@ -9,7 +9,7 @@
   simalq.util [player-melee-damage DamageType hurt-player next-in-cycle mixed-number]
   simalq.geometry [Direction pos+ at dist adjacent? dir-to pos-seed ray]
   simalq.game-state [G]
-  simalq.tile [Actor deftile mv-tile add-tile damage-tile destroy-tile]
+  simalq.tile [Tile Actor deftile mv-tile add-tile damage-tile destroy-tile]
   simalq.tile.scenery [walkability])
 (setv  T True  F False)
 
@@ -79,6 +79,8 @@
         #("Shot range" self.shot-range))
       (when self.kamikaze
         #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
+      (unless (is self.hook-destroyed Tile.hook-destroyed)
+        #("Effect on death" self.hook-destroyed.__doc__))
       #* extra
       #("Point value" (.format "{:,}{}"
         self.points
@@ -99,12 +101,12 @@
   ; into being.
   (setv (. (at pos) [-1] last-acted) G.turn-n))
 
-(defn try-to-attack-player [mon [dry-run F] [shots-ignore-obstacles F]]
+(defn try-to-attack-player [mon [dry-run F] [shots-ignore-obstacles F] [from-pos None]]
   "Try to melee or shoot the player, if the monster can. Return true
   if it succeeded. If `dry-run` is true, the attack isn't actually
   made."
 
-  (setv p mon.pos)
+  (setv p (or from-pos mon.pos))
   (setv d (dir-to p G.player.pos))
   (setv attack None)
 
@@ -140,7 +142,9 @@
   (hurt-player :attacker mon
     (damage-by-hp mon (if (= attack 'shot) mon.damage-shot mon.damage-melee))
     (if (= attack 'shot) DamageType.MonsterShot DamageType.MonsterMelee))
-  (when mon.kamikaze
+  (when (and mon.kamikaze mon.pos)
+    ; We check `mon.pos` so as not to call `destroy-tile` when we're
+    ; already being called by it.
     (destroy-tile mon))
   T)
 
@@ -448,3 +452,31 @@
   :damage-melee 20
 
   :flavor "A shadowy hooded figure bearing a wicked scythe that speaks in all capital letters. It can be destroyed, but don't expect that to be easy.")
+
+(deftile NonGen "f " "a floater"
+  :iq-ix 47
+  :points 2
+
+  :slot-defaults (dict :kamikazed F)
+  :mutable-slots #("kamikazed")
+
+  :damage-shot 10
+  :shot-range 1
+  :kamikaze T
+
+  :act (fn-dd [self]
+    (doc f"Float — If you're adjacent, increases your floater disturbance by {floater-disturbance-increment}. If your floater disturbance reaches 1, it's cleared and the monster attacks. Otherwise, the monster wanders per `Wander`.")
+    (when (adjacent? self.pos G.player.pos)
+      (+= G.player.floater-disturbance floater-disturbance-increment)
+      (when (pop-integer-part G.player.floater-disturbance)
+        (setv self.kamikazed T)
+        (return (try-to-attack-player self))))
+    (wander self :implicit-attack F))
+
+  :hook-destroyed (fn [self pos]
+    "The monster can attempt a free attack, unless it killed itself by kamikaze."
+    (unless self.kamikazed
+      (try-to-attack-player self :from-pos pos)))
+
+  :flavor "A giant aerial jellyfish, kept aloft by a foul-smelling and highly reactive gas. It doesn't fly so much as float about in the dungeon drafts. If disturbed, it readily explodes, and its explosions have the remarkable property of harming you and nobody else.")
+(setv floater-disturbance-increment (f/ 1 5))
