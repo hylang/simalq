@@ -214,6 +214,36 @@
   (check 21 11))
 
 
+(defn test-cloak-of-invisibility []
+  (init (mk-quest [
+    :map "
+      . d . . .
+      . . . . .
+      @ ! . i .
+      . . . . .
+      . o . . ."
+    :map-marks {
+      "! " "cloak of invisibility"}]))
+
+  (assert (= G.player.hp 100))
+  ; Get the cloak. Now that we're invisible, the orc can't approach
+  ; and the devil can't shoot. (Nor can the imp flee, and it's too
+  ; close to shoot even if the player were visible, but it can still
+  ; wander.)
+  (wk 'E)
+  (while (at (Pos G.map 3 2))
+    (wait))
+  (assert (<= G.turn-n 10))
+  (assert (= G.player.hp 100))
+  (assert-at [1 0] "orc")
+  (assert-at [1 4] "devil")
+  ; Step adjacent to the orc, allowing it to attack. The devil remains
+  ; immobile.
+  (wk 'SW)
+  (assert (= G.player.hp 97))
+  (assert-at [1 4] "devil"))
+
+
 (defn test-inventory []
   (init (mk-quest [:tiles [
      "wand of shielding" "wall-making wand"

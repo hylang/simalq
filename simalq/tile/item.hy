@@ -246,6 +246,18 @@
     f"Lets you act twice per turn for {self.duration} more turns.")
   :flavor "This cool concoction puts a pep in your step and a swiftness in your sword-swings.")
 
+(deftile StatusEffectItem "! " "a cloak of invisibility"
+  :color 'blue
+  :iq-ix 25
+  :points 100
+
+  :effect 'Ivis
+  :duration 25
+
+  :help (fn [self]
+    f"Makes you invisible for {self.duration} more turns. Most monsters can't track or shoot you while you're invisible, unless you're adjacent to them.")
+  :flavor "A cape enchanted with the power of the night sky. Try not to get it snagged on any loose flagstones (especially when it's invisible).")
+
 
 (defclass Usable [Item]
   "An item that's added to your inventory and can thereafter be

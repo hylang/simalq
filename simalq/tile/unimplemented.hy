@@ -11,7 +11,6 @@
 
 (for [[iq-ix stem] [
 
-    [25 "cloak_of_invisibility"]
     [32 "passwall_wand"]
     [48 "blob"]
     [50 "specter"]

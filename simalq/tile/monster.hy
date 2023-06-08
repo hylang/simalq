@@ -6,7 +6,7 @@
   fractions [Fraction :as f/]
   enum [Enum]
   toolz [unique]
-  simalq.util [player-melee-damage DamageType hurt-player next-in-cycle mixed-number]
+  simalq.util [player-melee-damage DamageType hurt-player next-in-cycle mixed-number player-status]
   simalq.geometry [Direction pos+ at dist adjacent? dir-to pos-seed ray]
   simalq.game-state [G]
   simalq.tile [Tile Actor deftile mv-tile add-tile damage-tile destroy-tile]
@@ -40,8 +40,10 @@
     shot-range None
       ; If set to an integer, it limits the distance at which the
       ; monster can shoot.
-    kamikaze False)
+    kamikaze F
       ; If true, the monster kills itself upon attacking.
+    sees-invisible F)
+      ; If true, the monster is unaffected by the player being invisible.
 
   (defn hook-player-bump [self origin]
     "Attack the monster in melee."
@@ -79,6 +81,8 @@
         #("Shot range" self.shot-range))
       (when self.kamikaze
         #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
+      (when self.sees-invisible
+        #("Invisibility detection" "The monster is unaffected by you being invisible."))
       (unless (is self.hook-destroyed Tile.hook-destroyed)
         #("Effect on death" self.hook-destroyed.__doc__))
       #* extra
@@ -101,6 +105,12 @@
   ; into being.
   (setv (. (at pos) [-1] last-acted) G.turn-n))
 
+(defn player-invisible-to [mon [mon-pos None]]
+  (and
+    (player-status 'Ivis)
+    (not (adjacent? (or mon-pos mon.pos) G.player.pos))
+    (not mon.sees-invisible)))
+
 (defn try-to-attack-player [mon [dry-run F] [shots-ignore-obstacles F] [from-pos None]]
   "Try to melee or shoot the player, if the monster can. Return true
   if it succeeded. If `dry-run` is true, the attack isn't actually
@@ -112,6 +122,9 @@
 
   (when (= p G.player.pos)
     ; If we're on the player's square, we can't attack her.
+    (return F))
+
+  (when (player-invisible-to mon p)
     (return F))
 
   ; Try a melee attack first.
@@ -160,6 +173,8 @@
   "Approach — If the monster can attack, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
 
   (when (and implicit-attack (try-to-attack-player mon))
+    (return))
+  (when (player-invisible-to mon)
     (return))
 
   ; Try to get closer to the player.
@@ -396,7 +411,9 @@
   :act (fn-dd [self]
     (doc f"Coward — If the monster is within {imp-flee-range} squares of you, it flees (per `Approach` in reverse). Otherwise, if it has line of sight to you (ignoring all obstacles) it adds {imp-shot-charge} to its shot power. If this is ≥1, it subtracts 1 to shoot you. Otherwise, it wanders (per `Wander`).")
 
-    (when (<= (dist G.player.pos self.pos) imp-flee-range)
+    (when (and
+        (<= (dist G.player.pos self.pos) imp-flee-range)
+        (not (player-invisible-to self)))
       (return (approach self :reverse T :implicit-attack F)))
     (when (try-to-attack-player self :dry-run T :shots-ignore-obstacles T)
       (+= self.shot-power imp-shot-charge)
