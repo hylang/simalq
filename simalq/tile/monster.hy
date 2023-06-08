@@ -472,7 +472,7 @@
   :resists #(DamageType.MagicArrow)
   :damage-melee 20
 
-  :flavor "A shadowy hooded figure bearing a wicked scythe that speaks in all capital letters. It can be destroyed, but don't expect that to be easy.")
+  :flavor "A shadowy hooded figure bearing a wicked scythe who speaks in all capital letters. It can be destroyed, but don't expect that to be easy.")
 
 (deftile NonGen "f " "a floater"
   :iq-ix 47
