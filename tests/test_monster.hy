@@ -1,7 +1,6 @@
 (require
   hyrule [do-n])
 (import
-  collections [Counter]
   fractions [Fraction :as f/]
   tests.lib [init mk-quest assert-at assert-hp wait set-square wk shoot mv-player add-usable use-item top]
   simalq.geometry [Direction Pos ray at]
@@ -444,14 +443,19 @@
       . . . . .
       @ . . i .
       . . . . ."]))
-   (wait)
-   (assert (=
-     (Counter (gfor
-       x [2 3 4]
-       y [0 1 2]
-       :if (!= [x y] [3 1])
-       (tuple (gfor  t (at (Pos G.map x y))  t.stem))))
-     {#() 7  #("imp") 1})))
+  (defn imp []
+    (setv [mon] (gfor
+      col G.map.data
+      stack col
+      t stack
+      :if (= t.stem "imp")
+      t))
+    mon)
+  ; We have to test this by peeking at the imp's internal state
+  ; because staying in place is a possible wandering step.
+  (assert (is (. (imp) wander-state) None))
+  (wait)
+  (assert (is-not (. (imp) wander-state) None)))
 
 
 (defn test-thorn-tree []
