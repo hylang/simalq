@@ -234,6 +234,18 @@
     f"Makes you invulnerable for {self.duration} more turns, protecting you from all damage and ambient poison, but not harmful status effects or disenchantment.")
   :flavor "A star-shaped pendant with two black spots in the center. Its magic is short-lived but potent indeed.")
 
+(deftile StatusEffectItem "! " "a potion of speed"
+  :color 'dark-green
+  :iq-ix 34
+  :points 100
+
+  :effect 'Fast
+  :duration 10
+
+  :help (fn [self]
+    f"Lets you act twice per turn for {self.duration} more turns.")
+  :flavor "This cool concoction puts a pep in your step and a swiftness in your sword-swings.")
+
 
 (defclass Usable [Item]
   "An item that's added to your inventory and can thereafter be

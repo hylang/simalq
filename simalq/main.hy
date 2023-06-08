@@ -39,6 +39,15 @@
     (setv G.player.just-exited F)
     (return))
 
+  (when (and
+      (player-status 'Fast)
+      (or
+        (< G.state-i 2)
+        (< (. G.states [(- G.state-i 2)] turn-n) G.turn-n)))
+    ; Let the player take a second action this turn. (Notice that
+    ; this doesn't stack with the free action from using an exit.)
+    (return))
+
   ; Allow actors in the reality bubble to act, in `burst`'s spiral
   ; order.
   (for [

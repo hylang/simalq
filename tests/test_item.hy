@@ -146,7 +146,7 @@
   (assert (= G.score (py "3*3 + 3*3"))))
 
 
-(defn test-amulet-invulnerability []
+(defn test-amulet-of-invulnerability []
   (init (mk-quest [
     :poison-intensity (f/ 1 3)
     :tiles ["amulet of invulnerability" "orc"]]))
@@ -177,6 +177,41 @@
   (check 40 100)
   (wait)
   (check 41 97))
+
+
+(defn test-potion-of-speed []
+  (init (mk-quest
+    [:tiles ["potion of speed" "orc"]]))
+  (defn check [state-i turn-n [player-hp None]]
+    (assert (and (= G.state-i state-i) (= G.turn-n turn-n)))
+    (when (is-not player-hp None)
+      (assert (= G.player.hp player-hp))))
+
+  (check 0 0 100)
+  ; Pick up the potion of speed. We immediately get a second action
+  ; for this turn, so the orc doesn't get to hit yet.
+  (wk 'E)
+  (check 1 0 100)
+  ; Wait a bit, watching the orc hit once per two actions.
+  (wait)
+  (check 2 1 97)
+  (wait)
+  (check 3 1 97)
+  (wait)
+  (check 4 2 94)
+  ; Kill the orc.
+  (wk 'E)
+  (check 5 2 94)
+  ; Wait around until the potion wears off. Tris gets 10 free actions
+  ; in total.
+  (wait 13)
+  (check 18 9)
+  (wait)
+  (check 19 9)
+  (wait)
+  (check 20 10)
+  (wait)
+  (check 21 11))
 
 
 (defn test-inventory []

@@ -9,20 +9,45 @@
 
 
 (defn test-player-goes-first []
-  ; The player acts first on every level.
+  "The player acts first on every level."
+
+  (defn check [state-i turn-n level-n [player-hp None]]
+    (assert (and
+      (= G.state-i state-i)
+      (= G.turn-n turn-n)
+      (= G.level-n level-n)))
+    (when (is-not player-hp None)
+      (assert (= G.player.hp player-hp))))
+
   (init (mk-quest
     [:tiles [["orc" :hp 3] "exit"]]
     [:tiles [["orc" :hp 1]]]))
+  (check  0 0  1 100)
   (wk 'E 2)
-  (assert (and (= G.player.hp 97)))
+  (check  2 2  1 97)
   (wk 'E 2)
   ; We're now on level 2, but the second monster won't get a hit in.
-  (assert (and (= G.level-n 2)))
-  (assert (and (= G.player.hp 97)))
+  (check  4 3  2 97)
   (assert-at 'E "orc")
   (wk 'E)
-  (assert (and (= G.player.hp 97)))
-  (assert-at 'E 'floor))
+  (check  5 4  2 97)
+  (assert-at 'E 'floor)
+
+  ; The effect of a potion of speed doesn't stack with this free
+  ; action.
+  (init (mk-quest
+    [:tiles ["potion of speed" 'floor "exit"]]
+    []))
+  (check  0 0  1)
+  (wk 'E)
+  (check  1 0  1)
+  (wk 'E)
+  (check  2 1  1)
+  (assert-at 'E "exit")
+  (wk 'E)
+  (check  3 1  2)
+  (wk 'E)
+  (check  4 2  2))
 
 
 (defn test-refresh-level []
