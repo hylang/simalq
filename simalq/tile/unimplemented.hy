@@ -12,7 +12,6 @@
 (for [[iq-ix stem] [
 
     [32 "passwall_wand"]
-    [48 "blob"]
     [50 "specter"]
     [52 "negaton"]
     [93 "false_exit"]

@@ -568,3 +568,24 @@
   (assert (= G.player.hp 90))
   (assert-at 'NE 'floor)
   (assert-at [3 0] 'floor))
+
+
+(defn test-blob []
+  (init (mk-quest [
+    :map "
+      . ████.
+      @ ██O ██"
+    :map-marks {
+      "O " ["blob" :hp 5]}]))
+
+  (wait 9)
+  (assert-at [2 0] "blob")
+  (assert-hp [2 0] 5)
+  (assert-at [3 1] 'floor)
+  ; After 10 turns, the blob splits. The child has half the parent's
+  ; HP, rounded down, and the parent's HP is reduced by this number.
+  (wait)
+  (assert-at [2 0] "blob")
+  (assert-hp [2 0] 3)
+  (assert-at [3 1] "blob")
+  (assert-hp [3 1] 2))

@@ -510,3 +510,34 @@
 
   :flavor "A giant aerial jellyfish, kept aloft by a foul-smelling and highly reactive gas. It doesn't fly so much as float about in the dungeon drafts. If disturbed, it readily explodes, and its explosions have the remarkable property of harming you and nobody else.")
 (setv floater-disturbance-increment (f/ 1 5))
+
+
+(deftile NonGen "O " "a blob"
+  :iq-ix 48
+  :points 0
+
+  :slot-defaults (dict :summon-direction None :summon-power (f/ 0))
+  :mutable-slots #("summon_direction" "summon_power")
+
+  :immune #(DamageType.MundaneArrow DamageType.MagicArrow)
+  :damage-melee 6
+  :summon-frequency (f/ 1 10)
+
+  :info-bullets (fn [self #* extra]
+    (NonGen.info-bullets self
+      #("Summoning power" (mixed-number self.summon-power))
+      #("Summoning direction" self.summon-direction)
+      #* extra))
+
+  :act (fn-dd [self]
+    (doc f"If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {it.summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
+    (when (try-to-attack-player self)
+      (return))
+    (when (and
+        (> self.hp 1)
+        (summon self "blob" (// self.hp 2)))
+      (-= self.hp (// self.hp 2))
+      (return))
+    (wander self :implicit-attack F))
+
+  :flavor "What looks like a big mobile puddle of slime is actually a man-sized amoeba. It retains the ability to divide (but not, fortunately, to grow), and its lack of distinct internal anatomy makes arrows pretty useless. It has just enough intelligence to notice that you're standing next to it and try to envelop you in its gloppy bulk.")
