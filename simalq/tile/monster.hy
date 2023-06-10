@@ -85,7 +85,7 @@
         #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
       (when self.sees-invisible
         #("Invisibility detection" "The monster is unaffected by you being invisible."))
-      (unless (is self.hook-destroyed Tile.hook-destroyed)
+      (unless (= self.hook-destroyed.__doc__ Tile.hook-destroyed.__doc__)
         #("Effect on death" self.hook-destroyed.__doc__))
       #* extra
       #("Point value" (.format "{:,}{}"
