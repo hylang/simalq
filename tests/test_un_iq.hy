@@ -97,9 +97,9 @@
     (setv t (get m x y 0))
     (assert (and
       (= t.hp generator-hp)
-      (= t.generate-class generates)
-      (= t.generate-frequency frequency)
-      (= t.generate-hp generate-hp))))
+      (= t.summon-class generates)
+      (= t.summon-frequency frequency)
+      (= t.summon-hp generate-hp))))
 
   (check 12 19  2  "orc"   (f/ 2 3) 2)
   (check  2 17  1  "ghost" (f/ 1 6) 2)

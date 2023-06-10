@@ -220,11 +220,11 @@
       ████████. "
     :map-marks {
       "G " ["orc generator"
-        :generate-frequency (f/ 2 3)
-        :generate-hp 2]}]))
+        :summon-frequency (f/ 2 3)
+        :summon-hp 2]}]))
 
   (defn check [power tN tNE tE tSE tW]
-    (assert (= (top [3 1] 'generation-power) power))
+    (assert (= (top [3 1] 'summon-power) power))
     (assert-at [3 2] tN)
     (assert-at [4 2] tNE)
     (assert-at [4 1] tE)
@@ -249,7 +249,7 @@
     :height 1
     :tiles [
       'floor 'floor "wall" 'floor
-      ["orc generator" :generate-frequency (f/ 1)]
+      ["orc generator" :summon-frequency (f/ 1)]
       'floor]]))
   (setv G.rules.reality-bubble-size 4)
 
@@ -277,7 +277,7 @@
         . . $ $"
       :map-marks {
         (if gen-west "a " "b ") ["orc generator"
-          :generate-frequency (f/ 1 4)]
+          :summon-frequency (f/ 1 4)]
         (if gen-west "b " "a ") 'floor
         "$ " "pile of gold"}]))
     (setv G.rules.dainty-monsters F)

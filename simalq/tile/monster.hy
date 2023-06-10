@@ -42,8 +42,10 @@
       ; monster can shoot.
     kamikaze F
       ; If true, the monster kills itself upon attacking.
-    sees-invisible F)
+    sees-invisible F
       ; If true, the monster is unaffected by the player being invisible.
+    summon-frequency (f/ 1 4))
+      ; How often the monster summons other monsters (if it can).
 
   (defn hook-player-bump [self origin]
     "Attack the monster in melee."
@@ -99,11 +101,36 @@
     (get damage (- (min monster.hp (len damage)) 1))
     damage))
 
-(defn summon [pos stem #** kwargs]
+(defn make-monster [pos stem #** kwargs]
   (add-tile pos stem #** kwargs)
   ; Newly created monsters don't get to act on the turn they come
   ; into being.
   (setv (. (at pos) [-1] last-acted) G.turn-n))
+
+(defn summon [mon stem hp [direction-slot "summon_direction"]]
+  "Increment summon power. Then, try to generate one or more monsters
+  in adjacent spaces. Return true if power was expended."
+
+  (+= mon.summon-power mon.summon-frequency)
+  (when (< mon.summon-power 1)
+    (return F))
+  (do-n (pop-integer-part mon.summon-power)
+    ; Find an empty square to place the new monster.
+    (do-n (len Direction.all)
+      (setattr mon direction-slot
+        (next-in-cycle Direction.all (getattr mon direction-slot)))
+      (setv target (pos+ mon.pos (getattr mon direction-slot)))
+      (unless target
+        (continue))
+      (when (= (at target) [])
+        (break))
+      (else
+        ; We couldn't find anywhere to place this monster. Just
+        ; end summoning, wasting the consumed summon power.
+        (return)))
+    ; We have a target. Place the monster.
+    (make-monster target stem :hp hp))
+  T)
 
 (defn player-invisible-to [mon [mon-pos None]]
   (and
@@ -245,55 +272,37 @@
   "An immobile structure that creates monsters nearby."
 
   (slot-defaults
-    generate-frequency (f/ 1 4)
-      ; How often a monster is generated.
-    generate-hp 1
-      ; How many hit points each monster will be generated with.
-    generation-power (f/ 0))
-      ; A per-turn accumulator of `generate-frequency`.
+    summon-frequency (f/ 1 4)
+    summon-hp 1
+      ; How many hit points each monster will be summoned with.
+    summon-power (f/ 0))
+      ; A per-turn accumulator of `summon-frequency`.
   (setv
-    mutable-slots ["generation_power"]
+    mutable-slots ["summon_power"]
     score-for-damaging T
     immune #(DamageType.Poison)
-    generate-class None)
+    summon-class None)
       ; The stem of the monster type to generate.
 
   (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
     (dict
-      :generate-hp (>> v2 5)
-      :generate-frequency (get
+      :summon-hp (>> v2 5)
+      :summon-frequency (get
         #(1 (f/ 1 2) (f/ 1 3) (f/ 1 4) (f/ 1 5) (f/ 1 6) (f/ 2 5) (f/ 1 10) (f/ 3 5) (+ 1 (f/ 1 3)) (+ 1 (f/ 1 2)) (+ 1 (f/ 2 3)) 2 (f/ 2 3) (f/ 3 4) (f/ 4 5) (f/ 5 6) (f/ 9 10))
           ; These come from IQ's `SetGenFreq`.
         (- (& v2 0b1111) 1))))
 
   (defn info-bullets [self #* extra]
     (.info-bullets (super)
-      #("Generation frequency" (mixed-number self.generate-frequency))
-      #("Generation power" (mixed-number self.generation-power))
-      #("Hit points of generated monsters" self.generate-hp)
+      #("Summoning frequency" (mixed-number self.summon-frequency))
+      #("Summoning power" (mixed-number self.summon-power))
+      #("Hit points of summoned monsters" self.summon-hp)
       #* extra))
 
   (defn act [self]
-    "Generate — The generator adds its generation frequency to its generation power. If the total is more than 1, the integer part is removed and a corresponding number of monsters are generated in adjacent empty squares. If there are no adjacent empty squares, the expended generation power is wasted. The square that the generator attempts to target rotates through the compass with each generation or failed attempt."
+    "Generate — The generator adds its summon frequency to its summon power. If the total is more than 1, the integer part is removed and a corresponding number of monsters are generated in adjacent empty squares. If there are no adjacent empty squares, the expended summon power is wasted. The square that the generator attempts to target rotates through the compass with each summon or failed attempt."
+    (summon self self.summon-class self.summon-hp "movement_state")))
 
-    (+= self.generation-power self.generate-frequency)
-    (do-n (pop-integer-part self.generation-power)
-      ; Find an empty square to place the new monster.
-      (do-n (len Direction.all)
-        (setv self.movement-state
-          (next-in-cycle Direction.all self.movement-state))
-        (setv target (pos+ self.pos self.movement-state))
-        (unless target
-          (continue))
-        (when (= (at target) [])
-          (break))
-        (else
-          ; We couldn't find anywhere to place this monster. Just
-          ; end generation, wasting the consumed generation power.
-          (return)))
-      ; We have a target. Place the monster.
-      (summon target self.generate-class
-        :hp self.generate-hp))))
 
 (defn defgenerated [
     mapsym name *
@@ -314,7 +323,7 @@
   (deftile Generator (+ "☉" (get mapsym 0)) (+ name " generator")
     :iq-ix-mapper ["hp"
       (dict (zip iq-ix-gen [1 2 3]))]
-    :generate-class mon-cls.stem
+    :summon-class mon-cls.stem
     :immune (tuple (unique (+ Generator.immune immune)))
     :points points-gen
     :flavor flavor-gen))
