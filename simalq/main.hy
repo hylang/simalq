@@ -119,8 +119,7 @@
   ; Before checking for a key, flush standard input, so any keys
   ; pressed during an animation or slow processing are ignored instead
   ; of queued for input.
-  (import sys termios)
-  (termios.tcflush sys.stdin termios.TCIFLUSH)
+  (while (B.inkey :timeout 0))
   (B.inkey :esc-delay .01))
 
 
