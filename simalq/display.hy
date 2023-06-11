@@ -225,9 +225,14 @@
         G.level-n)
       (.format "Turn {:,}{}"
         G.turn-n
-        (if (= G.turn-n (. G.states [-1] turn-n))
+        ; When the current game state isn't the last (because the
+        ; player has undone one or more states), count the number of
+        ; redoable states as a negative number. This may not equal
+        ; the difference in `G.turn-n` due to e.g.
+        ; `PlayerStatus.Fast`.
+        (if (= G.state-i (- (len G.states) 1))
           ""
-          (.format " ({})" (- G.turn-n (. G.states [-1] turn-n)))))
+          (.format " ({})" (- G.state-i (- (len G.states) 1)))))
       (.format "Score {:,}"
         G.score)
       (+ #* (gfor
