@@ -7,7 +7,6 @@
   fractions [Fraction :as f/]
   pytest
   tests.lib [init assert-at wait mk-quest mv-player wk shoot mk-tile assert-player-at assert-hp]
-  simalq.util [GameOverException]
   simalq.game-state [G save-game load-game]
   simalq.geometry [Pos at])
 (setv  T True  F False)
@@ -133,7 +132,6 @@
 
 
 (defn test-ambient-poison []
-  ; This also tests dying from hit-point loss.
 
   (defn check [poison hp]
     (assert (and
@@ -151,9 +149,9 @@
   (setv G.player.hp 10)
   (wait 49)
   (check (f/ 4 5)   1)
-  (with [e (pytest.raises GameOverException)]
-    (wait))
-  (assert (= e.value.args #('dead)))
+  (assert (is G.player.game-over-state None))
+  (wait)
+  (assert (= G.player.game-over-state 'dead))
 
   ; Check what happens when you move between levels with different
   ; poison intensities. This works quite differently from IQ's integer
@@ -269,3 +267,32 @@
   ; Load, restoring the previous state and the previous history.
   (load-game (/ tmp-path "mygame"))
   (check  1 4  50 1  "locked disappearing door"  11 2))
+
+
+(defn test-player-death []
+  (init (mk-quest
+    :starting-hp 20
+    [
+      :player-start [1 0]
+      :tiles [["Dark Knight" :hp 10] 'floor 'floor "orc"]]))
+  (defn check [state-i player-hp orc-x]
+    (assert (= G.state-i state-i))
+    (when (is-not player-hp None)
+      (assert (= G.player.hp player-hp)))
+    (assert-at [orc-x 0] "orc"))
+
+  (check 0 20 5)
+  (wk 'E)
+  (check 1 8 4)
+  ; Get killed. Since turn processing stops at the moment of Tris's
+  ; death, the orc doesn't get to advance.
+  (wk 'E)
+  (check 2 None 4)
+  ; Now that Tris is dead, she can't do anything.
+  (cant (wk 'E) "You're dead. You can undo or load a saved game.")
+  (cant (wait) "You're dead. You can undo or load a saved game.")
+  ; Undo, and instead do something that doesn't get Tris killed.
+  (setv G.state-i 1)
+  (check 1 8 4)
+  (wk 'W)
+  (check 2 8 3))

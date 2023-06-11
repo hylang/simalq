@@ -1,9 +1,9 @@
 (require
-  hyrule [unless]
+  hyrule [unless ecase]
   simalq.macros [pop-integer-part])
 (import
   contextlib [contextmanager]
-  simalq.util [CommandError message-queue msg hurt-player DamageType player-status]
+  simalq.util [CommandError message-queue msg hurt-player DamageType player-status GameOverException]
   simalq.color :as color
   simalq.geometry [burst at]
   simalq.game-state [G]
@@ -30,6 +30,14 @@
 
 
 (defn take-turn [action]
+  (try
+    (_take-turn action)
+    (except [GameOverException]
+      (msg (ecase G.player.game-over-state
+        'dead "You have died."
+        'won  "You won the quest!")))))
+
+(defn _take-turn [action]
   (do-action action)
 
   (when G.player.just-exited

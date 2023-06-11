@@ -145,10 +145,9 @@
   (assert-player-at 0 9)
 
   ; Exit from the last level, winning the game.
-  (wk 'E 14)
-  (with [e (pytest.raises GameOverException)]
-    (wk 'E))
-  (assert (= e.value.args #('won)))
+  (wk 'E 15)
+  (assert (= G.player.game-over-state 'won))
+  (cant (wk 'E) "You won the game. You can undo or load a saved game.")
 
   ; If the player steps on a tile with two exits, she should only
   ; advance one level, because her turn should end as soon as the

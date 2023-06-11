@@ -217,7 +217,8 @@
     you win the quest."
 
     (when (> G.level.next-level (len G.quest.levels))
-      (raise (GameOverException 'won)))
+      (setv G.player.game-over-state 'won)
+      (raise GameOverException))
     (hy.M.simalq/main.start-level G.level.next-level)
     (setv G.player.just-exited T)
     True)

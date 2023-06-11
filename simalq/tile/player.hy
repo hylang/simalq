@@ -1,6 +1,5 @@
 (import
   fractions [Fraction]
-  simalq.util [GameOverException]
   simalq.tile [Tile deftile])
 (setv  T True  F False)
 
@@ -11,6 +10,9 @@
   ; A type representing the player-character.
 
   :slot-defaults (dict
+    :game-over-state None
+      ; Set to a symbol when the game ends to indicate that the game
+      ; has ended and how.
     :hp 1
       ; How many hit points (HP) you have. When you run out, you die.
     :poison-dose (Fraction 0)
@@ -34,13 +36,11 @@
         "Holy Sword" F}
     :floater-disturbance (Fraction 0))
       ; A measure of how much time you've spent adjacent to floaters.
-  :mutable-slots (tuple (map hy.mangle '(hp poison-dose just-exited keys magic-arrows floater-disturbance)))
+  :mutable-slots (tuple (map hy.mangle '(game-over-state hp poison-dose just-exited keys magic-arrows floater-disturbance)))
     ; `inventory` and `artifacts` should be mutated directly rather
     ; reassigned.
 
   :damageable T
-  :hook-destroyed (fn [self pos]
-    (raise (GameOverException 'dead)))
 
   :flavor "People who've met Tris and Argonn separately are sometimes surprised to learn that they're siblings. They don't look much alike.")
 

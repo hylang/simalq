@@ -6,6 +6,7 @@
   re
   simalq.color :as color
   simalq.game-state [G]
+  simalq.util [GameOverException]
   simalq.geometry [at])
 (setv  T True  F False)
 
@@ -273,9 +274,14 @@
       ; No extra points are awarded for overkill damage.
   (when (<= tile.hp 0)
     ; It's destroyed.
-    (unless tile.score-for-damaging
-      (+= G.score tile.points))
-    (destroy-tile tile)))
+    (if (is tile G.player)
+      (do
+        (setv G.player.game-over-state 'dead)
+        (raise GameOverException))
+      (do
+        (unless tile.score-for-damaging
+          (+= G.score tile.points))
+        (destroy-tile tile)))))
 
 
 (defclass Actor [Tile]

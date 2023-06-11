@@ -203,6 +203,12 @@
       (raise))))
 
 (defn _execute-action [action]
+
+  (when G.player.game-over-state
+    (raise (CommandError (.format "{}. You can undo or load a saved game."
+      (ecase G.player.game-over-state
+        'dead "You're dead"
+        'won "You won the game")))))
   (when (and (player-status 'Para) (is-not (type action) Wait))
     (raise (CommandError "You're paralyzed. You can only wait for it to pass.")))
 
