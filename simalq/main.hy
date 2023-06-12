@@ -2,6 +2,7 @@
   hyrule [unless ecase]
   simalq.macros [pop-integer-part])
 (import
+  time [sleep]
   contextlib [contextmanager]
   simalq.util [CommandError message-queue msg hurt-player DamageType player-status GameOverException]
   simalq.color :as color
@@ -155,6 +156,7 @@
 
 (defn text-screen [text]
   (setv y-margin 2)
+  (setv pause-seconds 0.25)
 
   (unless (displaying)
     (return))
@@ -168,7 +170,10 @@
           line (B.wrap
             text
             (min max-wrap-cols B.width))
-          (.center line B.width)))))
+          (.center line B.width))))
+      ; Ignore input for a bit so the user doesn't accidentally
+      ; dismiss the screen while holding a key.
+      (sleep pause-seconds))
     :on-input (fn [key]
       'done)))
 
