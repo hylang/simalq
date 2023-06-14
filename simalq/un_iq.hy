@@ -127,6 +127,40 @@
 ;; * `iq-quest`
 ;; --------------------------------------------------------------
 
+(defn iq-quest [quest-name]
+  "Get the given original quest IQ, as a `Quest`. Or use the symbol
+  `all` to get all quests as a dictionary."
+  (if (= quest-name 'all)
+    (dfor
+      [k v] (.items (iq-quests-raw))
+      k (read-quest v))
+    (read-quest (get (iq-quests-raw) quest-name))))
+
+(defn [cache] iq-quests-raw []
+  "Get a dictionary of raw IQ quests as `bytes` objects."
+
+  ; Download the quests if needed.
+  (assert (get os.environ "XDG_CACHE_HOME"))
+  (setv path (/ (Path (get os.environ "XDG_CACHE_HOME")) "simalq"))
+  (.mkdir path :exist-ok T)
+  (setv path (/ path "infinity_quests_2.zip"))
+  (unless (.exists path)
+    (import http.client contextlib)
+    (with [con (contextlib.closing (http.client.HTTPConnection "arfer.net"))]
+      (.request con "GET" "/downloads/infinity_quests_2.zip"
+        :headers {"User-Agent" "Infinitesimal Quest 2 + epsilon"})
+      (setv r (.getresponse con))
+      (assert (= r.status 200))
+      (.write-bytes path (.read r))))
+
+  ; Read the files from the archive.
+  (setv prefix "infinity_quests_2/")
+  (with [z (ZipFile path "r")] (dfor
+    q (.namelist z)
+    :setv v (.read z q)
+    :if v
+    (.removeprefix q prefix) v)))
+
 (defn read-quest [inp]
   "Parse `bytes` into a `Quest`."
 
@@ -192,37 +226,3 @@
         :exit-speed l.exit-speed
         :moving-exit-start (mk-pos l.moving-exit-start)
         :map m)))))
-
-(defn iq-quest [quest-name]
-  "Get the given original quest IQ, as a `Quest`. Or use the symbol
-  `all` to get all quests as a dictionary."
-  (if (= quest-name 'all)
-    (dfor
-      [k v] (.items (iq-quests-raw))
-      k (read-quest v))
-    (read-quest (get (iq-quests-raw) quest-name))))
-
-(defn [cache] iq-quests-raw []
-  "Get a dictionary of raw IQ quests as `bytes` objects."
-
-  ; Download the quests if needed.
-  (assert (get os.environ "XDG_CACHE_HOME"))
-  (setv path (/ (Path (get os.environ "XDG_CACHE_HOME")) "simalq"))
-  (.mkdir path :exist-ok T)
-  (setv path (/ path "infinity_quests_2.zip"))
-  (unless (.exists path)
-    (import http.client contextlib)
-    (with [con (contextlib.closing (http.client.HTTPConnection "arfer.net"))]
-      (.request con "GET" "/downloads/infinity_quests_2.zip"
-        :headers {"User-Agent" "Infinitesimal Quest 2 + epsilon"})
-      (setv r (.getresponse con))
-      (assert (= r.status 200))
-      (.write-bytes path (.read r))))
-
-  ; Read the files from the archive.
-  (setv prefix "infinity_quests_2/")
-  (with [z (ZipFile path "r")] (dfor
-    q (.namelist z)
-    :setv v (.read z q)
-    :if v
-    (.removeprefix q prefix) v)))
