@@ -12,7 +12,7 @@
   simalq.tile.item [Item]
   simalq.tile.monster [Monster]
   simalq.quest [start-quest start-level]
-  simalq.un-iq [read-quest iq-quest]
+  simalq.un-iq [iq-quest]
   simalq.commands [Action get-command do-command do-action]
   simalq.display [draw-screen bless-colorstr])
 (setv  T True  F False)
@@ -22,7 +22,7 @@
   ; `skip-to-level` is used for debugging, so for convenience, don't
   ; show titles when it's provided.
   (with [(player-io)]
-    (start-quest (read-quest (iq-quest iq-quest-name))
+    (start-quest (iq-quest iq-quest-name)
       :show-title (not skip-to-level))
     (start-level
       :level-n (if skip-to-level (int skip-to-level) 1)

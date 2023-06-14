@@ -3,13 +3,11 @@
   fractions [Fraction :as f/]
   toolz [partition]
   simalq.geometry [Pos]
-  simalq.un-iq [read-quest iq-quest])
+  simalq.un-iq [iq-quest])
 
 
 (defn get-level-map [quest-name level-n]
-  (.
-    (read-quest (iq-quest quest-name))
-    levels [(- level-n 1)] map data))
+  (. (iq-quest quest-name) levels [(- level-n 1)] map data))
 
 
 (defn test-get-all []
@@ -19,14 +17,14 @@
 
 
 (defn test-bootcamp []
-  (setv quest (read-quest (iq-quest "Boot Camp 2")))
+  (setv quest (iq-quest "Boot Camp 2"))
   (assert (= quest.title "Boot Camp will teach you how to play Infinity Quest II"))
   (assert (= quest.starting-hp 500))
   (assert (= (len quest.levels) 26)))
 
 
 (defn test-bootcamp-level1 []
-  (setv level (. (read-quest (iq-quest "Boot Camp 2")) levels [0]))
+  (setv level (. (iq-quest "Boot Camp 2") levels [0]))
 
   ; Check the level attributes.
   (for [[got expected] (partition 2 [

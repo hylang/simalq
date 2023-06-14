@@ -8,7 +8,7 @@
   textwrap [dedent]
   simalq.geometry [Map Pos at pos+ Direction]
   simalq.quest [Quest Level]
-  simalq.un-iq [read-quest iq-quest]
+  simalq.un-iq [iq-quest]
   simalq.game-state [G]
   simalq.tile [Tile add-tile rm-tile mv-tile]
   simalq.commands [Walk Wait Shoot UseItem]
@@ -25,7 +25,7 @@
 (defn init [quest [level-n 1] #** rules]
   (start-quest
     :quest (if (isinstance quest str)
-      (read-quest (iq-quest quest))
+      (iq-quest quest)
       quest)
     :rules rules)
   (start-level level-n))

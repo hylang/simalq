@@ -12,6 +12,7 @@
   os
   pathlib [Path]
   zipfile [ZipFile]
+  functools [cache]
   construct
   toolz [partition]
   simalq.geometry [Map Pos]
@@ -123,7 +124,7 @@
   Terminated)))
 
 ;; --------------------------------------------------------------
-;; * `read-quest`, `iq-quest`
+;; * `iq-quest`
 ;; --------------------------------------------------------------
 
 (defn read-quest [inp]
@@ -192,10 +193,17 @@
         :moving-exit-start (mk-pos l.moving-exit-start)
         :map m)))))
 
-
 (defn iq-quest [quest-name]
-  "Get the given original quest file from IQ, as a raw `bytes`
-  object. Or use the symbol `all` to get all quests as a dictionary."
+  "Get the given original quest IQ, as a `Quest`. Or use the symbol
+  `all` to get all quests as a dictionary."
+  (if (= quest-name 'all)
+    (dfor
+      [k v] (.items (iq-quests-raw))
+      k (read-quest v))
+    (read-quest (get (iq-quests-raw) quest-name))))
+
+(defn [cache] iq-quests-raw []
+  "Get a dictionary of raw IQ quests as `bytes` objects."
 
   ; Download the quests if needed.
   (assert (get os.environ "XDG_CACHE_HOME"))
@@ -211,13 +219,10 @@
       (assert (= r.status 200))
       (.write-bytes path (.read r))))
 
-  ; Get the requested quest (heh).
+  ; Read the files from the archive.
   (setv prefix "infinity_quests_2/")
-  (with [z (ZipFile path "r")]
-    (if (= quest-name 'all)
-      (dfor
-        q (.namelist z)
-        :setv v (.read z q)
-        :if v
-        (.removeprefix q prefix) v)
-      (.read z (+ prefix quest-name)))))
+  (with [z (ZipFile path "r")] (dfor
+    q (.namelist z)
+    :setv v (.read z q)
+    :if v
+    (.removeprefix q prefix) v)))

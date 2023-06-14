@@ -7,13 +7,12 @@ each level."
   sys
   hy.pyops *
   pandas :as pd
-  simalq.un-iq [read-quest iq-quest]
+  simalq.un-iq [iq-quest]
   simalq.tile.unimplemented [UnimplementedTile])
 
 
 (setv qts (dfor
-  [qname v] (.items (iq-quest 'all))
-  :setv q (read-quest v)
+  [qname q] (.items (iq-quest 'all))
   qname (lfor  l q.levels  (sorted (sfor
     column l.map.data
     stack column
