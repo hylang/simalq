@@ -18,6 +18,7 @@
 
 (defn test-bootcamp []
   (setv quest (iq-quest "Boot Camp 2"))
+  (assert (= quest.name "Boot Camp 2"))
   (assert (= quest.title "Boot Camp will teach you how to play Infinity Quest II"))
   (assert (= quest.starting-hp 500))
   (assert (= (len quest.levels) 26)))

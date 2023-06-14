@@ -133,8 +133,8 @@
   (if (= quest-name 'all)
     (dfor
       [k v] (.items (iq-quests-raw))
-      k (read-quest v))
-    (read-quest (get (iq-quests-raw) quest-name))))
+      k (read-quest k v))
+    (read-quest quest-name (get (iq-quests-raw) quest-name))))
 
 (defn [cache] iq-quests-raw []
   "Get a dictionary of raw IQ quests as `bytes` objects."
@@ -161,11 +161,12 @@
     :if v
     (.removeprefix q prefix) v)))
 
-(defn read-quest [inp]
+(defn read-quest [name inp]
   "Parse `bytes` into a `Quest`."
 
   (setv data (.parse quest-fmt inp))
   (Quest
+    :name name
     :title data.title
     :starting-hp data.starting-hp
     :levels (tuple (gfor

@@ -32,11 +32,14 @@
 
 (defn mk-quest [
     #* levels
-    [title None]
     [starting-hp 100]]
-  (Quest :title title :starting-hp starting-hp :levels (tuple (gfor
-    [i level-args] (enumerate levels)
-    (mk-level :n (+ i 1) #** (kwdict level-args))))))
+  (Quest
+    :name "Test Quest"
+    :title "Test Quest title"
+    :starting-hp starting-hp
+    :levels (tuple (gfor
+      [i level-args] (enumerate levels)
+      (mk-level :n (+ i 1) #** (kwdict level-args))))))
 
 (defn mk-level [
     n
