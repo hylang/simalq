@@ -81,8 +81,11 @@
   (sleep flash-time-s))
 
 
-(setv invlets "asdfzxcvqwer")
-  ; Letters assigned to inventory slots, in order.
+(setv
+  ; Letters assigned to menu items, in order. "q" is deliberately
+  ; omitted, so it can be used for "quit".
+  menu-letters "asdfzxcvwerghjklbnmtyuiop"
+  menu-letters (+ menu-letters (.upper menu-letters)))
 
 
 (defn player-melee-damage []

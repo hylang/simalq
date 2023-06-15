@@ -4,7 +4,7 @@
 (import
   copy [deepcopy]
   simalq.color :as color
-  simalq.util [CommandError DamageType save-game-path msg player-shot-damage flash-map invlets player-status]
+  simalq.util [CommandError DamageType save-game-path msg player-shot-damage flash-map menu-letters player-status]
   simalq.geometry [Direction Pos pos+ at dist]
   simalq.game-state [G save-game load-game]
   simalq.tile [mv-tile damage-tile destroy-tile]
@@ -130,9 +130,9 @@
         :on-input (fn [key]
           (nonlocal item-ix)
           (when (and
-              (in key invlets)
-              (< (.index invlets key) G.rules.max-usables))
-            (setv item-ix (.index invlets key)))
+              (in key menu-letters)
+              (< (.index menu-letters key) G.rules.max-usables))
+            (setv item-ix (.index menu-letters key)))
           'done))
       (when (is-not item-ix None)
         (if (and

@@ -8,7 +8,7 @@
   hy.pyops *
   simalq.color :as color
   simalq.game-state [G]
-  simalq.util [mixed-number invlets StatusEffect]
+  simalq.util [mixed-number menu-letters StatusEffect]
   simalq.geometry [Pos at dist]
   simalq.tile [Tile])
 (setv  T True  F False)
@@ -249,7 +249,7 @@
   (setv lines (lfor
     [i item] (enumerate G.player.inventory)
     (.format " ({}) � {}  "
-      (get invlets i)
+      (get menu-letters i)
       (if item item.full-name "---"))))
   ; Pad out short lines and replace the "�"s with colored mapsyms.
   (lfor
