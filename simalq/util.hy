@@ -5,16 +5,10 @@
   simalq.macros [pop-integer-part])
 (import
   time [sleep]
-  os
-  pathlib [Path]
   enum [Enum]
   simalq.game-state [G]
   simalq.color :as colors)
 (setv  T True  F False)
-
-
-(setv save-game-path (/
-  (Path (get os.environ "XDG_DATA_HOME")) "simalq" "save.pklz"))
 
 
 (defn seq [a b [step 1]]

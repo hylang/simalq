@@ -4,11 +4,12 @@
 (import
   copy [deepcopy]
   simalq.color :as color
-  simalq.util [CommandError DamageType save-game-path msg player-shot-damage flash-map menu-letters player-status]
+  simalq.util [CommandError DamageType msg player-shot-damage flash-map menu-letters player-status]
   simalq.geometry [Direction Pos pos+ at dist]
-  simalq.game-state [G save-game load-game]
+  simalq.game-state [G]
   simalq.tile [mv-tile damage-tile destroy-tile]
-  simalq.tile.scenery [walkability])
+  simalq.tile.scenery [walkability]
+  simalq.save-load [save-game-to-slot get-saves-list load-game])
 (setv  T True  F False)
 
 
@@ -46,7 +47,9 @@
   [steps]
   :frozen T)
 (defdataclass SaveGame [Command]
-  "Write the global state to a file.")
+  "Write the global state to a file."
+  [kind]
+  :frozen T)
 (defdataclass LoadGame [Command]
   "Read a file and replace the global state with its contents.")
 
@@ -78,7 +81,8 @@
   "E" [ShiftHistory -10]
   "r" [ShiftHistory  +1]  ; Redo
   "R" [ShiftHistory +10]
-  "S" SaveGame
+  "S" [SaveGame 'main]
+  "C" [SaveGame 'checkpoint]
   "L" LoadGame})
 
 
@@ -86,7 +90,7 @@
   "This function is only for commands that aren't actions; see
   `do-action` for actions."
   (import
-    simalq.main [io-mode print-main-screen info-screen inkey take-turn])
+    simalq.main [io-mode print-main-screen info-screen inkey take-turn load-saved-game-screen])
 
   (defn targeting-mode [target-callback]
     "Allow the user to select a target square with the direction keys.
@@ -160,16 +164,16 @@
 
     SaveGame
       (try
-        (.parent.mkdir save-game-path :exist-ok T)
-        (save-game save-game-path)
-        (msg "Game saved.")
+        (save-game-to-slot (= cmd.kind 'checkpoint))
+        (msg f"Game saved ({cmd.kind !s}).")
         (except [e IOError]
           (raise (CommandError (+ "Save failed: " (str e))))))
 
     LoadGame
       (try
-        (load-game save-game-path)
-        (msg "Game loaded.")
+        (when (setx path (load-saved-game-screen (get-saves-list)))
+          (load-game path)
+          (msg "Game loaded."))
         (except [e IOError]
           (raise (CommandError (+ "Load failed: " (str e))))))))
 

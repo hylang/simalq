@@ -7,8 +7,9 @@
   fractions [Fraction :as f/]
   pytest
   tests.lib [init assert-at wait mk-quest mv-player wk shoot mk-tile assert-player-at assert-hp]
-  simalq.game-state [G save-game load-game]
-  simalq.geometry [Pos at])
+  simalq.game-state [G]
+  simalq.geometry [Pos at]
+  simalq.save-load [save-game load-game])
 (setv  T True  F False)
 
 

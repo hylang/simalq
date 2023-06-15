@@ -1,9 +1,6 @@
 (require
   simalq.macros [slot-defaults])
 (import
-  pathlib [Path]
-  pickle
-  zlib
   fractions [Fraction :as f/])
 (eval-and-compile (setv  T True  F False))
 
@@ -43,24 +40,6 @@
 (setv G (Global))
   ; This instance is the active `Global` object. It should only be
   ; modified in place, not reassigned.
-
-(defn save-game [[path None]]
-  "Save the global object."
-
-  (setv x (zlib.compress (pickle.dumps G pickle.HIGHEST-PROTOCOL)))
-  (when path
-    (.write-bytes (Path path) x)
-    (return None))
-  x)
-
-(defn load-game [inp]
-  "Replace the global object with a serialized version."
-
-  (when (isinstance inp Path)
-    (setv inp (.read-bytes inp)))
-  (setv new-global (pickle.loads (zlib.decompress inp)))
-  (for [k Global.__slots__]
-    (setattr G k (getattr new-global k))))
 
 
 (defclass GameState []

@@ -4,7 +4,7 @@
 (import
   time [sleep]
   contextlib [contextmanager]
-  simalq.util [CommandError message-queue msg hurt-player DamageType player-status GameOverException]
+  simalq.util [CommandError message-queue msg hurt-player DamageType player-status GameOverException menu-letters]
   simalq.color :as color
   simalq.geometry [burst at]
   simalq.game-state [G]
@@ -237,3 +237,32 @@
       (if (= new-ix top-line-ix)
         'done
         (setv top-line-ix new-ix)))))
+
+
+(defn load-saved-game-screen [saves-meta]
+  "Display a menu of saved games, and return the path of a saved game
+  to load (or `None` for no selection)."
+
+  (setv [saves display-lines] saves-meta)
+
+  (setv save-ix None)
+  (io-mode
+
+    :draw (fn []
+      (print
+        :flush T :sep "" :end ""
+        B.home B.clear
+        (.join "\n" (gfor
+          line (cut display-lines B.height)
+          (cut line B.width)))))
+
+    :on-input (fn [key]
+      (nonlocal save-ix)
+      (when (and
+          (in key menu-letters)
+          (< (.index menu-letters key) (len saves)))
+        (setv save-ix (.index menu-letters key)))
+      'done))
+
+  (when (is-not save-ix None)
+    (get saves save-ix "path")))
