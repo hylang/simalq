@@ -14,7 +14,11 @@
 (setv  T True  F False)
 
 
-(setv undead-immunities #(DamageType.Poison DamageType.DeathMagic))
+((fn [] (for [dt DamageType]
+  (setv (get (globals) dt.name) dt))))
+
+(setv undead-immunities #(Poison DeathMagic))
+
 
 (defclass Monster [Actor]
   "A non-player character, typically out to kill the player."
@@ -49,7 +53,7 @@
 
   (defn hook-player-bump [self origin]
     "Attack the monster in melee."
-    (damage-tile self (player-melee-damage) DamageType.PlayerMelee)
+    (damage-tile self (player-melee-damage) PlayerMelee)
     True)
 
   (setv act 'approach)
@@ -185,7 +189,7 @@
     (return T))
   (hurt-player :attacker mon
     (damage-by-hp mon (if (= attack 'shot) mon.damage-shot mon.damage-melee))
-    (if (= attack 'shot) DamageType.MonsterShot DamageType.MonsterMelee))
+    (if (= attack 'shot) MonsterShot MonsterMelee))
   (when (and mon.kamikaze mon.pos)
     ; We check `mon.pos` so as not to call `destroy-tile` when we're
     ; already being called by it.
@@ -280,7 +284,7 @@
   (setv
     mutable-slots ["summon_power"]
     score-for-damaging T
-    immune #(DamageType.Poison)
+    immune #(Poison)
     summon-class None)
       ; The stem of the monster type to generate.
 
@@ -446,10 +450,10 @@
   :iq-ix 51
   :points 10
 
-  :immune #(DamageType.MundaneArrow DamageType.MagicArrow DamageType.Poison)
+  :immune #(MundaneArrow MagicArrow Poison)
     ; We follow IQ in making thorn trees immune to poison, although
     ; the IQ manual suggests otherwise.
-  :weaknesses #(DamageType.Fire)
+  :weaknesses #(Fire)
   :damage-melee 4
   :act stationary
 
@@ -477,8 +481,8 @@
   :iq-ix 49
   :points 200
 
-  :immune #(DamageType.MundaneArrow DamageType.Fire #* undead-immunities)
-  :resists #(DamageType.MagicArrow)
+  :immune  #(MundaneArrow Fire #* undead-immunities)
+  :resists #(MagicArrow)
   :damage-melee 20
 
   :flavor "A shadowy hooded figure bearing a wicked scythe who speaks in all capital letters. It can be destroyed, but don't expect that to be easy.")
@@ -519,7 +523,7 @@
   :slot-defaults (dict :summon-direction None :summon-power (f/ 0))
   :mutable-slots #("summon_direction" "summon_power")
 
-  :immune #(DamageType.MundaneArrow DamageType.MagicArrow)
+  :immune #(MundaneArrow MagicArrow)
   :damage-melee 6
   :summon-frequency (f/ 1 10)
 
