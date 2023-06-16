@@ -487,6 +487,17 @@
 
   :flavor "A shadowy hooded figure bearing a wicked scythe who speaks in all capital letters. It can be destroyed, but don't expect that to be easy.")
 
+(deftile NonGen "N " "a negaton"
+  :iq-ix 52
+  :points 50
+
+  :immune #(PlayerMelee MundaneArrow Fire Poison DeathMagic)
+     ; The immunity to death magic is an addition to IQ.
+  :damage-melee 25
+  :kamikaze T
+
+  :flavor "A quantum of negative energy motivated only by a hatred of princess-based life forms. It can expend its entire payload in a single attack, and, being essentially mindless, it has no qualms about doing so. Magic arrows are pretty much the only thing strong enough to hurt it.")
+
 (deftile NonGen "f " "a floater"
   :iq-ix 47
   :points 2

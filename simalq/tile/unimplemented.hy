@@ -13,7 +13,6 @@
 
     [32 "passwall_wand"]
     [50 "specter"]
-    [52 "negaton"]
     [93 "false_exit"]
     [94 "exit_to_level_"]
     [101 "fire_mage"]
