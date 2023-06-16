@@ -411,6 +411,16 @@
   :flavor-mon "This fresh-faced would-be scholar has finished sewing the stars onto his robe and is starting to grow a beard. Idok has told the whole class that whoever kills you gets tenure. Considering what the rest of the academic job market is like, the offer has proven irresistible to many."
   :flavor-gen "The Pigpimples Institute of Thaumaturgy and Dweomercraft: a shameless diploma mill that happily takes students' money to teach them one spell, then sends them on a suicide mission against a much smarter and tougher opponent.")
 
+(defgenerated "s " "a shade"
+  :iq-ix-mon [171 172 173] :iq-ix-gen [174 175 176]
+  :points-mon 6 :points-gen 24
+
+  :immune #(MundaneArrow #* undead-immunities)
+  :damage-melee #(3 5 7)
+
+  :flavor-mon #[[A dark spirit with mastery of its semi-corporeal form, allowing ordinary arrows to pass right through it. As it approaches, it hisses "Death!"]]
+  :flavor-gen "Oh dear. Considering what's been done to this grave, destroying it would be a mercy.")
+
 (defgenerated "i " "an imp"
   :iq-ix-mon [43 67 68] :iq-ix-gen [44 69 70]
   :points-mon 4 :points-gen 15
