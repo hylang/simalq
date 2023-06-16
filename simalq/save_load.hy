@@ -16,6 +16,15 @@
 (setv saved-games-dir (/
   (Path (get os.environ "XDG_DATA_HOME")) "simalq" "save"))
 
+(defmacro no-gc [#* body]
+  "Temporarily disable garbage collection. This can substantially
+  speed up pickling and unpickling."
+  `(try
+    (hy.M.gc.disable)
+    ~@body
+    (finally
+      (hy.M.gc.enable))))
+
 ;; --------------------------------------------------------------
 ;; * Basic functions
 ;; --------------------------------------------------------------
@@ -30,7 +39,7 @@
       :turn-n G.turn-n
       :player-hp G.player.hp
       :score G.score)))))
-  (setv state (pickle.dumps G pickle.HIGHEST-PROTOCOL))
+  (setv state (no-gc (pickle.dumps G pickle.HIGHEST-PROTOCOL)))
 
   (with [o (ZipFile path "w")]
     (.writestr o "meta.json" meta :compress-type ZIP-STORED)
@@ -40,8 +49,8 @@
 (defn load-game [path]
   "Replace the global object with a saved one."
 
-  (setv new-global (pickle.loads (with [o (ZipFile path "r")]
-    (.read o "state.pkl"))))
+  (setv new-global (no-gc (pickle.loads (with [o (ZipFile path "r")]
+    (.read o "state.pkl")))))
   (for [k G.__slots__]
     (setattr G k (getattr new-global k))))
 
