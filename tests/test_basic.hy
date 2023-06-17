@@ -6,7 +6,7 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init assert-at wait mk-quest mv-player wk shoot mk-tile assert-player-at assert-hp]
+  tests.lib [init init-boot-camp assert-at wait mv-player wk shoot mk-tile assert-player-at assert-hp]
   simalq.game-state [G]
   simalq.geometry [Pos at]
   simalq.save-load [save-game load-game])
@@ -16,7 +16,7 @@
 (defn test-bootcamp-level1 []
   "Test the basics of walking, waiting, walls, plain doors, and pillars."
 
-  (init "Boot Camp 2")
+  (init-boot-camp)
   (assert (= G.level-n 1)) ; The level counter is 1-based.
 
   ; We start at the extreme northwest.
@@ -59,8 +59,8 @@
 
 
 (defn test-shoot []
-  (init (mk-quest
-    [:tiles ['floor 'floor 'floor 'floor ["orc" :hp 2]]]))
+  (init
+    [:tiles ['floor 'floor 'floor 'floor ["orc" :hp 2]]])
   (setv G.rules.reality-bubble-size 4)
 
   (assert (= G.turn-n 0))
@@ -85,18 +85,18 @@
   (shoot 'W)
 
   ; Shots are blocked by walls.
-  (init (mk-quest
-    [:tiles ["wall" "orc"]]))
+  (init
+    [:tiles ["wall" "orc"]])
   (assert-hp [2 0] 1)
   (shoot 'E)
   (assert-hp [2 0] 1))
 
 
 (defn test-walk-wrapping []
-  (init (mk-quest
+  (init
     [:width 20 :height 20 :wrap-y True
       :tiles ["exit"]]
-    [:width 20 :height 20 :wrap-x True :wrap-y True]))
+    [:width 20 :height 20 :wrap-x True :wrap-y True])
 
   (assert-player-at 0 0)
   (wk 'S)
@@ -116,10 +116,10 @@
 
 
 (defn test-shoot-wrapping []
-  (init (mk-quest [
+  (init [
     :map "
       . o . . @ ."
-    :wrap-x T]))
+    :wrap-x T])
   ; We can shoot an arrow that wraps around the level to kill the orc.
   (assert-at [1 0] "orc")
   (shoot 'E)
@@ -140,7 +140,7 @@
       (= G.player.poison-dose poison)
       (= G.player.hp hp))))
 
-  (init "Boot Camp 2")
+  (init-boot-camp)
   (check (f/ 0  ) 500)
   (assert (= G.level.poison-intensity (f/ 1 5)))
   (wait 4)
@@ -157,9 +157,9 @@
   ; Check what happens when you move between levels with different
   ; poison intensities. This works quite differently from IQ's integer
   ; poison counter.
-  (init (mk-quest
+  (init
     [:poison-intensity (f/ 1 3) :tiles ["exit"]]
-    [:poison-intensity (f/ 1 5)]))
+    [:poison-intensity (f/ 1 5)])
   (check (f/  0  3) 100)
   (wait 2)
   (check (f/  2  3) 100)
@@ -178,15 +178,15 @@
   (check (f/  1 15)  98)
 
   ; Try a level with no poison.
-  (init "Boot Camp 2" 26)
+  (init-boot-camp 26)
   (check (f/ 0) 500)
   (assert (= G.level.poison-intensity (f/ 0)))
   (wait 50)
   (check (f/ 0) 500)
 
   ; Try a lot of poison (more than IQ would support).
-  (init (mk-quest
-    [:poison-intensity (+ 2 (f/ 1 3))]))
+  (init
+    [:poison-intensity (+ 2 (f/ 1 3))])
   (check (f/ 0  ) 100)
   (wait)
   (check (f/ 1 3)  98)
@@ -197,8 +197,8 @@
 
 
 (defn test-game-state-history []
-  (init (mk-quest
-    [:tiles ["handful of gems" "orc"]]))
+  (init
+    [:tiles ["handful of gems" "orc"]])
   (defn check [state turn score hp t0 t1 t2]
     (assert (and
       (= G.state-i state) (= G.turn-n turn)
@@ -243,7 +243,7 @@
 
 
 (defn test-saveload [tmp-path]
-  (init "Boot Camp 2")
+  (init-boot-camp)
   (defn check [i n-states score keys thing px py]
     (assert (and
       (= G.state-i i) (= G.turn-n i) (= (len G.states) n-states)
@@ -271,11 +271,11 @@
 
 
 (defn test-player-death []
-  (init (mk-quest
+  (init
     :starting-hp 20
     [
       :player-start [1 0]
-      :tiles [["Dark Knight" :hp 10] 'floor 'floor "orc"]]))
+      :tiles [["Dark Knight" :hp 10] 'floor 'floor "orc"]])
   (defn check [state-i player-hp orc-x]
     (assert (= G.state-i state-i))
     (when (is-not player-hp None)

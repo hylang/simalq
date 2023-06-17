@@ -2,15 +2,15 @@
   hyrule [do-n])
 (import
   fractions [Fraction :as f/]
-  tests.lib [init mk-quest assert-at assert-hp wait set-square wk shoot mv-player add-usable use-item top]
+  tests.lib [init assert-at assert-hp wait set-square wk shoot mv-player add-usable use-item top]
   simalq.geometry [Direction Pos ray at]
   simalq.game-state [G])
 (setv  T True  F False)
 
 
 (defn test-simple-melee-combat []
-  (init (mk-quest
-    [:tiles [["Dark Knight" :hp 5]]]))
+  (init
+    [:tiles [["Dark Knight" :hp 5]]])
   (defn check [turn score tris mon]
     (assert (and (= G.turn-n turn) (= G.score score)))
     (assert (= G.player.hp tris))
@@ -35,10 +35,10 @@
 (defn test-monster-melee-diag []
 
   ; A monster can melee-attack diagonally around a column.
-  (init (mk-quest
+  (init
     [:map "
       | @
-      o ."]))
+      o ."])
   (assert (= G.player.hp 100))
   (assert-at 'SW "orc")
   (wait)
@@ -46,10 +46,10 @@
   (assert-at 'SW "orc")
 
   ; But not a wall. So the orc will use its first turn to walk east.
-  (init (mk-quest
+  (init
     [:map "
       ██@
-      o ."]))
+      o ."])
   (assert (= G.player.hp 100))
   (assert-at 'SW "orc")
   (wait)
@@ -60,8 +60,8 @@
 (defn test-approach []
 
   ; A monster can approach in a straight line.
-  (init (mk-quest
-    [:tiles ['floor 'floor 'floor "orc"]]))
+  (init
+    [:tiles ['floor 'floor 'floor "orc"]])
   (assert-at 'E 'floor)
   (wait 2)
   (assert-at 'E 'floor)
@@ -73,18 +73,18 @@
   (assert (= G.player.hp 97))
 
   ; A monster stymied when trying to go west will first try northwest.
-  (init (mk-quest
-    [:tiles ["pillar" "orc"]]))
+  (init
+    [:tiles ["pillar" "orc"]])
   (wait)
   (assert-at 'NE "orc")
 
   ; A monster stymied going west *and* northwest will take 3 turns
   ; to finally try southwest.
-  (init (mk-quest
+  (init
     [:map "
       . | .
       @ | o
-      . . ."]))
+      . . ."])
   (do-n 3
     (assert-at 'SE 'floor)
     (wait))
@@ -92,11 +92,11 @@
 
   ; When the monster is blocked W, NW, and SW, he'll just sit there
   ; forever.
-  (init (mk-quest
+  (init
     [:map "
       . . .
       @ ██o
-      . . ."]))
+      . . ."])
     ; A wall, unlike a pillar, blocks diagonal movement.
   (assert-at [2 1] "orc")
   (wait 100)
@@ -104,9 +104,9 @@
 
   ; A monster outside the reality bubble can't move.
   (setv r G.rules.reality-bubble-size)
-  (init (mk-quest [:tiles [
+  (init [:tiles [
     #* (* ['floor] r)
-    "orc"]]))
+    "orc"]])
   (assert-at [(+ r 1) 0] "orc")
   (wait 100)
   (assert-at [(+ r 1) 0] "orc")
@@ -115,9 +115,9 @@
 
   ; A monster can chase Tris around a wrapped map.
   ; (Accompanied by "Yakety Sax", one imagines.)
-  (init (mk-quest [
+  (init [
     :player-start #(4 4)
-    :width 9 :height 9 :wrap-y T]))
+    :width 9 :height 9 :wrap-y T])
   (set-square 'N "orc")
   (do-n 100
     (wk 'S)
@@ -130,8 +130,8 @@
   property of the spiral activation order of monsters that we inherit
   from IQ."
 
-  (init (mk-quest
-    [:player-start #(8 8)]))
+  (init
+    [:player-start #(8 8)])
 
   (defn arms []
     (lfor
@@ -151,8 +151,8 @@
 
 (defn test-nondainty []
   (for [dainty [F T]]
-    (init (mk-quest
-      [:height 1 :tiles ["pile of gold" "orc" "wall" "orc" "orc"]]))
+    (init
+      [:height 1 :tiles ["pile of gold" "orc" "wall" "orc" "orc"]])
     (when (not dainty)
       (setv G.rules.dainty-monsters F))
 
@@ -172,8 +172,8 @@
 
 
 (defn test-orc-or-goblin []
-  (init (mk-quest
-    [:tiles [["orc" :hp 3]]]))
+  (init
+    [:tiles [["orc" :hp 3]]])
 
   (assert-at 'E "orc")
   ; Get stabbed.
@@ -194,8 +194,8 @@
   "A generated monster with more than 3 HP does damage as if it had
   3 HP."
 
-  (init (mk-quest
-    [:tiles [["orc" :hp 10]]]))
+  (init
+    [:tiles [["orc" :hp 10]]])
 
   (for [[orc-hp score player-hp] [
       [10 0 100]
@@ -213,7 +213,7 @@
 
 
 (defn test-generator []
-  (init (mk-quest [
+  (init [
     :map "
       @ ████. .
       ████. G .
@@ -221,7 +221,7 @@
     :map-marks {
       "G " ["orc generator"
         :summon-frequency (f/ 2 3)
-        :summon-hp 2]}]))
+        :summon-hp 2]}])
 
   (defn check [power tN tNE tE tSE tW]
     (assert (= (top [3 1] 'summon-power) power))
@@ -245,12 +245,12 @@
 
 
 (defn test-generator-reality-bubble []
-  (init (mk-quest [
+  (init [
     :height 1
     :tiles [
       'floor 'floor "wall" 'floor
       ["orc generator" :summon-frequency (f/ 1)]
-      'floor]]))
+      'floor]])
   (setv G.rules.reality-bubble-size 4)
 
   ; Outside the reality bubble, generators do nothing.
@@ -270,7 +270,7 @@
     ; Try a case with the generator nearer to the player than the
     ; monster (`gen-west T`) and farther (`gen-west F`).
 
-    (init (mk-quest [
+    (init [
       :map "
         . . $ $
         @ . a b
@@ -279,7 +279,7 @@
         (if gen-west "a " "b ") ["orc generator"
           :summon-frequency (f/ 1 4)]
         (if gen-west "b " "a ") 'floor
-        "$ " "pile of gold"}]))
+        "$ " "pile of gold"}])
     (setv G.rules.dainty-monsters F)
 
     (defn check [orc-at-p1 orc-at-p2]
@@ -302,8 +302,8 @@
 
 
 (defn test-ghost []
-  (init (mk-quest
-    [:tiles [["ghost" :hp 3]]]))
+  (init
+    [:tiles [["ghost" :hp 3]]])
   (assert (and (= G.player.hp 100) (= G.score 0)))
   (assert-at 'E "ghost")
   ; Attack the ghost. We get 10 points for doing 2 damage.
@@ -316,8 +316,8 @@
 (defn test-bat-or-bee []
 
   ; A bat that's next to Tris just chews on her instead of moving.
-  (init (mk-quest
-    [:tiles ["bat"]]))
+  (init
+    [:tiles ["bat"]])
   (assert (= G.player.hp 100))
   (wait)
   (assert (= G.player.hp 99))
@@ -329,12 +329,12 @@
   ; A wandering bat will eventually cover the reality bubble, if
   ; it can't attack the player. It can't leave the reality bubble
   ; on its own.
-  (init (mk-quest
+  (init
     [:map "
         . . . . .
         . . b . .
         ██. . . .
-        @ ██. . ."]))
+        @ ██. . ."])
   (setv G.rules.reality-bubble-size 3)
   (assert (= G.player.hp 100))
   (setv seen-at (dfor
@@ -356,8 +356,8 @@
 (defn test-devil []
 
   ; At range, a devil shoots for 10 damage.
-  (init (mk-quest
-    [:tiles ['floor "devil"]]))
+  (init
+    [:tiles ['floor "devil"]])
   (assert (= G.player.hp 100))
   (wait)
   (assert (= G.player.hp 90))
@@ -366,17 +366,17 @@
   (assert (= G.player.hp 87))
 
   ; A diagonally blocked devil can't melee, so it shoots.
-  (init (mk-quest
+  (init
     [:map "
       . d
-      @ ██"]))
+      @ ██"])
   (assert (= G.player.hp 100))
   (wait)
   (assert (= G.player.hp 90))
 
   ; Monster shots can wrap around.
-  (init (mk-quest [:wrap-x T
-    :map ". @ ████████d ."]))
+  (init [:wrap-x T
+    :map ". @ ████████d ."])
   (assert (= G.player.hp 100))
   (wait)
   (assert (= G.player.hp 90))
@@ -384,8 +384,8 @@
   ; However, monsters only consider one direction for shooting. If the
   ; shortest path to the player (as the xorn phases) is blocked, they
   ; won't consider another valid direction.
-  (init (mk-quest [:wrap-x T
-    :map ". . @ ██d . ."]))
+  (init [:wrap-x T
+    :map ". . @ ██d . ."])
   (assert (= G.player.hp 100))
   (wait)
   (assert (= G.player.hp 100))
@@ -396,8 +396,8 @@
 
 
 (defn test-wizard []
-  (init (mk-quest
-    [:player-start #(5 0) :tiles [["wizard" :hp 3]]]))
+  (init
+    [:player-start #(5 0) :tiles [["wizard" :hp 3]]])
 
   (assert (= G.player.hp 100))
   ; Wizards always melee for 4 damage.
@@ -413,8 +413,8 @@
 
 (defn test-imp []
 
-  (init (mk-quest
-    [:height 1 :tiles ["wall" "wall" "imp"]]))
+  (init
+    [:height 1 :tiles ["wall" "wall" "imp"]])
   (assert (= G.player.hp 100))
   ; An imp initially needs to gain some shot power before it can
   ; shoot.
@@ -438,11 +438,11 @@
 
   ; On a turn that an imp isn't shooting or fleeing (even if it's
   ; gaining shot power), it wanders.
-  (init (mk-quest
+  (init
     [:map "
       . . . . .
       @ . . i .
-      . . . . ."]))
+      . . . . ."])
   (defn imp []
     (setv [mon] (gfor
       col G.map.data
@@ -459,8 +459,8 @@
 
 
 (defn test-thorn-tree []
-  (init (mk-quest
-    [:tiles ['floor ["thorn tree" :hp 3] ["thorn tree" :hp 10]]]))
+  (init
+    [:tiles ['floor ["thorn tree" :hp 3] ["thorn tree" :hp 10]]])
 
   ; Thorn trees are immobile.
   (assert-at [2 0] "thorn tree")
@@ -489,8 +489,8 @@
 
 
 (defn test-tricorn []
-  (init (mk-quest
-    [:tiles ['floor 'floor 'floor "Tricorn"]]))
+  (init
+    [:tiles ['floor 'floor 'floor "Tricorn"]])
 
   ; Tricorns can't shoot from more than 3 squares away. When they
   ; can't shoot, they approach as normal.
@@ -502,8 +502,8 @@
 
 
 (defn test-death []
-  (init (mk-quest
-    [:tiles [["Death" :hp 10]]]))
+  (init
+    [:tiles [["Death" :hp 10]]])
 
   (assert-hp 'E 10)
   ; Deaths are immune to mundane arrows.
@@ -520,9 +520,9 @@
 
 (defn test-floater []
 
-  (init (mk-quest [
+  (init [
     :height 1
-    :tiles ["wall" "floater" "wall"]]))
+    :tiles ["wall" "floater" "wall"]])
   ; If a floater activates while adjacent to us, we gain 1/5 floater
   ; disturbance.
   (assert (= G.player.floater-disturbance (f/ 0)))
@@ -554,12 +554,12 @@
 
   ; Contra IQ, floaters can explode on death regardless of how
   ; they're killed.
-  (init (mk-quest [
+  (init [
     :map "
       ██f ██.
       @ > . ☠"
     :map-marks {
-      "☠ " "jar of poison"}]))
+      "☠ " "jar of poison"}])
   (assert (= G.player.hp 100))
   (assert-at 'NE "floater")
   (assert-at [3 0] "jar of poison")
@@ -571,12 +571,12 @@
 
 
 (defn test-blob []
-  (init (mk-quest [
+  (init [
     :map "
       . ████.
       @ ██O ██"
     :map-marks {
-      "O " ["blob" :hp 5]}]))
+      "O " ["blob" :hp 5]}])
 
   (wait 9)
   (assert-at [2 0] "blob")

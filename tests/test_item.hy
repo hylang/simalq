@@ -3,14 +3,14 @@
   tests.lib [cant])
 (import
   fractions [Fraction :as f/]
-  tests.lib [init mk-quest assert-at assert-hp set-square mv-player wk shoot wait use-item mk-tile add-usable]
+  tests.lib [init init-boot-camp assert-at assert-hp set-square mv-player wk shoot wait use-item mk-tile add-usable]
   simalq.geometry [Pos Direction at]
   simalq.game-state [G])
 (setv  T True  F False)
 
 
 (defn test-treasure []
-  (init "Boot Camp 2")
+  (init-boot-camp)
 
   (mv-player 6 14)
   (assert (= G.score 0))
@@ -27,13 +27,13 @@
 
 
 (defn test-key-get []
-  (init "Boot Camp 2")
+  (init-boot-camp)
   (mv-player 13 10)
   (assert (and (= G.player.keys 0) (= G.score 0)))
   (wk 'S)
   (assert (and (= G.player.keys 1) (= G.score 50)))
 
-  (init "Boot Camp 2")
+  (init-boot-camp)
   (mv-player 13 10)
   (setv G.player.keys G.rules.max-keys)
   (assert (and (= G.player.keys G.rules.max-keys) (= G.score 0)))
@@ -42,7 +42,7 @@
 
   ; Being maxed out on keys doesn't prevent you from unlocking a door
   ; on the same square.
-  (init (mk-quest []))
+  (init [])
   (set-square 'E "key" "locked door")
   (assert-at 'E ["key" "locked door"])
   (setv G.player.keys G.rules.max-keys)
@@ -54,14 +54,14 @@
 
 
 (defn test-magic-arrow []
-  (init (mk-quest [
+  (init [
     :map "
       ████████d ████
       @ ↑ o d ☠ ##G "
     :map-marks {
       "o " ["orc" :hp 4]
       "☠ " "jar of poison"
-      "##" ["cracked wall" :hp 3]}]))
+      "##" ["cracked wall" :hp 3]}])
 
   ; Pick up some magic arrows.
   (assert (= G.player.magic-arrows 0))
@@ -86,9 +86,9 @@
 
 
 (defn test-food-eat []
-  (init (mk-quest [:tiles [
+  (init [:tiles [
      "snack" "meal" "jar of poison" "rotten food" "empty platter"
-     "dessert" "snack" "dessert"]]))
+     "dessert" "snack" "dessert"]])
   (assert (= G.player.hp 100))
   (wk 'E)
   (assert (= G.player.hp 125))
@@ -110,7 +110,7 @@
 
 
 (defn test-food-shoot []
-  (init (mk-quest [
+  (init [
     :map "
       @ % ☠ ██o o
       ████##██G ██
@@ -119,7 +119,7 @@
       "% " "snack"
       "☠ " "jar of poison"
       "##" ["cracked wall" :hp 2]
-      "o " ["orc" :hp 4]}]))
+      "o " ["orc" :hp 4]}])
   ; Shooting a snack (or most other foods) just destroys it.
   (assert-at 'E "snack")
   (shoot 'E)
@@ -147,9 +147,9 @@
 
 
 (defn test-amulet-of-invulnerability []
-  (init (mk-quest [
+  (init [
     :poison-intensity (f/ 1 3)
-    :tiles ["amulet of invulnerability" "orc"]]))
+    :tiles ["amulet of invulnerability" "orc"]])
   (defn check [turn-n player-hp [poison-dose None]]
     (assert (and (= G.turn-n turn-n)) (= G.player.hp player-hp))
     (when (is-not poison-dose None)
@@ -170,8 +170,8 @@
   (check 22 94 (f/ 2 3))
 
   ; If you get multiple status-effect items, the durations are summed.
-  (init (mk-quest [
-    :tiles [#* (* ["amulet of invulnerability"] 2) "orc"]]))
+  (init [
+    :tiles [#* (* ["amulet of invulnerability"] 2) "orc"]])
   (wk 'E 2)
   (wait 38)
   (check 40 100)
@@ -180,8 +180,8 @@
 
 
 (defn test-potion-of-speed []
-  (init (mk-quest
-    [:tiles ["potion of speed" "orc"]]))
+  (init
+    [:tiles ["potion of speed" "orc"]])
   (defn check [state-i turn-n [player-hp None]]
     (assert (and (= G.state-i state-i) (= G.turn-n turn-n)))
     (when (is-not player-hp None)
@@ -215,7 +215,7 @@
 
 
 (defn test-cloak-of-invisibility []
-  (init (mk-quest [
+  (init [
     :map "
       . d . . .
       . . . . .
@@ -223,7 +223,7 @@
       . . . . .
       . o . . ."
     :map-marks {
-      "! " "cloak of invisibility"}]))
+      "! " "cloak of invisibility"}])
 
   (assert (= G.player.hp 100))
   ; Get the cloak. Now that we're invisible, the orc can't approach
@@ -245,9 +245,9 @@
 
 
 (defn test-inventory []
-  (init (mk-quest [:tiles [
+  (init [:tiles [
      "wand of shielding" "wall-making wand"
-     "standard bomb" "standard bomb"]]))
+     "standard bomb" "standard bomb"]])
 
   (defn check [#* args]
     (assert (all (gfor
@@ -274,13 +274,13 @@
 
 
 (defn test-wand-shielding []
-  (init (mk-quest [
+  (init [
     :map "
       . o .
       ██. .
       $ @ ."
     :map-marks {
-      "$ " "pile of gold"}]))
+      "$ " "pile of gold"}])
   (add-usable "wand of shielding" 2)
 
   ; A wand of shielding creates a shield on each adjacent square (even
@@ -325,8 +325,9 @@
 
 
 (defn test-wand-wall-making []
-  (init :max-usables 4 :quest (mk-quest
-    [:tiles ["orc" "wall"]]))
+  (init
+    :max-usables 4
+    [:tiles ["orc" "wall"]])
   (add-usable "wall-making wand" 4)
 
   ; Unlike IQ, walls can be added regardless of what's already on the
@@ -346,9 +347,9 @@
 
   (defn check [item-stem usage #* damages]
     (setv starting-orc-hp 10)
-    (init (mk-quest [
+    (init [
       :height 1
-      :tiles (lfor  _ damages  ["orc" :hp starting-orc-hp])]))
+      :tiles (lfor  _ damages  ["orc" :hp starting-orc-hp])])
     (ecase usage
       'use (do
         ; Actually use the bomb.
@@ -374,15 +375,15 @@
 
   ; The sword artifact increases melee damage to 3. Multiple copies
   ; don't stack.
-  (init (mk-quest [
+  (init [
     :height 1
-    :tiles ["Holy Sword" "Holy Sword" ["orc" :hp 4]]]))
+    :tiles ["Holy Sword" "Holy Sword" ["orc" :hp 4]]])
   (wk 'E 3)
   (assert-hp 'E 1)
 
   ; The bow artifact is similar, but increases ranged damage to 2.
-  (init (mk-quest
-    [:tiles ["Elven Bow" ["orc" :hp 10]]]))
+  (init
+    [:tiles ["Elven Bow" ["orc" :hp 10]]])
   (wk 'E)
   (shoot 'E)
   (assert-hp 'E 8)
@@ -394,8 +395,8 @@
 
 
 (defn test-artifact-shield []
-  (init (mk-quest [
-    :tiles ["Magic Shield" "fixed damaging trap" "devil"]]))
+  (init [
+    :tiles ["Magic Shield" "fixed damaging trap" "devil"]])
 
   ; The shield makes you take 3/4 damage, rounded up.
   ; A devil's shot normally does 10 damage, but now does

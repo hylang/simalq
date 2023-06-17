@@ -2,7 +2,7 @@
 
 
 (import
-  tests.lib [init mk-quest assert-at assert-hp assert-player-at wk wait shoot mk-tile mv-player]
+  tests.lib [init assert-at assert-hp assert-player-at wk wait shoot mk-tile mv-player]
   simalq.game-state [G]
   simalq.geometry [Pos at])
 (setv  T True  F False)
@@ -19,9 +19,9 @@
     (when (is-not player-hp None)
       (assert (= G.player.hp player-hp))))
 
-  (init (mk-quest
+  (init
     [:tiles [["orc" :hp 3] "exit"]]
-    [:tiles [["orc" :hp 1]]]))
+    [:tiles [["orc" :hp 1]]])
   (check  0 0  1 100)
   (wk 'E 2)
   (check  2 2  1 97)
@@ -35,9 +35,9 @@
 
   ; The effect of a potion of speed doesn't stack with this free
   ; action.
-  (init (mk-quest
+  (init
     [:tiles ["potion of speed" 'floor "exit"]]
-    []))
+    [])
   (check  0 0  1)
   (wk 'E)
   (check  1 0  1)
@@ -52,8 +52,8 @@
 
 (defn test-refresh-level []
   ; Levels are refreshed when you revisit them.
-  (init (mk-quest [
-    :next-level 1 :tiles [["orc" :hp 3] "key" "exit"]]))
+  (init [
+    :next-level 1 :tiles [["orc" :hp 3] "key" "exit"]])
 
   (assert-player-at 0 0)
   (assert (= G.level-n 1))
@@ -71,8 +71,8 @@
   "Test which tile types can be shot through by the player or monsters."
 
   (defn check [tile player-can-shoot-through mon-can-shoot-through]
-    (init (mk-quest
-      [:tiles ['floor tile 'floor ["devil" :hp 2]]]))
+    (init
+      [:tiles ['floor tile 'floor ["devil" :hp 2]]])
     (assert (= G.player.hp 100))
     (shoot 'E)
     (assert-hp
@@ -111,7 +111,7 @@
     (Pos G.map (if ranged 2 1) 0))
 
   (for [wall-on-top [F T]  ranged [F T]]
-    (init (mk-quest []))
+    (init [])
     (mk-tile (mon-p) ["devil" :hp 3])
     (for [p [G.player.pos (mon-p)]]
       (mk-tile p "wall")
@@ -127,8 +127,8 @@
 (defn test-no-instack-attack []
   "Monsters on your square can't attack you."
 
-  (init (mk-quest
-    [:tiles ["devil"]]))
+  (init
+    [:tiles ["devil"]])
   (mv-player 1 0)
   (assert (= G.player.hp 100))
   ; We wait. The devil can't attack. It doesn't move, either, since

@@ -3,14 +3,14 @@
   tests.lib [cant])
 (import
   pytest
-  tests.lib [init mk-quest assert-at set-square mv-player assert-player-at wk wait shoot mk-tile]
+  tests.lib [init init-boot-camp assert-at set-square mv-player assert-player-at wk wait shoot mk-tile]
   simalq.util [GameOverException]
   simalq.geometry [at Pos]
   simalq.game-state [G])
 
 
 (defn test-unmodifiable-tiles []
-  (init "Boot Camp 2")
+  (init-boot-camp)
 
   (setv [t] (at (Pos G.map 13 5)))
   (assert (= t.stem "locked door"))
@@ -21,7 +21,7 @@
 
 
 (defn test-one-way-door []
-  (init "Boot Camp 2")
+  (init-boot-camp)
 
   (mv-player 3 13)
   (cant (wk 'S) "That one-way door must be entered from the east.")
@@ -39,8 +39,8 @@
 
   ; On a one-way door, you can still bump in the forbidden directions.
   ; IQ is inconsistent about this.
-  (init (mk-quest
-    [:tiles ["one-way door (north)"]]))
+  (init
+    [:tiles ["one-way door (north)"]])
   (mv-player 1 0)
   ; Try unlocking a door.
   (set-square 'E "locked door")
@@ -56,7 +56,7 @@
 
 
 (defn test-locked-doors []
-  (init "Boot Camp 2")
+  (init-boot-camp)
   (setv G.player.keys 2)
 
   ; Unlocked a locked door.
@@ -96,7 +96,7 @@
 
 
 (defn test-chest []
-  (init (mk-quest []))
+  (init [])
   (set-square [1 0] "treasure chest" "pile of gold")
   (set-square [2 0] "treasure chest" "meal")
 
@@ -117,7 +117,7 @@
 
 
 (defn test-exit []
-  (init "Boot Camp 2")
+  (init-boot-camp)
 
   ; Exit from level 1.
   (mv-player 0 1)
@@ -136,7 +136,7 @@
   (assert (!= G.map map-was))
 
   ; Exit from the penultimate level.
-  (init "Boot Camp 2" 25)
+  (init-boot-camp 25)
   (assert-player-at 9 21)
   (mv-player 26 9)
   (assert-at 'NE "exit")
@@ -152,7 +152,7 @@
   ; If the player steps on a tile with two exits, she should only
   ; advance one level, because her turn should end as soon as the
   ; first exit triggers.
-  (init (mk-quest [] [] []))
+  (init [] [] [])
   (set-square 'E #* (* ["exit"] 2))
   (wk 'E)
   (assert (= G.level-n 2)))
@@ -161,7 +161,7 @@
 (defn test-cracked-wall []
 
   ; Destroy a wall with 4 HP.
-  (init "Boot Camp 2")
+  (init-boot-camp)
   (mv-player 7 7)
   (assert-at 'N "cracked wall")
   (wk 'N)
@@ -171,8 +171,8 @@
   (assert-player-at 7 7)
 
   ; Destroy a wall with 10 HP.
-  (init (mk-quest
-    [:tiles [["cracked wall" :hp 10]]]))
+  (init
+    [:tiles [["cracked wall" :hp 10]]])
   (assert-at 'E "cracked wall")
   (wk 'E 4)
   (assert-at 'E "cracked wall")
@@ -182,8 +182,8 @@
 
 
 (defn test-pushblock []
-  (init (mk-quest
-    [:tiles ["pushblock" "pile of gold"]]))
+  (init
+    [:tiles ["pushblock" "pile of gold"]])
 
   ; Anything in the target square will block a pushblock.
   (cant (wk 'E) "There's no room to push the block there.")
@@ -197,7 +197,7 @@
 
 
 (defn test-gate []
-  (init (mk-quest []))
+  (init [])
   (defn t [] (Pos G.map 5 5))
 
   (mk-tile [1 0] ["gate" :target (t)])
@@ -215,8 +215,8 @@
 
   ; With no other teleporters in range, nothing happens when you walk
   ; into a teleporter.
-  (init (mk-quest
-    [:tiles ["teleporter"]]))
+  (init
+    [:tiles ["teleporter"]])
   (wk 'E)
   (assert-at 'here ['player "teleporter"])
   ; Teleporters can't be walked past diagonally.
@@ -226,11 +226,11 @@
   ; With multiple porters in range, you get sent to one of the
   ; nearest. Re-entering the original sends you to different nearest
   ; porters in sequence.
-  (init (mk-quest
+  (init
     [:map "
       ██┣┫████. . .
       ██. ██████┣┫.
-      @ ┣┫. ┣┫██. ."]))
+      @ ┣┫. ┣┫██. ."])
   (wk 'E)
   (assert-player-at 2 0)
   (mv-player 0 0)
@@ -243,9 +243,9 @@
   ; The destination porter needs to be in the reality bubble, but the
   ; target square need not be.
   (for [size [2 3]]
-    (init (mk-quest [
+    (init [
       :height 1
-      :tiles ["teleporter" "wall" "wall" "teleporter"]]))
+      :tiles ["teleporter" "wall" "wall" "teleporter"]])
     (setv G.rules.reality-bubble-size size)
     (wk 'E)
     (assert-player-at (if (= size 2) 1 5) 0))
@@ -253,8 +253,8 @@
   ; If you come out of the same teleporter several times, you'll
   ; arrive at its various adjacent free squares in a loop (north
   ; first, per `Direction.all`).
-  (init (mk-quest [
-    :tiles ["teleporter" "wall" "teleporter"]]))
+  (init [
+    :tiles ["teleporter" "wall" "teleporter"]])
   (setv targets [])
   (do-n 5
     (mv-player 0 0)
@@ -266,7 +266,7 @@
   ; Squares with items or scenery aren't eligible targets, but squares
   ; with monsters are. The monsters die (with all the normal
   ; consequences of monsters dying, contra IQ).
-  (init (mk-quest [
+  (init [
     :map "
       ████d 0 ┣┫
       @ ┣┫$ ┣┫++"
@@ -274,7 +274,7 @@
       "$ " "pile of gold"
       "d " ["devil" :hp 3]
       "0 " "standard bomb"
-      "++" "door"}]))
+      "++" "door"}])
    (wk 'E)
    (assert-player-at 2 1)
    (assert-at 'here 'player)
@@ -282,7 +282,7 @@
 
 
 (defn test-wallfall-trap []
-  (init (mk-quest [
+  (init [
     :map "
       @ t1t0t2
       . t1t0t2
@@ -293,7 +293,7 @@
       "t2" ["wallfall trap" :wallnum 2]
       "W0" ["trapped wall" :wallnum 0]
       "W1" ["trapped wall" :wallnum 1]
-      "W2" ["trapped wall" :wallnum 2]}]))
+      "W2" ["trapped wall" :wallnum 2]}])
   (setv G.rules.reality-bubble-size 0)
     ; Wallfall traps are unaffected by the reality bubble.
   (defn check [#* ts]
@@ -327,8 +327,8 @@
 
 
 (defn test-damaging-trap []
-  (init (mk-quest
-    [:tiles ["fixed damaging trap"]]))
+  (init
+    [:tiles ["fixed damaging trap"]])
 
   (assert (= G.player.hp 100))
   ; Step on the trap, taking 5 damage.
@@ -342,8 +342,8 @@
 
 
 (defn test-paralysis-trap []
-  (init (mk-quest
-    [:tiles ["paralysis trap" "orc"]]))
+  (init
+    [:tiles ["paralysis trap" "orc"]])
   (setv para-msg "You're paralyzed. You can only wait for it to pass.")
 
   ; Per IQ, after Tris gets paralyzed, monsters get 3 actions before

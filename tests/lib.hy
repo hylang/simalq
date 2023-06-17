@@ -22,12 +22,14 @@
     (hy.mangle k.name) v))
 
 
-(defn init [quest [level-n 1] #** rules]
+(defn init [#* levels [starting-hp 100] #** rules]
   (start-quest
-    :quest (if (isinstance quest str)
-      (iq-quest quest)
-      quest)
+    :quest (mk-quest #* levels :starting-hp starting-hp)
     :rules rules)
+  (start-level 1))
+
+(defn init-boot-camp [[level-n 1]]
+  (start-quest (iq-quest "Boot Camp 2"))
   (start-level level-n))
 
 (defn mk-quest [
