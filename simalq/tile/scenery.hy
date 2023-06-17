@@ -253,6 +253,7 @@
     ; Called a "moveable wall" in IQ. I think "wall" is misleading
     ; because it's not a diagonal blocker.
 
+  :blocks-monster T
   :hook-player-walk-to (fn [self origin]
     (setv target (pos+ self.pos (dir-to origin self.pos)))
     (when (or (not target) (at target))
