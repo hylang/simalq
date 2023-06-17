@@ -4,9 +4,10 @@
   simalq.strings
   simalq.util [CommandError]
   simalq.game-state [G]
-  simalq.geometry [pos-seed burst]
+  simalq.geometry [pos-seed burst at]
   simalq.tile [Tile deftile destroy-tile rm-tile add-tile]
-  simalq.util [DamageType StatusEffect hurt-player msg burst-damage])
+  simalq.tile.scenery [Scenery]
+  simalq.util [CommandError DamageType StatusEffect hurt-player msg burst-damage])
 (setv  T True  F False)
 
 
@@ -321,6 +322,21 @@
     (add-tile target "wall"))
 
   :flavor "This device is detested by the stonemason's union, but valued by homeowners and combat engineers, not to mention tyrants who desire vast dungeons.")
+
+(deftile Usable "/ " "a passwall wand"
+  :color 'dark-green
+  :iq-ix 32
+  :points 150
+
+  :use (fn [self target]
+    "Destroys one tile of wall, or other scenery types noted as destructible with a passwall wand."
+    (for [tile (at target)]
+      (when (and (isinstance tile Scenery) tile.destructible-by-passwall-wand)
+        (destroy-tile tile)
+        (return)))
+     (raise (CommandError "There isn't a destructible tile there.")))
+
+  :flavor #[[I always thought the phrase "open sesame" was a humorous deliberate corruption of "open says-a-me", but since it comes to us from French, if not from Arabic and then French, this is unlikely.]])
 
 
 (defclass FireBomb [Usable]

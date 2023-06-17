@@ -342,6 +342,22 @@
   (assert-at [3 0] "wall"))
 
 
+(defn test-wand-passwall []
+  (init
+    [:tiles ["orc" "wall" "pillar"]])
+  (add-usable "passwall wand" 3)
+
+  (cant (use-item 0  1 0) "There isn't a destructible tile there.")
+  (use-item 0  2 0)
+  (assert-at [2 0] 'floor)
+  (use-item 1  3 0)
+  (assert-at [3 0] 'floor)
+  (set-square [3 0] "wall" "wall")
+  (assert-at [3 0] ["wall" "wall"])
+  (use-item 2  3 0)
+  (assert-at [3 0] "wall"))
+
+
 (defn test-fire-bomb []
   "Put some orcs in a line and check how much damage is done to each."
 

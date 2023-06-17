@@ -19,8 +19,9 @@
       ; Block player and monster movement.
     blocks-diag F
       ; Block diagonal movement between orthogonally adjacent squares.
-    blocks-monster F)
+    blocks-monster F
       ; Block monster movement, even if `blocks-move` is false.
+    destructible-by-passwall-wand F)
 
   (defn dod [self prefix attr-sym]
     (setv m (getattr (type self) (hy.mangle attr-sym)))
@@ -56,6 +57,8 @@
           "Blocks your shots, but not monsters' shots"
         self.blocks-monster-shots
           "Blocks monsters' shots, but not your shots")
+      (when self.destructible-by-passwall-wand
+        "Destructible by a wand of passwall")
       (when self.superblock
         "Not subject to magical transformation or passage")
       #* extra
@@ -106,6 +109,7 @@
 (deftile Scenery "██" "a wall"
   :iq-ix 2
   :blocks-move T :blocks-diag T
+  :destructible-by-passwall-wand T
   :flavor "Among the most numerous and persistent of the obstacles that stand in the way of your inevitable victory.\n\n    This man, with lime and rough-cast, doth present\n    Wall, that vile Wall which did these lovers sunder;\n    And through Wall's chink, poor souls, they are content\n    To whisper, at the which let no man wonder.")
 
 (deftile Scenery "██" "the Void"
@@ -118,11 +122,13 @@
 (deftile Scenery "| " "a pillar"
   :iq-ix 12
   :blocks-move T
+  :destructible-by-passwall-wand T
   :flavor "A structure of vaguely Roman style.")
 
 (deftile Scenery "╷ " "a broken pillar"
   :iq-ix 82
   :blocks-move T :blocks-player-shots F
+  :destructible-by-passwall-wand T
   :flavor "It's just a chest-high half of a pillar now. Good thing it wasn't load-bearing, huh? It makes for good cover against enemy shots.")
 
 (deftile Scenery "++" "a door"
@@ -238,6 +244,7 @@
     {3 4  4 2  15 6}]
 
   :blocks-move T :blocks-diag T :blocks-player-shots F
+  :destructible-by-passwall-wand T
   :damageable T
   :immune #(DamageType.Poison DamageType.Fire DamageType.DeathMagic)
   :hook-player-bump (fn [self origin]
@@ -254,6 +261,7 @@
     ; because it's not a diagonal blocker.
 
   :blocks-monster T
+  :destructible-by-passwall-wand T
   :hook-player-walk-to (fn [self origin]
     (setv target (pos+ self.pos (dir-to origin self.pos)))
     (when (or (not target) (at target))
@@ -399,6 +407,7 @@
   :mapsym (property (fn [self]
     (+ "█" (if (< self.wallnum 10) (str self.wallnum) "^"))))
   :blocks-move T :blocks-diag T
+  :destructible-by-passwall-wand T
   :info-bullets (fn [self #* extra]
     (Scenery.info-bullets self
       #("Wallfall type" self.wallnum)))
