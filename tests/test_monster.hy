@@ -604,7 +604,6 @@
       (do
         (wait turns)
         (assert-at 'E "specter"))))
-
   ; Normally, specters move one square at a time, like any other
   ; monster.
   (check 2    'floor)
@@ -618,4 +617,13 @@
   ; implement it.)
   (check Inf  "Void")
   ; Nor over two blocked squares in a row.
-  (check Inf  "wall" "wall"))
+  (check Inf  "wall" "wall")
+
+  ; Test for a bug where a specter's movement state cycles too quickly
+  ; to allow jumping east here.
+  (init
+    [:map "
+       S ██.
+       ████@"])
+  (wait)
+  (assert-at 'N "specter"))

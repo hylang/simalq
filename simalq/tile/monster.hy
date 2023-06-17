@@ -200,7 +200,11 @@
   "Stationary — The monster attacks if it can, but is otherwise immobile."
   (try-to-attack-player mon))
 
-(defn approach [mon [implicit-attack T] [reverse F] [jump F]]
+(defn approach [mon
+    [implicit-attack T]
+    [advance-movement-state T]
+    [reverse F]
+    [jump F]]
   "Approach — If the monster can attack, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
   ; Return true if we successfully moved or attacked; false otherwise.
 
@@ -235,13 +239,15 @@
   (unless (ok-target)
     ; We can't go that way. Try a different direction.
     ; Use a non-random equivalent of IQ's `ApproachHero`.
-    (setv mon.movement-state
+    (setv movement-state
       (next-in-cycle Direction.orths mon.movement-state))
+    (when advance-movement-state
+      (setv mon.movement-state movement-state))
     (setv d (tuple (gfor c ["x" "y"]
-      (if (getattr mon.movement-state c)
+      (if (getattr movement-state c)
         (if (getattr d c)
           0
-          (getattr mon.movement-state c))
+          (getattr movement-state c))
         (getattr d c)))))
     ; Per IQ, we make only one attempt to find a new direction.
     ; So if this fails, give up.
@@ -596,7 +602,7 @@
   :act (fn [self]
      "Try to attack or approach per `Approach`. If that fails, try moving with a variation of `Approach` that allows skipping one intermediate tile."
      (or
-       (approach self)
+       (approach self :advance-movement-state F)
        (approach self :implicit-attack F :jump T)))
 
   :flavor "Yet another evil undead phantasm. This one's a real piece of work: it has a powerful heat-drain attack and the ability to teleport past obstacles.")
