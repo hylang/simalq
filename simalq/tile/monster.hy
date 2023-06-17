@@ -1,6 +1,6 @@
 (require
   hyrule [unless do-n]
-  simalq.macros [defdataclass slot-defaults pop-integer-part fn-dd])
+  simalq.macros [has defdataclass slot-defaults pop-integer-part fn-dd])
 (import
   re
   fractions [Fraction :as f/]
@@ -10,7 +10,7 @@
   simalq.geometry [Direction pos+ at dist adjacent? dir-to pos-seed ray]
   simalq.game-state [G]
   simalq.tile [Tile Actor deftile mv-tile add-tile damage-tile destroy-tile]
-  simalq.tile.scenery [walkability])
+  simalq.tile.scenery [Scenery walkability nogo?])
 (setv  T True  F False)
 
 
@@ -200,23 +200,39 @@
   "Stationary — The monster attacks if it can, but is otherwise immobile."
   (try-to-attack-player mon))
 
-(defn approach [mon [implicit-attack T] [reverse F]]
+(defn approach [mon [implicit-attack T] [reverse F] [jump F]]
   "Approach — If the monster can attack, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
+  ; Return true if we successfully moved or attacked; false otherwise.
 
   (when (and implicit-attack (try-to-attack-player mon))
-    (return))
+    (return T))
   (when (player-invisible-to mon)
-    (return))
+    (return F))
 
   ; Try to get closer to the player.
   (setv d (dir-to mon.pos G.player.pos))
   (when (is d None)
     ; The player is in our square. Just give up.
-    (return))
+    (return F))
   (when reverse
     (setv d d.opposite))
-  (setv [target wly] (walkability mon.pos d :monster? T))
-  (unless (= wly 'walk)
+
+  (setv target None)
+  (defn ok-target []
+    (nonlocal target)
+    (if jump
+      ; In jump mode, we move two squares, mostly ignoring tiles on
+      ; the intermediate square, and ignoring all diagonal blocking.
+      (and
+        (setx intermediate (pos+ mon.pos d))
+        (not (has intermediate Scenery it.superblock))
+        (setx target (pos+ intermediate d))
+        (not (nogo? target :monster? T)))
+      (do
+        (setv [target wly] (walkability mon.pos d :monster? T))
+        (= wly 'walk))))
+
+  (unless (ok-target)
     ; We can't go that way. Try a different direction.
     ; Use a non-random equivalent of IQ's `ApproachHero`.
     (setv mon.movement-state
@@ -227,15 +243,17 @@
           0
           (getattr mon.movement-state c))
         (getattr d c)))))
-    (unless (= d #(0 0))
-      (setv d (get Direction.from-coords d))
-      (setv [target wly] (walkability mon.pos d :monster? T)))
-    (unless (= wly 'walk)
-      ; Per IQ, we make only one attempt to find a new direction.
-      ; Give up.
-      (return)))
+    ; Per IQ, we make only one attempt to find a new direction.
+    ; So if this fails, give up.
+    (when (= d #(0 0))
+      (return F))
+    (setv d (get Direction.from-coords d))
+    (unless (ok-target)
+      (return F)))
+
   ; We're clear to move.
-  (mv-tile mon target))
+  (mv-tile mon target)
+  (return T))
 (setv Monster.act approach)
 
 (defn wander [mon [state-slot "movement_state"] [implicit-attack T]]
@@ -566,3 +584,19 @@
     (wander self :implicit-attack F))
 
   :flavor "What looks like a big mobile puddle of slime is actually a man-sized amoeba. It retains the ability to divide (but not, fortunately, to grow), and its lack of distinct internal anatomy makes arrows pretty useless. It has just enough intelligence to notice that you're standing next to it and try to envelop you in its gloppy bulk.")
+
+(deftile NonGen "S " "a specter"
+  :iq-ix 50
+  :points 100
+
+  :immune #(MundaneArrow #* undead-immunities)
+  :damage-melee 15
+  :sees-invisible T
+
+  :act (fn [self]
+     "Try to attack or approach per `Approach`. If that fails, try moving with a variation of `Approach` that allows skipping one intermediate tile."
+     (or
+       (approach self)
+       (approach self :implicit-attack F :jump T)))
+
+  :flavor "Yet another evil undead phantasm. This one's a real piece of work: it has a powerful heat-drain attack and the ability to teleport past obstacles.")

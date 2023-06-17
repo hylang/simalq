@@ -589,3 +589,33 @@
   (assert-hp [2 0] 3)
   (assert-at [3 1] "blob")
   (assert-hp [3 1] 2))
+
+
+(defn test-specter []
+
+  (defn check [turns #* middle-tiles]
+    (init [
+      :height 1
+      :tiles ['floor #* middle-tiles "specter"]])
+    (if (= turns Inf)
+      (do
+        (wait 100)
+        (assert-at [(+ (len middle-tiles) 2) 0] "specter"))
+      (do
+        (wait turns)
+        (assert-at 'E "specter"))))
+
+  ; Normally, specters move one square at a time, like any other
+  ; monster.
+  (check 2    'floor)
+  ; They can also jump over blocked squares, in which case they
+  ; move two squares in one turn.
+  (check 1    "wall")
+  ; They can jump over items or other monsters.
+  (check 1    "pile of gold")
+  (check 1    "thorn tree")
+  ; They can't jump over void. (IQ documents this, but doesn't
+  ; implement it.)
+  (check Inf  "Void")
+  ; Nor over two blocked squares in a row.
+  (check Inf  "wall" "wall"))

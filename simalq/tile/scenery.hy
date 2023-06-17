@@ -90,13 +90,17 @@
             (Pos target.map target.x p.y)]
           (has p2 Scenery it.blocks-diag))))
       'blocked-diag
-    (or
-        (and monster? G.rules.dainty-monsters (at target))
-        (has target Scenery it.blocks-move)
-        (has target hy.M.simalq/tile/monster.Monster T))
+    (nogo? target monster?)
       'bump
     True
       'walk)))
+
+(defn nogo? [pos monster?]
+  (or
+    (and monster? G.rules.dainty-monsters (at pos))
+    (and monster? (has pos Scenery it.blocks-monster))
+    (has pos Scenery it.blocks-move)
+    (has pos hy.M.simalq/tile/monster.Monster T)))
 
 
 (deftile Scenery "██" "a wall"
