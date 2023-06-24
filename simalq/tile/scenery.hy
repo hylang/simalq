@@ -131,6 +131,12 @@
   :destructible-by-passwall-wand T
   :flavor "It's just a chest-high half of a pillar now. Good thing it wasn't load-bearing, huh? It makes for good cover against enemy shots.")
 
+(deftile Scenery "◀▶" "a hole"
+  :color 'dark-gray
+  :iq-ix 107  ; crevasse
+  :blocks-move T :blocks-player-shots F :blocks-monster-shots F
+  :flavor "Watch your step.")
+
 (deftile Scenery "++" "a door"
   :color 'brown
   :iq-ix 5

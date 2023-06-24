@@ -87,6 +87,7 @@
   (check "door"            F F)
   (check "exit"            T T)
   (check "wallfall trap"   T T)
+  (check "hole"            T T)
   (check "magical energy shield"
                            T F)
   (check "broken pillar"   T F)

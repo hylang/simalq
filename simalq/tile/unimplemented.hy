@@ -19,7 +19,6 @@
     [104 "wand_of_annihilation"]
     [105 "exit_making_wand"]
     [106 "wand_of_gating"]
-    [107 "crevasse"]
     [108 "fountain"]
     [110 "candle"]
     [121 "poison_gas_bomb"]
