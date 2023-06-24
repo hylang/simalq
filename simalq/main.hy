@@ -8,9 +8,7 @@
   simalq.color :as color
   simalq.geometry [burst at]
   simalq.game-state [G]
-  simalq.tile.scenery [Scenery]
-  simalq.tile.item [Item]
-  simalq.tile.monster [Monster]
+  simalq.tile [Scenery Item Monster]
   simalq.quest [start-quest start-level]
   simalq.un-iq [iq-quest]
   simalq.commands [Action get-command do-command do-action]

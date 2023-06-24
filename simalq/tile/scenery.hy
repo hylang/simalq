@@ -103,7 +103,7 @@
     (and monster? G.rules.dainty-monsters (at pos))
     (and monster? (has pos Scenery it.blocks-monster))
     (has pos Scenery it.blocks-move)
-    (has pos hy.M.simalq/tile/monster.Monster T)))
+    (has pos hy.M.simalq/tile.Monster T)))
 
 
 (deftile Scenery "██" "a wall"
@@ -311,7 +311,7 @@
   :hook-player-walked-into (fn [self]
     "Teleports you to a free square adjacent to the nearest other teleporter in the reality bubble. If there is no eligible destination teleporter, no teleportation occurs; if there are several tied for the nearest, you'll cycle through them when you re-enter this teleporter. Squares are considered to be free even if they contain monsters, which are slain instantly if you teleport into them. The free square that you appear on is cycled each time you re-exit a teleporter."
 
-    (import simalq.tile.monster [Monster])
+    (import simalq.tile [Monster])
 
     ; Find a set of teleporters we can go to and their free adjacent
     ; positions.
