@@ -18,6 +18,8 @@ You can install SQ from source with the command ``pip install .``. Launch the ga
 
 The first time that SQ requires IQ's original quests, it will download them automatically. The download is cached, so no Internet connection is needed afterwards.
 
+See the `tilepedia <http://hylang.org/simalq/doc/tilepedia>`__ for an HTML compendium of tile info pages.
+
 The story so far
 ============================================================
 

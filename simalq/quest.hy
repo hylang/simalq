@@ -15,7 +15,7 @@
   :frozen T)
 
 (defn start-quest [quest [show-title T] [rules None]]
-  (when show-title
+  (when (and quest show-title)
     (hy.M.simalq/main.text-screen quest.title))
   (setv
     G.rules (Rules)
@@ -29,7 +29,7 @@
       (setattr G.rules k v)))
   (setv
     state.player (Player :pos None)
-    state.player.hp quest.starting-hp
+    state.player.hp (when quest quest.starting-hp)
     (cut state.player.inventory) (* [None] G.rules.max-usables))
   (.update state.player.status-effects (dfor  x StatusEffect  x 0))
   (.append G.states state)

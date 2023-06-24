@@ -303,10 +303,10 @@
 
 
 (import
-  ; For side-effects: namely, filling out `Tile.types` and
+  ; Chiefly for side-effects: namely, filling out `Tile.types` and
   ; `Tile.types-by-iq-ix`.
-  simalq.tile.player
-  simalq.tile.scenery
-  simalq.tile.item
-  simalq.tile.monster
-  simalq.tile.unimplemented)
+  simalq.tile.player [Player]
+  simalq.tile.scenery [Scenery]
+  simalq.tile.item [Item]
+  simalq.tile.monster [Monster]
+  simalq.tile.unimplemented [UnimplementedTile])

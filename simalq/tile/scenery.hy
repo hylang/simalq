@@ -292,7 +292,7 @@
     (dict :target (mk-pos #(v1 v2)))))
 
   :hook-player-walked-into (fn-dd [self]
-    (doc f"Teleports you to ({it.target.x}, {it.target.y}). Anything already there is unaffected.")
+    (doc f"Teleports you to {it.target}. Anything already there is unaffected.")
     (mv-tile G.player self.target)
     T)
 
