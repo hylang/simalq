@@ -75,8 +75,8 @@
       reality-bubble-size 6
         ; The reality bubble is the (Chebyshev) radius around the
         ; player in which monsters etc. get to act. It's a square
-        ; spanning `2 * reality-bubble-size + 1` squares on each side,
-        ; with the player in the center.
+        ; spanning `2 * reality-bubble-size + 1` map squares on each
+        ; side, with the player in the center.
       max-keys 8
         ; How many keys the player can carry at once.
       max-usables 3
