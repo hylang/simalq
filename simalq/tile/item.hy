@@ -31,7 +31,7 @@
       #("Pickup effect" (or
         self.pick-up.__doc__
         (self.pick-up.dynadoc self))))
-    #*extra
+    #* extra
     (when self.hook-player-shot
       #("Effect when you shoot it" (or
         self.hook-player-shot.__doc__
