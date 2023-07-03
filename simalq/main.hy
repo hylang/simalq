@@ -34,7 +34,8 @@
     (except [GameOverException]
       (msg (ecase G.player.game-over-state
         'dead "You have died."
-        'won  "You won the quest!")))))
+        'won  "You won the quest!"))))
+  (.advance-states G))
 
 (defn _take-turn [action]
   (do-action action)
@@ -44,15 +45,15 @@
     ; this turn. This means she always gets the first action on a
     ; level.
     (setv G.player.just-exited F)
+    (setv G.player.taking-extra-action T)
     (return))
 
   (when (and
       (player-status 'Fast)
-      (or
-        (< G.state-i 2)
-        (< (. G.states [(- G.state-i 2)] turn-n) G.turn-n)))
+      (not G.player.taking-extra-action))
     ; Let the player take a second action this turn. (Notice that
     ; this doesn't stack with the free action from using an exit.)
+    (setv G.player.taking-extra-action T)
     (return))
 
   ; Allow actors in the reality bubble to act, in `burst`'s spiral
@@ -87,22 +88,34 @@
       (-= (get G.player.status-effects se) 1)))
 
   ; Advance the turn counter last.
-  (+= G.turn-n 1))
+  (+= G.turn-n 1)
+  (setv G.player.taking-extra-action F))
 
 
 (setv B None)
+(setv _displaying F)
 
 (defn [contextmanager] player-io []
-  (global B)
+  (global B _displaying)
   (setv B (hy.M.blessed.Terminal))
   (try
+    (setv _displaying T)
     (with [_ (B.cbreak)  _ (B.fullscreen)  _ (B.hidden-cursor)]
       (yield))
     (finally
-      (setv B None))))
+      (setv _displaying F))))
+
+(defn [contextmanager] suppress-display []
+  (global _displaying)
+  (setv was _displaying)
+  (try
+    (setv _displaying F)
+    (yield)
+    (finally
+      (setv _displaying was))))
 
 (defn displaying []
-  (bool B))
+  _displaying)
 
 (defn io-mode [draw on-input]
   "Enter a modal interface that alternates between the callbacks

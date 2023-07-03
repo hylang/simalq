@@ -20,6 +20,10 @@
       ; ≥ 1 get converted to damage.
     :just-exited F
       ; Did you just use an exit?
+    :taking-extra-action F
+      ; Are you currently taking a second (or third, or further)
+      ; action for this turn? This is allowed by e.g.
+      ; `StatusEffect.Fast`.
     :status-effects {}
       ; Time remaining for each `StatusEffect` (0 for not having the
       ; effect).
@@ -36,7 +40,7 @@
         "Holy Sword" F}
     :floater-disturbance (Fraction 0))
       ; A measure of how much time you've spent adjacent to floaters.
-  :mutable-slots (tuple (map hy.mangle '(game-over-state hp poison-dose just-exited keys magic-arrows floater-disturbance)))
+  :mutable-slots (tuple (map hy.mangle '(game-over-state hp poison-dose just-exited taking-extra-action keys magic-arrows floater-disturbance)))
     ; `inventory` and `artifacts` should be mutated directly rather
     ; reassigned.
 

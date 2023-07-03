@@ -1,7 +1,8 @@
 (require
+  hyrule [unless]
   simalq.macros [defdataclass])
 (import
-  simalq.game-state [G Rules GameState]
+  simalq.game-state [G Rules]
   simalq.util [StatusEffect]
   simalq.tile [mv-tile]
   simalq.tile.player [Player]
@@ -19,21 +20,18 @@
     (hy.M.simalq/main.text-screen quest.title))
   (setv
     G.rules (Rules)
-    G.quest quest
-    G.states []
-    state (GameState))
-  (for [thing [G.rules state] [k v] (.items thing.slot-defaults)]
-    (setattr thing k (deepcopy v)))
+    G.quest quest)
+  (for [[k v] (.items Rules.slot-defaults)]
+    (setattr G.rules k (deepcopy v)))
   (when rules
     (for [[k v] (.items rules)]
       (setattr G.rules k v)))
+  (.initialize-states G)
   (setv
-    state.player (Player :pos None)
-    state.player.hp (when quest quest.starting-hp)
-    (cut state.player.inventory) (* [None] G.rules.max-usables))
-  (.update state.player.status-effects (dfor  x StatusEffect  x 0))
-  (.append G.states state)
-  (setv G.state-i 0))
+     G.player (Player :pos None)
+     G.player.hp (when quest quest.starting-hp)
+     (cut G.player.inventory) (* [None] G.rules.max-usables))
+  (.update G.player.status-effects (dfor  x StatusEffect  x 0)))
 
 
 (defdataclass Level []
@@ -55,4 +53,8 @@
     G.level (deepcopy level))
       ; The default behavior of `deepcopy` is smart enough to make all
       ; the references to `G.level.map` in tiles point to the new map.
-  (mv-tile G.player G.level.player-start))
+  (mv-tile G.player G.level.player-start)
+  (unless G.states
+    ; If we haven't saved any states yet (because the game just
+    ; started), save this as the first state in the history.
+    (.advance-states G)))

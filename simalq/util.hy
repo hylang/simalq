@@ -47,7 +47,8 @@
 (setv message-queue [])
 
 (defn msg [#* args]
-  (.append message-queue (.join " " (map str args))))
+  (when (hy.M.simalq/main.displaying)
+    (.append message-queue (.join " " (map str args)))))
 
 
 (defn flash-map [focus color ps labels flash-time-s]

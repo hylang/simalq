@@ -214,60 +214,58 @@
   (wk 'E)
   (check  2 2 253 97  'floor 'player 'floor)
   ; Undo.
-  (setv G.state-i 1)
+  (G.set-state-i 1)
   (check  1 1 250 97  'floor 'player "orc")
   ; Undo one more action.
-  (setv G.state-i 0)
+  (G.set-state-i 0)
   (check  0 0 0 100  'player "handful of gems" "orc")
   ; Redo.
-  (setv G.state-i 1)
+  (G.set-state-i 1)
   (check  1 1 250 97  'floor 'player "orc")
   ; Undo, then do an "effective redo" where we repeat our previous
   ; action.
-  (setv G.state-i 0)
+  (G.set-state-i 0)
   (wk 'E)
   (check  1 1 250 97  'floor 'player "orc")
   ; That preserved further redo history, so we can redo again.
-  (setv G.state-i 2)
+  (G.set-state-i 2)
   (check  2 2 253 97  'floor 'player 'floor)
   ; Undo, then take a new action.
-  (setv G.state-i 0)
+  (G.set-state-i 0)
   (wk 'N)
   (check  1 1 0 100  'floor "handful of gems" 'floor)
   ; We can no longer redo to the old state 2, since we branched off
   ; the history.
   (assert (= (len G.states) 2))
-  (setv G.state-i 2)
-  (with [(pytest.raises IndexError)]
-    (check  2 2 253 97  'floor 'player 'floor)))
+  (with [(pytest.raises ValueError)]
+    (G.set-state-i 2)))
 
 
 (defn test-saveload [tmp-path]
-  (init-boot-camp)
-  (defn check [i n-states score keys thing px py]
+  (init
+    [:tiles ["key" "locked disappearing door"]])
+
+  (defn check [i n-states score keys thing px]
     (assert (and
       (= G.state-i i) (= G.turn-n i) (= (len G.states) n-states)
       (= G.score score) (= G.player.keys keys)
-      (= G.player.pos.xy #(px py))))
-    (assert-at [10 2] thing))
+      (= G.player.pos.xy #(px 0))))
+    (assert-at [2 0] thing))
 
   ; Pick up a key, open a locked disappering door, and step there.
-  (mv-player 13 10)
-  (wk 'S)
-  (mv-player 11 2)
-  (wk 'W 2)
-  (check  3 4  50 0  'player  10 2)
+  (wk 'E 3)
+  (check  3 4  50 0  'player  2)
   ; Undo the last two actions.
-  (setv G.state-i 1)
-  (check  1 4  50 1  "locked disappearing door"  11 2)
+  (G.set-state-i 1)
+  (check  1 4  50 1  "locked disappearing door"  1)
   ; Save.
   (save-game (/ tmp-path "mygame"))
   ; Take a new action, discarding the redo history.
-  (wk 'E)
-  (check  2 3  50 1  "locked disappearing door"  12 2)
+  (wk 'W)
+  (check  2 3  50 1  "locked disappearing door"  0)
   ; Load, restoring the previous state and the previous history.
   (load-game (/ tmp-path "mygame"))
-  (check  1 4  50 1  "locked disappearing door"  11 2))
+  (check  1 4  50 1  "locked disappearing door"  1))
 
 
 (defn test-player-death []
@@ -293,7 +291,7 @@
   (cant (wk 'E) "You're dead. You can undo or load a saved game.")
   (cant (wait) "You're dead. You can undo or load a saved game.")
   ; Undo, and instead do something that doesn't get Tris killed.
-  (setv G.state-i 1)
+  (G.set-state-i 1)
   (check 1 8 4)
   (wk 'W)
   (check 2 8 3))

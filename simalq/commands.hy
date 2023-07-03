@@ -159,7 +159,7 @@
         (raise (CommandError "Nothing to undo.")))
       (when (and (> cmd.steps 0) (= G.state-i (- (len G.states) 1)))
         (raise (CommandError "Nothing to redo.")))
-      (setv G.state-i (max 0 (min (- (len G.states) 1)
+      (.set-state-i G (max 0 (min (- (len G.states) 1)
         (+ G.state-i cmd.steps)))))
 
     SaveGame
@@ -179,34 +179,7 @@
 
 
 (defn do-action [action]
-  ; Set up a new game state.
-  (setv new-state (deepcopy (get G.states G.state-i)))
-  (+= G.state-i 1)
-  (cond
-    (= G.state-i (len G.states))
-      ; We're at the end of the undo history, so append the new state.
-      (.append G.states new-state)
-    (= (. G.states [G.state-i] action) action)
-      ; We should effectively be redoing this state, since it's the
-      ; same action as last time and the game is deterministic.
-      ; Keep the remaining history for further redoing.
-      (setv (get G.states G.state-i) new-state)
-    True
-      ; We're branching off in a new direction. Discard the now-
-      ; obsolete redo history. (We don't support a full-blown tree
-      ; of states, just a line.)
-      (setv (cut G.states G.state-i None) [new-state]))
   (setv G.action action)
-  (try
-    (_execute-action action)
-    (except [CommandError]
-      ; No action occurred. Abort the new game state before bubbling
-      ; the exception up.
-      (del (get G.states G.state-i))
-      (-= G.state-i 1)
-      (raise))))
-
-(defn _execute-action [action]
 
   (when G.player.game-over-state
     (raise (CommandError (.format "{}. You can undo or load a saved game."
