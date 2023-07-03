@@ -13,6 +13,7 @@
 
 (setv snack-messages #(
   "French fries: bad for the heart, but good for the soul."
+  #[[These Larmers™ brand ham medallions are delightful. No wonder they've been "America's Favorite Taste" since 1928.]]
   "You dine on cucumber sandwiches. Very classy."
   "You drink some magically carbonated soda."
   "You eat a whole bucket of popcorn. The movie hasn't even started yet."
@@ -34,7 +35,7 @@
 (setv rotten-food-messages #(
   "I think you misread the expiration date on those cookies."
   "Maybe you shouldn't have gone with the steak tartare."
-  "Rotten meat! Kids, you gotta keep your meat ice cold."
+  "Rotten meat! Kids, you gotta keep your meat ice-cold."
   "Spoiled milk was a bad choice."
   "This kobold corpse tastes terrible!"
   "This peach is subpar."
