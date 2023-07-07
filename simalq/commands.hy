@@ -2,6 +2,7 @@
   hyrule [ecase do-n unless]
   simalq.macros [defdataclass])
 (import
+  sys
   copy [deepcopy]
   toolz [partition]
   simalq.color :as color
@@ -53,6 +54,8 @@
   :frozen T)
 (defdataclass LoadGame [Command]
   "Read a file and replace the global state with its contents.")
+(defdataclass Quit [Command]
+  "Quit the game.")
 
 
 (defn get-command [key]
@@ -87,7 +90,8 @@
   "R" [ShiftHistory +10]
   "S" [SaveGame 'main]
   "C" [SaveGame 'checkpoint]
-  "L" LoadGame})
+  "L" LoadGame
+  "!" Quit})
 
 
 (defn do-command [cmd]
@@ -179,7 +183,10 @@
           (load-game path)
           (msg "Game loaded."))
         (except [e IOError]
-          (raise (CommandError (+ "Load failed: " (str e))))))))
+          (raise (CommandError (+ "Load failed: " (str e))))))
+
+    Quit
+      (sys.exit)))
 
 
 (defn do-action [action]
