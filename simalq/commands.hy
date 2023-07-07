@@ -3,6 +3,7 @@
   simalq.macros [defdataclass])
 (import
   copy [deepcopy]
+  toolz [partition]
   simalq.color :as color
   simalq.util [CommandError DamageType msg player-shot-damage flash-map menu-letters player-status]
   simalq.geometry [Direction Pos pos+ at dist]
@@ -55,7 +56,7 @@
 
 
 (defn get-command [key]
-  (when (setx v (.get dir-keys (str key)))
+  (when (setx v (read-dir-key key))
     (return (if (= v 'center)
       (Wait)
       (Walk v))))
@@ -65,13 +66,16 @@
       (v))))
   None)
 
-(setv dir-keys (dfor
-  [k v] (.items {
-    "7y" Direction.NW  "8k" Direction.N  "9u" Direction.NE
-    "4h" Direction.W   "5." 'center      "6l" Direction.E
-    "1b" Direction.SW  "2j" Direction.S  "3n" Direction.SE})
-  char k
-  char v))
+(defn read-dir-key [key]
+  (.get _dir-keys (str key) (.get _dir-keys key.name)))
+(setv _dir-keys (dfor
+  :setv D Direction
+  [k v] (partition 2 [
+    ["7" "y" "HOME"] D.NW  ["8" "k" "UP"]     D.N      ["9" "u" "PGUP"]   D.NE
+    ["4" "h" "LEFT"] D.W   ["5" "." "ESCAPE"] 'center  ["6" "l" "RIGHT"]  D.E
+    ["1" "b" "END"]  D.SW  ["2" "j" "DOWN"]   D.S      ["3" "n" "PGDOWN"] D.SE])
+  s k
+  (if (> (len s) 1) (+ "KEY_" s) s) v))
 
 (setv cmd-keys {
   "a" GonnaUseItem
@@ -105,7 +109,7 @@
         (print-main-screen focus :status-bar F))
       :on-input (fn [key]
         (nonlocal focus)
-        (setv dir-v (.get dir-keys (str key)))
+        (setv dir-v (read-dir-key key))
         (cond
           (and dir-v (!= dir-v 'center))
             (setv focus (or (pos+ focus dir-v) focus))
@@ -122,7 +126,7 @@
     GonnaShoot (do
       ; A direction key causes Tris to shoot in that direction.
       ; Any other key just cancels out of shooting mode.
-      (setv v (.get dir-keys (str (inkey))))
+      (setv v (read-dir-key (inkey)))
       (when (isinstance v Direction)
         (take-turn (Shoot v))))
 
