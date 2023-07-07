@@ -1,6 +1,6 @@
 dependencies = [
-    'hy @ git+https://github.com/hylang/hy@18af19ef91a77521af7fcabb10d347a4382157c3',
-    'hyrule @ git+https://github.com/Kodiologist/hyrule@d51b6c376ba9b4412bda441a273c5673cca7bfc7',
+    'hy == 0.27.0',
+    'hyrule == 0.4.0',
     'toolz >= 0.12.0',
     'construct >= 2.10.68',
     'blessed >= 1.20.0']
