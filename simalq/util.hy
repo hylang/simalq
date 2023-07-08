@@ -4,11 +4,20 @@
   hyrule [unless]
   simalq.macros [pop-integer-part])
 (import
+  os
+  pathlib [Path]
   time [sleep]
   enum [Enum]
   simalq.game-state [G]
   simalq.color :as colors)
 (setv  T True  F False)
+
+
+(assert (get os.environ "XDG_CACHE_HOME"))
+(setv cache-dir (/ (Path (get os.environ "XDG_CACHE_HOME")) "simalq"))
+(assert (get os.environ "XDG_DATA_HOME"))
+(setv saved-games-dir (/
+  (Path (get os.environ "XDG_DATA_HOME")) "simalq" "save"))
 
 
 (defn seq [a b [step 1]]

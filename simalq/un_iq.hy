@@ -9,12 +9,11 @@
 (import
   types [FunctionType]
   fractions [Fraction]
-  os
-  pathlib [Path]
   zipfile [ZipFile]
   functools [cache]
   construct
   toolz [partition]
+  simalq.util [cache-dir]
   simalq.geometry [Map Pos]
   simalq.quest [Quest Level]
   simalq.tile [Tile])
@@ -140,10 +139,8 @@
   "Get a dictionary of raw IQ quests as `bytes` objects."
 
   ; Download the quests if needed.
-  (assert (get os.environ "XDG_CACHE_HOME"))
-  (setv path (/ (Path (get os.environ "XDG_CACHE_HOME")) "simalq"))
-  (.mkdir path :exist-ok T)
-  (setv path (/ path "infinity_quests_2.zip"))
+  (.mkdir cache-dir :exist-ok T)
+  (setv path (/ cache-dir "infinity_quests_2.zip"))
   (unless (.exists path)
     (import http.client contextlib)
     (with [con (contextlib.closing (http.client.HTTPConnection "arfer.net"))]

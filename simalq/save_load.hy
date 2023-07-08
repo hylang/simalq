@@ -1,20 +1,15 @@
 (require
   hyrule [unless])
 (import
-  os
   itertools [count]
   time [time]
   datetime [datetime]
   json
   pickle
   zipfile [ZipFile ZIP-STORED ZIP-DEFLATED]
-  pathlib [Path]
   simalq.game-state [G]
-  simalq.util [menu-letters])
+  simalq.util [menu-letters saved-games-dir])
 (setv  T True  F False)
-
-(setv saved-games-dir (/
-  (Path (get os.environ "XDG_DATA_HOME")) "simalq" "save"))
 
 ;; --------------------------------------------------------------
 ;; * Helper macros
