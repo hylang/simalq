@@ -165,7 +165,7 @@
 
 (setv max-wrap-cols 75)
 
-(defn text-screen [text]
+(defn text-screen [text center]
   (setv y-margin 2)
   (setv pause-seconds 0.25)
 
@@ -181,7 +181,7 @@
           line (B.wrap
             text
             (min max-wrap-cols B.width))
-          (.center line B.width))))
+          ((if center line.center line.ljust) B.width))))
       ; Ignore input for a bit so the user doesn't accidentally
       ; dismiss the screen while holding a key.
       (sleep pause-seconds))

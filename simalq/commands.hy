@@ -1,8 +1,9 @@
 (require
-  hyrule [ecase do-n unless]
+  hyrule [case ecase do-n unless]
   simalq.macros [defdataclass])
 (import
   sys
+  re
   copy [deepcopy]
   toolz [partition]
   simalq.color :as color
@@ -37,25 +38,33 @@
   [item-ix target-x target-y]
   :frozen T)
 
+(defdataclass Help [Command]
+  "Show this help screen.")
 (defdataclass GonnaShoot [Command]
-  "Prepare to take a direction key for shooting.")
+  "Fire an arrow. This key enters shooting mode; press a direction key
+  to shoot or any other key to cancel.")
 (defdataclass GonnaUseItem [Command]
-  "Show your inventory, and prepare to take a key indicating
-  the item to use.")
+  "Apply an item from your inventory.")
+  ; Actually: show your inventory, and prepare to take a key indicating
+  ; the item to use.
 (defdataclass Look [Command]
-  "Move the cursor around the level.")
+  "Look mode. Use a direction key to move the cursor, this key (or the
+  wait key) to get info on a tile under the cursor, and any other key
+  to exit look mode.")
+
 (defdataclass ShiftHistory [Command]
-  "Undo or redo."
+  "{details}"
+  ; Undo or redo.
   [steps]
   :frozen T)
 (defdataclass SaveGame [Command]
-  "Write the global state to a file."
+  "Save the game, {details}."
   [kind]
   :frozen T)
 (defdataclass LoadGame [Command]
-  "Read a file and replace the global state with its contents.")
+  "Load a saved game.")
 (defdataclass Quit [Command]
-  "Quit the game.")
+  "Quit the game. (You won't be prompted to confirm or save first.)")
 
 
 (defn get-command [key]
@@ -98,7 +107,7 @@
   "This function is only for commands that aren't actions; see
   `do-action` for actions."
   (import
-    simalq.main [io-mode print-main-screen info-screen inkey take-turn load-saved-game-screen])
+    simalq.main [io-mode text-screen print-main-screen info-screen inkey take-turn load-saved-game-screen])
 
   (defn targeting-mode [target-callback]
     "Allow the user to select a target square with the direction keys.
@@ -126,6 +135,9 @@
     focus)
 
   (ecase (type cmd)
+
+    Help
+      (text-screen help-text :center F)
 
     GonnaShoot (do
       ; A direction key causes Tris to shoot in that direction.
@@ -302,3 +314,31 @@
           (.use item)))
       (setv (get G.player.inventory action.item-ix) None)
       (destroy-tile item))))
+
+
+(setv controls (.join "\n" (lfor
+  [k cmd] (.items cmd-keys)
+  :setv [cmd arg] (if (isinstance cmd list) cmd [cmd None])
+  (+ k " - " (.format
+    (re.sub r"\s+" " " cmd.__doc__)
+    :details (case cmd
+      ShiftHistory
+        (.format "{} {}."
+          (if (< arg 0) "Undo the previous" "Redo the next")
+          (if (> (abs arg) 1) f"{(abs arg)} actions" "action"))
+      SaveGame
+        (ecase arg
+          'main "overwriting your main save file for this quest"
+          'checkpoint "creating a new checkpoint save")))))))
+
+(setv help-text (.strip #[f[
+
+All controls are case-sensitive. Use the numeric keypad or the vi-keys to move. Use `5` or `.` to wait, skipping a turn.
+
+{controls}
+
+Paths:
+- Saved games: {hy.M.simalq/util.saved-games-dir}
+- IQ quest cache: {hy.M.simalq/util.cache-dir}
+
+To delete a saved game, delete the corresponding file from the saved-game directory.]f]))

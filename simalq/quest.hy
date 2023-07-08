@@ -17,7 +17,7 @@
 
 (defn start-quest [quest [show-title T] [rules None]]
   (when (and quest show-title)
-    (hy.M.simalq/main.text-screen quest.title))
+    (hy.M.simalq/main.text-screen quest.title :center T))
   (setv
     G.rules (Rules)
     G.quest quest)
@@ -47,7 +47,8 @@
 (defn start-level [level-n [show-title T]]
   (setv level (get G.quest.levels (- level-n 1)))
   (when show-title
-    (hy.M.simalq/main.text-screen f"Level {level-n}\n\n{level.title}"))
+    (hy.M.simalq/main.text-screen :center T
+      f"Level {level-n}\n\n{level.title}"))
   (setv
     G.level-n level-n
     G.level (deepcopy level))
