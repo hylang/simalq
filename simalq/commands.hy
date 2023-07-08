@@ -90,17 +90,18 @@
   (if (> (len s) 1) (+ "KEY_" s) s) v))
 
 (setv cmd-keys {
-  "a" GonnaUseItem
-  "f" GonnaShoot
-  ";" Look
+  "?" Help
+  "!" Quit
+  "S" [SaveGame 'main]
+  "C" [SaveGame 'checkpoint]
+  "L" LoadGame
   "e" [ShiftHistory  -1]  ; Undo
   "E" [ShiftHistory -10]
   "r" [ShiftHistory  +1]  ; Redo
   "R" [ShiftHistory +10]
-  "S" [SaveGame 'main]
-  "C" [SaveGame 'checkpoint]
-  "L" LoadGame
-  "!" Quit})
+  ";" Look
+  "f" GonnaShoot
+  "a" GonnaUseItem})
 
 
 (defn do-command [cmd]
