@@ -164,46 +164,28 @@
 
 
 (setv max-wrap-cols 75)
+(setv x-margin (* 2 " "))
+(setv y-margin 1)
 
 (defn text-screen [text center]
-  (setv y-margin 2)
-  (setv pause-seconds 0.25)
-
   (unless (displaying)
     (return))
-  (io-mode
-    :draw (fn []
-      (print
-        :flush T :sep "" :end ""
-        B.home B.clear
-        (* "\n" y-margin)
-        (.join "\n" (lfor
-          line (B.wrap
-            text
-            (min max-wrap-cols B.width))
-          ((if center line.center line.ljust) B.width))))
-      ; Ignore input for a bit so the user doesn't accidentally
-      ; dismiss the screen while holding a key.
-      (sleep pause-seconds))
-    :on-input (fn [key]
-      'done)))
+  (_scrolling-text-screen (+
+    (* [""] y-margin)
+    (if center
+      (lfor
+        line (B.wrap
+          text
+          (min max-wrap-cols B.width))
+        (.center line B.width))
+      (wrapped text)))))
 
 (defn info-screen [t]
   "Enter an `io-mode` for showing information about the tile `t`."
 
-  (setv x-margin (* 2 " "))
-  (setv y-margin 1)
-
   (import
     re
     simalq.display [color-tile])
-
-  (defn wrapped [x]
-    (lfor
-      line (B.wrap
-        x
-        (min max-wrap-cols (- B.width (len x-margin))))
-      (+ x-margin line)))
 
   (setv lines [
     #* (* [""] y-margin)
@@ -226,7 +208,12 @@
     ""
     #* (wrapped t.flavor)])
 
+  (_scrolling-text-screen lines))
+
+(defn _scrolling-text-screen [lines]
+
   (setv top-line-ix 0)
+  (setv pause-seconds 0.25)
 
   (io-mode
 
@@ -236,7 +223,11 @@
         B.home B.clear
         (.join "\n" (cut lines
           top-line-ix
-          (+ top-line-ix B.height)))))
+          (+ top-line-ix B.height))))
+      (when (= top-line-ix 0)
+        ; Ignore input for a bit so the user doesn't accidentally
+        ; dismiss the screen while holding a key.
+        (sleep pause-seconds)))
 
     :on-input (fn [key]
       ; Advance `top-line-ix` (i.e., scroll the screen), or exit if
@@ -248,6 +239,13 @@
       (if (= new-ix top-line-ix)
         'done
         (setv top-line-ix new-ix)))))
+
+(defn wrapped [text]
+  (lfor
+    line (B.wrap
+      text
+      (min max-wrap-cols (- B.width (len x-margin))))
+    (+ x-margin line)))
 
 
 (defn load-saved-game-screen [saves-meta]
