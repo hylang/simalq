@@ -68,7 +68,7 @@
         (E.li name (E.ul #* (gfor
           tile tiles
           :if (isinstance tile superclass)
-          (E.li (mapsym tile) (E.a tile.full-name
+          (E.li (mapsym tile) (E.a tile.name-with-article
             :href (+ "#" (.replace tile.stem " " "-"))))))))))
 
     ; One section of info screens per superclass
@@ -78,7 +78,7 @@
         ; One info screen per tile type
         tile tiles
         :if (isinstance tile superclass)
-        [(E.h3 (mapsym tile) tile.full-name :id (.replace tile.stem " " "-"))
+        [(E.h3 (mapsym tile) tile.name-with-article :id (.replace tile.stem " " "-"))
           (E.ul #* (gfor
             bullet (.info-bullets tile)
             :if bullet

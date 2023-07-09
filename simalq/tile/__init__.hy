@@ -65,8 +65,16 @@
       s (getattr c "mutable_slots" #())
       s))
 
-  (defn [classmethod property] full-name [cls]
+  (defn [classmethod property] name-with-article [cls]
     (+ (if cls.article (+ cls.article " ") "") cls.stem))
+
+  (defn [property] full-name [self]
+    (setv suffix-items (.items (.suffix-dict self)))
+    (+ self.name-with-article (if suffix-items
+      (.format " ({})" (.join ", " (gfor
+        [k v] suffix-items
+        f"{k} {v}")))
+      "")))
 
   ; The below variables and methods may be overridden by subclasses.
 
@@ -135,6 +143,11 @@
     "This method should return a dictionary of instance variables
     to set for a new instance."
     (raise (TypeError (+ "Tile extras not implemented: " cls.stem))))
+
+  (defn suffix-dict [self]
+    "Return a dictionary of things to append to the full name of the
+    tile"
+    {})
 
   (defn info-bullets [self]
     "Return a list of bulleted items for an info screen. `None`s
