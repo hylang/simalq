@@ -120,7 +120,7 @@
     (setv focus G.player.pos)
     (io-mode
       :draw (fn []
-        (print-main-screen focus :status-bar F))
+        (print-main-screen focus :status-bar F :tile-list T))
       :on-input (fn [key]
         (nonlocal focus)
         (setv dir-v (read-dir-key key))

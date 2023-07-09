@@ -54,7 +54,7 @@
   (cut (+ x (colorstr (* " " (max 0 (- width (len x)))))) width))
 
 
-(defn draw-screen [width height focus status-bar inventory messages [overmarks None]]
+(defn draw-screen [width height focus status-bar tile-list inventory messages [overmarks None]]
   "Return a colorstr for the main screen."
 
   (setv out [])
@@ -79,7 +79,10 @@
       (when status-bar
         (+= i status-bar-lines))
       (setv (cut (get out i) (len line)) line)))
-  ; First, the inventory list.
+  ; First, the tile list.
+  (when tile-list
+    (scribble-on-map (draw-tile-list focus width)))
+  ; Then the inventory list.
   (when inventory
     (scribble-on-map (draw-inventory)))
   ; Then messages.
@@ -247,6 +250,16 @@
           (colorstr "  "))))
       #* (status-effects :bad F))))
 
+
+(defn draw-tile-list [pos width]
+  "Return a list of colorstrs, one for each tile in the stack at the
+  given position."
+  (lfor
+    tile (at pos)
+    (colorstr-to-width :width width (+
+      (colorstr "  ")
+      (color-tile tile)
+      (colorstr (+ " " tile.full-name))))))
 
 (defn draw-inventory []
   "Return a list of colorstrs."
