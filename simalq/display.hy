@@ -50,45 +50,50 @@
       (fn [x] x))
     (fg (bg c.char)))))
 
-(defn colorstr-to-width [x w]
-  (cut (+ x (colorstr (* " " (max 0 (- w (len x)))))) w))
+(defn colorstr-to-width [x width]
+  (cut (+ x (colorstr (* " " (max 0 (- width (len x)))))) width))
 
 
 (defn draw-screen [width height focus status-bar inventory messages [overmarks None]]
   "Return a colorstr for the main screen."
 
   (setv out [])
+
+  ; The status bar is drawn first.
   (when status-bar
     (+= out (lfor
       line (draw-status-bar)
       (colorstr-to-width line width))))
+  ; Then the map per se, including overmarks.
   (+= out (draw-map
     focus
     width
     (- height (if status-bar status-bar-lines 0))
     (or overmarks {})))
-  (when inventory
-    ; Write the inventory list over the map, just under the status bar.
-    (for [[i line] (enumerate (draw-inventory))]
+
+  ; Write other parts on top of the map, just under the status bar.
+  ; They can overlap each other, should they be enabled
+  ; simultaneously.
+  (defn scribble-on-map [lines]
+    (for [[i line] (enumerate lines)]
       (when status-bar
         (+= i status-bar-lines))
       (setv (cut (get out i) (len line)) line)))
-  (setv messages (lfor
-    m messages
-    :if (not-in m hide-messages)
-    line (textwrap.wrap m width)
-    line))
+  ; First, the inventory list.
+  (when inventory
+    (scribble-on-map (draw-inventory)))
+  ; Then messages.
   (when messages
-    ; Write messages over the map, just under the status bar.
-    (for [[i m] (enumerate messages)]
-      (when status-bar
-        (+= i status-bar-lines))
-      (when (< (len m) width)
+    (scribble-on-map (lfor
+      m messages
+      :if (not-in m hide-messages)
+      line (textwrap.wrap m width)
+      :setv line (+ line
         ; If there's room, pad the line with one extra space of the
         ; message color.
-        (+= m " "))
-      (setv (cut (get out i) (len m))
-        (colorstr m None color.message-bg))))
+        (if (< (len line) width) " " ""))
+      (colorstr line None color.message-bg))))
+
   out)
 
 
@@ -284,6 +289,7 @@
 
 
 (defn color-tile [t]
+  "Return a two-item colorstr."
   (lfor
     i [0 1]
     (ColorChar
