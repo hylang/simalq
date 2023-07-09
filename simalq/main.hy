@@ -8,7 +8,7 @@
   simalq.color :as color
   simalq.geometry [burst at]
   simalq.game-state [G]
-  simalq.tile [Scenery Item Monster]
+  simalq.tile [Tile]
   simalq.quest [start-quest start-level]
   simalq.un-iq [iq-quest]
   simalq.commands [Action get-command do-command do-action]
@@ -192,9 +192,9 @@
     (+ x-margin (bless-colorstr B (color-tile t)) "  " t.full-name)
     ""
     (+ x-margin (B.bold (next (gfor
-      cls [Scenery Item Monster (type t)]
-      :if (isinstance t cls)
-      cls.__name__))))
+      [name superclass] (.items Tile.superclasses)
+      :if (isinstance t superclass)
+      superclass.__name__))))
     ""
     #* (gfor
       bullet (.info-bullets t)

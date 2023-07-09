@@ -310,3 +310,7 @@
   simalq.tile.item [Item]
   simalq.tile.monster [Monster]
   simalq.tile.unimplemented [UnimplementedTile])
+
+(setv Tile.superclasses (do-mac (dfor
+  c '[Scenery Item Monster Player]
+  (str c) c)))

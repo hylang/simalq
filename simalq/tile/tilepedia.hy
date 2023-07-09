@@ -1,7 +1,7 @@
 (import
   simalq.color
   simalq.game-state [G]
-  simalq.tile [Tile Scenery Item Monster Player]
+  simalq.tile [Tile Player]
   simalq.display [color-tile]
   simalq.quest [Quest start-quest])
 (setv  T True  F False)
@@ -23,9 +23,6 @@
 
   (setv E (lxml.builder.ElementMaker
     :makeelement lxml.html.html-parser.makeelement))
-  (setv superclasses (do-mac (lfor
-    c '[Scenery Item Monster Player]
-    [(str c) c])))
 
   (defn mapsym [tile]
     (E.code :class "mapsym" #* (gfor
@@ -67,7 +64,7 @@
     (E.nav
       (E.h2 "Contents")
       (E.ul #* (gfor
-        [name superclass] superclasses
+        [name superclass] (.items Tile.superclasses)
         (E.li name (E.ul #* (gfor
           tile tiles
           :if (isinstance tile superclass)
@@ -76,7 +73,7 @@
 
     ; One section of info screens per superclass
     #* (cat (gfor
-      [name superclass] superclasses
+      [name superclass] (.items Tile.superclasses)
       [(E.h2 name) #* (cat (gfor
         ; One info screen per tile type
         tile tiles
