@@ -58,6 +58,9 @@
 
   (setv act 'approach)
 
+  (defn suffix-dict [self]
+    (dict :HP self.hp))
+
   (defn info-bullets [self #* extra]
     (defn damage-array [damage]
       (if (isinstance damage tuple)
@@ -320,10 +323,16 @@
           ; These come from IQ's `SetGenFreq`.
         (- (& v2 0b1111) 1))))
 
+  (defn suffix-dict [self]
+    (dict
+      :HP self.hp
+      :pw (mixed-number self.summon-power)
+      :freq (mixed-number self.summon-frequency)
+      :sHP self.summon-hp))
   (defn info-bullets [self #* extra]
     (.info-bullets (super)
-      #("Summoning frequency" (mixed-number self.summon-frequency))
       #("Summoning power" (mixed-number self.summon-power))
+      #("Summoning frequency" (mixed-number self.summon-frequency))
       #("Hit points of summoned monsters" self.summon-hp)
       #* extra))
 

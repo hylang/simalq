@@ -249,6 +249,9 @@
   :iq-ix-mapper ["hp"
     {3 4  4 2  15 6}]
 
+  :suffix-dict (fn [self]
+    (dict :HP self.hp))
+
   :blocks-move T :blocks-diag T :blocks-player-shots F
   :destructible-by-passwall-wand T
   :damageable T
@@ -291,6 +294,8 @@
   :read-tile-extras (classmethod (fn [cls mk-pos v1 v2]
     (dict :target (mk-pos #(v1 v2)))))
 
+  :suffix-dict (fn [self]
+    (dict :dest self.target))
   :hook-player-walked-into (fn-dd [self]
     (doc f"Teleports you to {it.target}. Anything already there is unaffected.")
     (mv-tile G.player self.target)
@@ -388,6 +393,8 @@
 
   :mapsym (property (fn [self]
     (+ "<" (if (< self.wallnum 10) (str self.wallnum) "^"))))
+  :suffix-dict (fn [self]
+    (dict :type self.wallnum))
   :hook-player-walked-into (fn-dd [self]
     (doc (if (= it.wallnum 0)
       "Destroys all trapped walls and other wallfall traps on the level, regardless of type."
@@ -412,6 +419,8 @@
 
   :mapsym (property (fn [self]
     (+ "█" (if (< self.wallnum 10) (str self.wallnum) "^"))))
+  :suffix-dict (fn [self]
+    (dict :type self.wallnum))
   :blocks-move T :blocks-diag T
   :destructible-by-passwall-wand T
   :info-bullets (fn [self #* extra]

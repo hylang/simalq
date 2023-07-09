@@ -3,7 +3,7 @@
   tests.lib [cant])
 (import
   pytest
-  tests.lib [init init-boot-camp assert-at set-square mv-player assert-player-at wk wait shoot mk-tile]
+  tests.lib [init init-boot-camp assert-at assert-full-name set-square mv-player assert-player-at wk wait shoot mk-tile]
   simalq.util [GameOverException]
   simalq.geometry [at Pos]
   simalq.game-state [G])
@@ -164,6 +164,7 @@
   (init-boot-camp)
   (mv-player 7 7)
   (assert-at 'N "cracked wall")
+  (assert-full-name 'N "a cracked wall (HP 4)")
   (wk 'N)
   (assert-at 'N "cracked wall")
   (wk 'N)
@@ -198,9 +199,10 @@
 
 (defn test-gate []
   (init [])
-  (defn t [] (Pos G.map 5 5))
+  (defn t [] (Pos G.map 5 6))
 
   (mk-tile [1 0] ["gate" :target (t)])
+  (assert-full-name [1 0] "a gate (dest <Pos 5,6>)")
   (set-square (t) "orc" "pile of gold" "exit")
   (assert (and (= G.turn-n 0) (= G.player.pos (Pos G.map 0 0))))
   ; Walking into the gate warps us to the target square, but
@@ -294,8 +296,12 @@
       "W0" ["trapped wall" :wallnum 0]
       "W1" ["trapped wall" :wallnum 1]
       "W2" ["trapped wall" :wallnum 2]}])
+  (assert-full-name 'E "a wallfall trap (type 1)")
+  (assert-full-name [3 0] "a trapped wall (type 2)")
+
   (setv G.rules.reality-bubble-size 0)
     ; Wallfall traps are unaffected by the reality bubble.
+
   (defn check [#* ts]
     (for [[t [x y]] (zip ts (lfor
         y (reversed (range G.map.height))

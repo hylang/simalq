@@ -130,6 +130,9 @@
 (defn assert-hp [locator value]
   (assert (= (top locator 'hp) value)))
 
+(defn assert-full-name [locator value]
+  (assert (= (top locator 'full-name) value)))
+
 (defn mk-tile [locator tile-spec]
   (when (= tile-spec 'floor)
     (return))

@@ -2,10 +2,16 @@
   hyrule [do-n])
 (import
   fractions [Fraction :as f/]
-  tests.lib [init assert-at assert-hp wait set-square wk shoot mv-player add-usable use-item top]
+  tests.lib [init assert-at assert-full-name assert-hp wait set-square wk shoot mv-player add-usable use-item top]
   simalq.geometry [Direction Pos ray at]
   simalq.game-state [G])
 (setv  T True  F False)
+
+
+(defn test-simple-full-name []
+  (init
+    [:tiles [["orc" :hp 3]]])
+  (assert-full-name 'E "an orc (HP 3)"))
 
 
 (defn test-simple-melee-combat []
@@ -222,6 +228,7 @@
       "G " ["orc generator"
         :summon-frequency (f/ 2 3)
         :summon-hp 2]}])
+  (assert-full-name [3 1] "an orc generator (HP 1, pw 0, freq 2/3, sHP 2)")
 
   (defn check [power tN tNE tE tSE tW]
     (assert (= (top [3 1] 'summon-power) power))
