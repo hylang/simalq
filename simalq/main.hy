@@ -194,7 +194,7 @@
     (+ x-margin (B.bold (next (gfor
       [name superclass] (.items Tile.superclasses)
       :if (isinstance t superclass)
-      superclass.__name__))))
+      name))))
     ""
     #* (gfor
       bullet (.info-bullets t)
