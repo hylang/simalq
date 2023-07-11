@@ -44,7 +44,8 @@
   "Fire an arrow. This key enters shooting mode; press a direction key
   to shoot or any other key to cancel.")
 (defdataclass GonnaUseItem [Command]
-  "Apply an item from your inventory.")
+  "Apply an item from your inventory. Some items need to be targeted
+  at a square, in the same way as look mode.")
   ; Actually: show your inventory, and prepare to take a key indicating
   ; the item to use.
 (defdataclass Look [Command]
