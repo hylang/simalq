@@ -3,6 +3,7 @@
 (import
   re
   hyrule [parse-args]
+  simalq [__version__]
   simalq.un-iq [iq-quest iq-quests-raw])
 
 
@@ -17,7 +18,7 @@
 
 
 (defn handle-cmdline-args [args]
-  (setv version-string "Infinitesimal Quest 2 + ε version 0")
+  (setv version-string f"Infinitesimal Quest 2 + ε version {__version__}")
   (setv p (parse-args :args args
     :prog "simalq"
     :description (+ version-string "\n" url)
