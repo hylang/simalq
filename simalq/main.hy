@@ -12,19 +12,29 @@
   simalq.quest [start-quest start-level]
   simalq.un-iq [iq-quest]
   simalq.commands [Action get-command do-command do-action]
-  simalq.display [draw-screen bless-colorstr])
+  simalq.display [draw-screen bless-colorstr]
+  simalq.save-load [get-saves-list load-game])
 (setv  T True  F False)
 
 
-(defn main [iq-quest-name [skip-to-level None]]
-  ; `skip-to-level` is used for debugging, so for convenience, don't
-  ; show titles when it's provided.
+(defn main [iq-quest-name [skip-to-level None] [load-main-save F]]
+  (start-quest (iq-quest iq-quest-name))
   (with [(player-io)]
-    (start-quest (iq-quest iq-quest-name)
-      :show-title (not skip-to-level))
-    (start-level
-      :level-n (if skip-to-level (int skip-to-level) 1)
-      :show-title (not skip-to-level))
+    (if (and
+        load-main-save
+        (setx save (next
+          (gfor  item (get (get-saves-list) 0)  :if (get item "main")  item)
+          None)))
+      (load-game (get save "path"))
+      (do
+        ; `skip-to-level` is used for debugging, so for convenience,
+        ; don't show titles when it's provided.
+        (start-quest (iq-quest iq-quest-name))
+        (unless skip-to-level
+          (text-screen G.quest.title :center T))
+        (start-level
+          :level-n (if skip-to-level (int skip-to-level) 1)
+          :show-title (not skip-to-level))))
     (main-io-loop)))
 
 

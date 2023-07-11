@@ -15,9 +15,7 @@
   [name title starting-hp levels]
   :frozen T)
 
-(defn start-quest [quest [show-title T] [rules None]]
-  (when (and quest show-title)
-    (hy.M.simalq/main.text-screen quest.title :center T))
+(defn start-quest [quest [rules None]]
   (setv
     G.rules (Rules)
     G.quest quest)
