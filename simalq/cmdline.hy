@@ -51,6 +51,7 @@
       :setv q (iq-quest name)
       [k v] (.items {
         "Name" (.replace name " " "_")
+        "Authors" q.authors
         "Levels" (len q.levels)
         "Description" (re.sub r"\s+" " " q.title)})
       f"{k}: {v}")))))

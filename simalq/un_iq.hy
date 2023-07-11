@@ -165,6 +165,9 @@
   (Quest
     :name name
     :title data.title
+    :authors (if (= name "New DeathQuest")
+      "Yves and Serge Meynard"
+      "Yves Meynard")
     :starting-hp data.starting-hp
     :levels (tuple (gfor
       [i l] (enumerate data.levels)

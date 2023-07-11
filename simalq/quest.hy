@@ -12,7 +12,7 @@
 
 (defdataclass Quest []
   "A scenario or campaign; a sequence of levels to play."
-  [name title starting-hp levels]
+  [name title authors starting-hp levels]
   :frozen T)
 
 (defn start-quest [quest [rules None]]

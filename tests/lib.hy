@@ -38,6 +38,7 @@
   (Quest
     :name "Test Quest"
     :title "Test Quest title"
+    :authors "Mitt Lowporch and Cire Whyhall"
     :starting-hp starting-hp
     :levels (tuple (gfor
       [i level-args] (enumerate levels)
