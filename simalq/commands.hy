@@ -43,11 +43,14 @@
 (defdataclass GonnaShoot [Command]
   "Fire an arrow. This key enters shooting mode; press a direction key
   to shoot or any other key to cancel.")
+(defdataclass Inventory [Command]
+  "Inventory display. Press the key corresponding to an item to get
+  info on it.")
 (defdataclass GonnaUseItem [Command]
   "Apply an item from your inventory. Some items need to be targeted
   at a square, in the same way as look mode.")
-  ; Actually: show your inventory, and prepare to take a key indicating
-  ; the item to use.
+  ; Actually: show your inventory, like `Inventory`, but use the
+  ; selected item instead of showing info.
 (defdataclass Look [Command]
   "Look mode. Use a direction key to move the cursor, this key (or the
   wait key) to get info on a tile under the cursor, and any other key
@@ -103,6 +106,7 @@
   "R" [ShiftHistory +10]
   ";" Look
   "f" GonnaShoot
+  "i" Inventory
   "a" GonnaUseItem})
 
 
@@ -152,6 +156,10 @@
         'done))
     ix)
 
+  (defn get-inventory-ix []
+    (menu G.rules.max-usables :draw (fn []
+      (print-main-screen G.player.pos :inventory T))))
+
   (ecase (type cmd)
 
     Help
@@ -164,10 +172,14 @@
       (when (isinstance v Direction)
         (take-turn (Shoot v))))
 
+    Inventory
+      (when (is-not None (setx item-ix (get-inventory-ix)))
+        (if (setx item (get G.player.inventory item-ix))
+          (info-screen item)
+          (raise (CommandError "That inventory slot is empty."))))
+
     GonnaUseItem
-      (when (is-not None (setx item-ix
-            (menu G.rules.max-usables :draw (fn []
-              (print-main-screen G.player.pos :inventory T)))))
+      (when (is-not None (setx item-ix (get-inventory-ix)))
         (if (and
             (setx item (get G.player.inventory item-ix))
             item.targeted)
