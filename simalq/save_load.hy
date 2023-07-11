@@ -89,7 +89,10 @@
 
   (setv saves (sorted
     (gfor
-      path (.iterdir (/ saved-games-dir G.quest.name))
+      path (try
+        (list (.iterdir (/ saved-games-dir G.quest.name)))
+        (except [FileNotFoundError]
+          []))
       (dict
         :path path
         :main (= path.stem "main")
