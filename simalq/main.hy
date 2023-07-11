@@ -29,7 +29,6 @@
       (do
         ; `skip-to-level` is used for debugging, so for convenience,
         ; don't show titles when it's provided.
-        (start-quest (iq-quest iq-quest-name))
         (unless skip-to-level
           (text-screen G.quest.title :center T))
         (start-level
