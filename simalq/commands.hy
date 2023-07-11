@@ -51,7 +51,8 @@
 (defdataclass Look [Command]
   "Look mode. Use a direction key to move the cursor, this key (or the
   wait key) to get info on a tile under the cursor, and any other key
-  to exit look mode.")
+  to exit look mode. If there's more than one tile on the selected
+  square, you'll be prompted to choose one when you try to get info.")
 
 (defdataclass ShiftHistory [Command]
   "{details}"
@@ -121,7 +122,7 @@
     (setv focus G.player.pos)
     (io-mode
       :draw (fn []
-        (print-main-screen focus :status-bar F :tile-list T))
+        (print-main-screen focus :status-bar F :tile-list 'nonpickable))
       :on-input (fn [key]
         (nonlocal focus)
         (setv dir-v (read-dir-key key))
@@ -136,6 +137,21 @@
             'done))))
     focus)
 
+  (defn menu [n-items draw]
+    "Allow the user to select an item from a list. Return an index of
+    the list or `None`."
+    (setv ix None)
+    (io-mode
+      :draw draw
+      :on-input (fn [key]
+        (nonlocal ix)
+        (when (and
+            (in key menu-letters)
+            (< (.index menu-letters key) n-items))
+          (setv ix (.index menu-letters key)))
+        'done))
+    ix)
+
   (ecase (type cmd)
 
     Help
@@ -148,19 +164,10 @@
       (when (isinstance v Direction)
         (take-turn (Shoot v))))
 
-    GonnaUseItem (do
-      (setv item-ix None)
-      (io-mode
-        :draw (fn []
-          (print-main-screen G.player.pos :inventory T))
-        :on-input (fn [key]
-          (nonlocal item-ix)
-          (when (and
-              (in key menu-letters)
-              (< (.index menu-letters key) G.rules.max-usables))
-            (setv item-ix (.index menu-letters key)))
-          'done))
-      (when (is-not item-ix None)
+    GonnaUseItem
+      (when (is-not None (setx item-ix
+            (menu G.rules.max-usables :draw (fn []
+              (print-main-screen G.player.pos :inventory T)))))
         (if (and
             (setx item (get G.player.inventory item-ix))
             item.targeted)
@@ -168,12 +175,17 @@
             (setv target (targeting-mode (fn [target] T)))
             (when target
               (take-turn (UseItem item-ix target.x target.y))))
-          (take-turn (UseItem item-ix None None)))))
+          (take-turn (UseItem item-ix None None))))
 
     Look
       (targeting-mode (fn [target]
-        (when (at target)
-          (info-screen (get (at target) 0)))
+        (when (and
+            (setx stack (at target))
+            (is-not None (setx tile-ix (if (= (len stack) 1)
+              0
+              (menu (len stack) :draw (fn []
+                (print-main-screen target :status-bar F :tile-list 'pickable)))))))
+          (info-screen (get stack tile-ix)))
         F))
 
     ShiftHistory (do

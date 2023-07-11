@@ -1,5 +1,5 @@
 (require
-  hyrule [unless]
+  hyrule [unless ecase]
   simalq.macros [defdataclass])
 (import
   math [ceil]
@@ -54,7 +54,13 @@
   (cut (+ x (colorstr (* " " (max 0 (- width (len x)))))) width))
 
 
-(defn draw-screen [width height focus status-bar tile-list inventory messages [overmarks None]]
+(defn draw-screen [
+    width height
+    focus
+    [status-bar T]
+    [tile-list None] [inventory F]
+    [messages #()]
+    [overmarks None]]
   "Return a colorstr for the main screen."
 
   (setv out [])
@@ -81,10 +87,16 @@
       (setv (cut (get out i) (len line)) line)))
   ; First, the tile list.
   (when tile-list
-    (scribble-on-map (draw-tile-list focus width)))
+    (scribble-on-map [
+      (colorstr f" {focus} ")
+      #* (tile-menu
+        (at focus)
+        :pickable? (ecase tile-list  'pickable T  'nonpickable F))]))
   ; Then the inventory list.
   (when inventory
-    (scribble-on-map (draw-inventory)))
+    (scribble-on-map (tile-menu
+      G.player.inventory
+      :pickable? T)))
   ; Then messages.
   (when messages
     (scribble-on-map (lfor
@@ -250,28 +262,17 @@
           (colorstr "  "))))
       #* (status-effects :bad F))))
 
-
-(defn draw-tile-list [pos width]
-  "Return a list of colorstrs, one for each tile in the stack at the
-  given position."
-  (lfor
-    tile (at pos)
-    (colorstr-to-width :width width (+
-      (colorstr "  ")
-      (color-tile tile)
-      (colorstr (+ " " tile.full-name))))))
-
-(defn draw-inventory []
-  "Return a list of colorstrs."
+(defn tile-menu [tiles pickable?]
+  "Return a list of colorstrs, one for each tile."
   ; Create the text for each line.
   (setv lines (lfor
-    [i item] (enumerate G.player.inventory)
-    (.format " ({}) � {}  "
-      (get menu-letters i)
+    [i item] (enumerate tiles)
+    (.format " {}� {}  "
+      (if pickable? (+ "(" (get menu-letters i) ") ") "")
       (if item item.full-name "---"))))
   ; Pad out short lines and replace the "�"s with colored mapsyms.
   (lfor
-    [line item] (zip lines G.player.inventory)
+    [line item] (zip lines tiles)
     :setv cs (colorstr-to-width (colorstr line) (max (map len lines)))
     :setv (cut cs (.index line "�") (+ (.index line "�") 1))
       (if item (color-tile item) (colorstr "  "))

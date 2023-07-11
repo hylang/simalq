@@ -155,12 +155,12 @@
         (except [e CommandError]
           (msg (get e.args 0)))))))
 
-(defn print-main-screen [focus [status-bar T] [tile-list F] [inventory F] [messages #()] [overmarks None]]
+(defn print-main-screen [focus #** kwargs]
   (print
     :flush T :sep "" :end ""
     B.home B.clear
     (.join "\n" (map (fn [x] (bless-colorstr B x)) (draw-screen
-      B.width B.height focus status-bar tile-list inventory messages overmarks)))))
+      B.width B.height focus #** kwargs)))))
 
 
 (setv max-wrap-cols 75)
