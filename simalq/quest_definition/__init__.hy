@@ -1,3 +1,7 @@
+"This file provides functions for concisely defining quests and
+levels. It also provides a dictionary `builtin-quests`, which gathers
+quest definitions from other files in this directory."
+
 ;; --------------------------------------------------
 ;; * Imports
 ;; --------------------------------------------------
@@ -41,11 +45,14 @@
 
 (defn mk-quest [
     #* levels
-    [starting-hp 100]]
+    [starting-hp 100]
+    [name "Test Quest"]
+    [title "Test Quest title"]
+    [authors "Mitt Lowporch and Cire Whyhall"]]
   (Quest
-    :name "Test Quest"
-    :title "Test Quest title"
-    :authors "Mitt Lowporch and Cire Whyhall"
+    :name name
+    :title title
+    :authors authors
     :starting-hp starting-hp
     :levels (tuple (gfor
       [i level-args] (enumerate levels)
@@ -124,3 +131,10 @@
     (setv  d {}  stem tile-spec)
     (setv  [stem #* d] tile-spec  d (kwdict d)))
   (add-tile (locate locator) stem #** d))
+
+;; --------------------------------------------------
+;; * Load built-in quests
+;; --------------------------------------------------
+
+(setv builtin-quests {})
+(import simalq.quest_definition.tutorial)
