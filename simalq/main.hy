@@ -10,15 +10,14 @@
   simalq.game-state [G]
   simalq.tile [Tile]
   simalq.quest [start-quest start-level]
-  simalq.un-iq [iq-quest]
   simalq.commands [Action get-command do-command do-action]
   simalq.display [draw-screen bless-colorstr]
   simalq.save-load [get-saves-list load-game])
 (setv  T True  F False)
 
 
-(defn main [iq-quest-name [skip-to-level None] [load-main-save F]]
-  (start-quest (iq-quest iq-quest-name))
+(defn main [quest [skip-to-level None] [load-main-save F]]
+  (start-quest quest)
   (with [(player-io)]
     (if (and
         load-main-save

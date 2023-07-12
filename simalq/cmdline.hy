@@ -4,12 +4,13 @@
   re
   hyrule [parse-args]
   simalq [__version__]
-  simalq.un-iq [iq-quest iq-quests-raw])
+  simalq.un-iq [iq-quest iq-quests-raw]
+  simalq.quest-definition [builtin-quests])
 
 
 (setv url "http://hylang.org/simalq")
 
-(setv enabled-iq-quests #(
+(setv advertised-iq-quests #(
    "New First Quest"
    "New DeathQuest"))
   ; New Nightmare also works, but I want to denazify it before
@@ -38,18 +39,25 @@
   (setv p.QUEST (.replace p.QUEST "_" " "))
     ; We allow the quest name to be specified with underscores in
     ; place of spaces so the user doesn't have to quote them.
-  (unless (in p.QUEST (iq-quests-raw))
+  (unless (in p.QUEST (available-quests))
     (exit f"No such quest: {(hy.repr p.QUEST)}. See `simalq --quests`."))
 
   (hy.M.simalq/main.main
-    :iq-quest-name p.QUEST
+    :quest ((get (available-quests) p.QUEST))
     :load-main-save (not p.new)))
+
+(defn available-quests [] (dict
+  #** hy.M.simalq/quest-definition.builtin-quests
+  #** (dfor  x (iq-quests-raw)  x (fn [[x x]] (iq-quest x)))))
+    ; `x` is passed through as a default argument so the values stay
+    ; different.
 
 (defn quest-list []
   (.join "\n\n" (gfor
-    name enabled-iq-quests
+    [name qf] (.items (available-quests))
+    :if (or (in name advertised-iq-quests) (in name builtin-quests))
     (.join "\n" (gfor
-      :setv q (iq-quest name)
+      :setv q (qf)
       [k v] (.items {
         "Name" (.replace name " " "_")
         "Authors" q.authors
