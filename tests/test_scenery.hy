@@ -3,10 +3,11 @@
   tests.lib [cant])
 (import
   pytest
-  tests.lib [init init-boot-camp assert-at assert-full-name set-square mv-player assert-player-at wk wait shoot mk-tile]
+  tests.lib [init init-boot-camp assert-at assert-full-name set-square mv-player assert-player-at wk wait shoot]
   simalq.util [GameOverException]
   simalq.geometry [at Pos]
-  simalq.game-state [G])
+  simalq.game-state [G]
+  simalq.quest-definition [mk-tile])
 
 
 (defn test-unmodifiable-tiles []

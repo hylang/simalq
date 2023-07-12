@@ -2,9 +2,10 @@
 
 
 (import
-  tests.lib [init assert-at assert-hp assert-player-at wk wait shoot mk-tile mv-player]
+  tests.lib [init assert-at assert-hp assert-player-at wk wait shoot mv-player]
   simalq.game-state [G]
-  simalq.geometry [Pos at])
+  simalq.geometry [Pos at]
+  simalq.quest-definition [mk-tile])
 (setv  T True  F False)
 
 

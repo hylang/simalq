@@ -3,9 +3,10 @@
   tests.lib [cant])
 (import
   fractions [Fraction :as f/]
-  tests.lib [init init-boot-camp assert-at assert-hp set-square mv-player wk shoot wait use-item mk-tile add-usable]
+  tests.lib [init init-boot-camp assert-at assert-hp set-square mv-player wk shoot wait use-item add-usable]
   simalq.geometry [Pos Direction at]
-  simalq.game-state [G])
+  simalq.game-state [G]
+  simalq.quest-definition [mk-tile])
 (setv  T True  F False)
 
 
