@@ -24,7 +24,12 @@
         (setx save (next
           (gfor  item (get (get-saves-list) 0)  :if (get item "main")  item)
           None)))
-      (load-game (get save "path"))
+      (do
+        (load-game (get save "path"))
+        (when skip-to-level
+          (start-level
+            :level-n skip-to-level
+            :show-title F)))
       (do
         ; `skip-to-level` is used for debugging, so for convenience,
         ; don't show titles when it's provided.

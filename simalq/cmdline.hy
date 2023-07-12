@@ -34,7 +34,10 @@
         :help "list available quests and exit"]
       ["-n" "--new"
         :action "store_true"
-        :help "start a new game (default: load the main save slot, or start a new game if there isn't one)"]]))
+        :help "start a new game (default: load the main save slot, or start a new game if there isn't one)"]
+      ["--skip-to-level"
+        :type int :metavar "N"
+        :help "skip to the requested level (for debugging)"]]))
 
   (setv p.QUEST (.replace p.QUEST "_" " "))
     ; We allow the quest name to be specified with underscores in
@@ -44,6 +47,7 @@
 
   (hy.M.simalq/main.main
     :quest ((get (available-quests) p.QUEST))
+    :skip-to-level p.skip-to-level
     :load-main-save (not p.new)))
 
 (defn available-quests [] (dict
