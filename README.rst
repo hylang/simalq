@@ -1,7 +1,15 @@
 Infinitesimal Quest 2 + ε
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-Infinitesimal Quest 2 + ε (or "SQ" for short; Python package name ``simalq``) is an in-progress, not-yet-playable Gauntlet-like turn-based puzzling dungeon crawler written to serve as an official example program for `Hy <http://hylang.org>`_. It's a reimplementation / remake / demake of `Yves Meynard <http://yvesmeynard.com>`_'s 1996 Macintosh game Infinity Quest II, abbreviated "IQ". SQ is planned to feature:
+Infinitesimal Quest 2 + ε (or "SQ" for short; Python package name ``simalq``) is a Gauntlet-like turn-based puzzling dungeon crawler written to serve as an official example program for `Hy <http://hylang.org>`_. It's a reimplementation / remake / demake of `Yves Meynard <http://yvesmeynard.com>`_'s 1996 Macintosh game Infinity Quest II, abbreviated "IQ".
+
+.. figure:: https://hylang.org/simalq/img/screenshot-New_First_Quest-l10-0cf40784f039b08828dc9e2a41bd9544ee646755.png
+  :height: 300
+  :alt: A terminal window with a colorful roguelike-esque map.
+
+  The game running in Konsole on Lubuntu. Here our hero is getting overwhelmed by devils and bats on level 10 of New First Quest.
+
+Features of SQ include:
 
 - Playability on any platform with Python 3 and a compatible terminal emulator
 - Glorious roguelike-like console display, with no distracting graphics, sounds, or mouse support
@@ -14,7 +22,9 @@ Infinitesimal Quest 2 + ε (or "SQ" for short; Python package name ``simalq``) i
 Usage
 ============================================================
 
-You can install SQ from source with the command ``pip install .``. Launch the game with ``python3 -m simalq 'New First Quest'``, or run the tests with ``pytest``.
+You can install SQ via `pip <https://packaging.python.org/en/latest/tutorials/installing-packages/>`__ from the Python Package Index (PyPI) with the command ``pip install simalq``, or from source with  ``pip install .``. For the best display, you should use a terminal emulator that supports 24-bit color (I'm a fan of `Konsole <https://konsole.kde.org>`__), but SQ should be able to cope with less color support and use the best approximations available via its dependency `blessed <https://pypi.org/project/blessed/>`__.
+
+Run SQ with ``python3 -m simalq``, or run the tests with ``pytest``. Use ``python3 -m simalq --help`` for options. A good way to start is Tutorial Quest: ``python3 -m simalq Tutorial_Quest``.
 
 The first time that SQ requires IQ's original quests, it will download them automatically. The download is cached, so no Internet connection is needed afterwards.
 
@@ -30,14 +40,19 @@ Her Royal Highness Princess Triskaidecagonn XIII (whose friends call her "Tris")
 Differences from IQ
 ============================================================
 
-Apart from cosmetic and other interface differences, the chief way SQ differs from IQ in its design is its commitment to determinism. SQ replaces IQ's random mechanics, such as monster pathfinding, with deterministic equivalents, sometimes making aspects of the game stateful that were previously stateless. SQ also deliberately omits interface hijinks like darkness and confusion. SQ adds mid-game saving and loading, undo, visibility of the map outside the hero's shooting radius, fixes to bugs and weird behavior (e.g., winning with a "you have died" message if you win the game and die to poison on the same turn), removal of many engine limits (e.g., max and min level size), and the ability to adjust some core game rules (e.g., whether monsters can walk on items).
+Apart from cosmetic and other interface differences, the chief way SQ differs from IQ in its design is its commitment to determinism. SQ replaces IQ's random mechanics, such as monster pathfinding, with deterministic equivalents, sometimes making aspects of the game stateful that were previously stateless. SQ also deliberately omits interface hijinks like darkness and confusion. SQ adds flavor text for tiles, mid-game saving and loading, undo, visibility of the map outside the hero's shooting radius, fixes to bugs and weird behavior (e.g., winning with a "you have died" message if you win the game and die to poison on the same turn), removal of many engine limits (e.g., max and min level size), and the ability to adjust some core game rules (e.g., whether monsters can walk on items).
 
 While the author of IQ kindly provided me with its source code for reference, SQ is an original work that doesn't substantively copy IQ at the code level, and has many fine differences (deliberate, and probably also accidental) in behavior.
 
-Contributing
+Development status
 ============================================================
 
-At this stage of development, bug reports and feature requests are unlikely to be useful, so the GitHub issues list is disabled. If you'd like to get involved, get in touch with me directly.
+SQ is reasonably polished and allows playing through several complete quests. The primary thing that's missing is the implementation of more tile types, to support more of IQ's original quests. I also plan to do some larger-scale code cleanup and document some of the interesting parts of the implementation, so that SQ better serves its purpose as an instructive example Hy program.
+
+Version history
+============================================================
+
+- 0.1.0 (2023-07-13): First playable release.
 
 License
 ============================================================
