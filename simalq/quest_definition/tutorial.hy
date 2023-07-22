@@ -200,6 +200,7 @@
     "ld" "locked door"
     "<1" ["wallfall trap" :wallnum 1]
     "█1" ["trapped wall" :wallnum 1]
+    "{}" ["gate" :target "$ "]
     "w " ["wizard" :hp 3]
     "☉d" ["devil generator" :hp 3
       :summon-frequency (f/ 1 3)
@@ -336,15 +337,6 @@
 ;; * End matter
 
 })))
-
-; Set the gate target in a hacky way, since I haven't given `mk-quest`
-; a proper way to do it.
-(for [col (. quest levels [(- 7 1)] map data)  stack col  tile stack]
-  (when (= tile.stem "gate")
-    (object.__setattr__ tile "target" (next (gfor
-      col2 tile.pos.map.data  stack2 col2  tile2 stack2
-      :if (= tile2.stem "pile of gold")
-      tile2.pos)))))
 
 quest)
 

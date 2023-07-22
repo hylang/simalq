@@ -214,6 +214,19 @@
   (assert-at 'here ['player "orc" "pile of gold" "exit"]))
 
 
+(defn test-gate-mapsym-target []
+  (init [
+    :map "
+      . . o
+      @ {}."
+    :map-marks {
+      "{}" ["gate" :target "o "]}])
+
+  (wk 'E)
+  (assert-player-at 2 1)
+  (assert-at 'here ['player "orc"]))
+
+
 (defn test-teleporter []
 
   ; With no other teleporters in range, nothing happens when you walk

@@ -82,15 +82,16 @@ quest definitions from other files in this directory."
         (try (.index map "\n") (except [ValueError] (len map)))
         2)))
       (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
-      (for [
-          [y row] (enumerate (reversed (.split map "\n")))
-          :do (when (% (len row) 2) (setv row (+ row " ")))
-          [x mapsym] (enumerate (partition 2 row))]
+      (setv mapsyms (dfor
+        [y row] (enumerate (reversed (.split map "\n")))
+        :do (when (% (len row) 2) (setv row (+ row " ")))
+        [x mapsym] (enumerate (partition 2 row))
+        #(x y) (.join "" mapsym)))
+      (for [[[x y] mapsym] (.items mapsyms)]
         (setv p (Pos m x y))
-        (setv mapsym (.join "" mapsym))
         (cond
           (in mapsym map-marks)
-            (mk-tile p (get map-marks mapsym))
+            (mk-tile p (get map-marks mapsym) m mapsyms)
           (= mapsym "@ ")
             (setv player-start #(x y))
           (= mapsym ". ")
@@ -124,12 +125,25 @@ quest definitions from other files in this directory."
     :exit-speed exit-speed
     :moving-exit-start moving-exit-start))
 
-(defn mk-tile [locator tile-spec]
+(defn mk-tile [locator tile-spec [map-object None] [mapsyms None]]
   (when (= tile-spec 'floor)
     (return))
   (if (isinstance tile-spec str)
     (setv  d {}  stem tile-spec)
     (setv  [stem #* d] tile-spec  d (kwdict d)))
+  (when (isinstance (.get d "target") str)
+    ; When it's a string, this attribute is treated specially: it
+    ; should come in as a mapsym, and we change it to the `Pos` for
+    ; that mapsym.
+    (setv matches (lfor
+      [xy mapsym] (.items mapsyms)
+      :if (= mapsym (get d "target"))
+      xy))
+    (unless matches
+      (raise (ValueError f"`target` not found: {mapsym}")))
+    (when (> (len matches) 1)
+      (raise (ValueError f"Ambiguous `target`: {mapsym}")))
+    (setv (get d "target") (Pos map-object #* (get matches 0))))
   (add-tile (locate locator) stem #** d))
 
 ;; --------------------------------------------------
