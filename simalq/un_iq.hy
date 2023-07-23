@@ -5,10 +5,10 @@
 ;; --------------------------------------------------------------
 
 (require
-  hyrule [unless])
+  hyrule [unless case])
 (import
   types [FunctionType]
-  fractions [Fraction]
+  fractions [Fraction :as f/]
   zipfile [ZipFile]
   functools [cache]
   construct
@@ -215,15 +215,103 @@
             T
               (raise (ValueError (+ "Bad `Tile.types-by-iq-ix` entry: " (repr result))))))))
 
-      (Level
+      (denazify name (+ i 1) (Level
         :n (+ i 1)
         :title l.title
         :player-start (mk-pos l.player-start)
         :next-level l.next-level
         :poison-intensity (if (= l.poison-interval 0)
-          (Fraction 0)
-          (Fraction 1 l.poison-interval))
+          (f/ 0)
+          (f/ 1 l.poison-interval))
         :time-limit l.time-limit
         :exit-speed l.exit-speed
         :moving-exit-start (mk-pos l.moving-exit-start)
-        :map m)))))
+        :map m))))))
+
+;; --------------------------------------------------------------
+;; * Denazification
+;; --------------------------------------------------------------
+
+(defn denazify [quest-name level-n level]
+  "Remove swastika-based designs in the given IQ level. The level is
+  modified in place and then returned."
+  (case [quest-name level-n]
+
+    ["New Nightmare" 1] (do
+      ; Replace the large central swastika.
+      (replace-map-rect level 10 10
+        :map "
+          . . . . . ██{}██. . . . .
+          . . . ██##██{}██##██. . .
+          . . ████d ██☉G██d ████. .
+          . ████d d ██. ██d d ████.
+          . ██% d d ██. ██d d % ██.
+          ████████████+↑████████████
+          {}{}☉G. . +←. +→. . ☉G{}{}
+          ████████████+↓████████████
+          . ██% d d ██. ██d d % ██.
+          . ████d d ██. ██d d ████.
+          . . ████d ██☉G██d ████. .
+          . . . ██##██{}██##██. . .
+          . . . . . ██{}██. . . . ."
+        :map-marks {
+          "% " "meal"
+          "d " ["devil" :hp 3]
+          "☉G" ["ghost generator"
+            :summon-frequency (f/ 2 3)
+            :summon-hp 2]})
+      ; Set targets for the gates.
+      (for [[x1 y1 x2 y2] (partition 4 [
+          16 11  3  3  11 16  3 29  16 21 29 29  21 16 29  3
+          16 10 16 16  10 16 16 16  16 22 16 16  22 16 16 16])]
+        (object.__setattr__ (get level.map.data x1 y1 0)
+          "target" (Pos level.map x2 y2))))
+
+    ["New Nightmare" 24] (do
+      ; Replace the 5-by-5 trap swastikas.
+      (for [[x y] [[12 29] [25 30] [25 18] [11 7] [26 6]]]
+        (replace-map-rect level x y
+          :map "
+            <>. . . <>
+            <>. . . <>
+            <><><><><>
+            <>. . . <>
+            <>. . . <>"
+          :map-marks {
+            "<>" "fixed damaging trap"}))
+      ; Reconfigure the room in the northwest corner.
+      (replace-map-rect level 2 32
+        :map "
+          <1█1█1K █1█1█1
+          <>█1█1G █1█1K
+          <>█1█1G █1█1G
+          ++G G k █1k G
+          <>█1█1█1█1G █1
+          <>█1█1█1█1G █1
+          <><><><><>dd<>"
+        :map-marks {
+          "++" "door"
+          "dd" "locked disappearing door"
+          "<1" ["wallfall trap" :wallnum 1]
+          "█1" ["trapped wall" :wallnum 1]
+          "<>" "fixed damaging trap"
+          "k " "key"
+          "G " ["ghost" :hp 3]
+          "K " ["Dark Knight" :hp 12]})))
+
+  level)
+
+(defn replace-map-rect [old x y #** mk-level-args]
+  "Replace a rectangular region of the level `old`. `x` and `y` are
+  the coordinates of where (0, 0) of the new level should be placed in
+  `old`."
+  (import
+    simalq.tile [mv-tile rm-tile]
+    simalq.quest-definition [mk-level])
+
+  (setv new (mk-level #** mk-level-args))
+  (for [xn (range new.map.width)  yn (range new.map.height)]
+    (for [tile (get old.map.data (+ xn x) (+ yn y))]
+      (rm-tile tile))
+    (for [tile (get new.map.data xn yn)]
+      (mv-tile tile (Pos old.map (+ xn x) (+ yn y))))))

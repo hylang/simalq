@@ -42,7 +42,9 @@ Differences from IQ
 
 Apart from cosmetic and other interface differences, the chief way SQ differs from IQ in its design is its commitment to determinism. SQ replaces IQ's random mechanics, such as monster pathfinding, with deterministic equivalents, sometimes making aspects of the game stateful that were previously stateless. SQ also deliberately omits interface hijinks like darkness and confusion. SQ adds flavor text for tiles, mid-game saving and loading, undo, visibility of the map outside the hero's shooting radius, fixes to bugs and weird behavior (e.g., winning with a "you have died" message if you win the game and die to poison on the same turn), removal of many engine limits (e.g., max and min level size), and the ability to adjust some core game rules (e.g., whether monsters can walk on items).
 
-While the author of IQ kindly provided me with its source code for reference, SQ is an original work that doesn't substantively copy IQ at the code level, and has many fine differences (deliberate, and probably also accidental) in behavior.
+The original IQ map layouts have a number of swastika-like designs. Yves Meynard, the author of IQ, explained to me in 2023 "I meant them to be a shorthand mark of evil. Looking back at IQ2, it's the one thing I wish I hadn't done, because there was a potential for misreading the symbol." I agree that without an explanatory context, like fighting Nazis, swastikas are uncomfortable to see in a video game. So, when SQ loads the original levels, it censors the swastikas by replacing them with new layouts I've made up for the corresponding level regions. I leave skull designs untouched, although the Totenkopf was also a Nazi symbol, because a generic skull shape is more universal and less Nazi-associated in contemporary times.
+
+While Yves kindly provided me with IQ's source code for reference, SQ is an original work that doesn't substantively copy IQ at the code level, and has many fine differences (deliberate, and probably also accidental) in behavior.
 
 Development status
 ============================================================

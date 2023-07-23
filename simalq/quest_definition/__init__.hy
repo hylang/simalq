@@ -59,7 +59,7 @@ quest definitions from other files in this directory."
       (mk-level :n (+ i 1) #** (kwdict level-args))))))
 
 (defn mk-level [
-    n
+    [n 1]
     [player-start #(0 0)]
     [width 16] [height 16] [wrap-x False] [wrap-y False]
     [tiles #()]

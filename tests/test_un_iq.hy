@@ -2,6 +2,7 @@
   collections [Counter]
   fractions [Fraction :as f/]
   toolz [partition]
+  simalq.util [seq]
   simalq.geometry [Pos]
   simalq.un-iq [iq-quest])
 
@@ -78,6 +79,22 @@
   ; Check the hit points of the two cracked walls.
   (assert (= (. level map data [7] [8] [0] hp) 4))
   (assert (= (. level map data [15] [15] [0] hp) 2)))
+
+
+(defn test-denazify []
+  (setv m (get-level-map "New Nightmare" 24))
+  ; The original 5-by-5 trap swastikas on this level each comprise
+  ; 17 traps and 8 floor squares.
+  ; Our replacements have 13 traps and 12 floor squares.
+  (assert (=
+    (dict (Counter (gfor
+      x (seq 12 16)
+      y (seq 29 33)
+      :setv stack (get m x y)
+      (if (len stack)
+        (.join "-" (gfor  t stack  t.stem))
+        'floor))))
+    {"fixed damaging trap" 13  'floor 12})))
 
 
 (defn test-varlife []

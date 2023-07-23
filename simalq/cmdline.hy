@@ -12,9 +12,8 @@
 
 (setv advertised-iq-quests #(
    "New First Quest"
-   "New DeathQuest"))
-  ; New Nightmare also works, but I want to denazify it before
-  ; advertising it.
+   "New DeathQuest"
+   "New Nightmare"))
   ; The other IQ quests have at least one unimplemented tile type.
 
 
