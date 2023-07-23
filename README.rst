@@ -54,6 +54,7 @@ SQ is reasonably polished and allows playing through several complete quests. Th
 Version history
 ============================================================
 
+- 0.2.0 (2023-07-23): The IQ quest New Nightmare has been denazified and added to ``--quests``.
 - 0.1.0 (2023-07-13): First playable release.
 
 License
