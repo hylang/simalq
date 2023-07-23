@@ -1,3 +1,3 @@
 import hy
 
-__version__ = '(unreleased)'
+__version__ = '0.2.0'
