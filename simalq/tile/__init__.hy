@@ -100,7 +100,9 @@
     flavor None
       ; Flavor text to show in a help screen.
     iq-ix None
-      ; The number that represents this tile in IQ.
+      ; The number that represents this tile in IQ. It can also be a
+      ; tuple, in which case all included numbers will be translated to
+      ; this tile.
     iq-ix-mapper None
       ; An alternative to `iq-ix` for many-to-one matchups from IQ to
       ; SQ tiles. It should be a list like
@@ -219,8 +221,9 @@
   (setv (get (globals) stem) cls)
 
   (when (setx iq-ix (.get kwargs "iq_ix"))
-    (assert (not-in iq-ix Tile.types-by-iq-ix))
-    (setv (get Tile.types-by-iq-ix iq-ix) cls))
+    (for [i (if (isinstance iq-ix int) [iq-ix] iq-ix)]
+      (assert (not-in i Tile.types-by-iq-ix))
+      (setv (get Tile.types-by-iq-ix i) cls)))
   (when (in "iq_ix_mapper" kwargs)
     (setv [slot d] (get kwargs "iq_ix_mapper"))
     (assert (in slot (sfor  [_ s] (.all-slots cls)  s)))

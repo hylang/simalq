@@ -10,6 +10,9 @@
 (defn get-level-map [quest-name level-n]
   (. (iq-quest quest-name) levels [(- level-n 1)] map data))
 
+(defn assert-stem [m x y stem]
+  (assert (= (. m [x] [y] [0] stem) stem)))
+
 
 (defn test-get-all []
   (setv d (iq-quest 'all))
@@ -126,15 +129,13 @@
 
 (defn test-healing-potions []
   (setv m (get-level-map "Boot Camp 2" 9))
-  (defn check [x y stem]
-    (assert (= (. m [x] [y] [0] stem) stem)))
 
-  (check  1 14 "snack")  ; healing salve
-  (check  1 10 "meal")  ; healing potion
-  (check  1  6 "meal")  ; unknown potion, good
-  (check  6  1 "empty platter")  ; unknown potion, neutral
-  (check 10  1 "rotten food")  ; unknown potion, bad
-  (check 14  1 "dessert"))  ; super-healing potion
+  (assert-stem m  1 14 "snack")         ; healing salve
+  (assert-stem m  1 10 "meal")          ; healing potion
+  (assert-stem m  1  6 "meal")          ; unknown potion, good
+  (assert-stem m  6  1 "empty platter") ; unknown potion, neutral
+  (assert-stem m 10  1 "rotten food")   ; unknown potion, bad
+  (assert-stem m 14  1 "dessert"))      ; super-healing potion
 
 
 (defn test-wallfall []
@@ -178,3 +179,11 @@
   (setv m (get-level-map "Boot Camp 2" 8))
   (check  3 12  5 15)
   (check  0 10  30 12))
+
+
+(defn test-removed-traps []
+  (setv m (get-level-map "Boot Camp 2" 6))
+
+  (assert-stem m 15  5 "pile of debris")  ; dimness trap
+  (assert-stem m 10  3 "pile of debris")  ; darkness trap
+  (assert-stem m 15 16 "broken trap"))    ; false exit

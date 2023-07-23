@@ -11,7 +11,6 @@
 
 (for [[iq-ix stem] [
 
-    [93 "false_exit"]
     [94 "exit_to_level_"]
     [101 "fire_mage"]
     [102 "open_portcullis"]
@@ -22,7 +21,6 @@
     [108 "fountain"]
     [110 "candle"]
     [121 "poison_gas_bomb"]
-    [122 "dimness_trap"]
     [129 "archdevil"]
     [130 "exit_mobile"]
     [131 "invisible_wall"]
@@ -42,7 +40,6 @@
     [145 "unstable_moveable_wall_2"]
     [146 "fire_fountain"]
     [147 "wand_of_light"]
-    [148 "darkness_trap"]
     [149 "counterpoison_amulet"]
     [150 "poisonous_amulet"]
     [151 "passwall_amulet"]
@@ -76,7 +73,6 @@
     [186 "invisible_mage"]
     [187 "magical_mirror"]
     [188 "fading_wall"]
-    [189 "confusion_trap"]
     [190 "wall_generator_north"]
     [191 "wall_generator_south"]
     [192 "wall_generator_west"]

@@ -451,6 +451,27 @@
   :flavor "A magical field that causes you to vividly remember something embarrassing that you did as a teenager, forcing you to briefly freeze in horror. The problem with being royalty is that awkward adolescent moments all too easily become international incidents.")
 (setv paralysis-duration 3)
 
+(deftile Trap ", " "a broken trap"
+  :iq-ix #(
+    ; Removed trap-like tiles that stick around after stepping on them.
+     93   ; false exit
+    189)  ; confusion trap
+
+  :flavor "This once-vicious trap has decayed from neglect and is now pointlessly collecting dust. It was probably implemented in Flash or something.")
+
+(deftile Trap ", " "a pile of debris"
+  :color 'navy
+  :iq-ix #(
+    ; Removed trap-like tiles that are destroyed when you step on them.
+    122   ; dimness trap
+    148)  ; darkness trap
+
+  :hook-player-walked-into (fn [self]
+    "The tile is destroyed."
+    (destroy-tile self))
+
+  :flavor "Dungeon trash like sawdust, loose stones, pebbles, greasy chicken bones left over from goblin feasts, broken wands, and maybe a dead body, all bunched together into a small mound. Running through it will knock it over and get your boots really gross.")
+
 
 (deftile Scenery "()" "a magical energy shield"
   :color 'dark-orange
