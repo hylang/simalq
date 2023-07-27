@@ -7,7 +7,7 @@
   simalq.geometry [pos-seed burst at]
   simalq.tile [Tile deftile destroy-tile rm-tile add-tile]
   simalq.tile.scenery [Scenery]
-  simalq.util [CommandError DamageType StatusEffect hurt-player msg burst-damage])
+  simalq.util [CommandError DamageType StatusEffect hurt-player msg burst-damage refactor-hp])
 (setv  T True  F False)
 
 
@@ -74,12 +74,15 @@
   (defn-dd pick-up [self]
     (doc (cond
       it.hp-set-min
-        f"Sets your hit points to at least {it.hp-set-min}. If you already have that many, the effect is wasted."
+        f"Sets your hit points to at least {(refactor-hp it.hp-set-min)}. If you already have that many, the effect is wasted."
       (< it.hp-effect 0)
         f"Deals {(- it.hp-effect)} poison damage to you."
       T
-        f"Grants {it.hp-effect} hit points."))
-    (msg (if (and self.hp-set-min (>= G.player.hp self.hp-set-min))
+        f"Grants {(refactor-hp it.hp-effect)} hit points."))
+    (msg (if
+      (and
+        self.hp-set-min
+        (>= G.player.hp (refactor-hp self.hp-set-min)))
       self.waste-message
       (get self.eat-messages (%
         ; Food at the same position on the same level number will have
@@ -89,11 +92,11 @@
         (len self.eat-messages)))))
     (cond
       self.hp-set-min
-        (setv G.player.hp (max self.hp-set-min G.player.hp))
+        (setv G.player.hp (max (refactor-hp self.hp-set-min) G.player.hp))
       (< self.hp-effect 0)
         (hurt-player (- self.hp-effect) DamageType.Poison)
       T
-        (+= G.player.hp self.hp-effect))))
+        (+= G.player.hp (refactor-hp self.hp-effect)))))
 
 (setv (get Tile.types-by-iq-ix 21) (fn [pos _ te-v2]
   ; IQ's three types of unknown potion are mapped to items with fixed

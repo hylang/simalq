@@ -85,12 +85,12 @@
     (setv path (/ directory "main.zip")))
   (save-game path))
 
-(defn get-saves-list []
+(defn get-saves-list [[quest-name None]]
 
   (setv saves (sorted
     (gfor
       path (try
-        (list (.iterdir (/ saved-games-dir G.quest.name)))
+        (list (.iterdir (/ saved-games-dir (or quest-name G.quest.name))))
         (except [FileNotFoundError]
           []))
       (dict

@@ -16,14 +16,15 @@
 (setv  T True  F False)
 
 
-(defn main [quest [skip-to-level None] [load-main-save F]]
-  (start-quest quest)
+(defn main [quest [rules None] [skip-to-level None] [load-main-save F]]
+  (setv save (and
+    load-main-save
+    (setx save (next
+      (gfor  item (get (get-saves-list quest.name) 0)  :if (get item "main")  item)
+      None))))
+  (start-quest quest (and (not save) rules))
   (with [(player-io)]
-    (if (and
-        load-main-save
-        (setx save (next
-          (gfor  item (get (get-saves-list) 0)  :if (get item "main")  item)
-          None)))
+    (if save
       (do
         (load-game (get save "path"))
         (when skip-to-level
@@ -82,7 +83,8 @@
   ; Dose the player with ambient poison, and convert an accumulated
   ; dose ≥1 into damage.
   (unless (player-status 'Ivln)
-    (+= G.player.poison-dose G.level.poison-intensity)
+    (+= G.player.poison-dose
+      (* G.rules.poison-factor G.level.poison-intensity))
     (hurt-player :animate F
       (pop-integer-part G.player.poison-dose)
       DamageType.Poison))

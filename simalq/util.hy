@@ -146,6 +146,9 @@
 
 (setv hp-warning-threshold 100)
 
+(defn refactor-hp [x]
+  (int (round (* G.rules.player-hp-factor x))))
+
 (defn hurt-player [amount damage-type [animate T] [attacker None]]
   (import simalq.geometry [ray dir-to dist])
 
@@ -177,7 +180,10 @@
   (setv hp-was G.player.hp)
   (unless (player-status 'Ivln)
     (hy.M.simalq/tile.damage-tile G.player amount damage-type))
-  (when (chainc G.player.hp <= hp-warning-threshold < hp-was)
+  (when (chainc
+         G.player.hp
+      <= (refactor-hp hp-warning-threshold)
+      <  hp-was)
     (msg "Princess needs food badly!")))
 
 

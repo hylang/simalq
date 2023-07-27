@@ -224,12 +224,14 @@
       :if (get G.player.status-effects se)
       (.format "{} {}" se.name (get G.player.status-effects se))))
 
+  (setv poison (* G.rules.poison-factor G.level.poison-intensity))
+
   #(
     (j
       (.format "HP {:,}"
         G.player.hp)
-      (when G.level.poison-intensity
-        (+ "☠ " (mixed-number G.level.poison-intensity)))
+      (when poison
+        (+ "☠ " (mixed-number poison)))
       None ; Reserved for time limits, like "Tm 1,000"
       (when G.player.keys
         (.format "⚷ {}" G.player.keys))

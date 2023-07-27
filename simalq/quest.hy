@@ -3,7 +3,7 @@
   simalq.macros [defdataclass])
 (import
   simalq.game-state [G Rules]
-  simalq.util [StatusEffect]
+  simalq.util [StatusEffect refactor-hp]
   simalq.tile [mv-tile]
   simalq.tile.player [Player]
   copy [deepcopy])
@@ -27,7 +27,7 @@
   (.initialize-states G)
   (setv
      G.player (Player :pos None)
-     G.player.hp (when quest quest.starting-hp)
+     G.player.hp (when quest (refactor-hp quest.starting-hp))
      (cut G.player.inventory) (* [None] G.rules.max-usables))
   (.update G.player.status-effects (dfor  x StatusEffect  x 0)))
 

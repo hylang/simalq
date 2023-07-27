@@ -1,6 +1,7 @@
 (require
   hyrule [unless])
 (import
+  fractions [Fraction :as f/]
   re
   hyrule [parse-args]
   simalq [__version__]
@@ -34,6 +35,12 @@
       ["-n" "--new"
         :action "store_true"
         :help "start a new game (default: load the main save slot, or start a new game if there isn't one)"]
+      ["--player-hp-factor"
+        :type f/ :metavar "X"
+        :help "multiply your starting HP and all healing by the fraction X (affects new games only)"]
+      ["--poison-factor"
+        :type f/ :metavar "X"
+        :help "multiply ambient poison rates by the fraction X (affects new games only)"]
       ["--skip-to-level"
         :type int :metavar "N"
         :help "skip to the requested level (for debugging)"]]))
@@ -44,10 +51,21 @@
   (unless (in p.QUEST (available-quests))
     (exit f"No such quest: {(hy.repr p.QUEST)}. See `simalq --quests`."))
 
+  (when (or
+      (and p.player-hp-factor (< p.player-hp-factor 0))
+      (and p.poison-factor (< p.poison-factor 0)))
+    (exit "HP and poison factors must be nonnegative."))
+  (when (= p.player-hp-factor 0)
+    (exit "Okay, fine, you start with 0 HP. Welcome to the game. Game over. Wasn't that fun?"))
+
   (hy.M.simalq/main.main
     :quest ((get (available-quests) p.QUEST))
     :skip-to-level p.skip-to-level
-    :load-main-save (not p.new)))
+    :load-main-save (not p.new)
+    :rules (dfor
+      k ["player_hp_factor" "poison_factor"]
+      :if (is-not (getattr p k) None)
+      k (getattr p k))))
 
 (defn available-quests [] (dict
   #** hy.M.simalq/quest-definition.builtin-quests

@@ -197,6 +197,23 @@
   (check (f/ 0  )  93))
 
 
+(defn test-ambient-poison-with-factor []
+
+  (init :poison-factor (f/ 1 4)
+    [:poison-intensity (f/ 1 3)])
+  (assert (= G.player.hp 100))
+  (wait 11)
+  (assert (= G.player.hp 100))
+  (wait)
+  (assert (= G.player.hp 99))
+
+  (init :poison-factor (f/ 0)
+    [:poison-intensity (f/ 1 3)])
+  (assert (= G.player.hp 100))
+  (wait 50)
+  (assert (= G.player.hp 100)))
+
+
 (defn test-game-state-history []
   (init
     [:tiles ["handful of gems" "orc"]])

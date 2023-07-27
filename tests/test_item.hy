@@ -110,6 +110,20 @@
   (assert (= G.player.hp 525)))
 
 
+(defn test-food-hp-factor []
+  (init :player-hp-factor (f/ 1 2)
+    [:tiles ["snack" "meal" "dessert"]])
+  (assert (= G.player.hp 50))
+  (wk 'E)
+  (assert (= G.player.hp 62))
+    ; The snack heals 12 HP rather than 13 because of the
+    ; round-to-even rule.
+  (wk 'E)
+  (assert (= G.player.hp 112))
+  (wk 'E)
+  (assert (= G.player.hp 250)))
+
+
 (defn test-food-shoot []
   (init [
     :map "

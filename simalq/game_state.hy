@@ -161,6 +161,10 @@
         ; player in which monsters etc. get to act. It's a square
         ; spanning `2 * reality-bubble-size + 1` map squares on each
         ; side, with the player in the center.
+      player-hp-factor (f/ 1)
+        ; Multiplies the player's starting HP and healing.
+      poison-factor (f/ 1)
+        ; Multiplies all ambient poison rates.
       max-keys 8
         ; How many keys the player can carry at once.
       max-usables 3
