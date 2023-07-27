@@ -1,6 +1,7 @@
 (require
   hyrule [unless])
 (import
+  fractions [Fraction :as f/]
   itertools [count]
   time [time]
   datetime [datetime]
@@ -8,7 +9,7 @@
   pickle
   zipfile [ZipFile ZIP-STORED ZIP-DEFLATED]
   simalq.game-state [G]
-  simalq.util [menu-letters saved-games-dir])
+  simalq.util [menu-letters saved-games-dir mixed-number])
 (setv  T True  F False)
 
 ;; --------------------------------------------------------------
@@ -47,7 +48,9 @@
       :level-n G.level-n
       :turn-n G.turn-n
       :player-hp G.player.hp
-      :score G.score)))))
+      :score G.score
+      :player-hp-factor (.as-integer-ratio G.rules.player-hp-factor)
+      :poison-factor (.as-integer-ratio G.rules.poison-factor))))))
   (setv state (no-gc (suppressing-quest
     (pickle.dumps G pickle.HIGHEST-PROTOCOL))))
 
@@ -103,16 +106,18 @@
       (get d "time")))))
 
   (setv display-lines [
-    "                       Date  DL   Turn    HP   Score"
+    "                       Date  DL   Turn    HP   Score  HP f.  Poison f."
     #* (lfor
       [i save] (enumerate saves)
-      (.format " ({}) {:4} {:%Y %b %d %H:%M} {:3d} {:6,} {:5,} {:7,}"
+      (.format " ({}) {:4} {:%Y %b %d %H:%M} {:3d} {:6,} {:5,} {:7,} {:>6} {:>10}"
         (get menu-letters i)
         (if (get save "main") "main" "")
         (datetime.fromtimestamp (get save "time"))
         (get save "level_n")
         (get save "turn_n")
         (get save "player_hp")
-        (get save "score")))])
+        (get save "score")
+        (mixed-number (f/ #* (get save "player_hp_factor")))
+        (mixed-number (f/ #* (get save "poison_factor")))))])
 
   #(saves display-lines))
