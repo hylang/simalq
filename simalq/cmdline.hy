@@ -17,6 +17,10 @@
    "New Nightmare"))
   ; The other IQ quests have at least one unimplemented tile type.
 
+(setv difficulty-presets (dict
+  :easy (dict :hp (f/ 2) :poison (f/ 0))
+  :hard (dict :hp (f/ 2 3) :poison (f/ 1 2))))
+
 
 (defn handle-cmdline-args [args]
   (setv version-string f"Infinitesimal Quest 2 + ε version {__version__}")
@@ -35,6 +39,12 @@
       ["-n" "--new"
         :action "store_true"
         :help "start a new game (default: load the main save slot, or start a new game if there isn't one)"]
+      ["--easy"
+        :action "store_true"
+        :help f"easy mode; equivalent to `--player-hp-factor {(get difficulty-presets "easy" "hp")} --poison-factor {(get difficulty-presets "easy" "poison")}` (so you have more health, and ambient poison is removed)"]
+      ["--hard"
+        :action "store_true"
+        :help f"hard mode; equivalent to `--player-hp-factor {(get difficulty-presets "hard" "hp")} --poison-factor {(get difficulty-presets "hard" "poison")}` (so you have less health, but ambient poison is reduced to compensate)"]
       ["--player-hp-factor"
         :type f/ :metavar "X"
         :help "multiply your starting HP and all healing by the fraction X (affects new games only)"]
@@ -50,6 +60,17 @@
     ; place of spaces so the user doesn't have to quote them.
   (unless (in p.QUEST (available-quests))
     (exit f"No such quest: {(hy.repr p.QUEST)}. See `simalq --quests`."))
+
+  (when (or p.easy p.hard)
+    (when (and p.easy p.hard)
+      (exit "Easy mode and hard mode are incompatible."))
+    ; Allow each part of the difficulty preset to be overriden by the
+    ; lower-level arguments.
+    (setv preset (get difficulty-presets (if p.hard "hard" "easy")))
+    (when (is p.player-hp-factor None)
+      (setv p.player-hp-factor (get preset "hp")))
+    (when (is p.poison-factor None)
+      (setv p.poison-factor (get preset "poison"))))
 
   (when (or
       (and p.player-hp-factor (< p.player-hp-factor 0))
