@@ -100,6 +100,12 @@
     {"fixed damaging trap" 13  'floor 12})))
 
 
+(defn test-skulls-in-titles []
+  (assert (=
+    (. (iq-quest "BoneQuest") levels [0] title)
+    "☠☠☠\nAbandon hope, ye who enter here\n☠☠☠")))
+
+
 (defn test-varlife []
   (setv m (get-level-map "New First Quest" 3))
   (setv t (get m 11 11 0))

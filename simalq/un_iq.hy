@@ -71,10 +71,14 @@
     (.replace (.decode obj "mac_roman") "\r" "\n")))
 
 (defn iq-str [n]
-  "A length-prefixed string that may have trailing junk data."
+  "A length-prefixed string (with skulls for bullets) that may have
+  trailing junk data."
   (with-construct (FocusedSeq "string"
     (/ "len" Byte)
-    (/ "string" (mac-roman-str this.len))
+    (/ "string" (adapt (mac-roman-str this.len) (.replace obj "•" "☠")))
+      ; IQ uses a font that displays bullets as skulls. We imitate it
+      ; thus. The skull emoji (U+1F480) is arguably a closer match in
+      ; design, but emoji in terminals sometimes cause funky spacing.
     (Bytes (- n 2 this.len)))))
 
 (setv big-bool
