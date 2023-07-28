@@ -8,7 +8,7 @@
   simalq.color :as color
   simalq.geometry [burst at]
   simalq.game-state [G]
-  simalq.tile [Tile]
+  simalq.tile [Tile Scenery]
   simalq.quest [start-quest start-level]
   simalq.commands [Action get-command do-command do-action]
   simalq.display [draw-screen bless-colorstr]
@@ -81,13 +81,21 @@
   ; Now do end-of-turn processing.
 
   ; Dose the player with ambient poison, and convert an accumulated
-  ; dose ≥1 into damage.
-  (unless (player-status 'Ivln)
+  ; dose ≥1 into damage. Also, deal damage from poison emitters.
+  (setv [protected extra-poison] (map any (zip #* (gfor
+    pos (burst G.player.pos 1)
+    tile (at pos)
+    (if (isinstance tile Scenery)
+      #(tile.protects-vs-poison-air tile.emits-poison-air)
+      #(F F))))))
+  (unless (or protected (player-status 'Ivln))
     (+= G.player.poison-dose
       (* G.rules.poison-factor G.level.poison-intensity))
     (hurt-player :animate F
       (pop-integer-part G.player.poison-dose)
-      DamageType.Poison))
+      DamageType.Poison)
+    (when extra-poison
+      (hurt-player G.rules.poison-emitter-damage DamageType.Poison)))
 
   ; Run each-turn hooks. Unless the object is neither on this level
   ; nor in the player's inventory, in which case, kick the object off

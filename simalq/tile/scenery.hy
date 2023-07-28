@@ -21,7 +21,9 @@
       ; Block diagonal movement between orthogonally adjacent squares.
     blocks-monster F
       ; Block monster movement, even if `blocks-move` is false.
-    destructible-by-passwall-wand F)
+    destructible-by-passwall-wand F
+    protects-vs-poison-air F
+    emits-poison-air F)
 
   (defn dod [self prefix attr-sym]
     (setv m (getattr (type self) (hy.mangle attr-sym)))
@@ -65,7 +67,11 @@
       (.dod self "Effect when bumped" 'hook-player-bump)
       (.dod self "Effect when trying to enter" 'hook-player-walk-to)
       (.dod self "Effect when stepped onto" 'hook-player-walked-into)
-      (.dod self "Effect when trying to exit" 'hook-player-walk-from)]))
+      (.dod self "Effect when trying to exit" 'hook-player-walk-from)
+      (when self.protects-vs-poison-air
+        #("Special effect" "If you end your turn within 1 square of this tile, you'll take no damage from ambient poison or poisonous fountains. Other sources of poison damage are unaffected."))
+      (when self.emits-poison-air
+        #("Special effect" f"If you end your turn within 1 square of this tile, you'll take {G.rules.poison-emitter-damage} poison damage. This effect applies no more once per turn."))]))
 
 
 (defn walkability [p direction monster?]
@@ -283,6 +289,25 @@
     F)
 
   :flavor "Where do video games get all their crates from? There must be entire warehouses full of 'em, am I right?")
+
+
+(deftile Scenery "{ " "a water fountain"
+  :color 'steel-blue
+  :iq-ix 108
+
+  :blocks-move T
+  :protects-vs-poison-air T
+
+  :flavor "An ornate decorative fountain featuring a statue of a particularly homely goblin. The fountain's spray fills the air about it with a refreshing mist.")
+
+(deftile Scenery "{ " "a poisonous fountain"
+  :color 'dark-green
+  :iq-ix 137
+
+  :blocks-move T
+  :emits-poison-air T
+
+  :flavor "An ornate decorative fountain featuring a statue of Death himself. The fountain's spray fills the air about it with a suffocating miasma.")
 
 
 (deftile Scenery "{}" "a gate"

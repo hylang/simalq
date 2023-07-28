@@ -2,6 +2,7 @@
   hyrule [ecase do-n]
   tests.lib [cant])
 (import
+  fractions [Fraction :as f/]
   pytest
   tests.lib [init init-boot-camp assert-at assert-full-name set-square mv-player assert-player-at wk wait shoot]
   simalq.util [GameOverException]
@@ -196,6 +197,43 @@
   (wk 'W)
   (assert-at [0 0] "pushblock")
   (assert-at [1 0] 'player))
+
+
+(defn test-fountains []
+  (init [
+    :poison-intensity (f/ 1 5)
+    :map "
+      pfpfwf
+      pf@ wf
+      ☠ . ."
+    :map-marks {
+      "wf" "water fountain"
+      "pf" "poisonous fountain"
+      "☠ " "jar of poison"}])
+
+  ; When next to at least one water fountain, the player takes no
+  ; damage from ambient poison or from poison fountains.
+  (assert (= G.player.hp 100))
+  (wait 10)
+  (assert (= G.player.hp 100))
+  (set-square 'E)
+  (wait 10)
+  (assert (= G.player.hp 100))
+  ; Water fountains don't protect against other sources of poison
+  ; damage.
+  (shoot 'SW)
+  (assert (= G.player.hp 80))
+
+  ; Without a water fountain, poisonous fountains do 2 damage per
+  ; turn. This stacks with ambient poison, but it only applies once no
+  ; matter how many poison fountains are adjacent.
+  (set-square 'NE)
+  (wait)
+  (assert (= G.player.hp 78))
+  (wait 3)
+  (assert (= G.player.hp 72))
+  (wait)
+  (assert (= G.player.hp 69)))
 
 
 (defn test-gate []

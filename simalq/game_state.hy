@@ -183,6 +183,8 @@
         ; How many magic arrows come in a pickup.
       artifact-shield-factor (f/ 3 4)
         ; How much the artifact shield multiplies incoming damage by.
+      poison-emitter-damage 2
+        ; Damage per turn from poisonous fountains.
       dainty-monsters T))
         ; Whether monsters will only step on empty floor (with some
         ; exceptions, like spiders walking on webs). Otherwise,
