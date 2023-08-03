@@ -227,7 +227,7 @@
         :poison-intensity (if (= l.poison-interval 0)
           (f/ 0)
           (f/ 1 l.poison-interval))
-        :time-limit l.time-limit
+        :time-limit (or l.time-limit None)
         :exit-speed l.exit-speed
         :moving-exit-start (mk-pos l.moving-exit-start)
         :map m))))))

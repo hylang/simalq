@@ -232,7 +232,8 @@
         G.player.hp)
       (when poison
         (+ "☠ " (mixed-number poison)))
-      None ; Reserved for time limits, like "Tm 1,000"
+      (when G.time-left
+        (.format "⏲ {:,}" G.time-left))
       (when G.player.keys
         (.format "⚷ {}" G.player.keys))
       (when G.player.magic-arrows (+

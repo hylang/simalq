@@ -40,7 +40,7 @@
       level.player-start (Pos level.map 0 15)
       level.next-level 2
       level.poison-intensity (f/ 1 5)
-      level.time-limit 0
+      level.time-limit None
       level.exit-speed 10
       level.moving-exit-start None
       level.map.wrap-x False

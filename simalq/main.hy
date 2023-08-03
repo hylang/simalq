@@ -111,6 +111,14 @@
     (when (get G.player.status-effects se)
       (-= (get G.player.status-effects se) 1)))
 
+  ; Tick down the time limit.
+  (when G.time-left
+    (if (= G.time-left 1)
+      ; Time's up. (We check on 1 rather than 0 so that a time limit of 3
+      ; allows 3 turns.)
+      (start-level G.level.next-level)
+      (-= G.time-left 1)))
+
   ; Advance the turn counter last.
   (+= G.turn-n 1)
   (setv G.player.taking-extra-action F))

@@ -139,6 +139,9 @@
       ; The number of rounds that have elapsed so far. This usually
       ; increments by 1 between successive states, but not always, due
       ; to effects that give the player extra actions.
+    time-left None
+      ; The number of turns remaining on the current level's time limit
+      ; (if it has one).
     player None))
       ; A `Player` object.
 

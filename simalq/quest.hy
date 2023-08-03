@@ -51,9 +51,10 @@
       f"Level {level-n}\n\n{level.title}"))
   (setv
     G.level-n level-n
-    G.level (deepcopy level))
+    G.level (deepcopy level)
       ; The default behavior of `deepcopy` is smart enough to make all
       ; the references to `G.level.map` in tiles point to the new map.
+    G.time-left G.level.time-limit)
   (mv-tile G.player G.level.player-start)
   (unless G.states
     ; If we haven't saved any states yet (because the game just

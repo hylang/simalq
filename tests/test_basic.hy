@@ -214,6 +214,32 @@
   (assert (= G.player.hp 100)))
 
 
+(defn test-time-limit []
+  (init
+    [:time-limit 3
+      :poison-intensity (f/ 1)
+      :map "d @ k k k"
+      :map-marks {"k " "key"}]
+    [])
+  (defn check [level-n turn player-hp keys]
+    (assert (= G.level.n level-n))
+    (assert (= G.turn-n turn))
+    (assert (= G.player.hp player-hp))
+    (assert (= G.player.keys keys)))
+
+  ; Walk east, collecting the keys and getting shot by the devil (and
+  ; taking poison damage). Contra IQ, the last turn fully elapses
+  ; (including e.g. poison) before we go to the next level.
+  (wk 'E)
+  (check 1 1 89 1)
+  (wk 'E)
+  (check 1 2 78 2)
+  (wk 'E)
+  (check 2 3 67 3)
+  (wait 10)
+  (check 2 13 67 3))
+
+
 (defn test-game-state-history []
   (init
     [:tiles ["handful of gems" "orc"]])
