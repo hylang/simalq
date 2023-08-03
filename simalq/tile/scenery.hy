@@ -3,7 +3,7 @@
   simalq.macros [has defn-dd fn-dd])
 (import
   simalq.color :as color
-  simalq.util [CommandError GameOverException player-melee-damage DamageType next-in-cycle StatusEffect hurt-player]
+  simalq.util [CommandError player-melee-damage DamageType next-in-cycle StatusEffect hurt-player]
   simalq.geometry [Pos Direction pos+ at burst dist dir-to]
   simalq.tile [Tile deftile replace-tile damage-tile mv-tile destroy-tile]
   simalq.game-state [G])
@@ -238,10 +238,7 @@
     "Takes you to the next dungeon level. If there is no such level,
     you win the quest."
 
-    (when (> G.level.next-level (len G.quest.levels))
-      (setv G.player.game-over-state 'won)
-      (raise GameOverException))
-    (hy.M.simalq/main.start-level G.level.next-level)
+    (hy.M.simalq/quest.start-level G.level.next-level)
     (setv G.player.just-exited T)
     True)
 

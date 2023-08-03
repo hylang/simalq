@@ -3,7 +3,7 @@
   simalq.macros [defdataclass])
 (import
   simalq.game-state [G Rules]
-  simalq.util [StatusEffect refactor-hp]
+  simalq.util [StatusEffect refactor-hp GameOverException]
   simalq.tile [mv-tile]
   simalq.tile.player [Player]
   copy [deepcopy])
@@ -43,6 +43,9 @@
   :frozen T)
 
 (defn start-level [level-n [show-title T]]
+  (when (> level-n (len G.quest.levels))
+    (setv G.player.game-over-state 'won)
+    (raise GameOverException))
   (setv level (get G.quest.levels (- level-n 1)))
   (when show-title
     (hy.M.simalq/main.text-screen :center T
