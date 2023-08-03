@@ -80,6 +80,14 @@
 
   ; Now do end-of-turn processing.
 
+  ; Run each-turn hooks. Unless the object is neither on this level
+  ; nor in the player's inventory, in which case, kick the object off
+  ; the list.
+  (for [o (list G.each-turn)]
+    (unless (or (in o G.player.inventory) (and o.pos (is o.pos.map G.map)))
+      (.remove G.each-turn o))
+    (.each-turn o))
+
   ; Dose the player with ambient poison, and convert an accumulated
   ; dose ≥1 into damage. Also, deal damage from poison emitters.
   (setv [protected extra-poison] (map any (zip #* (gfor
@@ -96,14 +104,6 @@
       DamageType.Poison)
     (when extra-poison
       (hurt-player G.rules.poison-emitter-damage DamageType.Poison)))
-
-  ; Run each-turn hooks. Unless the object is neither on this level
-  ; nor in the player's inventory, in which case, kick the object off
-  ; the list.
-  (for [o (list G.each-turn)]
-    (unless (or (in o G.player.inventory) (and o.pos (is o.pos.map G.map)))
-      (.remove G.each-turn o))
-    (.each-turn o))
 
   ; Tick down status effects.
   (for [se (list G.player.status-effects)]
