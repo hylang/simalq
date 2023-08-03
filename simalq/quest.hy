@@ -44,8 +44,7 @@
 
 (defn start-level [level-n [show-title T]]
   (when (> level-n (len G.quest.levels))
-    (setv G.player.game-over-state 'won)
-    (raise GameOverException))
+    (raise (GameOverException 'won)))
   (setv level (get G.quest.levels (- level-n 1)))
   (when show-title
     (hy.M.simalq/main.text-screen :center T

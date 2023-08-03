@@ -291,9 +291,7 @@
   (when (<= tile.hp 0)
     ; It's destroyed.
     (if (is tile G.player)
-      (do
-        (setv G.player.game-over-state 'dead)
-        (raise GameOverException))
+      (raise (GameOverException 'dead))
       (do
         (unless tile.score-for-damaging
           (+= G.score tile.points))

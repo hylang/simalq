@@ -45,7 +45,8 @@
 (defn take-turn [action]
   (try
     (_take-turn action)
-    (except [GameOverException]
+    (except [e GameOverException]
+      (setv [G.player.game-over-state] e.args)
       (ecase G.player.game-over-state
         'dead (msg "You have died.")
         'won  (victory-screen))))
