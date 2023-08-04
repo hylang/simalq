@@ -211,6 +211,19 @@
   :flavor "Now we're talkin'! These missiles engraved with mystical runes hit hard and keep on going. Sadly, Tris is so excited to use them that she can't shoot mundane arrows until she's used them all up.")
 
 
+(deftile Item "⏲ " "a clock"
+  :iq-ix 138
+    ; IQ uses an hourglass. We use a clock instead because it's hard
+    ; to get a non-emoji hourglass.
+  :points 0
+
+  :pick-up (fn-dd [self]
+    (doc f"Adds {G.rules.time-bonus} turns to the current time limit.")
+    (+= G.time-left G.rules.time-bonus))
+
+  :flavor "Oh dear! Oh dear! I shall be late!")
+
+
 (defclass StatusEffectItem [Item]
   (setv
     __slots__ []

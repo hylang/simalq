@@ -86,6 +86,16 @@
   (assert-at [6 0] 'floor))
 
 
+(defn test-clock []
+  (init [
+    :time-limit 10
+    :tiles ["clock"]])
+  (wait 2)
+  (assert (= G.time-left 8))
+  (wk 'E)
+  (assert (= G.time-left 32)))
+
+
 (defn test-food-eat []
   (init [:tiles [
      "snack" "meal" "jar of poison" "rotten food" "empty platter"

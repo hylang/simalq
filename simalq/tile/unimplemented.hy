@@ -28,7 +28,6 @@
     [134 "siren"]
     [135 "spider"]
     [136 "web"]
-    [138 "hourglass"]
     [139 "phasing_wall_in"]
     [140 "phasing_wall_out"]
     [141 "phasing_wall_trap"]
