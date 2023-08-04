@@ -236,7 +236,25 @@
       :summon-frequency (f/ 1)
       :summon-hp 3]}]
 
-9 [:title "Monsters have a variety of immunities, behavior, and special abilities. Check their info screens for the deets."
+9 [:title "Some levels have a time limit. When you run out of time, you automatically advance to the next level."
+  :time-limit 15
+  :map "
+     ▒▒▒▒▒▒▒▒▒▒⏲ ▒▒▒▒▒▒▒▒▒▒
+     ▒▒▒▒▒▒▒▒. . . ▒▒▒▒▒▒▒▒
+     ▒▒▒▒▒▒. . . . . ▒▒▒▒▒▒
+     ▒▒▒▒. . . . . . . ▒▒▒▒
+     ▒▒. . . . . . . . . ▒▒
+     $ . . . . @ . . . . $
+     ▒▒. . . . . . . . . ▒▒
+     ▒▒▒▒. . . . . . . ▒▒▒▒
+     ▒▒▒▒▒▒. . . . . ▒▒▒▒▒▒
+     ▒▒▒▒▒▒▒▒. . . ▒▒▒▒▒▒▒▒
+     ▒▒▒▒▒▒▒▒▒▒$ ▒▒▒▒▒▒▒▒▒▒"
+  :map-marks {
+    "▒▒" "Void"
+    "$ " "pile of gold"}]
+
+10 [:title "Monsters have a variety of immunities, behavior, and special abilities. Check their info screens for the deets."
   :poison-intensity (f/ 1 8)
   :map "
     @ ██. . ++. . . ██i . . ++b . . . . . . . . ██>
@@ -258,8 +276,7 @@
     "i " ["imp" :hp 2]
     "b3" ["bat" :hp 3]}]
 
-
-10 [:title "Pop quiz! Escape this level to complete the tutorial."
+11 [:title "Pop quiz! Escape this level to complete the tutorial."
   :poison-intensity (f/ 1 8)
   :map "
     . . . . . ██. . . . . ██. . . . . . ◀▶. . . . ◀▶. . . . <8
