@@ -38,6 +38,22 @@
         (self.hook-player-shot.dynadoc self))))]))
 
 
+(deftile Item "$ " "a lump of fool's gold"
+  :color 'orange
+  :iq-ix 110
+    ; The candle, which doen't take an inventory slot and is worth no
+    ; points.
+  :points 0
+  :flavor "Whoa! This is worthless. But no less than worthless, at least.")
+
+(deftile Item "$ " "a pile of silver"
+  :color 'dark-gray
+  :iq-ix 153
+    ; The amulet of sight, which doesn't take an inventory slot and is
+    ; worth 50 points.
+  :points 50
+  :flavor "Ooh, not quite as shiny.")
+
 (deftile Item "$ " "a pile of gold"
   :color 'dark-yellow
   :iq-ix 18
@@ -314,6 +330,18 @@
         (self.use.dynadoc self)))
       #* extra)))
 
+(deftile Usable "/ " "a wand of nothing"
+  :iq-ix 147  ; wand of light
+  :points 50
+
+  :targeted F
+  :use (fn [self]
+    "Does nothing."
+    (msg (get simalq.strings.wand-of-nothing-messages (%
+      (pos-seed G.player.pos)
+      (len simalq.strings.wand-of-nothing-messages)))))
+
+  :flavor "Technically magical, but not terribly useful.")
 
 (deftile Usable "/ " "a wand of shielding"
   :color 'orange
