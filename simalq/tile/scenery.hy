@@ -432,7 +432,8 @@
   :flavor #[[Easy there, Admiral Ackbar. This kind of trap isn't necessarily dangerous. Well, admittedly, the key word here is "necessarily".]])
 
 (deftile Scenery :name "a trapped wall"
-  :color 'dark-yellow
+  :color #('black 'pale-yellow)
+  :color-bg #(None 'black)
   :slot-defaults (dict
     :wallnum 1)
   :iq-ix-mapper ["wallnum" (do
