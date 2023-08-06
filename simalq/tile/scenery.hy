@@ -468,11 +468,11 @@
   :iq-ix 36
 
   :hook-player-walked-into (fn-dd [self]
-    (doc f"Paralyzes you for {paralysis-duration} turns. While you're paralyzed, waiting is the only action you can take.")
-    (+= (get G.player.status-effects StatusEffect.Para) paralysis-duration))
+    (doc f"Paralyzes you for {G.rules.paralysis-duration} turns. While you're paralyzed, waiting is the only action you can take.")
+    (+= (get G.player.status-effects StatusEffect.Para)
+      G.rules.paralysis-duration))
 
   :flavor "A magical field that causes you to vividly remember something embarrassing that you did as a teenager, forcing you to briefly freeze in horror. The problem with being royalty is that awkward adolescent moments all too easily become international incidents.")
-(setv paralysis-duration 3)
 
 (deftile Trap ", " "a broken trap"
   :iq-ix #(

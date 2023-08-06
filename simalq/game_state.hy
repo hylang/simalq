@@ -188,6 +188,8 @@
         ; How many turns a clock pickup extends the time limit by.
       artifact-shield-factor (f/ 3 4)
         ; How much the artifact shield multiplies incoming damage by.
+      paralysis-duration 3
+        ; How many rounds paralysis lasts for.
       poison-emitter-damage 2
         ; Damage per turn from poisonous fountains.
       dainty-monsters T))
