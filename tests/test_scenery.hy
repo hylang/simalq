@@ -5,7 +5,7 @@
   fractions [Fraction :as f/]
   pytest
   tests.lib [init init-boot-camp assert-at assert-full-name set-square mv-player assert-player-at wk wait shoot]
-  simalq.util [GameOverException]
+  simalq.util [GameOverException StatusEffect]
   simalq.geometry [at Pos]
   simalq.game-state [G]
   simalq.quest-definition [mk-tile])
@@ -416,3 +416,13 @@
   (assert (= G.player.hp 91))
   (wk 'E)
   (assert (= G.player.hp 91)))
+
+
+(defn test-web []
+  (init
+    [:tiles ["web"]])
+  (assert-at 'E "web")
+  ; Walking onto the web destroys it and paralyzes Tris.
+  (wk 'E)
+  (assert-at 'here 'player)
+  (assert (= (get G.player.status-effects StatusEffect.Para) 2)))

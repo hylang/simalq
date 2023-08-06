@@ -474,6 +474,19 @@
 
   :flavor "A magical field that causes you to vividly remember something embarrassing that you did as a teenager, forcing you to briefly freeze in horror. The problem with being royalty is that awkward adolescent moments all too easily become international incidents.")
 
+(deftile Scenery "##" "a web"
+  :color 'dark-gray
+  :iq-ix 136
+
+  :blocks-move F :blocks-monster T
+  :hook-player-walked-into (fn-dd [self]
+    (doc f"The tile is destroyed, but you're paralyzed for {G.rules.paralysis-duration} turns.")
+    (+= (get G.player.status-effects StatusEffect.Para)
+      G.rules.paralysis-duration)
+    (destroy-tile self))
+
+  :flavor "This spiderweb is the size of a really big spiderweb. Until Idok cleans up the dungeon properly, you'll have to tediously carve your way through the webs with your sword. Got any recommendations for a good smitemaster?")
+
 (deftile Trap ", " "a broken trap"
   :iq-ix #(
     ; Removed trap-like tiles that stick around after stepping on them.

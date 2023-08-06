@@ -263,7 +263,8 @@
           "d " ["devil" :hp 3]
           "☉G" ["ghost generator"
             :summon-frequency (f/ 2 3)
-            :summon-hp 2]})
+            :summon-hp 2]
+          "##" ["cracked wall"]})
       ; Set targets for the gates.
       (for [[x1 y1 x2 y2] (partition 4 [
           16 11  3  3  11 16  3 29  16 21 29 29  21 16 29  3
