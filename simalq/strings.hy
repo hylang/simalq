@@ -71,6 +71,7 @@
   "The wand turns into a limp strand of spaghetti."
   "The wand turns itself into a pickle! Funniest stuff you've ever seen."
   "Updated my journal."
+  "What a horrible night to have a curse."
   "You are suddenly very masculine!"
   "You briefly hallucinate a three-headed monkey."
   "You found kitten!"
