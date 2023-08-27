@@ -240,10 +240,10 @@
   cls)
 
 
-(defn add-tile [pos stem #** kwargs]
+(defn add-tile [pos stem [stack-ix 0] #** kwargs]
   (setv t ((get Tile.types stem) :pos pos #** kwargs))
   (when pos
-    (.insert (at pos) 0 t))
+    (.insert (at pos) stack-ix t))
   t)
 
 (defn rm-tile [tile]

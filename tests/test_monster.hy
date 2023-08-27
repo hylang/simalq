@@ -628,9 +628,32 @@
 
   ; Test for a bug where a specter's movement state cycles too quickly
   ; to allow jumping east here.
-  (init
-    [:map "
+  (init [
+    :map "
        S ██.
-       ████@"])
+       ████@"
+    :map-marks {
+      "S " "specter"}])
   (wait)
   (assert-at 'N "specter"))
+
+
+(defn test-spider []
+
+  (init
+    [:tiles ['floor "web" "giant spider"]])
+  ; A spider can walk onto webs.
+  (wk 'E)
+  (assert-at 'E ["giant spider" "web"])
+  ; It also creates a web if it steps onto a tile without one.
+  (wk 'W)
+  (assert-at 'E ["giant spider" "web"])
+  ; The web is created where it goes to, not where it came from.
+  (assert-at [3 0] 'floor)
+
+  ; A spider that doesn't move during its turn can still create a web.
+  (init
+    [:tiles ["wall" "giant spider"]])
+  (assert-at [2 0] "giant spider")
+  (wait)
+  (assert-at [2 0] ["giant spider" "web"]))

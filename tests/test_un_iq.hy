@@ -133,6 +133,15 @@
   (check  6 10  3  "orc"   (f/ 1 2) 1))
 
 
+(defn test-spider []
+  ; Every spider in IQ gets a web.
+  (setv m (get-level-map "Nightmare 2" 1))
+  (setv [top bottom] (get m 0 14))
+  (assert (= top.stem "giant spider"))
+  (assert (= top.hp 6))
+  (assert (= bottom.stem "web")))
+
+
 (defn test-healing-potions []
   (setv m (get-level-map "Boot Camp 2" 9))
 

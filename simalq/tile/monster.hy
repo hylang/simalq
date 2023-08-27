@@ -207,7 +207,8 @@
     [implicit-attack T]
     [advance-movement-state T]
     [reverse F]
-    [jump F]]
+    [jump F]
+    [ethereal-to #()]]
   "Approach — If the monster can attack, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
   ; Return true if we successfully moved or attacked; false otherwise.
 
@@ -234,9 +235,9 @@
         (setx intermediate (pos+ mon.pos d))
         (not (has intermediate Scenery it.superblock))
         (setx target (pos+ intermediate d))
-        (not (nogo? target :monster? T)))
+        (not (nogo? target :monster? T :ethereal-to ethereal-to)))
       (do
-        (setv [target wly] (walkability mon.pos d :monster? T))
+        (setv [target wly] (walkability mon.pos d :monster? T :ethereal-to ethereal-to))
         (= wly 'walk))))
 
   (unless (ok-target)
@@ -265,7 +266,7 @@
   (return T))
 (setv Monster.act approach)
 
-(defn wander [mon [state-slot "movement_state"] [implicit-attack T]]
+(defn wander [mon [state-slot "movement_state"] [implicit-attack T] [ethereal-to #()]]
   "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
 
   (when (and implicit-attack (try-to-attack-player mon))
@@ -284,7 +285,7 @@
   (setattr mon state-slot (% (+ (* a (getattr mon state-slot)) c) m))
   (unless d
     (return))
-  (setv [target wly] (walkability mon.pos d :monster? T))
+  (setv [target wly] (walkability mon.pos d :monster? T :ethereal-to ethereal-to))
   (unless (= wly 'walk)
     (return))
   (when (> (dist G.player.pos target) G.rules.reality-bubble-size)
@@ -615,3 +616,34 @@
        (approach self :implicit-attack F :jump T)))
 
   :flavor "Yet another evil undead phantasm. This one's a real piece of work: it has a powerful heat-drain attack and the ability to teleport past obstacles.")
+
+
+(deftile NonGen "S " "a giant spider"
+  :color 'brown
+  :points 50
+
+  :slot-defaults (dict :wander-state None)
+  :mutable-slots #("wander_state")
+
+  :damage-melee 10
+
+  :act (fn-dd [self]
+    (doc f"If the monster is within {spider-approach-range} squares of you, it approaches (per `Approach`). Otherwise, it wanders (per `Wander`). In both cases, it can move through webs, and it creates a web on its square afterwards if no web is there already.")
+    ; Move or attack.
+    (if (and
+        (<= (dist G.player.pos self.pos) spider-approach-range)
+        (not (player-invisible-to self)))
+      (approach self :ethereal-to ["web"])
+      (wander self "wander_state" :ethereal-to ["web"]))
+    ; Spin a web in our new position, if there isn't one there
+    ; already.
+    (unless (any (gfor  tile (at self.pos)  (= tile.stem "web")))
+      (add-tile self.pos "web" :stack-ix (+ 1 (.index (at self.pos) self)))))
+
+  :flavor "This eight-legged beastie has powerful jaws, high-speed spinnerets, and the mark of a white skull embedded in the brown fur of its big fat abdomen. It's definitely giant and ambiguously intelligent, but not friendly or talkative.")
+(setv spider-approach-range 2)
+(setv (get Tile.types-by-iq-ix 135) (fn [pos _ te-v2]
+  ; Unlike IQ, we represent the spider and its web separately.
+  [
+    ((get Tile.types "giant spider") :pos pos :hp te-v2)
+    ((get Tile.types "web") :pos pos)]))

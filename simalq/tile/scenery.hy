@@ -1,6 +1,6 @@
 (require
   hyrule [unless]
-  simalq.macros [has defn-dd fn-dd])
+  simalq.macros [defn-dd fn-dd])
 (import
   simalq.color :as color
   simalq.util [CommandError player-melee-damage DamageType next-in-cycle StatusEffect hurt-player]
@@ -74,10 +74,12 @@
         #("Special effect" f"If you end your turn within 1 square of this tile, you'll take {G.rules.poison-emitter-damage} poison damage. This effect applies no more once per turn."))]))
 
 
-(defn walkability [p direction monster?]
+(defn walkability [p direction monster? [ethereal-to #()]]
   "Can an actor at `p` walk in `direction`, or at least bump something
   there (e.g., attacking a monster), considering geometry and scenery?
   `monster?` should be true for a monster and false for the player.
+  `ethereal-to` can be a list or tuple of tile types (specified by
+  stem) that the actor is specially allowed to ignore.
 
   Return a 2-tuple. The first element is the target position (`None`
   if it's out of bounds) and the second is a symbol:
@@ -97,19 +99,26 @@
           p2 [
             (Pos target.map p.x target.y)
             (Pos target.map target.x p.y)]
-          (has p2 Scenery it.blocks-diag))))
+          tile (at p2)
+          (and
+            (isinstance tile Scenery)
+            tile.blocks-diag
+            (not-in tile.stem ethereal-to)))))
       'blocked-diag
-    (nogo? target monster?)
+    (nogo? target monster? ethereal-to)
       'bump
     True
       'walk)))
 
-(defn nogo? [pos monster?]
-  (or
-    (and monster? G.rules.dainty-monsters (at pos))
-    (and monster? (has pos Scenery it.blocks-monster))
-    (has pos Scenery it.blocks-move)
-    (has pos hy.M.simalq/tile.Monster T)))
+(defn nogo? [pos monster? ethereal-to]
+  (any (gfor
+    tile (at pos)
+    (and (not-in tile.stem ethereal-to) (or
+      (and monster? G.rules.dainty-monsters)
+      (isinstance tile hy.M.simalq/tile.Monster)
+      (and (isinstance tile Scenery) (or
+        (and monster? tile.blocks-monster)
+        tile.blocks-move)))))))
 
 
 (deftile Scenery "██" "a wall"
