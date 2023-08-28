@@ -225,7 +225,8 @@
       ████. G .
       ████████. "
     :map-marks {
-      "G " ["orc generator"
+      "G " ["generator"
+        :summon-class "orc"
         :summon-frequency (f/ 2 3)
         :summon-hp 2]}])
   (assert-full-name [3 1] "an orc generator (HP 1, pw 0, freq 2/3, sHP 2)")
@@ -256,7 +257,7 @@
     :height 1
     :tiles [
       'floor 'floor "wall" 'floor
-      ["orc generator" :summon-frequency (f/ 1)]
+      ["generator" :summon-class "orc" :summon-frequency (f/ 1)]
       'floor]])
   (setv G.rules.reality-bubble-size 4)
 
@@ -283,7 +284,8 @@
         @ . a b
         . . $ $"
       :map-marks {
-        (if gen-west "a " "b ") ["orc generator"
+        (if gen-west "a " "b ") ["generator"
+          :summon-class "orc"
           :summon-frequency (f/ 1 4)]
         (if gen-west "b " "a ") 'floor
         "$ " "pile of gold"}])

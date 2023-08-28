@@ -261,7 +261,8 @@
         :map-marks {
           "% " "meal"
           "d " ["devil" :hp 3]
-          "☉G" ["ghost generator"
+          "☉G" ["generator"
+            :summon-class "ghost"
             :summon-frequency (f/ 2 3)
             :summon-hp 2]
           "##" ["cracked wall"]})

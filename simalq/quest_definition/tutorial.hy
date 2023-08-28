@@ -140,7 +140,8 @@
     "++" "door"
     "x " ["wallfall trap" :wallnum 1]
     "X " ["trapped wall" :wallnum 1]
-    "☉o" ["orc generator" :hp 3
+    "☉o" ["generator" :hp 3
+      :summon-class "orc"
       :summon-frequency (f/ 1 2)
       :summon-hp 1]
     #** (dfor
@@ -202,7 +203,8 @@
     "█1" ["trapped wall" :wallnum 1]
     "{}" ["gate" :target "$ "]
     "w " ["wizard" :hp 3]
-    "☉d" ["devil generator" :hp 3
+    "☉d" ["generator" :hp 3
+      :summon-class "devil"
       :summon-frequency (f/ 1 3)
       :summon-hp 1]
     "$ " "pile of gold"
@@ -232,7 +234,8 @@
     "☠ " "jar of poison"
     "o " ["orc" :hp 3]
     "0 " "strong bomb"
-    "☉w" ["wizard generator" :hp 2
+    "☉w" ["generator" :hp 2
+      :summon-class "wizard"
       :summon-frequency (f/ 1)
       :summon-hp 3]}]
 
@@ -330,17 +333,21 @@
     "t " ["Tricorn" :hp 4]
     "o3" ["orc" :hp 3]
     "S " ["specter" :hp 3]
-    "☉G" ["ghost generator" :hp 3
+    "☉G" ["generator" :hp 3
+      :summon-class "ghost"
       :summon-frequency (f/ 1 3)
       :summon-hp 3]
     "d2" ["devil" :hp 2]
-    "☉d" ["devil generator" :hp 2
+    "☉d" ["generator" :hp 2
+      :summon-class "devil"
       :summon-frequency (f/ 1 2)
       :summon-hp 1]
-    "☉o" ["orc generator" :hp 3
+    "☉o" ["generator" :hp 3
+      :summon-class "orc"
       :summon-frequency (f/ 1)
       :summon-hp 1]
-    "☉B" ["giant bee generator" :hp 2
+    "☉B" ["generator" :hp 2
+      :summon-class "giant bee"
       :summon-frequency (f/ 1 4)
       :summon-hp 1]
     "O " ["blob" :hp 8]
