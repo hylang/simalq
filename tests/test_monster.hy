@@ -3,7 +3,7 @@
 (import
   fractions [Fraction :as f/]
   tests.lib [init assert-at assert-full-name assert-hp wait set-square wk shoot mv-player add-usable use-item top]
-  simalq.geometry [Direction Pos ray at]
+  simalq.geometry [Direction Pos ray at burst]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -495,6 +495,49 @@
   (use-item 0  2 0)
   (assert-at [2 0] 'floor)
   (assert-at [3 0] 'floor))
+
+
+(defn test-generator-thorn-tree []
+  "Test a generator of a monster type that isn't allowed in IQ
+  (namely, thorn trees)."
+
+  (init
+    [:tiles [["generator" :hp 3 :summon-class "thorn tree"]]])
+  ; Generators inherit the immunities of the monster type they
+  ; generate, so a thorn-tree generator is immune to arrows.
+  (shoot 'E)
+  (assert-hp 'E 3)
+  ; They also inherit whether you get points for hitting them or
+  ; destroying them. When IQ doesn't specify a point value, the
+  ; point value is quadruple the monster's.
+  (wk 'E)
+  (assert-hp 'E 1)
+  (assert (= G.score 0))
+  (wk 'E)
+  (assert (= G.score (* 4 10)))
+
+  (setv shp 7)
+  (init [
+    :map "
+      . . . . . .
+      . . . . . .
+      @ . . G . .
+      . . . . . .
+      . . . . . ."
+    :map-marks {
+      "G " ["generator"
+        :hp 3
+        :summon-class "thorn tree"
+        :summon-frequency (f/ 1)
+        :summon-hp shp]}])
+  ; Check the full name.
+  (assert-full-name [3 2]
+    f"a thorn-tree generator (HP 3, pw 0, freq 1, sHP {shp})")
+  ; Check that the generator produces a ring of trees.
+  (wait 9)
+  (for [p (burst (Pos G.map 3 2) 1 :exclude-center T)]
+    (assert-at p "thorn tree")
+    (assert-hp p shp)))
 
 
 (defn test-tricorn []
