@@ -4,7 +4,7 @@
   simalq.strings
   simalq.util [CommandError]
   simalq.game-state [G]
-  simalq.geometry [pos-seed burst at]
+  simalq.geometry [pos-seed turn-and-pos-seed burst at]
   simalq.tile [Tile deftile destroy-tile rm-tile add-tile]
   simalq.tile.scenery [Scenery]
   simalq.util [CommandError DamageType StatusEffect hurt-player msg burst-damage refactor-hp])
@@ -338,7 +338,7 @@
   :use (fn [self]
     "Does nothing."
     (msg (get simalq.strings.wand-of-nothing-messages (%
-      (pos-seed G.player.pos)
+      (turn-and-pos-seed G.player.pos)
       (len simalq.strings.wand-of-nothing-messages)))))
 
   :flavor "Technically magical, but not terribly useful.")

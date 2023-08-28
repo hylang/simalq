@@ -166,6 +166,14 @@
     pos.x
     (* G.map.width pos.y)))
 
+(defn turn-and-pos-seed [pos]
+  "Like `pos-seed`, but also uses `G.turn-n`."
+  (+
+    (pos-seed pos)
+    (* G.turn-n 1,000,000,007)))
+      ; The multiplier is chosen to be (a) prime and (b) bigger
+      ; than typical reasonable `pos-seed` values.
+
 
 (defn burst [center size [exclude-center False]]
   "Return a generator of all distinct points within distance `size` of

@@ -7,7 +7,7 @@
   enum [Enum]
   toolz [unique]
   simalq.util [player-melee-damage DamageType hurt-player next-in-cycle mixed-number player-status]
-  simalq.geometry [Direction pos+ at dist adjacent? dir-to pos-seed ray]
+  simalq.geometry [Direction pos+ at dist adjacent? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
   simalq.tile [Tile Actor deftile mv-tile add-tile damage-tile destroy-tile]
   simalq.tile.scenery [Scenery walkability nogo?])
@@ -279,7 +279,7 @@
   (setv  m (** 8 3)  c 1  a (+ 2 1))
   (when (= (getattr mon state-slot) None)
     ; Seed the RNG.
-    (setattr mon state-slot (% (pos-seed mon.pos) m)))
+    (setattr mon state-slot (% (turn-and-pos-seed mon.pos) m)))
   (setv options (+ Direction.all #(None)))
   (setv d (get options (% (getattr mon state-slot) (len options))))
   (setattr mon state-slot (% (+ (* a (getattr mon state-slot)) c) m))
