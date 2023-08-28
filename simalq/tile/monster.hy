@@ -48,8 +48,14 @@
       ; If true, the monster kills itself upon attacking.
     sees-invisible F
       ; If true, the monster is unaffected by the player being invisible.
-    summon-frequency (f/ 1 4))
+    summon-frequency (f/ 1 4)
       ; How often the monster summons other monsters (if it can).
+    flavor-for-generator "In defiance of thermodynamics, this device pumps out monsters endlessly.")
+      ; Flavor text for generators of this monster type.
+
+  (defn [classmethod] points-for-generator [cls]
+    "How many points the monster's generator is worth."
+    (* 4 cls.points))
 
   (defn hook-player-bump [self origin]
     "Attack the monster in melee."
@@ -294,53 +300,65 @@
 
 
 (defclass Generated [Monster]
-  "A monster that can be produced by a generator."
+  "A monster that can be produced by a generator in IQ."
 
   (setv
     __slots__ []
     score-for-damaging T))
 
-(defclass Generator [Monster]
-  "An immobile structure that creates monsters nearby."
+(defmacro self-sc [#* rest]
+  `(. Tile.types [self.summon-class] ~@rest))
 
-  (slot-defaults
-    summon-frequency (f/ 1 4)
-    summon-hp 1
-      ; How many hit points each monster will be summoned with.
-    summon-power (f/ 0))
-      ; A per-turn accumulator of `summon-frequency`.
-  (setv
-    mutable-slots ["summon_power"]
-    score-for-damaging T
-    immune #(Poison)
-    summon-class None)
+(deftile Monster :name "generator"
+  ; An immobile structure that creates monsters nearby.
+
+  :slot-defaults (dict
+    :summon-class "orc"
       ; The stem of the monster type to generate.
+    :summon-frequency (f/ 1 4)
+    :summon-hp 1
+      ; How many hit points each monster will be summoned with.
+    :summon-power (f/ 0))
+      ; A per-turn accumulator of `summon-frequency`.
+  :mutable-slots #("summon_power")
 
-  (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
-    (dict
-      :summon-hp (>> v2 5)
-      :summon-frequency (get
-        #(1 (f/ 1 2) (f/ 1 3) (f/ 1 4) (f/ 1 5) (f/ 1 6) (f/ 2 5) (f/ 1 10) (f/ 3 5) (+ 1 (f/ 1 3)) (+ 1 (f/ 1 2)) (+ 1 (f/ 2 3)) 2 (f/ 2 3) (f/ 3 4) (f/ 4 5) (f/ 5 6) (f/ 9 10))
-          ; These come from IQ's `SetGenFreq`.
-        (- (& v2 0b1111) 1))))
+  :mapsym (property (fn [self]
+    (+ "☉" (self-sc mapsym [0]))))
+  :points (property (fn [self]
+    (self-sc (points-for-generator))))
 
-  (defn suffix-dict [self]
+  :score-for-damaging (property (fn [self]
+    (self-sc score-for-damaging)))
+  :immune (property (fn [self]
+    (setv x (self-sc immune))
+    (+ x (if (in Poison x) #() #(Poison)))))
+
+  :full-name (property (fn [self]
+    (setv sc (self-sc))
+    (.format "{}{} {}"
+      (if sc.article (+ sc.article " ") "")
+      (.replace sc.stem " " "-")
+      (Tile.full-name.fget self))))
+  :suffix-dict (fn [self]
     (dict
       :HP self.hp
       :pw (mixed-number self.summon-power)
       :freq (mixed-number self.summon-frequency)
       :sHP self.summon-hp))
-  (defn info-bullets [self #* extra]
-    (.info-bullets (super)
+  :info-bullets (fn [self #* extra]
+    (Monster.info-bullets self
       #("Summoning power" (mixed-number self.summon-power))
       #("Summoning frequency" (mixed-number self.summon-frequency))
+      #("Type of summoned monsters" self.summon-class)
       #("Hit points of summoned monsters" self.summon-hp)
       #* extra))
 
-  (defn act [self]
+  :act (fn [self]
     "Generate — The generator adds its summon frequency to its summon power. If the total is more than 1, the integer part is removed and a corresponding number of monsters are generated in adjacent empty squares. If there are no adjacent empty squares, the expended summon power is wasted. The square that the generator attempts to target rotates through the compass with each summon or failed attempt."
-    (summon self self.summon-class self.summon-hp "movement_state")))
+    (summon self self.summon-class self.summon-hp "movement_state"))
 
+  :flavor (property (fn [self]
+    (self-sc flavor-for-generator))))
 
 (defn defgenerated [
     mapsym name *
@@ -356,24 +374,33 @@
       (dict (zip iq-ix-mon [1 2 3]))]
     :immune immune
     :points points-mon
+    :points-for-generator (classmethod (fn [cls] points-gen))
     :flavor flavor-mon
+    :flavor-for-generator flavor-gen
     #** kwargs))
-  (deftile Generator (+ "☉" (get mapsym 0)) (+ name " generator")
-    :iq-ix-mapper ["hp"
-      (dict (zip iq-ix-gen [1 2 3]))]
-    :summon-class mon-cls.stem
-    :immune (tuple (unique (+ Generator.immune immune)))
-    :points points-gen
-    :flavor flavor-gen))
+
+  (for [[iq-ix hp] (zip iq-ix-gen [1 2 3])]
+    (setv (get Tile.types-by-iq-ix iq-ix) (fn [pos _ te-v2 [hp hp]]
+      ; We need `[hp hp]` above to be sure we get a separate variable
+      ; for each closure.
+      [((get Tile.types "generator")
+        :pos pos
+        :hp hp
+        :summon-class mon-cls.stem
+        :summon-hp (>> te-v2 5)
+        :summon-frequency (get
+          #(1 (f/ 1 2) (f/ 1 3) (f/ 1 4) (f/ 1 5) (f/ 1 6) (f/ 2 5) (f/ 1 10) (f/ 3 5) (+ 1 (f/ 1 3)) (+ 1 (f/ 1 2)) (+ 1 (f/ 2 3)) 2 (f/ 2 3) (f/ 3 4) (f/ 4 5) (f/ 5 6) (f/ 9 10))
+            ; These come from IQ's `SetGenFreq`.
+          (- (& te-v2 0b1111) 1)))]))))
 
 
 (defclass NonGen [Monster]
-  "A monster that isn't produced by a generator."
+  "A monster that has no generators in IQ."
 
   (setv __slots__ [])
 
   (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
-      (dict :hp v2)))
+    (dict :hp v2)))
 
 
 (defgenerated "o " "an orc"
