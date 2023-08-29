@@ -32,15 +32,6 @@
     slot-defaults ~slots))
 
 
-(defmacro has [pos tile-type predicate-form]
-  `(next
-    (gfor
-      it (hy.M.simalq/geometry.at ~pos)
-      :if (and (isinstance it ~tile-type) ~predicate-form)
-      it)
-    None))
-
-
 (defmacro defn-dd [fname params doc-form #* body]
   #[[Define a function with a "dynamic docstring": another function
   stored in an attribute `dynadoc` of the host function.]]

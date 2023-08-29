@@ -1,6 +1,6 @@
 (require
   hyrule [unless do-n]
-  simalq.macros [has defdataclass slot-defaults pop-integer-part fn-dd])
+  simalq.macros [slot-defaults pop-integer-part fn-dd])
 (import
   re
   fractions [Fraction :as f/]
@@ -239,7 +239,9 @@
       ; the intermediate square, and ignoring all diagonal blocking.
       (and
         (setx intermediate (pos+ mon.pos d))
-        (not (has intermediate Scenery it.superblock))
+        (not (any (gfor
+          tile (at intermediate)
+          (and (isinstance tile Scenery) tile.superblock))))
         (setx target (pos+ intermediate d))
         (not (nogo? target :monster? T :ethereal-to ethereal-to)))
       (do
