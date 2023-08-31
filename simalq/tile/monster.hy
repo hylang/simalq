@@ -1,6 +1,6 @@
 (require
   hyrule [unless do-n]
-  simalq.macros [slot-defaults pop-integer-part fn-dd])
+  simalq.macros [slot-defaults pop-integer-part meth defmeth])
 (import
   re
   fractions [Fraction :as f/]
@@ -57,57 +57,57 @@
     "How many points the monster's generator is worth."
     (* 4 cls.points))
 
-  (defn hook-player-bump [self origin]
+  (defmeth hook-player-bump [origin]
     "Attack the monster in melee."
-    (damage-tile self (player-melee-damage) PlayerMelee)
+    (damage-tile @ (player-melee-damage) PlayerMelee)
     True)
 
   (setv act 'approach)
 
-  (defn suffix-dict [self]
-    (dict :HP self.hp))
+  (defmeth suffix-dict []
+    (dict :HP @hp))
 
-  (defn info-bullets [self #* extra]
+  (defmeth info-bullets [#* extra]
     (defn damage-array [damage]
       (if (isinstance damage tuple)
         (.join " / " (gfor
           d damage
-          (if (= d (damage-by-hp self damage))
+          (if (= d (damage-by-hp @ damage))
             f"[{d}]"
             (str d))))
         damage))
 
     [
-      #("Hit points" self.hp)
-      (if self.immune
-        #("Immune to" (.join ", " (gfor  x self.immune  x.value)))
+      #("Hit points" @hp)
+      (if @immune
+        #("Immune to" (.join ", " (gfor  x @immune  x.value)))
         "No immunities")
-      (when self.resists
-        #("Takes no more than 1 damage from" (.join ", " (gfor  x self.resists  x.value))))
-      (when self.weaknesses
-        #("Instantly destroyed by" (.join ", " (gfor  x self.weaknesses  x.value))))
-      (if self.damage-melee
-        #("Melee damage" (damage-array self.damage-melee))
+      (when @resists
+        #("Takes no more than 1 damage from" (.join ", " (gfor  x @resists  x.value))))
+      (when @weaknesses
+        #("Instantly destroyed by" (.join ", " (gfor  x @weaknesses  x.value))))
+      (if @damage-melee
+        #("Melee damage" (damage-array @damage-melee))
         "No melee attack")
-      (if self.damage-shot
-        #("Shot damage" (damage-array self.damage-shot))
+      (if @damage-shot
+        #("Shot damage" (damage-array @damage-shot))
         "No ranged attack")
-      (when self.shot-range
-        #("Shot range" self.shot-range))
-      (when self.kamikaze
+      (when @shot-range
+        #("Shot range" @shot-range))
+      (when @kamikaze
         #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
-      (when self.sees-invisible
+      (when @sees-invisible
         #("Invisibility detection" "The monster is unaffected by you being invisible."))
-      (unless (= self.hook-destroyed.__doc__ Tile.hook-destroyed.__doc__)
-        #("Effect on death" self.hook-destroyed.__doc__))
+      (unless (= @hook-destroyed.__doc__ Tile.hook-destroyed.__doc__)
+        #("Effect on death" @hook-destroyed.__doc__))
       #* extra
       #("Point value" (.format "{:,}{}"
-        self.points
-        (if self.score-for-damaging " (scored per HP lost)" "")))
+        @points
+        (if @score-for-damaging " (scored per HP lost)" "")))
       #("Behavior" (or
-        self.act.__doc__
-        (self.act.dynadoc self)))
-      #("Movement state" self.movement-state)]))
+        @act.__doc__
+        (@act.dynadoc @)))
+      #("Movement state" @movement-state)]))
 
 (defn damage-by-hp [monster damage]
   (if (isinstance damage tuple)
@@ -324,42 +324,42 @@
       ; A per-turn accumulator of `summon-frequency`.
   :mutable-slots #("summon_power")
 
-  :mapsym (property (fn [self]
+  :mapsym (property (meth []
     (+ "☉" (self-sc mapsym [0]))))
-  :points (property (fn [self]
+  :points (property (meth []
     (self-sc (points-for-generator))))
 
-  :score-for-damaging (property (fn [self]
+  :score-for-damaging (property (meth []
     (self-sc score-for-damaging)))
-  :immune (property (fn [self]
+  :immune (property (meth []
     (setv x (self-sc immune))
     (+ x (if (in Poison x) #() #(Poison)))))
 
-  :full-name (property (fn [self]
+  :full-name (property (meth []
     (setv sc (self-sc))
     (.format "{}{} {}"
       (if sc.article (+ sc.article " ") "")
       (.replace sc.stem " " "-")
-      (Tile.full-name.fget self))))
-  :suffix-dict (fn [self]
+      (Tile.full-name.fget @))))
+  :suffix-dict (meth []
     (dict
-      :HP self.hp
-      :pw (mixed-number self.summon-power)
-      :freq (mixed-number self.summon-frequency)
-      :sHP self.summon-hp))
-  :info-bullets (fn [self #* extra]
-    (Monster.info-bullets self
-      #("Summoning power" (mixed-number self.summon-power))
-      #("Summoning frequency" (mixed-number self.summon-frequency))
-      #("Type of summoned monsters" self.summon-class)
-      #("Hit points of summoned monsters" self.summon-hp)
+      :HP @hp
+      :pw (mixed-number @summon-power)
+      :freq (mixed-number @summon-frequency)
+      :sHP @summon-hp))
+  :info-bullets (meth [#* extra]
+    (Monster.info-bullets @
+      #("Summoning power" (mixed-number @summon-power))
+      #("Summoning frequency" (mixed-number @summon-frequency))
+      #("Type of summoned monsters" @summon-class)
+      #("Hit points of summoned monsters" @summon-hp)
       #* extra))
 
-  :act (fn [self]
+  :act (meth []
     "Generate — The generator adds its summon frequency to its summon power. If the total is more than 1, the integer part is removed and a corresponding number of monsters are generated in adjacent empty squares. If there are no adjacent empty squares, the expended summon power is wasted. The square that the generator attempts to target rotates through the compass with each summon or failed attempt."
-    (summon self self.summon-class self.summon-hp "movement_state"))
+    (summon @ @summon-class @summon-hp "movement_state"))
 
-  :flavor (property (fn [self]
+  :flavor (property (meth []
     (self-sc flavor-for-generator))))
 
 (defn defgenerated [
@@ -494,24 +494,24 @@
   :mutable-slots #("shot_power" "wander_state")
 
   :damage-shot #(1 2 3)
-  :act (fn-dd [self]
+  :act (meth []
     (doc f"Coward — If the monster is within {imp-flee-range} squares of you, it flees (per `Approach` in reverse). Otherwise, if it has line of sight to you (ignoring all obstacles) it adds {imp-shot-charge} to its shot power. If this is ≥1, it subtracts 1 to shoot you. Otherwise, it wanders (per `Wander`).")
 
     (when (and
-        (<= (dist G.player.pos self.pos) imp-flee-range)
-        (not (player-invisible-to self)))
-      (return (approach self :reverse T :implicit-attack F)))
-    (when (try-to-attack-player self :dry-run T :shots-ignore-obstacles T)
-      (+= self.shot-power imp-shot-charge)
-      (when (pop-integer-part self.shot-power)
-        (try-to-attack-player self :shots-ignore-obstacles T)
+        (<= (dist G.player.pos @pos) imp-flee-range)
+        (not (player-invisible-to @)))
+      (return (approach @ :reverse T :implicit-attack F)))
+    (when (try-to-attack-player @ :dry-run T :shots-ignore-obstacles T)
+      (+= @shot-power imp-shot-charge)
+      (when (pop-integer-part @.shot-power)
+        (try-to-attack-player @ :shots-ignore-obstacles T)
         (return)))
-    (wander self "wander_state" :implicit-attack F))
+    (wander @ "wander_state" :implicit-attack F))
 
-  :info-bullets (fn [self #* extra]
-    (Generated.info-bullets self
-      #("Shot power" self.shot-power)
-      #("Wandering state" self.wander-state)))
+  :info-bullets (meth [#* extra]
+    (Generated.info-bullets @
+      #("Shot power" @shot-power)
+      #("Wandering state" @wander-state)))
 
   :flavor-mon #[[Weak but incredibly annoying, this snickering little fiend is called a "lobber" in the tongue of the ancients. It throws hellstones, cursed missiles that can pierce most any obstacle. In close quarters, it resorts to cowering helplessly and begging for mercy, but, being a literal demon, it has no compunctions about getting right back to firing at you the moment it feels safe.]]
   :flavor-gen "They don't make ziggurats like they used to.")
@@ -582,19 +582,19 @@
   :shot-range 1
   :kamikaze T
 
-  :act (fn-dd [self]
+  :act (meth []
     (doc f"Float — If you're adjacent, increases your floater disturbance by {floater-disturbance-increment}. If your floater disturbance reaches 1, it's cleared and the monster attacks. Otherwise, the monster wanders per `Wander`.")
-    (when (adjacent? self.pos G.player.pos)
+    (when (adjacent? @pos G.player.pos)
       (+= G.player.floater-disturbance floater-disturbance-increment)
       (when (pop-integer-part G.player.floater-disturbance)
-        (setv self.kamikazed T)
-        (return (try-to-attack-player self))))
-    (wander self :implicit-attack F))
+        (setv @kamikazed T)
+        (return (try-to-attack-player @))))
+    (wander @ :implicit-attack F))
 
-  :hook-destroyed (fn [self pos]
+  :hook-destroyed (meth [pos]
     "The monster can attempt a free attack, unless it killed itself by kamikaze."
-    (unless self.kamikazed
-      (try-to-attack-player self :from-pos pos)))
+    (unless @kamikazed
+      (try-to-attack-player @ :from-pos pos)))
 
   :flavor "A giant aerial jellyfish, kept aloft by a foul-smelling and highly reactive gas. It doesn't fly so much as float about in the dungeon drafts. If disturbed, it readily explodes, and its explosions have the remarkable property of harming you and nobody else.")
 (setv floater-disturbance-increment (f/ 1 5))
@@ -611,22 +611,22 @@
   :damage-melee 6
   :summon-frequency (f/ 1 10)
 
-  :info-bullets (fn [self #* extra]
-    (NonGen.info-bullets self
-      #("Summoning power" (mixed-number self.summon-power))
-      #("Summoning direction" self.summon-direction)
+  :info-bullets (meth [#* extra]
+    (NonGen.info-bullets @
+      #("Summoning power" (mixed-number @summon-power))
+      #("Summoning direction" @summon-direction)
       #* extra))
 
-  :act (fn-dd [self]
-    (doc f"If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {it.summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
-    (when (try-to-attack-player self)
+  :act (meth []
+    (doc f"If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {@summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
+    (when (try-to-attack-player @)
       (return))
     (when (and
-        (> self.hp 1)
-        (summon self "blob" (// self.hp 2)))
-      (-= self.hp (// self.hp 2))
+        (> @hp 1)
+        (summon @ "blob" (// @hp 2)))
+      (-= @hp (// @hp 2))
       (return))
-    (wander self :implicit-attack F))
+    (wander @ :implicit-attack F))
 
   :flavor "What looks like a big mobile puddle of slime is actually a man-sized amoeba. It retains the ability to divide (but not, fortunately, to grow), and its lack of distinct internal anatomy makes arrows pretty useless. It has just enough intelligence to notice that you're standing next to it and try to envelop you in its gloppy bulk.")
 
@@ -638,11 +638,11 @@
   :damage-melee 15
   :sees-invisible T
 
-  :act (fn [self]
+  :act (meth []
      "Try to attack or approach per `Approach`. If that fails, try moving with a variation of `Approach` that allows skipping one intermediate tile."
      (or
-       (approach self :advance-movement-state F)
-       (approach self :implicit-attack F :jump T)))
+       (approach @ :advance-movement-state F)
+       (approach @ :implicit-attack F :jump T)))
 
   :flavor "Yet another evil undead phantasm. This one's a real piece of work: it has a powerful heat-drain attack and the ability to teleport past obstacles.")
 
@@ -656,18 +656,18 @@
 
   :damage-melee 10
 
-  :act (fn-dd [self]
+  :act (meth []
     (doc f"If the monster is within {spider-approach-range} squares of you, it approaches (per `Approach`). Otherwise, it wanders (per `Wander`). In both cases, it can move through webs, and it creates a web on its square afterwards if no web is there already.")
     ; Move or attack.
     (if (and
-        (<= (dist G.player.pos self.pos) spider-approach-range)
-        (not (player-invisible-to self)))
-      (approach self :ethereal-to ["web"])
-      (wander self "wander_state" :ethereal-to ["web"]))
+        (<= (dist G.player.pos @pos) spider-approach-range)
+        (not (player-invisible-to @)))
+      (approach @ :ethereal-to ["web"])
+      (wander @ "wander_state" :ethereal-to ["web"]))
     ; Spin a web in our new position, if there isn't one there
     ; already.
-    (unless (any (gfor  tile (at self.pos)  (= tile.stem "web")))
-      (add-tile self.pos "web" :stack-ix (+ 1 (.index (at self.pos) self)))))
+    (unless (any (gfor  tile (at @pos)  (= tile.stem "web")))
+      (add-tile @pos "web" :stack-ix (+ 1 (.index (at @pos) @)))))
 
   :flavor "This eight-legged beastie has powerful jaws, high-speed spinnerets, and the mark of a white skull embedded in the brown fur of its big fat abdomen. It's definitely giant and ambiguously intelligent, but not friendly or talkative.")
 (setv spider-approach-range 2)

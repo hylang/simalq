@@ -1,6 +1,6 @@
 (require
   hyrule [unless]
-  simalq.macros [slot-defaults])
+  simalq.macros [slot-defaults defmeth])
 (import
   copy [deepcopy]
   fractions [Fraction :as f/])
@@ -30,45 +30,45 @@
   ; For convenience, attributes of `GameState` can be treated as
   ; attributes of `Global`. Such access is passed through to the
   ; current state.
-  (defn __getattr__ [self name]
+  (defmeth __getattr__ [name]
     (if (in name (+ GameState.__slots__ HydratedGameState.__slots__))
-      (getattr self.state name)
-      (object.__getattribute__ self name)))
-  (defn __setattr__ [self name value]
+      (getattr @state name)
+      (object.__getattribute__ @ name)))
+  (defmeth __setattr__ [name value]
     (if (in name (+ GameState.__slots__ HydratedGameState.__slots__))
-      (setattr self.state name value)
-      (object.__setattr__ self name value)))
+      (setattr @state name value)
+      (object.__setattr__ @ name value)))
 
-  (defn [property] map [self]
-    (. self state level map))
+  (defmeth [property] map []
+    @state.level.map)
 
-  (defn initialize-states [self]
+  (defmeth initialize-states []
     "Clear `GameState` attributes and start fresh. `rules` should
     already be set."
 
-    (setv self.state (HydratedGameState :action None))
+    (setv @state (HydratedGameState :action None))
     (for [[k v] (.items HydratedGameState.slot-defaults)]
-      (setattr self.state k (deepcopy v)))
-    (setv self.states [])
-    (setv self.state-i None))
+      (setattr @state k (deepcopy v)))
+    (setv @states [])
+    (setv @state-i None))
 
-  (defn advance-states [self]
+  (defmeth advance-states []
     "Increment the state counter and save the current state to the
     history."
 
-    (if (is self.state-i None)
-      (setv self.state-i 0)
-      (+= self.state-i 1))
+    (if (is @state-i None)
+      (setv @state-i 0)
+      (+= @state-i 1))
     (defn copy-state []
-      (if (% self.state-i self.rules.state-dehydration-factor)
-        (DehydratedGameState :action self.state.action)
-        (deepcopy self.state)))
+      (if (% @state-i @rules.state-dehydration-factor)
+        (DehydratedGameState :action @state.action)
+        (deepcopy @state)))
     (cond
-      (= self.state-i (len self.states))
+      (= @state-i (len @states))
         ; We're at the end of the undo history, so append a copy of
         ; the new state.
-        (.append self.states (copy-state))
-      (= (. self.states [self.state-i] action) self.state.action)
+        (.append @states (copy-state))
+      (= (. @states [@state-i] action) @state.action)
         ; We should effectively be redoing this state, since it's the
         ; same action as last time and the game is deterministic.
         ; Keep the remaining history for further redoing.
@@ -77,15 +77,15 @@
         ; We're branching off in a new direction. Discard the now-
         ; obsolete redo history. (We don't support a full-blown tree
         ; of states, just a timeline.)
-        (setv (cut self.states self.state-i None) [(copy-state)])))
+        (setv (cut @states @state-i None) [(copy-state)])))
 
-  (defn set-state-i [self target-i]
+  (defmeth set-state-i [target-i]
     "Undo or redo to a given index in the state history."
 
     (import
       simalq.main [suppress-display take-turn])
 
-    (unless (chainc 0 <= target-i < (len self.states))
+    (unless (chainc 0 <= target-i < (len @states))
       (raise (ValueError f"Illegal state index {target-i}")))
 
     ; Search for the most recent hydrated game state before the target
@@ -93,15 +93,15 @@
     ; hydrated.
     (setv last-hydrated-i (next (gfor
       i (range target-i -1 -1)
-      :if (isinstance (get self.states i) HydratedGameState)
+      :if (isinstance (get @states i) HydratedGameState)
       i)))
     ; Run the whole game (with display turned off) from the hydrated
     ; state to the target state.
-    (setv self.state-i last-hydrated-i)
-    (setv self.state (deepcopy (get self.states self.state-i)))
+    (setv @state-i last-hydrated-i)
+    (setv @state (deepcopy (get @states @state-i)))
     (with [(suppress-display)]
       (for [i (range (+ last-hydrated-i 1) (+ target-i 1))]
-        (take-turn (. self.states [i] action))))))
+        (take-turn (. @states [i] action))))))
 
 
 (setv G (Global))
@@ -118,8 +118,8 @@
       ; The player's `Action` that produced this game state from the
       ; previous one. It's `None` only for the initial state.
 
-  (defn __init__ [self action]
-    (setv self.action action)))
+  (defmeth __init__ [action]
+    (setv @action action)))
 
 (defclass HydratedGameState [GameState]
   "A fully elaborated game state."

@@ -1,3 +1,5 @@
+(require
+  simalq.macros [meth])
 (import
   dataclasses [dataclass]
   simalq.tile [Tile])
@@ -93,9 +95,9 @@
     #(UnimplementedTile)
     (dict
       :__slots__ ["tile_extras"]
-      :__init__ (fn [self * pos [tile-extras None]]
-        (object.__setattr__ self "pos" pos)
-        (object.__setattr__ self "tile_extras" tile-extras))
+      :__init__ (meth [* pos [tile-extras None]]
+        (object.__setattr__ @ "pos" pos)
+        (object.__setattr__ @ "tile_extras" tile-extras))
       :stem stem
       :read-tile-extras (classmethod (fn [cls mk-pos a b]
         (dict :tile-extras #(a b)))))))

@@ -2,7 +2,7 @@
 
 (require
   hyrule [unless]
-  simalq.macros [pop-integer-part])
+  simalq.macros [pop-integer-part defmeth])
 (import
   os
   pathlib [Path]
@@ -134,8 +134,8 @@
     Pois  "poisonous touch"
     MKey  "magical key"
     Prot  "protection")
-  (defn [property] bad [self]
-    (in self [StatusEffect.Para StatusEffect.Weak])))
+  (defmeth [property] bad []
+    (in @ [StatusEffect.Para StatusEffect.Weak])))
 
 (defn player-status [abbreviation]
   "Does the player have the given status effect?"

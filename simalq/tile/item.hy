@@ -1,5 +1,5 @@
 (require
-  simalq.macros [defn-dd fn-dd unless])
+  simalq.macros [unless meth defmeth])
 (import
   simalq.strings
   simalq.util [CommandError]
@@ -18,24 +18,24 @@
     __slots__ []
     destroy-after-pickup T)
 
-  (defn hook-player-walked-into [self]
-    (+= G.score self.points)
-    (.pick-up self)
-    (when self.destroy-after-pickup
-      (destroy-tile self)))
-  (defn pick-up [self])
+  (defmeth hook-player-walked-into []
+    (+= G.score @points)
+    (@pick-up)
+    (when @destroy-after-pickup
+      (destroy-tile @)))
+  (defmeth pick-up [])
 
-  (defn info-bullets [self #* extra] [
-    #("Point value" (format self.points ","))
-    (when (is-not (. (type self) pick-up) Item.pick-up)
+  (defmeth info-bullets [#* extra] [
+    #("Point value" (format @points ","))
+    (when (is-not (. (type @) pick-up) Item.pick-up)
       #("Pickup effect" (or
-        self.pick-up.__doc__
-        (self.pick-up.dynadoc self))))
+        @pick-up.__doc__
+        (@pick-up.dynadoc @))))
     #* extra
-    (when self.hook-player-shot
+    (when @hook-player-shot
       #("Effect when you shoot it" (or
-        self.hook-player-shot.__doc__
-        (self.hook-player-shot.dynadoc self))))]))
+        @hook-player-shot.__doc__
+        (@hook-player-shot.dynadoc @))))]))
 
 
 (deftile Item "$ " "a lump of fool's gold"
@@ -82,37 +82,37 @@
     waste-message None)
       ; A message for when you eat the food but it has no effect.
 
-  (defn hook-player-shot [self]
+  (defmeth hook-player-shot []
     "The item is destroyed."
-    (destroy-tile self)
+    (destroy-tile @)
     (msg "Someone shot the food."))
 
-  (defn-dd pick-up [self]
+  (defmeth pick-up []
     (doc (cond
-      it.hp-set-min
-        f"Sets your hit points to at least {(refactor-hp it.hp-set-min)}. If you already have that many, the effect is wasted."
-      (< it.hp-effect 0)
-        f"Deals {(- it.hp-effect)} poison damage to you."
+      @hp-set-min
+        f"Sets your hit points to at least {(refactor-hp @hp-set-min)}. If you already have that many, the effect is wasted."
+      (< @hp-effect 0)
+        f"Deals {(- @hp-effect)} poison damage to you."
       T
-        f"Grants {(refactor-hp it.hp-effect)} hit points."))
+        f"Grants {(refactor-hp @hp-effect)} hit points."))
     (msg (if
       (and
-        self.hp-set-min
-        (>= G.player.hp (refactor-hp self.hp-set-min)))
-      self.waste-message
-      (get self.eat-messages (%
+        @hp-set-min
+        (>= G.player.hp (refactor-hp @hp-set-min)))
+      @waste-message
+      (get @eat-messages (%
         ; Food at the same position on the same level number will have
         ; the same message. Nearby pieces of food will typically have
         ; different messages.
-        (pos-seed self.pos)
-        (len self.eat-messages)))))
+        (pos-seed @pos)
+        (len @eat-messages)))))
     (cond
-      self.hp-set-min
-        (setv G.player.hp (max (refactor-hp self.hp-set-min) G.player.hp))
-      (< self.hp-effect 0)
-        (hurt-player (- self.hp-effect) DamageType.Poison)
+      @hp-set-min
+        (setv G.player.hp (max (refactor-hp @hp-set-min) G.player.hp))
+      (< @hp-effect 0)
+        (hurt-player (- @hp-effect) DamageType.Poison)
       T
-        (+= G.player.hp (refactor-hp self.hp-effect)))))
+        (+= G.player.hp (refactor-hp @hp-effect)))))
 
 (setv (get Tile.types-by-iq-ix 21) (fn [pos _ te-v2]
   ; IQ's three types of unknown potion are mapped to items with fixed
@@ -181,15 +181,15 @@
   :hp-effect -50
   :eat-messages #("You drink a jar of poison. It tastes pretty bad.")
 
-  :hook-player-shot (fn-dd [self]
+  :hook-player-shot (meth []
     (doc #[f[Explodes in a size-{(get poison-burst "size")} burst of poison, which does {(get poison-burst "dmg_monster")} poison damage to monsters and {(get poison-burst "dmg_player")} to you.]f])
-    (burst-damage self.pos :damage-type DamageType.Poison
+    (burst-damage @pos :damage-type DamageType.Poison
       :amount (*
         [(get poison-burst "dmg_monster")]
         (+ 1 (get poison-burst "size")))
       :color 'moss-green
       :player-amount (get poison-burst "dmg_player"))
-    (destroy-tile self))
+    (destroy-tile @))
 
   :flavor "I think you're not supposed to drink this.")
 (setv poison-burst (dict
@@ -202,11 +202,11 @@
   :iq-ix 19
   :points 50
 
-  :hook-player-walk-to (fn [self origin]
+  :hook-player-walk-to (meth [origin]
     (when (>= G.player.keys G.rules.max-keys)
       (raise (CommandError "Your keyring has no room for another key."))))
 
-  :pick-up (fn-dd [self]
+  :pick-up (meth []
     (doc f"Adds to your count of keys. If you're at the maximum number
       of keys ({G.rules.max-keys}), you can't step on its square.")
     (+= G.player.keys 1)
@@ -220,7 +220,7 @@
   :iq-ix 27
   :points 100
 
-  :pick-up (fn-dd [self]
+  :pick-up (meth []
     (doc f"Gives you {G.rules.magic-arrows-pickup-size} magic arrows. Magic arrows are fired in place of regular arrows. They do {G.rules.player-shot-damage-magic} damage, and hurt some monsters that are immune to mundane arrows. If a magic arrow destroys a monster or object, it continues on its path and can keep doing damage.")
     (+= G.player.magic-arrows G.rules.magic-arrows-pickup-size))
 
@@ -233,7 +233,7 @@
     ; to get a non-emoji hourglass.
   :points 0
 
-  :pick-up (fn-dd [self]
+  :pick-up (meth []
     (doc f"Adds {G.rules.time-bonus} turns to the current time limit.")
     (+= G.time-left G.rules.time-bonus))
 
@@ -246,14 +246,14 @@
     effect None
     duration None)
 
-  (defn help [self])
+  (defmeth help [])
 
-  (defn-dd pick-up [self]
+  (defmeth pick-up []
     (doc (.help it))
     (+=
       (get G.player.status-effects
-        (getattr StatusEffect (str self.effect)))
-      self.duration)))
+        (getattr StatusEffect (str @effect)))
+      @duration)))
 
 (deftile StatusEffectItem "! " "an amulet of invulnerability"
   :color 'dark-yellow
@@ -263,8 +263,8 @@
   :effect 'Ivln
   :duration 20
 
-  :help (fn [self]
-    f"Makes you invulnerable for {self.duration} more turns, protecting you from all damage and ambient poison, but not harmful status effects or disenchantment.")
+  :help (meth []
+    f"Makes you invulnerable for {@duration} more turns, protecting you from all damage and ambient poison, but not harmful status effects or disenchantment.")
   :flavor "A star-shaped pendant with two black spots in the center. Its magic is short-lived but potent indeed.")
 
 (deftile StatusEffectItem "! " "a potion of speed"
@@ -275,8 +275,8 @@
   :effect 'Fast
   :duration 10
 
-  :help (fn [self]
-    f"Lets you act twice per turn for {self.duration} more turns.")
+  :help (meth []
+    f"Lets you act twice per turn for {@duration} more turns.")
   :flavor "This cool concoction puts a pep in your step and a swiftness in your sword-swings.")
 
 (deftile StatusEffectItem "! " "a cloak of invisibility"
@@ -287,8 +287,8 @@
   :effect 'Ivis
   :duration 25
 
-  :help (fn [self]
-    f"Makes you invisible for {self.duration} more turns. Most monsters can't track or shoot you while you're invisible, unless you're adjacent to them.")
+  :help (meth []
+    f"Makes you invisible for {@duration} more turns. Most monsters can't track or shoot you while you're invisible, unless you're adjacent to them.")
   :flavor "A cape enchanted with the power of the night sky. Try not to get it snagged on any loose flagstones (especially when it's invisible).")
 
 
@@ -303,31 +303,31 @@
       ; Whether the item should be used with a target. The argument
       ; `target` is provided to `use` only if this is true.
 
-  (defn hook-player-walk-to [self origin]
+  (defmeth hook-player-walk-to [origin]
     (unless (any (gfor  x G.player.inventory  (is x None)))
       (raise (CommandError "Your inventory is full."))))
 
-  (defn-dd pick-up [self]
+  (defmeth pick-up []
     (doc f"Adds the item to your inventory. If you're at the maximum number
       of usable items ({G.rules.max-usables}), you can't step on its square.")
-    (rm-tile self)
+    (rm-tile @)
     (setv
       (get G.player.inventory (next (gfor
         [ix item] (enumerate G.player.inventory)
         :if (is item None)
         ix)))
-      self))
+      @))
 
-  (defn use [self target]
+  (defmeth use [target]
     "Called when the player applies the item for use. The caller
     will destroy the item afterwards."
     (raise NotImplementedError))
 
-  (defn info-bullets [self #* extra]
+  (defmeth info-bullets [#* extra]
     (.info-bullets (super)
-      #(f"Effect when applied ({(if self.targeted "" "un")}targeted)" (or
-        self.use.__doc__
-        (self.use.dynadoc self)))
+      #(f"Effect when applied ({(if @targeted "" "un")}targeted)" (or
+        @use.__doc__
+        (@use.dynadoc @)))
       #* extra)))
 
 (deftile Usable "/ " "a wand of nothing"
@@ -335,7 +335,7 @@
   :points 50
 
   :targeted F
-  :use (fn [self]
+  :use (meth []
     "Does nothing."
     (msg (get simalq.strings.wand-of-nothing-messages (%
       (turn-and-pos-seed G.player.pos)
@@ -349,7 +349,7 @@
   :points 100
 
   :targeted F
-  :use (fn [self]
+  :use (meth []
     "Creates a magical energy shield in each square adjacent to you. These shield tiles block monsters and their shots, but not you or your shots."
     (for [p (burst G.player.pos 1 :exclude-center T)]
       (add-tile p "magical energy shield")))
@@ -361,7 +361,7 @@
   :iq-ix 33
   :points 150
 
-  :use (fn [self target]
+  :use (meth [target]
     "Creates one tile of ordinary wall."
     (add-tile target "wall"))
 
@@ -372,7 +372,7 @@
   :iq-ix 32
   :points 150
 
-  :use (fn [self target]
+  :use (meth [target]
     "Destroys one tile of wall, or other scenery types noted as destructible with a passwall wand."
     (for [tile (at target)]
       (when (and (isinstance tile Scenery) tile.destructible-by-passwall-wand)
@@ -389,19 +389,19 @@
     use-blast-damage None
     shot-blast-damage None)
 
-  (defn bomb-burst [self target amount]
+  (defmeth bomb-burst [target amount]
     (burst-damage target :damage-type DamageType.Fire
       :amount amount
       :color 'orange))
 
-  (defn-dd use [self target]
-    (doc f"Explodes in a size-{(- (len it.use-blast-damage) 1)} burst of fire, damaging monsters according to their distance from the center. The amounts of damage at the center and each successive distance are: {(.join ", " (map str it.use-blast-damage))}. You take no damage.")
-    (.bomb-burst self target self.use-blast-damage))
+  (defmeth use [target]
+    (doc f"Explodes in a size-{(- (len @use-blast-damage) 1)} burst of fire, damaging monsters according to their distance from the center. The amounts of damage at the center and each successive distance are: {(.join ", " (map str @use-blast-damage))}. You take no damage.")
+    (@bomb-burst target @use-blast-damage))
 
-  (defn-dd hook-player-shot [self]
-    (doc f"Explodes in a weaker size-{(- (len it.shot-blast-damage) 1)} burst, with these damages: {(.join ", " (map str it.shot-blast-damage))}.")
-    (.bomb-burst self self.pos self.shot-blast-damage)
-    (destroy-tile self)))
+  (defmeth hook-player-shot []
+    (doc f"Explodes in a weaker size-{(- (len @shot-blast-damage) 1)} burst, with these damages: {(.join ", " (map str @shot-blast-damage))}.")
+    (@bomb-burst @pos @shot-blast-damage)
+    (destroy-tile @)))
 
 (deftile FireBomb "0 " "a standard bomb"
   :color 'dark-green
@@ -439,17 +439,17 @@
     __slots__ []
     color-bg 'magenta)
 
-  (defn help [self])
+  (defmeth help [])
 
-  (defn-dd pick-up [self]
-    (doc (.help it))
-    (setv (get G.player.artifacts self.stem) T)))
+  (defmeth pick-up []
+    (doc (@help))
+    (setv (get G.player.artifacts @stem) T)))
 
 (deftile Artifact "[ " "the Magic Shield"
   :iq-ix 28
   :points 3,000
 
-  :help (fn [self]
+  :help (meth []
     f"Permanently reduces all damage from monsters' attacks to {G.rules.artifact-shield-factor} the normal value, rounded up. Damage from other sources is unaffected.")
   :flavor "The best defense is a good defense.")
 
@@ -457,7 +457,7 @@
   :iq-ix 29
   :points 4,000
 
-  :help (fn [self]
+  :help (meth []
     f"Permanently increases your shot damage (with mundane arrows) to {G.rules.player-shot-damage-artifact}.")
   :flavor "A mighty weapon carved from sacred wood in the realm of maple syrup and free healthcare.")
 
@@ -465,6 +465,6 @@
   :iq-ix 30
   :points 5,000
 
-  :help (fn [self]
+  :help (meth []
     f"Permanently increases your melee damage to {G.rules.player-melee-damage-artifact}.")
   :flavor "A weapon blessed by the vaguely defined divine personages that may or may not watch over you. What it lacks in lore, in makes up for in murderyness.\n\n    I came not to send peace, but a sword.")

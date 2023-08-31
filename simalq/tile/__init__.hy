@@ -1,6 +1,6 @@
 (require
   hyrule [unless]
-  simalq.macros [slot-defaults])
+  simalq.macros [slot-defaults defmeth])
 (import
   copy [deepcopy]
   re
@@ -19,38 +19,38 @@
   (setv types {})
   (setv types-by-iq-ix {})
 
-  (defn __init__ [self #** kwargs]
+  (defmeth __init__ [#** kwargs]
     ; - Each keyword argument must match a slot.
     ; - All subclasses must set `__slots__` (if only to an empty list).
     ; - No slot named may be used twice in a single inheritance chain.
-    (for [[cls slot] (.all-slots self)]
-       (object.__setattr__ self slot
+    (for [[cls slot] (@all-slots)]
+       (object.__setattr__ @ slot
          (if (in slot kwargs)
            (.pop kwargs slot)
            (deepcopy (get cls.slot-defaults slot)))))
     (when kwargs
       (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}")))
-    (when self.each-turn
-      (.append G.each-turn self)))
+    (when @each-turn
+      (.append G.each-turn @)))
 
-  (defn __setattr__ [self name value]
-    (if (in name (.all-mutable-slots self))
-      (object.__setattr__ self name value)
-      (raise (AttributeError f"Tried to set attribute {name !r} on an instance of {(type self) !r}. Use `object.__setattr__` if you really mean it."))))
+  (defmeth __setattr__ [name value]
+    (if (in name (@all-mutable-slots))
+      (object.__setattr__ @ name value)
+      (raise (AttributeError f"Tried to set attribute {name !r} on an instance of {(type @) !r}. Use `object.__setattr__` if you really mean it."))))
 
-  (defn __deepcopy__ [self memo]
+  (defmeth __deepcopy__ [memo]
     ; We provide this to avoid triggering `__setattr__` in `deepcopy`.
-    (setv t (.__new__ self (type self)))
-    (for [[_ slot] (.all-slots self)]
-      (object.__setattr__ t slot (deepcopy (getattr self slot) memo)))
+    (setv t (@__new__ (type @)))
+    (for [[_ slot] (@all-slots)]
+      (object.__setattr__ t slot (deepcopy (getattr @ slot) memo)))
     t)
 
-  (defn __setstate__ [self state]
+  (defmeth __setstate__ [state]
     ; We provide this to avoid triggering `__setattr__` in
     ; `pickle.load`.
     (setv [_ slot-dict] state)
     (for [[k v] (.items slot-dict)]
-      (object.__setattr__ self k v)))
+      (object.__setattr__ @ k v)))
 
   (defn [classmethod] all-slots [cls]
     (lfor
@@ -68,9 +68,9 @@
   (defn [classmethod property] name-with-article [cls]
     (+ (if cls.article (+ cls.article " ") "") cls.stem))
 
-  (defn [property] full-name [self]
-    (setv suffix-items (.items (.suffix-dict self)))
-    (+ self.name-with-article (if suffix-items
+  (defmeth [property] full-name []
+    (setv suffix-items (.items (@suffix-dict)))
+    (+ @name-with-article (if suffix-items
       (.format " ({})" (.join ", " (gfor
         [k v] suffix-items
         f"{k} {v}")))
@@ -146,29 +146,29 @@
     to set for a new instance."
     (raise (TypeError (+ "Tile extras not implemented: " cls.stem))))
 
-  (defn suffix-dict [self]
+  (defmeth suffix-dict []
     "Return a dictionary of things to append to the full name of the
     tile"
     {})
 
-  (defn info-bullets [self]
+  (defmeth info-bullets []
     "Return a list of bulleted items for an info screen. `None`s
     in this list will be filtered out by the caller."
     [])
 
-  (defn hook-player-bump [self origin]
+  (defmeth hook-player-bump [origin]
     "Called when the player tries to walk towards this tile. Return
     true to end her turn."
     None)
-  (defn hook-player-walk-from [self target]
+  (defmeth hook-player-walk-from [target]
     "Called when the player is about to walk from a square containing
     this tile. The hook shouldn't change the game state, but it can
     raise CommandError to halt the movement."
     None)
-  (defn hook-player-walk-to [self origin]
+  (defmeth hook-player-walk-to [origin]
     "Analogous to `Tile.hook-player-walk-from`."
     None)
-  (defn hook-player-walked-into [self]
+  (defmeth hook-player-walked-into []
     "Called when the player successfully walks into this tile. Return
     true to end her turn."
     None)
@@ -178,7 +178,7 @@
     ; further processing of this arrow against this tile will stop
     ; after the hook is called. (A magic arrow might still keep going
     ; to other tiles.)
-  (defn hook-destroyed [self pos]
+  (defmeth hook-destroyed [pos]
     "Called when the tile is destroyed by damage. The tile has already
     been removed, but its previous position is given by `pos`."
     None))
@@ -306,14 +306,14 @@
     last-acted None)
   (setv mutable-slots #("last_acted"))
 
-  (defn maybe-act [self]
+  (defmeth maybe-act []
     "Act, if we haven't already acted this turn."
-    (when (or (is self.last-acted None) (< self.last-acted G.turn-n))
-      (.act self)
-      (setv self.last-acted G.turn-n)))
+    (when (or (is @last-acted None) (< @last-acted G.turn-n))
+      (@act)
+      (setv @last-acted G.turn-n)))
 
-  (defn act [self]
-    (raise (TypeError f"No `act` method defined for actor {(type self)}"))))
+  (defmeth act []
+    (raise (TypeError f"No `act` method defined for actor {(type @)}"))))
 
 
 (import

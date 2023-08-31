@@ -1,6 +1,6 @@
 (require
   hyrule [unless]
-  simalq.macros [defn-dd fn-dd])
+  simalq.macros [defmeth meth])
 (import
   simalq.color :as color
   simalq.util [CommandError player-melee-damage DamageType next-in-cycle StatusEffect hurt-player]
@@ -25,52 +25,52 @@
     protects-vs-poison-air F
     emits-poison-air F)
 
-  (defn dod [self prefix attr-sym]
-    (setv m (getattr (type self) (hy.mangle attr-sym)))
+  (defmeth dod [prefix attr-sym]
+    (setv m (getattr (type @) (hy.mangle attr-sym)))
     (setv r None)
     (when (is-not m (getattr Tile (hy.mangle attr-sym)))
       (setv r (if (hasattr m "dynadoc")
-        (.dynadoc m self)
+        (.dynadoc m @)
         m.__doc__)))
     (when r
       #(prefix r)))
 
-  (defn info-bullets [self #* extra]
-    (setv blocks-monster (or self.blocks-monster self.blocks-move))
+  (defmeth info-bullets [#* extra]
+    (setv blocks-monster (or @blocks-monster @blocks-move))
     [
-      (when self.damageable
-        #("Hit points" self.hp))
-      (when self.damageable
-        (if self.immune
-          #("Immune to" (.join ", " (gfor  x self.immune  x.value)))
+      (when @damageable
+        #("Hit points" @hp))
+      (when @damageable
+        (if @immune
+          #("Immune to" (.join ", " (gfor  x @immune  x.value)))
           "No immunities"))
-      (when self.blocks-move
+      (when @blocks-move
         "Blocks all movement")
       (when (and
-          (not self.blocks-move)
-          (or self.blocks-monster G.rules.dainty-monsters))
+          (not @blocks-move)
+          (or @blocks-monster G.rules.dainty-monsters))
         "Blocks monster movement")
-      (when self.blocks-diag
+      (when @blocks-diag
         "Blocks diagonal movement around itself")
       (cond
-        (and self.blocks-player-shots self.blocks-monster-shots)
+        (and @blocks-player-shots @blocks-monster-shots)
           "Blocks all shots"
-        self.blocks-player-shots
+        @blocks-player-shots
           "Blocks your shots, but not monsters' shots"
-        self.blocks-monster-shots
+        @blocks-monster-shots
           "Blocks monsters' shots, but not your shots")
-      (when self.destructible-by-passwall-wand
+      (when @destructible-by-passwall-wand
         "Destructible by a wand of passwall")
-      (when self.superblock
+      (when @superblock
         "Not subject to magical transformation or passage")
       #* extra
-      (.dod self "Effect when bumped" 'hook-player-bump)
-      (.dod self "Effect when trying to enter" 'hook-player-walk-to)
-      (.dod self "Effect when stepped onto" 'hook-player-walked-into)
-      (.dod self "Effect when trying to exit" 'hook-player-walk-from)
-      (when self.protects-vs-poison-air
+      (@dod "Effect when bumped" 'hook-player-bump)
+      (@dod "Effect when trying to enter" 'hook-player-walk-to)
+      (@dod "Effect when stepped onto" 'hook-player-walked-into)
+      (@dod "Effect when trying to exit" 'hook-player-walk-from)
+      (when @protects-vs-poison-air
         #("Special effect" "If you end your turn within 1 square of this tile, you'll take no damage from ambient poison or poisonous fountains. Other sources of poison damage are unaffected."))
-      (when self.emits-poison-air
+      (when @emits-poison-air
         #("Special effect" f"If you end your turn within 1 square of this tile, you'll take {G.rules.poison-emitter-damage} poison damage. This effect applies no more once per turn."))]))
 
 
@@ -164,18 +164,18 @@
     result-when-opened None
     blocks-monster T)
 
-  (defn-dd hook-player-bump [self origin]
+  (defmeth hook-player-bump [origin]
     (doc (+ "Consumes one key to "
-      (if it.result-when-opened
-        f"replace the tile with {(hy.repr it.result-when-opened)}."
+      (if @result-when-opened
+        f"replace the tile with {(hy.repr @result-when-opened)}."
         "destroy the tile.")))
 
     (unless G.player.keys
       (raise (CommandError "It's locked, and you're keyless at the moment.")))
     (-= G.player.keys 1)
-    (if self.result-when-opened
-      (replace-tile self self.result-when-opened)
-      (destroy-tile self))
+    (if @result-when-opened
+      (replace-tile @ @result-when-opened)
+      (destroy-tile @))
     True))
 
 (deftile LockedDoor "++" "a locked door"
@@ -216,16 +216,16 @@
       direction None
       color #('brown 'red))
 
-    (defn-dd hook-player-walk-from [self target]
-      (doc f"Only allows you to walk {it.direction.name}.")
-      (unless (= (pos+ self.pos self.direction) target)
-        (raise (CommandError f"You can only go {self.direction.name} from this one-way door."))))
-    (defn-dd hook-player-walk-to [self origin]
+    (defmeth hook-player-walk-from [target]
+      (doc f"Only allows you to walk {@direction.name}.")
+      (unless (= (pos+ @pos @direction) target)
+        (raise (CommandError f"You can only go {@direction.name} from this one-way door."))))
+    (defmeth hook-player-walk-to [origin]
       (doc f"Only allows you to enter from the
-        {it.direction.opposite.name}.")
-      (unless (= (pos+ origin self.direction) self.pos)
+        {@direction.opposite.name}.")
+      (unless (= (pos+ origin @direction) @pos)
         (raise (CommandError (.format "That one-way door must be entered from the {}."
-          self.direction.opposite.name)))))
+          @direction.opposite.name)))))
 
     (setv flavor "My way or the highway!"))
 
@@ -243,7 +243,7 @@
   :blocks-monster T
   :blocks-player-shots F :blocks-monster-shots F
 
-  :hook-player-walked-into (fn [self]
+  :hook-player-walked-into (meth []
     "Takes you to the next dungeon level. If there is no such level,
     you win the quest."
 
@@ -261,16 +261,16 @@
   :iq-ix-mapper ["hp"
     {3 4  4 2  15 6}]
 
-  :suffix-dict (fn [self]
-    (dict :HP self.hp))
+  :suffix-dict (meth []
+    (dict :HP @hp))
 
   :blocks-move T :blocks-diag T :blocks-player-shots F
   :destructible-by-passwall-wand T
   :damageable T
   :immune #(DamageType.Poison DamageType.Fire DamageType.DeathMagic)
-  :hook-player-bump (fn [self origin]
+  :hook-player-bump (meth [origin]
     "You attack the wall with your sword."
-    (damage-tile self (player-melee-damage) DamageType.PlayerMelee)
+    (damage-tile @ (player-melee-damage) DamageType.PlayerMelee)
     True)
 
   :flavor "I think this dungeon might not be up to code.")
@@ -283,15 +283,15 @@
 
   :blocks-monster T
   :destructible-by-passwall-wand T
-  :hook-player-walk-to (fn [self origin]
-    (setv target (pos+ self.pos (dir-to origin self.pos)))
+  :hook-player-walk-to (meth [origin]
+    (setv target (pos+ @pos (dir-to origin @pos)))
     (when (or (not target) (at target))
       (raise (CommandError "There's no room to push the block there."))))
 
-  :hook-player-walked-into (fn [self]
+  :hook-player-walked-into (meth []
     "You push the block in the same direction that you entered the square. The destination square must be empty, or else you won't be able to step on the original square."
-    (setv target (pos+ self.pos G.action.direction))
-    (mv-tile self target)
+    (setv target (pos+ @pos G.action.direction))
+    (mv-tile @ target)
     F)
 
   :flavor "Where do video games get all their crates from? There must be entire warehouses full of 'em, am I right?")
@@ -325,11 +325,11 @@
   :read-tile-extras (classmethod (fn [cls mk-pos v1 v2]
     (dict :target (mk-pos #(v1 v2)))))
 
-  :suffix-dict (fn [self]
-    (dict :dest self.target))
-  :hook-player-walked-into (fn-dd [self]
-    (doc f"Teleports you to {it.target}. Anything already there is unaffected.")
-    (mv-tile G.player self.target)
+  :suffix-dict (meth []
+    (dict :dest @target))
+  :hook-player-walked-into (meth []
+    (doc f"Teleports you to {@target}. Anything already there is unaffected.")
+    (mv-tile G.player @target)
     T)
 
   :flavor "A small stone arch containing a rippling, sparkling sheet of violet light. It functions as a magic portal that can send you elsewhere on this level. Sadly, arrows in flight won't survive the trip.")
@@ -344,7 +344,7 @@
   :iq-ix 23
   :blocks-diag T :blocks-monster T
 
-  :hook-player-walked-into (fn [self]
+  :hook-player-walked-into (meth []
     "Teleports you to a free square adjacent to the nearest other teleporter in the reality bubble. If there is no eligible destination teleporter, no teleportation occurs; if there are several tied for the nearest, you'll cycle through them when you re-enter this teleporter. Squares are considered to be free even if they contain monsters, which are slain instantly if you teleport into them. The free square that you appear on is cycled each time you re-exit a teleporter."
 
     (import simalq.tile [Monster])
@@ -354,7 +354,7 @@
     (setv candidate-dist Inf)
     (setv candidates [])
     (for [p (burst G.player.pos G.rules.reality-bubble-size :exclude-center T)]
-      (when (> (dist p self.pos) candidate-dist)
+      (when (> (dist p @pos) candidate-dist)
         ; When multiple teleporters are in range, we consider only
         ; the subset that's as close as possible.
         (break))
@@ -369,7 +369,7 @@
                 (isinstance n-tile Monster)))
               n-p)))
             (.append candidates #(tile neighbors))
-            (setv candidate-dist (dist p self.pos)))
+            (setv candidate-dist (dist p @pos)))
           (break))))
 
     ; Choose the other teleporter to use.
@@ -377,8 +377,8 @@
       (return F))
     (setv [other-porter neighbors] (get
       candidates
-      (% self.times-entered (len candidates))))
-    (+= self.times-entered 1)
+      (% @times-entered (len candidates))))
+    (+= @times-entered 1)
     ; Choose the specific target square.
     (while True
       (setv other-porter.output-dir
@@ -398,10 +398,10 @@
 
     T)
 
-  :info-bullets (fn [self #* extra]
-    (Scenery.info-bullets self
-      #("Times entered" self.times-entered)
-      #("Output direction" self.output-dir)))
+  :info-bullets (meth [#* extra]
+    (Scenery.info-bullets @
+      #("Times entered" @times-entered)
+      #("Output direction" @output-dir)))
 
   :flavor "A bulky cubic device representing an early attempt at teleportation technology. Its operation is a bit convoluted. The fun part is, you can tele-frag with it.")
 
@@ -422,20 +422,20 @@
     (setv x [115 13 75 76 77 111 112 113 114])
     (dict (zip x (range (len x)))))]
 
-  :mapsym (property (fn [self]
-    (+ "<" (if (< self.wallnum 10) (str self.wallnum) "^"))))
-  :suffix-dict (fn [self]
-    (dict :type self.wallnum))
-  :hook-player-walked-into (fn-dd [self]
-    (doc (if (= it.wallnum 0)
+  :mapsym (property (meth []
+    (+ "<" (if (< @wallnum 10) (str @wallnum) "^"))))
+  :suffix-dict (meth []
+    (dict :type @wallnum))
+  :hook-player-walked-into (meth []
+    (doc (if (= @wallnum 0)
       "Destroys all trapped walls and other wallfall traps on the level, regardless of type."
-      f"Destroys all trapped walls on the level of type {it.wallnum} or 0, along with all other wallfall traps of type {it.wallnum}."))
+      f"Destroys all trapped walls on the level of type {@wallnum} or 0, along with all other wallfall traps of type {@wallnum}."))
     (for [col G.map.data  stack col  tile stack]
       (when (or
           (and (= tile.stem "trapped wall")
-            (or (= self.wallnum 0) (in tile.wallnum [0 self.wallnum])))
+            (or (= @wallnum 0) (in tile.wallnum [0 @wallnum])))
           (and (= tile.stem "wallfall trap")
-            (or (= self.wallnum 0) (= tile.wallnum self.wallnum))))
+            (or (= @wallnum 0) (= tile.wallnum @wallnum))))
         (destroy-tile tile))))
 
   :flavor #[[Easy there, Admiral Ackbar. This kind of trap isn't necessarily dangerous. Well, admittedly, the key word here is "necessarily".]])
@@ -449,15 +449,15 @@
     (setv x [120 14 78 79 80 116 117 118 119])
     (dict (zip x (range (len x)))))]
 
-  :mapsym (property (fn [self]
-    (+ "█" (if (< self.wallnum 10) (str self.wallnum) "^"))))
-  :suffix-dict (fn [self]
-    (dict :type self.wallnum))
+  :mapsym (property (meth []
+    (+ "█" (if (< @wallnum 10) (str @wallnum) "^"))))
+  :suffix-dict (meth []
+    (dict :type @wallnum))
   :blocks-move T :blocks-diag T
   :destructible-by-passwall-wand T
-  :info-bullets (fn [self #* extra]
-    (Scenery.info-bullets self
-      #("Wallfall type" self.wallnum)))
+  :info-bullets (meth [#* extra]
+    (Scenery.info-bullets @
+      #("Wallfall type" @wallnum)))
 
   :flavor "The special thing about this wall is that it can be destroyed by wallfall traps of the corresponding type.\n\nWhat's the deal with monster closets? Monsters are proud of who they are, am I right? I'll be here all week.")
 
@@ -465,7 +465,7 @@
   :color 'red
   :iq-ix 35  ; damage-causing trap
 
-  :hook-player-walked-into (fn-dd [self]
+  :hook-player-walked-into (meth []
     (doc f"Does {trap-damage} damage.")
     (hurt-player trap-damage DamageType.Trap))
 
@@ -476,7 +476,7 @@
   :color 'purple
   :iq-ix 36
 
-  :hook-player-walked-into (fn-dd [self]
+  :hook-player-walked-into (meth []
     (doc f"Paralyzes you for {G.rules.paralysis-duration} turns. While you're paralyzed, waiting is the only action you can take.")
     (+= (get G.player.status-effects StatusEffect.Para)
       G.rules.paralysis-duration))
@@ -488,11 +488,11 @@
   :iq-ix 136
 
   :blocks-move F :blocks-monster T
-  :hook-player-walked-into (fn-dd [self]
+  :hook-player-walked-into (meth []
     (doc f"The tile is destroyed, but you're paralyzed for {G.rules.paralysis-duration} turns.")
     (+= (get G.player.status-effects StatusEffect.Para)
       G.rules.paralysis-duration)
-    (destroy-tile self))
+    (destroy-tile @))
 
   :flavor "This spiderweb is the size of a really big spiderweb. Until Idok cleans up the dungeon properly, you'll have to tediously carve your way through the webs with your sword. Got any recommendations for a good smitemaster?")
 
@@ -511,9 +511,9 @@
     122   ; dimness trap
     148)  ; darkness trap
 
-  :hook-player-walked-into (fn [self]
+  :hook-player-walked-into (meth []
     "The tile is destroyed."
-    (destroy-tile self))
+    (destroy-tile @))
 
   :flavor "Dungeon trash like sawdust, loose stones, pebbles, greasy chicken bones left over from goblin feasts, broken wands, and maybe a dead body, all bunched together into a small mound. Running through it will knock it over and get your boots really gross.")
 
@@ -529,13 +529,13 @@
   :blocks-move F :blocks-monster T
   :blocks-player-shots F :blocks-monster-shots T
 
-  :each-turn (fn [self]
-    (-= self.time-remaining 1)
-    (unless self.time-remaining
-      (destroy-tile self)))
+  :each-turn (meth []
+    (-= @time-remaining 1)
+    (unless @time-remaining
+      (destroy-tile @)))
 
-  :info-bullets (fn [self #* extra]
-    (Scenery.info-bullets self
-      #("Turns remaining" self.time-remaining)))
+  :info-bullets (meth [#* extra]
+    (Scenery.info-bullets @
+      #("Turns remaining" @time-remaining)))
 
   :flavor "These glittering barriers of orange plasma offer you plenty of protection and monsters none at all. Enjoy 'em while they last.")

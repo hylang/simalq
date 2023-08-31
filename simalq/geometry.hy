@@ -1,6 +1,6 @@
 (require
   hyrule [unless do-n]
-  simalq.macros [defdataclass])
+  simalq.macros [defdataclass defmeth meth])
 (import
   itertools [chain]
   toolz [unique]
@@ -19,7 +19,7 @@
     ; that square. An empty stack means that the tile has only floor.
   :frozen T :eq F
 
-  (defn [classmethod] make [self wrap-x wrap-y width height]
+  (defmeth [classmethod] make [wrap-x wrap-y width height]
     "Create a new blank map."
     (Map
       wrap-x
@@ -28,10 +28,10 @@
         _ (range width)
         (tuple (gfor  _ (range height)  []))))))
 
-  (defn [property] width [self]
-    (len self.data))
-  (defn [property] height [self]
-    (len (get self.data 0))))
+  (defmeth [property] width []
+    (len @data))
+  (defmeth [property] height []
+    (len (get @data 0))))
 
 
 (defdataclass Direction []
@@ -67,8 +67,8 @@
     d2 Direction.all
     :if (and (= d1.x (- d2.x)) (= d1.y (- d2.y)))
     d1 d2))
-  (setv Direction.opposite (property (fn [self]
-    (get opposites self))))))
+  (setv Direction.opposite (property (meth []
+    (get opposites @))))))
 
 
 (defdataclass Pos []
@@ -77,7 +77,7 @@
   [map x y]
   :frozen T
 
-  (defn __init__ [self map x y]
+  (defmeth __init__ [map x y]
     (when map.wrap-x
       (%= x map.width))
     (when map.wrap-y
@@ -87,17 +87,17 @@
     (for [[k v] (.items (dict  :map map  :x x  :y y))]
       ; Call `object.__setattr__` to bypass `dataclass`'s frozen
       ; checks.
-      (object.__setattr__ self k v)))
+      (object.__setattr__ @ k v)))
 
-  (defn __str__ [self]
+  (defmeth __str__ []
     "Provide a concise representation, without the linked map."
-    f"<Pos {self.x},{self.y}>")
+    f"<Pos {@x},{@y}>")
 
-  (defn __hash__ [self]
-    (hash #(self.x self.y (id self.map))))
+  (defmeth __hash__ []
+    (hash #(@x @y (id @map))))
 
-  (defn [property] xy [self]
-    #(self.x self.y)))
+  (defmeth [property] xy []
+    #(@x @y)))
 
 (hy.repr-register Pos str)
 
