@@ -4,9 +4,10 @@
 (import
   time [sleep]
   contextlib [contextmanager]
+  simalq.strings
   simalq.util [CommandError message-queue msg hurt-player DamageType player-status GameOverException menu-letters]
   simalq.color :as color
-  simalq.geometry [burst at]
+  simalq.geometry [burst at turn-and-pos-seed]
   simalq.game-state [G]
   simalq.tile [Tile Scenery]
   simalq.quest [start-quest start-level]
@@ -48,7 +49,11 @@
     (except [e GameOverException]
       (setv [G.player.game-over-state] e.args)
       (ecase G.player.game-over-state
-        'dead (msg "You have died.")
+        'dead (msg
+          "You have died."
+          (get simalq.strings.death-messages (%
+             (turn-and-pos-seed G.player.pos)
+             (len simalq.strings.death-messages))))
         'won  (victory-screen))))
   (.advance-states G))
 
