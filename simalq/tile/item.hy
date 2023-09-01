@@ -249,7 +249,7 @@
   (defmeth help [])
 
   (defmeth pick-up []
-    (doc (.help it))
+    (doc (@help))
     (+=
       (get G.player.status-effects
         (getattr StatusEffect (str @effect)))
