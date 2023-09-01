@@ -150,7 +150,15 @@
                 (setv c.fg o.fg)
                 (setv c.char o.char)))
             (= [mx my] [focus.x focus.y])
-              (setv c.bg color.focus)))
+              (setv c.bg
+                ; Use a different color for the focus if the player
+                ; is dead and it's on the player's square. This is
+                ; the most prominent visual indication of death.
+                (if (and
+                    (= p G.player.pos)
+                    (= G.player.game-over-state 'dead))
+                  color.focus-on-dead-player
+                  color.focus))))
            cs)
         ; Otherwise, we're off the map. Draw border.
         (colorstr "██" color.void)))

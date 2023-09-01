@@ -12,6 +12,7 @@
       'pale-yellow [1 1 (/ 3 4)]
       'dark-yellow [(/ 1 2) (/ 1 2) 0]
       'pale-red [1 (/ 7 8) (/ 7 8)]
+      'bright-red [1 0 0]
       'red [(/ 3 4) 0 0]
       'orange [1 (/ 1 2) 0]
       'dark-orange [(/ 3 4) (/ 1 2) 0]
@@ -39,6 +40,7 @@
   reality-fringe-block 'dark-gray
   overwrapped 'dark-gray
   focus 'yellow
+  focus-on-dead-player 'bright-red
   message-bg 'pale-yellow
 
   flash-label 'white
