@@ -13,11 +13,10 @@
 (setv  T True  F False)
 
 
-(assert (get os.environ "XDG_CACHE_HOME"))
-(setv cache-dir (/ (Path (get os.environ "XDG_CACHE_HOME")) "simalq"))
-(assert (get os.environ "XDG_DATA_HOME"))
-(setv saved-games-dir (/
-  (Path (get os.environ "XDG_DATA_HOME")) "simalq" "save"))
+(setv platform-dirs (hy.M.platformdirs.PlatformDirs
+  :appname "simalq" :appauthor "hylang"))
+(setv cache-dir (Path platform-dirs.user-cache-dir))
+(setv saved-games-dir (/ (Path platform-dirs.user-data-dir) "save"))
 
 
 (defn seq [a b [step 1]]

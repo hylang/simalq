@@ -143,7 +143,7 @@
   "Get a dictionary of raw IQ quests as `bytes` objects."
 
   ; Download the quests if needed.
-  (.mkdir cache-dir :exist-ok T)
+  (.mkdir cache-dir :parents T :exist-ok T)
   (setv path (/ cache-dir "infinity_quests_2.zip"))
   (unless (.exists path)
     (import http.client contextlib)

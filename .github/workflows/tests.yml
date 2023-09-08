@@ -5,9 +5,6 @@ on: [pull_request, push]
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      XDG_CACHE_HOME: /tmp/xdg-cache
-      XDG_DATA_HOME: /tmp/xdg-data
 
     steps:
     - uses: actions/checkout@v3
@@ -15,11 +12,7 @@ jobs:
     - run: pip install .
     - uses: actions/cache@v3
       with:
-        key: XDG_CACHE_HOME
-        path: ${{ env.XDG_CACHE_HOME }}
-    - name: Further setup
-      shell: bash
-      run: |
-          mkdir -p "$XDG_CACHE_HOME"
-          pip install pytest
+        key: cache-dir
+        path: /home/runner/.cache/simalq
+    - run: pip install pytest
     - run: pytest tests
