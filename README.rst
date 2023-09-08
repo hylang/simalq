@@ -56,6 +56,7 @@ Version history
 
 This section lists the most important user-visible changes in each release. Typically, saved games for each version *aren't* compatible with other versions, but release numbers marked with an asterisk (*) should be compatible with saved games from the previous release. Unless making a backward-compatible upgrade of this kind, you should delete all your saved games before upgrading the game.
 
+- 0.4.0* (2023-09-08): SQ now uses `platformdirs <https://pypi.org/project/platformdirs>`__ to set data directories.
 - 0.3.0 (2023-09-01): There are now difficulty options available through the command line. Variability in the movement of wandering monsters, such as bats, has been improved.
 - 0.2.0* (2023-07-23): The IQ quest New Nightmare has been denazified and added to ``--quests``.
 - 0.1.0 (2023-07-13): First playable release.
