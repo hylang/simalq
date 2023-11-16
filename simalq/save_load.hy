@@ -20,10 +20,10 @@
   "Temporarily disable garbage collection. This can substantially
   speed up pickling and unpickling."
   `(try
-    (hy.M.gc.disable)
+    (hy.I.gc.disable)
     ~@body
     (finally
-      (hy.M.gc.enable))))
+      (hy.I.gc.enable))))
 
 (defmacro suppressing-quest [#* body]
   "Pull the quest object out of `G` temporarily."

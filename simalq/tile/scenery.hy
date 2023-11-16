@@ -115,7 +115,7 @@
     tile (at pos)
     (and (not-in tile.stem ethereal-to) (or
       (and monster? G.rules.dainty-monsters)
-      (isinstance tile hy.M.simalq/tile.Monster)
+      (isinstance tile hy.I.simalq/tile.Monster)
       (and (isinstance tile Scenery) (or
         (and monster? tile.blocks-monster)
         tile.blocks-move)))))))
@@ -247,7 +247,7 @@
     "Takes you to the next dungeon level. If there is no such level,
     you win the quest."
 
-    (hy.M.simalq/quest.start-level G.level.next-level)
+    (hy.I.simalq/quest.start-level G.level.next-level)
     (setv G.player.just-exited T)
     True)
 

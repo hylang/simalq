@@ -364,4 +364,4 @@
 
 quest)
 
-(setv (get hy.M.simalq/quest-definition.builtin-quests name) quest-fn)
+(setv (get hy.I.simalq/quest-definition.builtin-quests name) quest-fn)

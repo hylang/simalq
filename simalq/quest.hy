@@ -47,7 +47,7 @@
     (raise (GameOverException 'won)))
   (setv level (get G.quest.levels (- level-n 1)))
   (when show-title
-    (hy.M.simalq/main.text-screen :center T
+    (hy.I.simalq/main.text-screen :center T
       f"Level {level-n}\n\n{level.title}"))
   (setv
     G.level-n level-n

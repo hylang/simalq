@@ -27,7 +27,7 @@
   (setv p (parse-args :args args
     :prog "simalq"
     :description (+ version-string "\n" url)
-    :formatter-class hy.M.argparse.RawDescriptionHelpFormatter
+    :formatter-class hy.I.argparse.RawDescriptionHelpFormatter
     [
       ["QUEST"
         :help "the quest to play; see --quests"]
@@ -79,7 +79,7 @@
   (when (= p.player-hp-factor 0)
     (exit "Okay, fine, you start with 0 HP. Welcome to the game. Game over. Wasn't that fun?"))
 
-  (hy.M.simalq/main.main
+  (hy.I.simalq/main.main
     :quest ((get (available-quests) p.QUEST))
     :skip-to-level p.skip-to-level
     :load-main-save (not p.new)
@@ -89,7 +89,7 @@
       k (getattr p k))))
 
 (defn available-quests [] (dict
-  #** hy.M.simalq/quest-definition.builtin-quests
+  #** hy.I.simalq/quest-definition.builtin-quests
   #** (dfor  x (iq-quests-raw)  x (fn [[x x]] (iq-quest x)))))
     ; `x` is passed through as a default argument so the values stay
     ; different.

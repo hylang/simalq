@@ -364,7 +364,7 @@ All controls are case-sensitive. Use the numeric keypad or the vi-keys to move. 
 {controls}
 
 Paths:
-- Saved games: {hy.M.simalq/util.saved-games-dir}
-- IQ quest cache: {hy.M.simalq/util.cache-dir}
+- Saved games: {hy.I.simalq/util.saved-games-dir}
+- IQ quest cache: {hy.I.simalq/util.cache-dir}
 
 To delete a saved game, delete the corresponding file from the saved-game directory.]f]))

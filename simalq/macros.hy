@@ -15,7 +15,7 @@
   (unless fields
     (.extend kwargs '[:frozen True]))
   `(defclass
-    [(hy.M.dataclasses.dataclass :slots True ~@kwargs)]
+    [(hy.I.dataclasses.dataclass :slots True ~@kwargs)]
     ~class-name ~superclasses
     ~@docstring
     ~@(gfor

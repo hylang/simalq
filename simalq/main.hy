@@ -81,7 +81,7 @@
   (for [
       pos (burst G.player.pos G.rules.reality-bubble-size)
       tile (at pos)
-      :if (isinstance tile hy.M.simalq/tile.Actor)]
+      :if (isinstance tile hy.I.simalq/tile.Actor)]
     (.maybe-act tile))
 
   ; Now do end-of-turn processing.
@@ -134,7 +134,7 @@
 
 (defn [contextmanager] player-io []
   (global B _displaying)
-  (setv B (hy.M.blessed.Terminal))
+  (setv B (hy.I.blessed.Terminal))
   (try
     (setv _displaying T)
     (with [_ (B.cbreak)  _ (B.fullscreen)  _ (B.hidden-cursor)]

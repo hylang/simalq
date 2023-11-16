@@ -13,7 +13,7 @@
 (setv  T True  F False)
 
 
-(setv platform-dirs (hy.M.platformdirs.PlatformDirs
+(setv platform-dirs (hy.I.platformdirs.PlatformDirs
   :appname "simalq" :appauthor "hylang"))
 (setv cache-dir (Path platform-dirs.user-cache-dir))
 (setv saved-games-dir (/ (Path platform-dirs.user-data-dir) "save"))
@@ -55,7 +55,7 @@
 (setv message-queue [])
 
 (defn msg [#* args]
-  (when (hy.M.simalq/main.displaying)
+  (when (hy.I.simalq/main.displaying)
     (.append message-queue (.join " " (map str args)))))
 
 
@@ -178,7 +178,7 @@
 
   (setv hp-was G.player.hp)
   (unless (player-status 'Ivln)
-    (hy.M.simalq/tile.damage-tile G.player amount damage-type))
+    (hy.I.simalq/tile.damage-tile G.player amount damage-type))
   (when (chainc
          G.player.hp
       <= (refactor-hp hp-warning-threshold)
