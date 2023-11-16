@@ -1,10 +1,10 @@
 dependencies = [
-    'hy == 0.27.0',
-    'hyrule == 0.4.0',
+    'hy @ git+https://github.com/hylang/hy@408cc7560bb89516208966104641fe2394e6aabe',
+    'hyrule @ git+https://github.com/hylang/hyrule@2aabac6506053cc49d38552973924280c3349886',
     'toolz >= 0.12.0',
     'construct >= 2.10.68',
     'blessed >= 1.20.0',
-    'platformdirs >= 3.10.0']
+    'platformdirs >= 4.0.0']
 
 import setuptools
 from pathlib import Path
