@@ -18,6 +18,7 @@ setuptools.setup(
     long_description_content_type = 'text/x-rst',
     project_urls = {
         'Source Code': 'https://github.com/hylang/simalq'},
+    python_requires = '>= 3.10',
     install_requires = dependencies,
     packages = setuptools.find_packages(),
     package_data = dict(simalq = [
