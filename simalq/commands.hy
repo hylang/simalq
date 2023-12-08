@@ -73,6 +73,7 @@
 
 
 (defn get-command [key]
+  (import simalq.keyboard [read-dir-key cmd-keys])
   (when (setx v (read-dir-key key))
     (return (if (= v 'center)
       (Wait)
@@ -83,37 +84,13 @@
       (v))))
   None)
 
-(defn read-dir-key [key]
-  (.get _dir-keys (str key) (.get _dir-keys key.name)))
-(setv _dir-keys (dfor
-  :setv D Direction
-  [k v] (partition 2 [
-    ["7" "y" "HOME"] D.NW  ["8" "k" "UP"]     D.N      ["9" "u" "PGUP"]   D.NE
-    ["4" "h" "LEFT"] D.W   ["5" "." "ESCAPE"] 'center  ["6" "l" "RIGHT"]  D.E
-    ["1" "b" "END"]  D.SW  ["2" "j" "DOWN"]   D.S      ["3" "n" "PGDOWN"] D.SE])
-  s k
-  (if (> (len s) 1) (+ "KEY_" s) s) v))
-
-(setv cmd-keys {
-  "?" Help
-  "!" Quit
-  "S" [SaveGame 'main]
-  "C" [SaveGame 'checkpoint]
-  "L" LoadGame
-  "e" [ShiftHistory  -1]  ; Undo
-  "E" [ShiftHistory -10]
-  "r" [ShiftHistory  +1]  ; Redo
-  "R" [ShiftHistory +10]
-  ";" Look
-  "f" GonnaShoot
-  "i" Inventory
-  "a" GonnaUseItem})
 
 
 (defn do-command [cmd]
   "This function is only for commands that aren't actions; see
   `do-action` for actions."
   (import
+    simalq.keyboard [read-dir-key]
     simalq.main [io-mode text-screen print-main-screen info-screen inkey take-turn load-saved-game-screen])
 
   (defn targeting-mode [target-callback]
@@ -163,7 +140,7 @@
   (ecase (type cmd)
 
     Help
-      (text-screen help-text :center F)
+      (text-screen (help-text) :center F)
 
     GonnaShoot (do
       ; A direction key causes Tris to shoot in that direction.
@@ -342,22 +319,23 @@
       (destroy-tile item))))
 
 
-(setv controls (.join "\n" (lfor
-  [k cmd] (.items cmd-keys)
-  :setv [cmd arg] (if (isinstance cmd list) cmd [cmd None])
-  (+ k " - " (.format
-    (re.sub r"\s+" " " cmd.__doc__)
-    :details (case cmd
-      ShiftHistory
-        (.format "{} {}."
-          (if (< arg 0) "Undo the previous" "Redo the next")
-          (if (> (abs arg) 1) f"{(abs arg)} actions" "action"))
-      SaveGame
-        (ecase arg
-          'main "overwriting your main save file for this quest"
-          'checkpoint "creating a new checkpoint save")))))))
+(defn help-text []
+  (setv controls (.join "\n" (lfor
+    [k cmd] (.items hy.I.simalq/keyboard.cmd-keys)
+    :setv [cmd arg] (if (isinstance cmd list) cmd [cmd None])
+    (+ k " - " (.format
+      (re.sub r"\s+" " " cmd.__doc__)
+      :details (case cmd
+        ShiftHistory
+          (.format "{} {}."
+            (if (< arg 0) "Undo the previous" "Redo the next")
+            (if (> (abs arg) 1) f"{(abs arg)} actions" "action"))
+        SaveGame
+          (ecase arg
+            'main "overwriting your main save file for this quest"
+            'checkpoint "creating a new checkpoint save")))))))
 
-(setv help-text (.strip #[f[
+  (.strip #[f[
 
 All controls are case-sensitive. Use the numeric keypad or the vi-keys to move. Use `5` or `.` to wait, skipping a turn.
 
