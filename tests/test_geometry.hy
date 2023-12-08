@@ -12,7 +12,7 @@
 
 (defn test-map []
   (setv  w 5  h 3)
-  (setv m (Map :wrap-x F :wrap-y F :data
+  (setv m (Map.from-data :wrap-x F :wrap-y F :data
     (tuple (gfor
       x (range w)
       (tuple (gfor
@@ -36,7 +36,7 @@
 
 (defn test-pos []
   (defn example-map []
-    (Map :data (* #((* #([T]) 3)) 3) :wrap-x F :wrap-y F))
+    (Map.from-data :data (* #((* #([T]) 3)) 3) :wrap-x F :wrap-y F))
 
   (setv m (example-map))
   (Pos :map m :x 0 :y 0)
@@ -63,7 +63,7 @@
 (defn test-pos+ []
   (setv map-data (* #((* #([T]) 5)) 5))
 
-  (setv m (Map :data map-data :wrap-x F :wrap-y F))
+  (setv m (Map.from-data :data map-data :wrap-x F :wrap-y F))
   (assert (=
     (pos+ (Pos m 0 0) Direction.N)
     (Pos m 0 1)))
@@ -77,7 +77,7 @@
     (pos+ (Pos m 0 0) Direction.W)
     None))
 
-  (setv m (Map :data map-data :wrap-x T :wrap-y F))
+  (setv m (Map.from-data :data map-data :wrap-x T :wrap-y F))
   (assert (=
     (pos+ (Pos m 0 0) Direction.W)
     (Pos m 4 0)))
