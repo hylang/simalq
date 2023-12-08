@@ -341,7 +341,10 @@ All controls are case-sensitive. Use the numeric keypad or the vi-keys to move. 
 
 {controls}
 
-Paths:
+You can rebind keys by editing the Hy source code at
+  {hy.I.simalq/keyboard.__file__}
+
+Other filepaths of interest:
 - Saved games: {hy.I.simalq/util.saved-games-dir}
 - IQ quest cache: {hy.I.simalq/util.cache-dir}
 
