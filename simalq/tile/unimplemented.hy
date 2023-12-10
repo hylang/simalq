@@ -94,7 +94,7 @@
     stem
     #(UnimplementedTile)
     (dict
-      :__slots__ ["tile_extras"]
+      :fields ["tile_extras"]
       :__init__ (meth [* pos [tile-extras None]]
         (object.__setattr__ @ "pos" pos)
         (object.__setattr__ @ "tile_extras" tile-extras))

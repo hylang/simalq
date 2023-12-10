@@ -1,6 +1,6 @@
 (require
   hyrule [unless]
-  simalq.macros [slot-defaults defmeth])
+  simalq.macros [field-defaults defmeth])
 (import
   copy [deepcopy]
   re
@@ -12,7 +12,7 @@
 
 
 (defclass Tile []
-  (slot-defaults
+  (field-defaults
     pos None)
       ; Generally this will actually be a `Pos`, but it could be
       ; `None` for e.g. an item in the player's inventory.
@@ -20,50 +20,47 @@
   (setv types-by-iq-ix {})
 
   (defmeth __init__ [#** kwargs]
-    ; - Each keyword argument must match a slot.
-    ; - All subclasses must set `__slots__` (if only to an empty list).
-    ; - No slot named may be used twice in a single inheritance chain.
-    (for [[cls slot] (@all-slots)]
-       (object.__setattr__ @ slot
-         (if (in slot kwargs)
-           (.pop kwargs slot)
-           (deepcopy (get cls.slot-defaults slot)))))
+    ; - Each keyword argument must match a field.
+    ; - No field name may be used twice in a single inheritance chain.
+    (for [[cls field] (@all-fields)]
+       (object.__setattr__ @ field
+         (if (in field kwargs)
+           (.pop kwargs field)
+           (deepcopy (get cls.field-defaults field)))))
     (when kwargs
       (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}")))
     (when @each-turn
       (.append G.each-turn @)))
 
   (defmeth __setattr__ [name value]
-    (if (in name (@all-mutable-slots))
+    (if (in name (@all-mutable-fields))
       (object.__setattr__ @ name value)
       (raise (AttributeError f"Tried to set attribute {name !r} on an instance of {(type @) !r}. Use `object.__setattr__` if you really mean it."))))
 
   (defmeth __deepcopy__ [memo]
     ; We provide this to avoid triggering `__setattr__` in `deepcopy`.
     (setv t (@__new__ (type @)))
-    (for [[_ slot] (@all-slots)]
-      (object.__setattr__ t slot (deepcopy (getattr @ slot) memo)))
+    (for [[_ field] (@all-fields)]
+      (object.__setattr__ t field (deepcopy (getattr @ field) memo)))
     t)
 
   (defmeth __setstate__ [state]
     ; We provide this to avoid triggering `__setattr__` in
     ; `pickle.load`.
-    (setv [_ slot-dict] state)
-    (for [[k v] (.items slot-dict)]
+    (for [[k v] (.items state)]
       (object.__setattr__ @ k v)))
 
-  (defn [classmethod] all-slots [cls]
+  (defn [classmethod] all-fields [cls]
     (lfor
       c cls.__mro__
-      :if (is-not c object)
-      s c.__slots__
-      #(c s)))
+      field (.get c.__dict__ "fields" #())
+      #(c field)))
 
-  (defn [classmethod] all-mutable-slots [cls]
+  (defn [classmethod] all-mutable-fields [cls]
     (sfor
       c cls.__mro__
-      s (getattr c "mutable_slots" #())
-      s))
+      field (.get c.__dict__ "mutable_fields" #())
+      field))
 
   (defn [classmethod property] name-with-article [cls]
     (+ (if cls.article (+ cls.article " ") "") cls.stem))
@@ -79,8 +76,8 @@
   ; The below variables and methods may be overridden by subclasses.
 
   (setv
-    mutable-slots #()
-      ; Slots whose values should be freely adjustable with `setv`,
+    mutable-fields #()
+      ; Fields whose values should be freely adjustable with `setv`,
       ; `+=`, etc.
     article None
       ; "a", "the", etc.
@@ -107,15 +104,15 @@
       ; An alternative to `iq-ix` for many-to-one matchups from IQ to
       ; SQ tiles. It should be a list like
       ;   ["hp" {1 2  3 4  5 6}]
-      ; where the first element is a slot name and the second is a
-      ; dictionary mapping IQ values to values for the slot.
+      ; where the first element is a field name and the second is a
+      ; dictionary mapping IQ values to values for the field.
     points 0
       ; Points awarded for picking up an object, killing a monster,
       ; etc.
     damageable F
       ; Whether a tile of this kind can be hurt by the player's sword
       ; etc. To be overridden in subclasses, which, if they enable it,
-      ; should include a slot `hp`.
+      ; should include a field `hp`.
     immune #()
       ; Damage types the tile ignores.
     resists #()
@@ -200,9 +197,8 @@
     (raise (TypeError f"Unknown attributes: {new-attrs}")))
       ; New attributes should be introduced in a superclass. Otherwise,
       ; you're probably just typoing an attribute name.
-  (.setdefault kwargs "__slots__" (if (in "slot_defaults" kwargs)
-    (tuple (.keys (get kwargs "slot_defaults")))
-    #()))
+  (when (and (in "field_defaults" kwargs) (not-in "fields" kwargs))
+    (setv (get kwargs "fields") (tuple (.keys (get kwargs "field_defaults")))))
 
   (setv cls (type
     stem
@@ -225,16 +221,16 @@
       (assert (not-in i Tile.types-by-iq-ix))
       (setv (get Tile.types-by-iq-ix i) cls)))
   (when (in "iq_ix_mapper" kwargs)
-    (setv [slot d] (get kwargs "iq_ix_mapper"))
-    (assert (in slot (sfor  [_ s] (.all-slots cls)  s)))
-    (for [[iq-ix slot-value] (.items d)]
+    (setv [field d] (get kwargs "iq_ix_mapper"))
+    (assert (in field (sfor  [_ x] (.all-fields cls)  x)))
+    (for [[iq-ix field-value] (.items d)]
       (assert (not-in iq-ix Tile.types-by-iq-ix))
       (setv (get Tile.types-by-iq-ix iq-ix)
-        (dict :cls cls :slot slot :value slot-value))))
+        (dict :cls cls :field field :value field-value))))
 
   (hy.repr-register cls (fn [x]
     (.format "(<{}> {})" stem (.join " " (gfor
-      [_ s] (.all-slots x)
+      [_ s] (.all-fields x)
       (.format ":{} {}" (hy.unmangle s) (hy.repr (getattr x s))))))))
 
   cls)
@@ -302,9 +298,9 @@
   "A kind of tile (typically a monster) that gets to do something each
   turn that it's in the reality bubble."
 
-  (slot-defaults
+  (field-defaults
     last-acted None)
-  (setv mutable-slots #("last_acted"))
+  (setv mutable-fields #("last_acted"))
 
   (defmeth maybe-act []
     "Act, if we haven't already acted this turn."

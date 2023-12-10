@@ -36,12 +36,12 @@
     ~@rest))
 
 
-(defmacro slot-defaults [#* items]
+(defmacro field-defaults [#* items]
   (import toolz [partition])
-  (setv slots (dfor  [k v] (partition 2 items)  (hy.mangle k) v))
+  (setv fields (dfor  [k v] (partition 2 items)  (hy.mangle k) v))
   `(setv
-    __slots__ [~@(.keys slots)]
-    slot-defaults ~slots))
+    fields [~@(.keys fields)]
+    field-defaults ~fields))
 
 
 (defmacro defmeth [#* args]

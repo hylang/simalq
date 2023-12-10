@@ -1,6 +1,6 @@
 (require
   hyrule [unless do-n]
-  simalq.macros [slot-defaults pop-integer-part meth defmeth])
+  simalq.macros [field-defaults pop-integer-part meth defmeth])
 (import
   re
   fractions [Fraction :as f/]
@@ -23,7 +23,7 @@
 (defclass Monster [Actor]
   "A non-player character, typically out to kill the player."
 
-  (slot-defaults
+  (field-defaults
     hp 1
         ; The monster's number of hit points (HP). When a monster's
         ; HP hits 0, it dies.
@@ -31,7 +31,7 @@
         ; A bit of memory or plan that the monster uses to choose
         ; its movements. Its meaning depends on `ai`.
   (setv
-    mutable-slots #("hp" "movement_state")
+    mutable-fields #("hp" "movement_state")
     damageable T
     damage-melee None
       ; How much damage the monster does with its basic melee attack.
@@ -120,7 +120,7 @@
   ; into being.
   (setv (. (at pos) [-1] last-acted) G.turn-n))
 
-(defn summon [mon stem hp [direction-slot "summon_direction"]]
+(defn summon [mon stem hp [direction-field "summon_direction"]]
   "Increment summon power. Then, try to generate one or more monsters
   in adjacent spaces. Return true if power was expended."
 
@@ -130,9 +130,9 @@
   (do-n (pop-integer-part mon.summon-power)
     ; Find an empty square to place the new monster.
     (do-n (len Direction.all)
-      (setattr mon direction-slot
-        (next-in-cycle Direction.all (getattr mon direction-slot)))
-      (setv target (pos+ mon.pos (getattr mon direction-slot)))
+      (setattr mon direction-field
+        (next-in-cycle Direction.all (getattr mon direction-field)))
+      (setv target (pos+ mon.pos (getattr mon direction-field)))
       (unless target
         (continue))
       (when (= (at target) [])
@@ -274,7 +274,7 @@
   (return T))
 (setv Monster.act approach)
 
-(defn wander [mon [state-slot "movement_state"] [implicit-attack T] [ethereal-to #()]]
+(defn wander [mon [state-field "movement_state"] [implicit-attack T] [ethereal-to #()]]
   "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
 
   (when (and implicit-attack (try-to-attack-player mon))
@@ -285,12 +285,12 @@
   ; to look randomish, but not long.
   ; https://en.wikipedia.org/w/index.php?title=Linear_congruential_generator&oldid=1140372972#c_%E2%89%A0_0
   (setv  m (** 8 3)  c 1  a (+ 2 1))
-  (when (= (getattr mon state-slot) None)
+  (when (= (getattr mon state-field) None)
     ; Seed the RNG.
-    (setattr mon state-slot (% (turn-and-pos-seed mon.pos) m)))
+    (setattr mon state-field (% (turn-and-pos-seed mon.pos) m)))
   (setv options (+ Direction.all #(None)))
-  (setv d (get options (% (getattr mon state-slot) (len options))))
-  (setattr mon state-slot (% (+ (* a (getattr mon state-slot)) c) m))
+  (setv d (get options (% (getattr mon state-field) (len options))))
+  (setattr mon state-field (% (+ (* a (getattr mon state-field)) c) m))
   (unless d
     (return))
   (setv [target wly] (walkability mon.pos d :monster? T :ethereal-to ethereal-to))
@@ -305,7 +305,6 @@
   "A monster that can be produced by a generator in IQ."
 
   (setv
-    __slots__ []
     score-for-damaging T))
 
 (defmacro self-sc [#* rest]
@@ -314,7 +313,7 @@
 (deftile Monster :name "generator"
   ; An immobile structure that creates monsters nearby.
 
-  :slot-defaults (dict
+  :field-defaults (dict
     :summon-class "orc"
       ; The stem of the monster type to generate.
     :summon-frequency (f/ 1 4)
@@ -322,7 +321,7 @@
       ; How many hit points each monster will be summoned with.
     :summon-power (f/ 0))
       ; A per-turn accumulator of `summon-frequency`.
-  :mutable-slots #("summon_power")
+  :mutable-fields #("summon_power")
 
   :mapsym (property (meth []
     (+ "☉" (self-sc mapsym [0]))))
@@ -398,8 +397,6 @@
 
 (defclass NonGen [Monster]
   "A monster that has no generators in IQ."
-
-  (setv __slots__ [])
 
   (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
     (dict :hp v2)))
@@ -488,10 +485,10 @@
   :iq-ix-mon [43 67 68] :iq-ix-gen [44 69 70]
   :points-mon 4 :points-gen 15
 
-  :slot-defaults (dict
+  :field-defaults (dict
     :shot-power (f/ 0)
     :wander-state None)
-  :mutable-slots #("shot_power" "wander_state")
+  :mutable-fields #("shot_power" "wander_state")
 
   :damage-shot #(1 2 3)
   :act (meth []
@@ -575,8 +572,8 @@
   :iq-ix 47
   :points 2
 
-  :slot-defaults (dict :kamikazed F)
-  :mutable-slots #("kamikazed")
+  :field-defaults (dict :kamikazed F)
+  :mutable-fields #("kamikazed")
 
   :damage-shot 10
   :shot-range 1
@@ -604,8 +601,8 @@
   :iq-ix 48
   :points 0
 
-  :slot-defaults (dict :summon-direction None :summon-power (f/ 0))
-  :mutable-slots #("summon_direction" "summon_power")
+  :field-defaults (dict :summon-direction None :summon-power (f/ 0))
+  :mutable-fields #("summon_direction" "summon_power")
 
   :immune #(MundaneArrow MagicArrow)
   :damage-melee 6
@@ -651,8 +648,8 @@
   :color 'brown
   :points 50
 
-  :slot-defaults (dict :wander-state None)
-  :mutable-slots #("wander_state")
+  :field-defaults (dict :wander-state None)
+  :mutable-fields #("wander_state")
 
   :damage-melee 10
 

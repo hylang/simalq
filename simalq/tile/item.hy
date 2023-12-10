@@ -15,7 +15,6 @@
   "An object the player can pick up."
 
   (setv
-    __slots__ []
     destroy-after-pickup T)
 
   (defmeth hook-player-walked-into []
@@ -69,7 +68,6 @@
 
 (defclass Food [Item]
   (setv
-    __slots__ []
     hp-effect None
       ; How much you're healed (or damaged, for negative values)
       ; by the food.
@@ -242,7 +240,6 @@
 
 (defclass StatusEffectItem [Item]
   (setv
-    __slots__ []
     effect None
     duration None)
 
@@ -297,7 +294,6 @@
   consumed as an action."
 
   (setv
-    __slots__ []
     destroy-on-pickup F
     targeted T)
       ; Whether the item should be used with a target. The argument
@@ -385,7 +381,6 @@
 
 (defclass FireBomb [Usable]
   (setv
-    __slots__ []
     use-blast-damage None
     shot-blast-damage None)
 
@@ -436,7 +431,6 @@
 
 (defclass Artifact [Item]
   (setv
-    __slots__ []
     color-bg 'magenta)
 
   (defmeth help [])

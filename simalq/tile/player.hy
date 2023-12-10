@@ -9,7 +9,7 @@
 (deftile Tile "@ " character-name
   ; A type representing the player-character.
 
-  :slot-defaults (dict
+  :field-defaults (dict
     :game-over-state None
       ; Set to a symbol when the game ends to indicate that the game
       ; has ended and how.
@@ -40,7 +40,7 @@
         "Holy Sword" F}
     :floater-disturbance (Fraction 0))
       ; A measure of how much time you've spent adjacent to floaters.
-  :mutable-slots (tuple (map hy.mangle '(game-over-state hp poison-dose just-exited taking-extra-action keys magic-arrows floater-disturbance)))
+  :mutable-fields (tuple (map hy.mangle '(game-over-state hp poison-dose just-exited taking-extra-action keys magic-arrows floater-disturbance)))
     ; `inventory` and `artifacts` should be mutated directly rather
     ; reassigned.
 

@@ -5,8 +5,8 @@
   tests.lib [init-boot-camp])
 
 
-(defn test-no-new-slots []
-  "You can't accidentally create new attributes on slotted objects."
+(defn test-no-new-attrs []
+  "You can't accidentally create new attributes on most instances."
 
   (init-boot-camp)
 

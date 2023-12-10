@@ -14,7 +14,6 @@
   "A mostly static part of the level, such as a wall or trap."
 
   (setv
-    __slots__ []
     blocks-move F
       ; Block player and monster movement.
     blocks-diag F
@@ -160,7 +159,6 @@
 
 (defclass LockedDoor [Scenery]
   (setv
-    __slots__ []
     result-when-opened None
     blocks-monster T)
 
@@ -211,7 +209,6 @@
   (defclass OneWayDoor [Scenery]
 
     (setv
-      __slots__ []
       blocks-monster T
       direction None
       color #('brown 'red))
@@ -255,9 +252,9 @@
 
 
 (deftile Scenery "##" "a cracked wall"
-  :slot-defaults (dict
+  :field-defaults (dict
     :hp 2)
-  :mutable-slots #("hp")
+  :mutable-fields #("hp")
   :iq-ix-mapper ["hp"
     {3 4  4 2  15 6}]
 
@@ -318,7 +315,7 @@
 
 (deftile Scenery "{}" "a gate"
   :color 'purple
-  :slot-defaults (dict
+  :field-defaults (dict
     :target None)
   :iq-ix 24
 
@@ -337,10 +334,10 @@
 
 (deftile Scenery "┣┫" "a teleporter"
   :color 'purple
-  :slot-defaults (dict
+  :field-defaults (dict
     :times-entered 0
     :output-dir None)
-  :mutable-slots #("times_entered" "output_dir")
+  :mutable-fields #("times_entered" "output_dir")
   :iq-ix 23
   :blocks-diag T :blocks-monster T
 
@@ -408,14 +405,13 @@
 
 (defclass Trap [Scenery]
   (setv
-    __slots__ []
     blocks-move F
     blocks-player-shots F
     blocks-monster-shots F))
 
 (deftile Trap :name "a wallfall trap"
   :color 'dark-yellow
-  :slot-defaults (dict
+  :field-defaults (dict
     :wallnum 1)
   :iq-ix-mapper ["wallnum" (do
     ; These are just called "traps" in IQ.
@@ -443,7 +439,7 @@
 (deftile Scenery :name "a trapped wall"
   :color #('black 'pale-yellow)
   :color-bg #(None 'black)
-  :slot-defaults (dict
+  :field-defaults (dict
     :wallnum 1)
   :iq-ix-mapper ["wallnum" (do
     (setv x [120 14 78 79 80 116 117 118 119])
@@ -520,9 +516,9 @@
 
 (deftile Scenery "()" "a magical energy shield"
   :color 'dark-orange
-  :slot-defaults (dict
+  :field-defaults (dict
     :time-remaining 12)
-  :mutable-slots #("time_remaining")
+  :mutable-fields #("time_remaining")
   :iq-ix None
     ; In IQ, tiles of this type can only be created mid-game.
 

@@ -208,9 +208,9 @@
               [(result :pos p #** (te result))]
             (is (type result) dict)
               ; This `iq-ix` specifies the type and a certain value of
-              ; a slot.
+              ; a field.
               [((get result "cls") :pos p
-                #** {(get result "slot") (get result "value")}
+                #** {(get result "field") (get result "value")}
                 #** (te (get result "cls")))]
             (callable (type result))
               ; A special case where a callback makes the tiles
