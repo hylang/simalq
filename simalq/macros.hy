@@ -3,24 +3,36 @@
 
 
 (defmacro defdataclass [class-name superclasses #* rest]
-  (setv   rest (list rest)  docstring []  fields []  kwargs [])
+  (setv   rest (list rest)  docstring []  fields []  field-defaults []  kwargs [])
   (when (and rest (isinstance (get rest 0) hy.models.String))
     (.append docstring (.pop rest 0)))
-  (when rest
-    (setv fields (.pop rest 0))
-    (assert (isinstance fields hy.models.List)))
+  (when rest (cond
+    (= (get rest 0) ':field-defaults)
+      (do
+        (.pop rest 0)
+        (setv field-defaults (.pop rest 0)))
+    (isinstance (get rest 0) hy.models.List)
+      (setv fields (.pop rest 0))
+    True
+      (raise ValueError)))
   (while (and rest (isinstance (get rest 0) hy.models.Keyword))
     (.append kwargs (.pop rest 0))
     (.append kwargs (.pop rest 0)))
-  (unless fields
+  (unless (or fields field-defaults)
     (.extend kwargs '[:frozen True]))
   `(defclass
     [(hy.I.dataclasses.dataclass :slots True ~@kwargs)]
     ~class-name ~superclasses
     ~@docstring
-    ~@(gfor
-      field fields
-      `(annotate ~field ...))
+    ~@(if field-defaults
+      (gfor
+        [field default] (hy.I.toolz.partition 2 field-defaults)
+        `(setv (annotate ~field ...) ~(if (= default '[])
+          '(hy.I.dataclasses.field :default-factory list)
+          default)))
+      (gfor
+        field fields
+        `(annotate ~field ...)))
     ~@rest))
 
 

@@ -19,8 +19,6 @@
   (setv
     G.rules (Rules)
     G.quest quest)
-  (for [[k v] (.items Rules.slot-defaults)]
-    (setattr G.rules k (deepcopy v)))
   (when rules
     (for [[k v] (.items rules)]
       (setattr G.rules k v)))

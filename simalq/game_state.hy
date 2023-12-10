@@ -1,17 +1,17 @@
 (require
   hyrule [unless]
-  simalq.macros [slot-defaults defmeth])
+  simalq.macros [defdataclass defmeth])
 (import
   copy [deepcopy]
   fractions [Fraction :as f/])
 (setv  T True  F False)
 
 
-(defclass Global []
+(defdataclass Global []
   "All state information for the game being played, including an undo
   history of individual `GameState`s."
 
-  (slot-defaults
+  :field-defaults [
     rules None
       ; A `Rules` object. It shouldn't be mutated mid-game, or the
       ; game-state history can get desynchronized.
@@ -20,9 +20,9 @@
       ; of each level can be retrieved from it.
     state None
       ; The current `GameState`.
-    states None
+    states []
       ; A history of `GameState`s.
-    state-i None)
+    state-i None]
       ; An index of `states`, pointing to the predecessor of `state`.
       ; Typically its value is just the last index of `states`, but it's
       ; decremented when states are undone.
@@ -46,9 +46,7 @@
     "Clear `GameState` attributes and start fresh. `rules` should
     already be set."
 
-    (setv @state (HydratedGameState :action None))
-    (for [[k v] (.items HydratedGameState.slot-defaults)]
-      (setattr @state k (deepcopy v)))
+    (setv @state (HydratedGameState))
     (setv @states [])
     (setv @state-i None))
 
@@ -61,7 +59,7 @@
       (+= @state-i 1))
     (defn copy-state []
       (if (% @state-i @rules.state-dehydration-factor)
-        (DehydratedGameState :action @state.action)
+        (GameState :action @state.action)
         (deepcopy @state)))
     (cond
       (= @state-i (len @states))
@@ -104,27 +102,21 @@
         (take-turn (. @states [i] action))))))
 
 
-(setv G (Global))
-  ; This instance is the active `Global` object. It should only be
-  ; modified in place, not reassigned.
+(defdataclass GameState []
+  #[[A state in which the game is ready to receive another action
+  from the player. Instances of this class but not `HydratedGameState`
+  are "dehydrated" game states.]]
 
-
-(defclass GameState []
-  "An abstract base class for a state in which the game is ready to
-  receive another action from the player."
-
-  (slot-defaults
-    action None)
+  :field-defaults
+    [action None])
       ; The player's `Action` that produced this game state from the
       ; previous one. It's `None` only for the initial state.
 
-  (defmeth __init__ [action]
-    (setv @action action)))
 
-(defclass HydratedGameState [GameState]
+(defdataclass HydratedGameState [GameState]
   "A fully elaborated game state."
 
-  (slot-defaults
+  :field-defaults [
     level None
       ; A `Level` object. This is mutated to represent the level
       ; changing, such as monsters moving around.
@@ -142,23 +134,18 @@
     time-left None
       ; The number of turns remaining on the current level's time limit
       ; (if it has one).
-    player None))
+    player None])
       ; A `Player` object.
 
-(defclass DehydratedGameState [GameState]
-  "A lighter-weight substitute for a `HydratedGameState`."
 
-  (setv __slots__ []))
-
-
-(defclass Rules []
-  (slot-defaults
+(defdataclass Rules []
+  :field-defaults [
     ; The individual rules and their default values. All defaults
     ; are per IQ when applicable.
       state-dehydration-factor 100
         ; State 0, and every `state-dehydration-factor` states
         ; thereafter, are stored as `HydratedGameState`s. The rest are
-        ; stored as `DehydratedGameState`s.
+        ; stored as plain `GameState`s.
       reality-bubble-size 6
         ; The reality bubble is the (Chebyshev) radius around the
         ; player in which monsters etc. get to act. It's a square
@@ -192,8 +179,13 @@
         ; How many rounds paralysis lasts for.
       poison-emitter-damage 2
         ; Damage per turn from poisonous fountains.
-      dainty-monsters T))
+      dainty-monsters T])
         ; Whether monsters will only step on empty floor (with some
         ; exceptions, like spiders walking on webs). Otherwise,
         ; monsters obey similar rules as the player does regarding
         ; blocking tiles.
+
+
+(setv G (Global))
+  ; This instance is the active `Global` object. It should only be
+  ; modified in place, not reassigned.
