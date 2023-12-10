@@ -8,7 +8,6 @@
   pytest
   tests.lib [init init-boot-camp assert-at wait mv-player wk shoot assert-player-at assert-hp]
   simalq.game-state [G]
-  simalq.geometry [Pos at]
   simalq.save-load [save-game load-game]
   simalq.quest-definition [mk-tile])
 (setv  T True  F False)
