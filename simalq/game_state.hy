@@ -107,10 +107,9 @@
   from the player. Instances of this class but not `HydratedGameState`
   are "dehydrated" game states.]]
 
-  :field-defaults
-    [action None])
-      ; The player's `Action` that produced this game state from the
-      ; previous one. It's `None` only for the initial state.
+  :field-defaults [action None])
+    ; The player's `Action` that produced this game state from the
+    ; previous one. It's `None` only for the initial state.
 
 
 (defdataclass HydratedGameState [GameState]
@@ -139,51 +138,51 @@
 
 
 (defdataclass Rules []
+
   :field-defaults [
-    ; The individual rules and their default values. All defaults
-    ; are per IQ when applicable.
-      state-dehydration-factor 100
-        ; State 0, and every `state-dehydration-factor` states
-        ; thereafter, are stored as `HydratedGameState`s. The rest are
-        ; stored as plain `GameState`s.
-      reality-bubble-size 6
-        ; The reality bubble is the (Chebyshev) radius around the
-        ; player in which monsters etc. get to act. It's a square
-        ; spanning `2 * reality-bubble-size + 1` map squares on each
-        ; side, with the player in the center.
-      player-hp-factor (f/ 1)
-        ; Multiplies the player's starting HP and healing.
-      poison-factor (f/ 1)
-        ; Multiplies all ambient poison rates.
-      max-keys 8
-        ; How many keys the player can carry at once.
-      max-usables 3
-        ; How many inventory slots the player has for wands etc.
-      player-melee-damage-base 2
-        ; How much damage the player does with her sword normally.
-      player-melee-damage-artifact 3
-        ; How much with the relevant artifact.
-      player-shot-damage-base 1
-        ; How much damage the player does with her bow normally.
-      player-shot-damage-artifact 2
-        ; How much with the relevant artifact (and no magic arrows).
-      player-shot-damage-magic 3
-        ; How much damage the player does with magic arrows.
-      magic-arrows-pickup-size 10
-        ; How many magic arrows come in a pickup.
-      time-bonus 25
-        ; How many turns a clock pickup extends the time limit by.
-      artifact-shield-factor (f/ 3 4)
-        ; How much the artifact shield multiplies incoming damage by.
-      paralysis-duration 3
-        ; How many rounds paralysis lasts for.
-      poison-emitter-damage 2
-        ; Damage per turn from poisonous fountains.
-      dainty-monsters T])
-        ; Whether monsters will only step on empty floor (with some
-        ; exceptions, like spiders walking on webs). Otherwise,
-        ; monsters obey similar rules as the player does regarding
-        ; blocking tiles.
+    ; All defaults are per IQ when applicable.
+    state-dehydration-factor 100
+      ; State 0, and every `state-dehydration-factor` states
+      ; thereafter, are stored as `HydratedGameState`s. The rest are
+      ; stored as plain `GameState`s.
+    reality-bubble-size 6
+      ; The reality bubble is the (Chebyshev) radius around the
+      ; player in which monsters etc. get to act. It's a square
+      ; spanning `2 * reality-bubble-size + 1` map squares on each
+      ; side, with the player in the center.
+    player-hp-factor (f/ 1)
+      ; Multiplies the player's starting HP and healing.
+    poison-factor (f/ 1)
+      ; Multiplies all ambient poison rates.
+    max-keys 8
+      ; How many keys the player can carry at once.
+    max-usables 3
+      ; How many inventory slots the player has for wands etc.
+    player-melee-damage-base 2
+      ; How much damage the player does with her sword normally.
+    player-melee-damage-artifact 3
+      ; How much with the relevant artifact.
+    player-shot-damage-base 1
+      ; How much damage the player does with her bow normally.
+    player-shot-damage-artifact 2
+      ; How much with the relevant artifact (and no magic arrows).
+    player-shot-damage-magic 3
+      ; How much damage the player does with magic arrows.
+    magic-arrows-pickup-size 10
+      ; How many magic arrows come in a pickup.
+    time-bonus 25
+      ; How many turns a clock pickup extends the time limit by.
+    artifact-shield-factor (f/ 3 4)
+      ; How much the artifact shield multiplies incoming damage by.
+    paralysis-duration 3
+      ; How many rounds paralysis lasts for.
+    poison-emitter-damage 2
+      ; Damage per turn from poisonous fountains.
+    dainty-monsters T])
+      ; Whether monsters will only step on empty floor (with some
+      ; exceptions, like spiders walking on webs). Otherwise,
+      ; monsters obey similar rules as the player does regarding
+      ; blocking tiles.
 
 
 (setv G (Global))
