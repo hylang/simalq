@@ -25,7 +25,7 @@
 (defdataclass ColorChar []
   "A character with a foreground and background color. Colors can
   be `None` or a symbol (a key of `color.by-name`)."
-  [char fg bg])
+  :fields [char fg bg])
 
 (defn colorstr [s [fg None] [bg None]]
   "Convert a string to a colorstr, i.e., a list of `ColorChar`s."

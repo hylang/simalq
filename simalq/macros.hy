@@ -3,21 +3,21 @@
 
 
 (defmacro defdataclass [class-name superclasses #* rest]
-  (setv   rest (list rest)  docstring []  fields []  field-defaults []  kwargs [])
+  (setv   rest (list rest)  docstring [])
   (when (and rest (isinstance (get rest 0) hy.models.String))
     (.append docstring (.pop rest 0)))
-  (when rest (cond
-    (= (get rest 0) ':field-defaults)
-      (do
-        (.pop rest 0)
-        (setv field-defaults (.pop rest 0)))
-    (isinstance (get rest 0) hy.models.List)
-      (setv fields (.pop rest 0))
-    True
-      (raise ValueError)))
+  (setv  kwargs []  fields []  field-defaults [])
   (while (and rest (isinstance (get rest 0) hy.models.Keyword))
-    (.append kwargs (.pop rest 0))
-    (.append kwargs (.pop rest 0)))
+    (setv [k v #* rest] rest)
+    (cond
+      (= k ':fields)
+        (setv fields v)
+      (= k ':field-defaults)
+        (setv field-defaults v)
+      True
+        (.extend kwargs [k v])))
+  (assert (not (and fields field-defaults)))
+    ; `field-defaults` defines `fields` implicitly.
   (unless (or fields field-defaults)
     (.extend kwargs '[:frozen True]))
   `(defclass

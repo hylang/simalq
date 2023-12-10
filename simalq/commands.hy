@@ -27,15 +27,15 @@
 (defdataclass Walk [Action]
   "Try to walk one step in the given direction, or attack something
   that's in the way with your sword."
-  [direction]
+  :fields [direction]
   :frozen T)
 (defdataclass Shoot [Action]
   "Fire an arrow in the given direction."
-  [direction]
+  :fields [direction]
   :frozen T)
 (defdataclass UseItem [Action]
   "Apply an item from your inventory."
-  [item-ix target-x target-y]
+  :fields [item-ix target-x target-y]
   :frozen T)
 
 (defdataclass Help [Command]
@@ -60,11 +60,11 @@
 (defdataclass ShiftHistory [Command]
   "{details}"
   ; Undo or redo.
-  [steps]
+  :fields [steps]
   :frozen T)
 (defdataclass SaveGame [Command]
   "Save the game, {details}."
-  [kind]
+  :fields [kind]
   :frozen T)
 (defdataclass LoadGame [Command]
   "Load a saved game.")

@@ -12,7 +12,7 @@
 (defdataclass Map []
   "A level layout."
 
-  [wrap-x wrap-y data width height]
+  :fields [wrap-x wrap-y data width height]
     ; `wrap-x` and `wrap-y` are Booleans.
     ; `data` is a tuple of tuples representing the squares of the map.
     ; Each tile is itself a list representing a stack of tiles on
@@ -33,7 +33,7 @@
 
 
 (defdataclass Direction []
-  [name x y]
+  :fields [name x y]
   :frozen T)
 ((fn []
   ; Define the direction constants (`Direction.N`, `.NE`, etc.)
@@ -72,7 +72,7 @@
 (defdataclass Pos []
   "A position; a point on a map."
 
-  [map x y]
+  :fields [map x y]
   :frozen T
 
   (defmeth __init__ [map x y]

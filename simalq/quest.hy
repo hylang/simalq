@@ -12,7 +12,7 @@
 
 (defdataclass Quest []
   "A scenario or campaign; a sequence of levels to play."
-  [name title authors starting-hp levels]
+  :fields [name title authors starting-hp levels]
   :frozen T)
 
 (defn start-quest [quest [rules None]]
@@ -32,7 +32,8 @@
 
 (defdataclass Level []
   "A map and associated data for playing it."
-  [n title player-start next-level
+  :fields [
+    n title player-start next-level
     poison-intensity time-limit exit-speed moving-exit-start
     map]
   ; Poison intensity is a fraction.Fraction, the amount of poison to
