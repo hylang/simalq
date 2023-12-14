@@ -28,9 +28,7 @@
            (.pop kwargs field)
            (deepcopy (get cls.field-defaults field)))))
     (when kwargs
-      (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}")))
-    (when @each-turn
-      (.append G.each-turn @)))
+      (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}"))))
 
   (defmeth __setattr__ [name value]
     (if (in name (@all-mutable-fields))
@@ -132,11 +130,8 @@
       ; If `damageable` is true, it overrides this.
     blocks-monster-shots T
       ; Whether monsters are prevented from shooting by this tile.
-    superblock F
+    superblock F)
       ; Resist all ordinary attempts to change or bypass the tile.
-    each-turn None)
-      ; Set this to a method to get instances added to `G.each-turn`
-      ; upon creation. The method will be called in the main turn loop.
 
   (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
     "This method should return a dictionary of instance variables
@@ -181,10 +176,14 @@
     None))
 
 
-(defn deftile [superclass mapsym name #** kwargs]
+(defn deftile [superclasses mapsym name #** kwargs]
   "Declare and return a new concrete and final tile type. Superclasses
   of tiles not meant to themselves be instantiated should be declared
   with `defclass`."
+
+  (setv superclasses (if (isinstance superclasses #(list tuple))
+    (tuple superclasses)
+    #(superclasses)))
 
   (setv article None)
   (setv stem (re.sub r"\A(a|an|the|some) "
@@ -192,7 +191,10 @@
     name))
   (assert (or (isinstance mapsym property) (= (len mapsym) 2)))
 
-  (setv new-attrs (lfor  k kwargs  :if (not (hasattr superclass k))  k))
+  (setv new-attrs (lfor
+    k kwargs
+    :if (not (any (gfor  c superclasses  (hasattr c k))))
+    k))
   (when new-attrs
     (raise (TypeError f"Unknown attributes: {new-attrs}")))
       ; New attributes should be introduced in a superclass. Otherwise,
@@ -202,7 +204,7 @@
 
   (setv cls (type
     stem
-    #(superclass)
+    superclasses
     (dict
       :article article
       :stem stem
@@ -310,6 +312,27 @@
 
   (defmeth act []
     (raise (TypeError f"No `act` method defined for actor {(type @)}"))))
+
+
+(defclass EachTurner [Tile]
+  "Like `Actor`, but the method can still fire outside the reality
+  bubble, and it goes after all actors."
+
+  (defmeth __init__ [#** kwargs]
+    (.__init__ (super) #** kwargs)
+    (.append G.each-turn @))
+
+  (defmeth [classmethod] run-all []
+    "Run all currently registered hooks. Unless an object is neither
+    on this level nor in the player's inventory, in which case, kick
+    the object off the list."
+    (for [o (list G.each-turn)]
+      (unless (or (in o G.player.inventory) (and o.pos (is o.pos.map G.map)))
+        (.remove G.each-turn o))
+      (.each-turn o)))
+
+  (defmeth each-turn []
+    (raise (NotImplementedError))))
 
 
 (import

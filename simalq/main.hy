@@ -86,13 +86,8 @@
 
   ; Now do end-of-turn processing.
 
-  ; Run each-turn hooks. Unless the object is neither on this level
-  ; nor in the player's inventory, in which case, kick the object off
-  ; the list.
-  (for [o (list G.each-turn)]
-    (unless (or (in o G.player.inventory) (and o.pos (is o.pos.map G.map)))
-      (.remove G.each-turn o))
-    (.each-turn o))
+  ; Run `each-turn` hooks.
+  (hy.I.simalq/tile.EachTurner.run-all)
 
   ; Dose the player with ambient poison, and convert an accumulated
   ; dose ≥1 into damage. Also, deal damage from poison emitters.

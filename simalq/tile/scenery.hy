@@ -5,7 +5,7 @@
   simalq.color :as color
   simalq.util [CommandError player-melee-damage DamageType next-in-cycle StatusEffect hurt-player]
   simalq.geometry [Pos Direction pos+ at burst dist dir-to]
-  simalq.tile [Tile deftile replace-tile damage-tile mv-tile destroy-tile]
+  simalq.tile [Tile EachTurner deftile replace-tile damage-tile mv-tile destroy-tile]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -514,7 +514,7 @@
   :flavor "Dungeon trash like sawdust, loose stones, pebbles, greasy chicken bones left over from goblin feasts, broken wands, and maybe a dead body, all bunched together into a small mound. Running through it will knock it over and get your boots really gross.")
 
 
-(deftile Scenery "()" "a magical energy shield"
+(deftile [Scenery EachTurner] "()" "a magical energy shield"
   :color 'dark-orange
   :field-defaults (dict
     :time-remaining 12)
