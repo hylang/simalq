@@ -20,13 +20,15 @@
   (setv types-by-iq-ix {})
 
   (defmeth __init__ [#** kwargs]
-    ; - Each keyword argument must match a field.
-    ; - No field name may be used twice in a single inheritance chain.
-    (for [[cls field] (@all-fields)]
-       (object.__setattr__ @ field
-         (if (in field kwargs)
-           (.pop kwargs field)
-           (deepcopy (get cls.field-defaults field)))))
+    ; Each keyword argument must match a field.
+    (for [field (@all-fields)]
+      (object.__setattr__ @ field
+        (if (in field kwargs)
+          (.pop kwargs field)
+          (deepcopy (next (gfor
+            c (. (type @) __mro__)
+            :if (in field (getattr c "field_defaults" {}))
+            (get c.field-defaults field)))))))
     (when kwargs
       (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}"))))
 
@@ -38,7 +40,7 @@
   (defmeth __deepcopy__ [memo]
     ; We provide this to avoid triggering `__setattr__` in `deepcopy`.
     (setv t (@__new__ (type @)))
-    (for [[_ field] (@all-fields)]
+    (for [field (@all-fields)]
       (object.__setattr__ t field (deepcopy (getattr @ field) memo)))
     t)
 
@@ -49,10 +51,10 @@
       (object.__setattr__ @ k v)))
 
   (defn [classmethod] all-fields [cls]
-    (lfor
+    (sfor
       c cls.__mro__
       field (.get c.__dict__ "fields" #())
-      #(c field)))
+      field))
 
   (defn [classmethod] all-mutable-fields [cls]
     (sfor
@@ -224,7 +226,7 @@
       (setv (get Tile.types-by-iq-ix i) cls)))
   (when (in "iq_ix_mapper" kwargs)
     (setv [field d] (get kwargs "iq_ix_mapper"))
-    (assert (in field (sfor  [_ x] (.all-fields cls)  x)))
+    (assert (in field (.all-fields cls)))
     (for [[iq-ix field-value] (.items d)]
       (assert (not-in iq-ix Tile.types-by-iq-ix))
       (setv (get Tile.types-by-iq-ix iq-ix)
@@ -232,7 +234,7 @@
 
   (hy.repr-register cls (fn [x]
     (.format "(<{}> {})" stem (.join " " (gfor
-      [_ s] (.all-fields x)
+      s (.all-fields x)
       (.format ":{} {}" (hy.unmangle s) (hy.repr (getattr x s))))))))
 
   cls)
