@@ -1,20 +1,21 @@
+(require
+  simalq.macros [meth])
 (import
   fractions [Fraction]
-  simalq.tile [Tile deftile])
+  simalq.util [GameOverException]
+  simalq.tile [Tile Damageable deftile])
 (setv  T True  F False)
 
 
 (setv character-name "Princess Triskaidecagonn XIII")
 
-(deftile Tile "@ " character-name
+(deftile [Damageable] "@ " character-name
   ; A type representing the player-character.
 
   :field-defaults (dict
     :game-over-state None
       ; Set to a symbol when the game ends to indicate that the game
       ; has ended and how.
-    :hp 1
-      ; How many hit points (HP) you have. When you run out, you die.
     :poison-dose (Fraction 0)
       ; The current amount of ambient poison breathed in. Amounts
       ; ≥ 1 get converted to damage.
@@ -44,7 +45,8 @@
     ; `inventory` and `artifacts` should be mutated directly rather
     ; reassigned.
 
-  :damageable T
+  :be-thus-destroyed (meth []
+    (raise (GameOverException 'dead)))
 
   :flavor "People who've met Tris and Argonn separately are sometimes surprised to learn that they're siblings. They don't look much alike.")
 

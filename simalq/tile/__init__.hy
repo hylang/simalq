@@ -6,7 +6,7 @@
   re
   simalq.color :as color
   simalq.game-state [G]
-  simalq.util [GameOverException]
+  simalq.util [player-melee-damage DamageType]
   simalq.geometry [at])
 (setv  T True  F False)
 
@@ -109,27 +109,8 @@
     points 0
       ; Points awarded for picking up an object, killing a monster,
       ; etc.
-    damageable F
-      ; Whether a tile of this kind can be hurt by the player's sword
-      ; etc. To be overridden in subclasses, which, if they enable it,
-      ; should include a field `hp`.
-    immune #()
-      ; Damage types the tile ignores.
-    resists #()
-      ; Damage types the tile can only take 1 damage from. Immunities
-      ; apply first (but you should avoid having the same damage type
-      ; in each).
-    weaknesses #()
-      ; Damage types that can instantly destroy the tile. Immunities
-      ; apply first.
-    score-for-damaging F
-      ; If true, you get the tile's point value per HP of damage you
-      ; do to it (with no points for overkill). Otherwise, you get
-      ; its point value for destroying it (or picking it up, if it's
-      ; an item).
     blocks-player-shots T
       ; Whether the player's arrows are stopped by this tile.
-      ; If `damageable` is true, it overrides this.
     blocks-monster-shots T
       ; Whether monsters are prevented from shooting by this tile.
     superblock F)
@@ -145,10 +126,10 @@
     tile"
     {})
 
-  (defmeth info-bullets []
+  (defmeth info-bullets [#* bullets]
     "Return a list of bulleted items for an info screen. `None`s
     in this list will be filtered out by the caller."
-    [])
+    bullets)
 
   (defmeth hook-player-bump [origin]
     "Called when the player tries to walk towards this tile. Return
@@ -267,37 +248,6 @@
     ((get Tile.types new-stem) :pos old.pos)))
 
 
-(defn damage-tile [tile amount damage-type]
-  "`amount` can be `Inf` or a nonnegative `int`. `damage-type` can be
-  `None` for non-modifiable pure damage."
-
-  (when (= amount 0)
-    (return))
-  (unless tile.damageable
-    (raise TypeError))
-  (when (in damage-type tile.immune)
-    ; The tile shrugs off the attack.
-    (return))
-  (when (in damage-type tile.resists)
-    ; The tile can't take more than 1 damage.
-    (setv amount 1))
-  (when (or (= amount Inf) (in damage-type tile.weaknesses))
-    ; This will be a one-hit kill.
-    (setv amount tile.hp))
-  (-= tile.hp amount)
-  (when tile.score-for-damaging
-    (+= G.score (* tile.points (min amount (+ tile.hp amount)))))
-      ; No extra points are awarded for overkill damage.
-  (when (<= tile.hp 0)
-    ; It's destroyed.
-    (if (is tile G.player)
-      (raise (GameOverException 'dead))
-      (do
-        (unless tile.score-for-damaging
-          (+= G.score tile.points))
-        (destroy-tile tile)))))
-
-
 (defclass Actor [Tile]
   "A kind of tile (typically a monster) that gets to do something each
   turn that it's in the reality bubble."
@@ -335,6 +285,77 @@
 
   (defmeth each-turn []
     (raise (NotImplementedError))))
+
+
+(defclass Damageable [Tile]
+  "Tiles that can take damage, like from being attacked by the player
+  or a monster, and track hit points.
+
+  Instances ignore the attribute `Tile.blocks-player-shots`."
+
+  (field-defaults
+    hp 1)
+      ; The tile's number of hit points (HP). When its HP hits 0,
+      ; it's destroyed.
+
+  (setv
+    mutable-fields #("hp")
+    immune #()
+      ; Damage types the tile ignores.
+    resists #()
+      ; Damage types the tile can only take 1 damage from. Immunities
+      ; apply first (but you should avoid having the same damage type
+      ; in each).
+    weaknesses #()
+      ; Damage types that can instantly destroy the tile. Immunities
+      ; apply first.
+    score-for-damaging F)
+      ; If true, you get the tile's point value per HP of damage you
+      ; do to it (with no points for overkill). Otherwise, you get
+      ; its point value for destroying it (or picking it up, if it's
+      ; an item).
+
+  (defmeth hook-player-bump [origin]
+    "You attack the tile with your sword."
+    (@damage (player-melee-damage) DamageType.PlayerMelee)
+    True)
+
+  (defmeth damage [amount damage-type]
+    "Take some damage. `amount` can be `Inf` or a nonnegative `int`.
+    `damage-type` can be `None` for non-modifiable pure damage."
+
+    (when (= amount 0)
+      (return))
+    (when (in damage-type @immune)
+      (return))
+    (when (in damage-type @resists)
+      (setv amount 1))
+    (when (or (= amount Inf) (in damage-type @weaknesses))
+      ; This will be a one-hit kill.
+      (setv amount @hp))
+    (-= @hp amount)
+    (when @score-for-damaging
+      (+= G.score (* @points (min amount (+ @hp amount)))))
+        ; No extra points are awarded for overkill damage.
+    (when (<= @hp 0)
+      (@be-thus-destroyed)))
+
+  (defmeth be-thus-destroyed []
+    (unless @score-for-damaging
+      (+= G.score @points))
+    (destroy-tile @))
+
+  (defmeth info-bullets [#* extra]
+    (.info-bullets (super)
+      #("Hit points" @hp)
+      (if @immune
+        #("Immune to" (.join ", " (gfor  x @immune  x.value)))
+        "No immunities")
+      (when @resists
+        #("Takes no more than 1 damage from" (.join ", " (gfor  x @resists  x.value))))
+      (when @weaknesses
+        #("Instantly destroyed by" (.join ", " (gfor  x @weaknesses  x.value))))
+       #* extra)))
 
 
 (import

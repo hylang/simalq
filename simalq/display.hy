@@ -10,7 +10,7 @@
   simalq.game-state [G]
   simalq.util [mixed-number menu-letters StatusEffect]
   simalq.geometry [Pos at dist]
-  simalq.tile [Tile])
+  simalq.tile [Tile Damageable])
 (setv  T True  F False)
 
 
@@ -325,7 +325,7 @@
           (get t.color-bg i)
         t.color-bg
           t.color-bg
-        (and t.damageable (is-not t G.player))
+        (and (isinstance t Damageable) (is-not t G.player))
           ; Monsters etc. get an automatic background color to show
           ; how many HP they have.
           (.get color.tile-bg-by-hp

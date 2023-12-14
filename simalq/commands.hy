@@ -10,7 +10,7 @@
   simalq.util [CommandError DamageType msg player-shot-damage flash-map menu-letters player-status]
   simalq.geometry [Direction Pos pos+ at dist]
   simalq.game-state [G]
-  simalq.tile [mv-tile damage-tile destroy-tile]
+  simalq.tile [Damageable mv-tile destroy-tile]
   simalq.tile.scenery [walkability]
   simalq.save-load [save-game-to-slot get-saves-list load-game])
 (setv  T True  F False)
@@ -281,10 +281,10 @@
               (.hook-player-shot tile)
               (unless (and magic (!= tile.pos target))
                 (return)))
-            tile.damageable (do
+            (isinstance tile Damageable) (do
               ; The arrow damages the tile and may stop.
               (animate)
-              (damage-tile tile (player-shot-damage magic) (if magic
+              (.damage tile (player-shot-damage magic) (if magic
                 DamageType.MagicArrow
                 DamageType.MundaneArrow))
               (unless (and magic (!= tile.pos target))

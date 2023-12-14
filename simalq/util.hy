@@ -178,7 +178,7 @@
 
   (setv hp-was G.player.hp)
   (unless (player-status 'Ivln)
-    (hy.I.simalq/tile.damage-tile G.player amount damage-type))
+    (.damage G.player amount damage-type))
   (when (chainc
          G.player.hp
       <= (refactor-hp hp-warning-threshold)
@@ -196,7 +196,7 @@
 
   (import
     simalq.geometry [burst at dist]
-    simalq.tile [damage-tile])
+    simalq.tile [Damageable])
 
   (setv b (tuple (burst center (- (len amount) 1))))
   (flash-map
@@ -206,10 +206,7 @@
     :labels {}
     :flash-time-s .5)
 
-  (for [p b  tile (at p)  :if tile.damageable]
+  (for [p b  tile (at p)  :if (isinstance tile Damageable)]
     (if (is tile G.player)
       (hurt-player player-amount damage-type)
-      (damage-tile
-        tile
-        (get amount (dist center p))
-        damage-type))))
+      (.damage tile (get amount (dist center p)) damage-type))))

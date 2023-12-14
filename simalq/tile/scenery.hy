@@ -3,9 +3,9 @@
   simalq.macros [defmeth meth])
 (import
   simalq.color :as color
-  simalq.util [CommandError player-melee-damage DamageType next-in-cycle StatusEffect hurt-player]
+  simalq.util [CommandError DamageType next-in-cycle StatusEffect hurt-player]
   simalq.geometry [Pos Direction pos+ at burst dist dir-to]
-  simalq.tile [Tile EachTurner deftile replace-tile damage-tile mv-tile destroy-tile]
+  simalq.tile [Tile EachTurner Damageable deftile replace-tile mv-tile destroy-tile]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -36,13 +36,7 @@
 
   (defmeth info-bullets [#* extra]
     (setv blocks-monster (or @blocks-monster @blocks-move))
-    [
-      (when @damageable
-        #("Hit points" @hp))
-      (when @damageable
-        (if @immune
-          #("Immune to" (.join ", " (gfor  x @immune  x.value)))
-          "No immunities"))
+    (.info-bullets (super)
       (when @blocks-move
         "Blocks all movement")
       (when (and
@@ -70,7 +64,7 @@
       (when @protects-vs-poison-air
         #("Special effect" "If you end your turn within 1 square of this tile, you'll take no damage from ambient poison or poisonous fountains. Other sources of poison damage are unaffected."))
       (when @emits-poison-air
-        #("Special effect" f"If you end your turn within 1 square of this tile, you'll take {G.rules.poison-emitter-damage} poison damage. This effect applies no more once per turn."))]))
+        #("Special effect" f"If you end your turn within 1 square of this tile, you'll take {G.rules.poison-emitter-damage} poison damage. This effect applies no more once per turn.")))))
 
 
 (defn walkability [p direction monster? [ethereal-to #()]]
@@ -251,10 +245,9 @@
   :flavor "Get me outta here.")
 
 
-(deftile Scenery "##" "a cracked wall"
+(deftile [Scenery Damageable] "##" "a cracked wall"
   :field-defaults (dict
     :hp 2)
-  :mutable-fields #("hp")
   :iq-ix-mapper ["hp"
     {3 4  4 2  15 6}]
 
@@ -263,12 +256,7 @@
 
   :blocks-move T :blocks-diag T :blocks-player-shots F
   :destructible-by-passwall-wand T
-  :damageable T
   :immune #(DamageType.Poison DamageType.Fire DamageType.DeathMagic)
-  :hook-player-bump (meth [origin]
-    "You attack the wall with your sword."
-    (damage-tile @ (player-melee-damage) DamageType.PlayerMelee)
-    True)
 
   :flavor "I think this dungeon might not be up to code.")
 
@@ -388,7 +376,7 @@
     ; At the target, tele-frag all tiles, which we already know must
     ; be monsters.
     (for [tile (at target)]
-      (damage-tile tile Inf None))
+      (.damage tile Inf None))
 
     ; Now actually move the player.
     (mv-tile G.player target)

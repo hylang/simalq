@@ -6,10 +6,10 @@
   fractions [Fraction :as f/]
   enum [Enum]
   toolz [unique]
-  simalq.util [player-melee-damage DamageType hurt-player next-in-cycle mixed-number player-status]
+  simalq.util [DamageType hurt-player next-in-cycle mixed-number player-status]
   simalq.geometry [Direction pos+ at dist adjacent? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
-  simalq.tile [Tile Actor deftile mv-tile add-tile damage-tile destroy-tile]
+  simalq.tile [Tile Actor Damageable deftile mv-tile add-tile destroy-tile]
   simalq.tile.scenery [Scenery walkability nogo?])
 (setv  T True  F False)
 
@@ -20,19 +20,15 @@
 (setv undead-immunities #(Poison DeathMagic))
 
 
-(defclass Monster [Actor]
+(defclass Monster [Actor Damageable]
   "A non-player character, typically out to kill the player."
 
   (field-defaults
-    hp 1
-        ; The monster's number of hit points (HP). When a monster's
-        ; HP hits 0, it dies.
     movement-state None)
         ; A bit of memory or plan that the monster uses to choose
         ; its movements. Its meaning depends on `ai`.
   (setv
     mutable-fields #("hp" "movement_state")
-    damageable T
     damage-melee None
       ; How much damage the monster does with its basic melee attack.
       ; This can be `None`, one number, or a tuple of numbers, with
@@ -57,11 +53,6 @@
     "How many points the monster's generator is worth."
     (* 4 cls.points))
 
-  (defmeth hook-player-bump [origin]
-    "Attack the monster in melee."
-    (damage-tile @ (player-melee-damage) PlayerMelee)
-    True)
-
   (setv act 'approach)
 
   (defmeth suffix-dict []
@@ -77,15 +68,7 @@
             (str d))))
         damage))
 
-    [
-      #("Hit points" @hp)
-      (if @immune
-        #("Immune to" (.join ", " (gfor  x @immune  x.value)))
-        "No immunities")
-      (when @resists
-        #("Takes no more than 1 damage from" (.join ", " (gfor  x @resists  x.value))))
-      (when @weaknesses
-        #("Instantly destroyed by" (.join ", " (gfor  x @weaknesses  x.value))))
+    (.info-bullets (super)
       (if @damage-melee
         #("Melee damage" (damage-array @damage-melee))
         "No melee attack")
@@ -107,7 +90,7 @@
       #("Behavior" (or
         @act.__doc__
         (@act.dynadoc @)))
-      #("Movement state" @movement-state)]))
+      #("Movement state" @movement-state))))
 
 (defn damage-by-hp [monster damage]
   (if (isinstance damage tuple)
