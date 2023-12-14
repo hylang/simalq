@@ -6,7 +6,7 @@
   fractions [Fraction :as f/]
   enum [Enum]
   toolz [unique]
-  simalq.util [DamageType hurt-player next-in-cycle mixed-number player-status]
+  simalq.util [DamageType next-in-cycle mixed-number player-status]
   simalq.geometry [Direction pos+ at dist adjacent? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
   simalq.tile [Tile Actor Damageable deftile mv-tile add-tile destroy-tile]
@@ -179,7 +179,7 @@
   ; Execute the attack.
   (when dry-run
     (return T))
-  (hurt-player :attacker mon
+  (.damage G.player :attacker mon
     (damage-by-hp mon (if (= attack 'shot) mon.damage-shot mon.damage-melee))
     (if (= attack 'shot) MonsterShot MonsterMelee))
   (when (and mon.kamikaze mon.pos)

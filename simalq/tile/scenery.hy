@@ -3,7 +3,7 @@
   simalq.macros [defmeth meth])
 (import
   simalq.color :as color
-  simalq.util [CommandError DamageType next-in-cycle StatusEffect hurt-player]
+  simalq.util [CommandError DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction pos+ at burst dist dir-to]
   simalq.tile [Tile EachTurner Damageable deftile replace-tile mv-tile destroy-tile]
   simalq.game-state [G])
@@ -451,7 +451,7 @@
 
   :hook-player-walked-into (meth []
     (doc f"Does {trap-damage} damage.")
-    (hurt-player trap-damage DamageType.Trap))
+    (.damage G.player trap-damage DamageType.Trap))
 
   :flavor "A dense assortment of pointy, painful objects that can penetrate the toughest footwear.")
 (setv trap-damage 5)

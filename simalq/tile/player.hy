@@ -1,8 +1,12 @@
 (require
+  hyrule [unless]
   simalq.macros [meth])
 (import
   fractions [Fraction]
-  simalq.util [GameOverException]
+  simalq.game-state [G]
+  simalq.color :as colors
+  simalq.util [GameOverException DamageType msg refactor-hp hp-warning-threshold player-status flash-map]
+  simalq.geometry [ray dir-to dist]
   simalq.tile [Tile Damageable deftile])
 (setv  T True  F False)
 
@@ -44,6 +48,41 @@
   :mutable-fields (tuple (map hy.mangle '(game-over-state hp poison-dose just-exited taking-extra-action keys magic-arrows floater-disturbance)))
     ; `inventory` and `artifacts` should be mutated directly rather
     ; reassigned.
+
+  :damage (meth [amount damage-type [animate T] [attacker None]]
+    (unless amount
+      (return))
+
+    (when (and
+        (get @artifacts "Magic Shield")
+        (in damage-type #(DamageType.MonsterMelee DamageType.MonsterShot)))
+      (setv amount (int (.__ceil__
+        (* G.rules.artifact-shield-factor amount)))))
+
+    (when animate
+      (flash-map
+        @pos
+        colors.flash-player-damaged
+        (+
+          (if (and attacker attacker.pos)
+            (ray @pos
+              (dir-to @pos attacker.pos)
+              (dist @pos attacker.pos))
+            #())
+          (if (player-status 'Ivln)
+            #()
+            #(@pos)))
+        {@pos (if (> amount 99) "OW" (format amount "2"))}
+        :flash-time-s .2))
+
+    (setv hp-was @hp)
+    (unless (player-status 'Ivln)
+      (Damageable.damage @ amount damage-type))
+    (when (chainc
+           @hp
+        <= (refactor-hp hp-warning-threshold)
+        <  hp-was)
+      (msg "Princess needs food badly!")))
 
   :be-thus-destroyed (meth []
     (raise (GameOverException 'dead)))

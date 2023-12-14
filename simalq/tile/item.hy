@@ -7,7 +7,7 @@
   simalq.geometry [pos-seed turn-and-pos-seed burst at]
   simalq.tile [Tile deftile destroy-tile rm-tile add-tile]
   simalq.tile.scenery [Scenery]
-  simalq.util [CommandError DamageType StatusEffect hurt-player msg burst-damage refactor-hp])
+  simalq.util [CommandError DamageType StatusEffect msg burst-damage refactor-hp])
 (setv  T True  F False)
 
 
@@ -108,7 +108,7 @@
       @hp-set-min
         (setv G.player.hp (max (refactor-hp @hp-set-min) G.player.hp))
       (< @hp-effect 0)
-        (hurt-player (- @hp-effect) DamageType.Poison)
+        (.damage G.player (- @hp-effect) DamageType.Poison)
       T
         (+= G.player.hp (refactor-hp @hp-effect)))))
 

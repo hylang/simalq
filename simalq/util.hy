@@ -148,43 +148,6 @@
 (defn refactor-hp [x]
   (int (round (* G.rules.player-hp-factor x))))
 
-(defn hurt-player [amount damage-type [animate T] [attacker None]]
-  (import simalq.geometry [ray dir-to dist])
-
-  (unless amount
-    (return))
-
-  (when (and
-      (get G.player.artifacts "Magic Shield")
-      (in damage-type #(DamageType.MonsterMelee DamageType.MonsterShot)))
-    (setv amount (int (.__ceil__
-      (* G.rules.artifact-shield-factor amount)))))
-
-  (when animate
-    (flash-map
-      G.player.pos
-      colors.flash-player-damaged
-      (+
-        (if (and attacker attacker.pos)
-          (ray G.player.pos
-            (dir-to G.player.pos attacker.pos)
-            (dist G.player.pos attacker.pos))
-          #())
-        (if (player-status 'Ivln)
-          #()
-          #(G.player.pos)))
-      {G.player.pos (if (> amount 99) "OW" (format amount "2"))}
-      :flash-time-s .2))
-
-  (setv hp-was G.player.hp)
-  (unless (player-status 'Ivln)
-    (.damage G.player amount damage-type))
-  (when (chainc
-         G.player.hp
-      <= (refactor-hp hp-warning-threshold)
-      <  hp-was)
-    (msg "Princess needs food badly!")))
-
 
 (defn burst-damage [
     center color amount damage-type [player-amount 0]]
@@ -207,6 +170,6 @@
     :flash-time-s .5)
 
   (for [p b  tile (at p)  :if (isinstance tile Damageable)]
-    (if (is tile G.player)
-      (hurt-player player-amount damage-type)
-      (.damage tile (get amount (dist center p)) damage-type))))
+    (.damage tile
+      (if (is tile G.player) player-amount (get amount (dist center p)))
+      damage-type)))

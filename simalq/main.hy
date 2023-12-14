@@ -5,7 +5,7 @@
   time [sleep]
   contextlib [contextmanager]
   simalq.strings
-  simalq.util [CommandError message-queue msg hurt-player DamageType player-status GameOverException menu-letters]
+  simalq.util [CommandError message-queue msg DamageType player-status GameOverException menu-letters]
   simalq.color :as color
   simalq.geometry [burst at turn-and-pos-seed]
   simalq.game-state [G]
@@ -100,11 +100,11 @@
   (unless (or protected (player-status 'Ivln))
     (+= G.player.poison-dose
       (* G.rules.poison-factor G.level.poison-intensity))
-    (hurt-player :animate F
+    (.damage G.player :animate F
       (pop-integer-part G.player.poison-dose)
       DamageType.Poison)
     (when extra-poison
-      (hurt-player G.rules.poison-emitter-damage DamageType.Poison)))
+      (.damage G.player G.rules.poison-emitter-damage DamageType.Poison)))
 
   ; Tick down status effects.
   (for [se (list G.player.status-effects)]
