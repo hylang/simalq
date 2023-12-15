@@ -51,7 +51,7 @@
 
   (defn [classmethod] points-for-generator [cls]
     "How many points the monster's generator is worth."
-    (* 4 cls.points))
+    (* 4 cls.destruction-points))
 
   (setv act 'approach)
 
@@ -84,9 +84,6 @@
       (unless (= @hook-destroyed.__doc__ Tile.hook-destroyed.__doc__)
         #("Effect on death" @hook-destroyed.__doc__))
       #* extra
-      #("Point value" (.format "{:,}{}"
-        @points
-        (if @score-for-damaging " (scored per HP lost)" "")))
       #("Behavior" (or
         @act.__doc__
         (@act.dynadoc @)))
@@ -308,7 +305,7 @@
 
   :mapsym (property (meth []
     (+ "☉" (self-sc mapsym [0]))))
-  :points (property (meth []
+  :destruction-points (property (meth []
     (self-sc (points-for-generator))))
 
   :score-for-damaging (property (meth []
@@ -357,7 +354,7 @@
     :iq-ix-mapper ["hp"
       (dict (zip iq-ix-mon [1 2 3]))]
     :immune immune
-    :points points-mon
+    :destruction-points points-mon
     :points-for-generator (classmethod (fn [cls] points-gen))
     :flavor flavor-mon
     :flavor-for-generator flavor-gen
@@ -501,7 +498,7 @@
 
 (deftile NonGen "T " "a thorn tree"
   :iq-ix 51
-  :points 10
+  :destruction-points 10
 
   :immune #(MundaneArrow MagicArrow Poison)
     ; We follow IQ in making thorn trees immune to poison, although
@@ -514,7 +511,7 @@
 
 (deftile NonGen "K " "a Dark Knight"
   :iq-ix 53
-  :points 75
+  :destruction-points 75
 
   :damage-melee 12
 
@@ -522,7 +519,7 @@
 
 (deftile NonGen "t " "a Tricorn"
   :iq-ix 54
-  :points 10
+  :destruction-points 10
 
   :damage-melee 5
   :damage-shot 6
@@ -532,7 +529,7 @@
 
 (deftile NonGen "D " "Death"
   :iq-ix 49
-  :points 200
+  :destruction-points 200
 
   :immune  #(MundaneArrow Fire #* undead-immunities)
   :resists #(MagicArrow)
@@ -542,7 +539,7 @@
 
 (deftile NonGen "N " "a negaton"
   :iq-ix 52
-  :points 50
+  :destruction-points 50
 
   :immune #(PlayerMelee MundaneArrow Fire Poison DeathMagic)
      ; The immunity to death magic is an addition to IQ.
@@ -553,7 +550,7 @@
 
 (deftile NonGen "f " "a floater"
   :iq-ix 47
-  :points 2
+  :destruction-points 2
 
   :field-defaults (dict :kamikazed F)
   :mutable-fields #("kamikazed")
@@ -582,7 +579,7 @@
 
 (deftile NonGen "O " "a blob"
   :iq-ix 48
-  :points 0
+  :destruction-points 0
 
   :field-defaults (dict :summon-direction None :summon-power (f/ 0))
   :mutable-fields #("summon_direction" "summon_power")
@@ -612,7 +609,7 @@
 
 (deftile NonGen "S " "a specter"
   :iq-ix 50
-  :points 100
+  :destruction-points 100
 
   :immune #(MundaneArrow #* undead-immunities)
   :damage-melee 15
@@ -629,7 +626,7 @@
 
 (deftile NonGen "S " "a giant spider"
   :color 'brown
-  :points 50
+  :destruction-points 50
 
   :field-defaults (dict :wander-state None)
   :mutable-fields #("wander_state")

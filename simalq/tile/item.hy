@@ -15,17 +15,17 @@
   "An object the player can pick up."
 
   (setv
-    destroy-after-pickup T)
+    destroy-after-pickup T
+    acquirement-points 0)
 
   (defmeth hook-player-walked-into []
-    (+= G.score @points)
+    (+= G.score @acquirement-points)
     (@pick-up)
     (when @destroy-after-pickup
       (destroy-tile @)))
   (defmeth pick-up [])
 
   (defmeth info-bullets [#* extra] [
-    #("Point value" (format @points ","))
     (when (is-not (. (type @) pick-up) Item.pick-up)
       #("Pickup effect" (or
         @pick-up.__doc__
@@ -34,7 +34,8 @@
     (when @hook-player-shot
       #("Effect when you shoot it" (or
         @hook-player-shot.__doc__
-        (@hook-player-shot.dynadoc @))))]))
+        (@hook-player-shot.dynadoc @))))
+    #("Point value" (format @acquirement-points ","))]))
 
 
 (deftile Item "$ " "a lump of fool's gold"
@@ -42,7 +43,7 @@
   :iq-ix 110
     ; The candle, which doen't take an inventory slot and is worth no
     ; points.
-  :points 0
+  :acquirement-points 0
   :flavor "Whoa! This is worthless. But no less than worthless, at least.")
 
 (deftile Item "$ " "a pile of silver"
@@ -50,19 +51,19 @@
   :iq-ix 153
     ; The amulet of sight, which doesn't take an inventory slot and is
     ; worth 50 points.
-  :points 50
+  :acquirement-points 50
   :flavor "Ooh, not quite as shiny.")
 
 (deftile Item "$ " "a pile of gold"
   :color 'dark-yellow
   :iq-ix 18
-  :points 100
+  :acquirement-points 100
   :flavor "Ooh, shiny.")
 
 (deftile Item "$ " "a handful of gems"
   :color 'red
   :iq-ix 109
-  :points 250
+  :acquirement-points 250
   :flavor "Ooh, shinier.")
 
 
@@ -123,7 +124,7 @@
 (deftile Food "% " "a meal"
   :color 'red
   :iq-ix 20  ; healing potion
-  :points 0
+  :acquirement-points 0
 
   :hp-effect 100
   :eat-messages simalq.strings.meal-messages
@@ -133,7 +134,7 @@
 (deftile Food "% " "a snack"
   :color 'navy
   :iq-ix 83  ; healing salve
-  :points 0
+  :acquirement-points 0
 
   :hp-effect 25
   :eat-messages simalq.strings.snack-messages
@@ -143,7 +144,7 @@
 (deftile Food "☠ " "some rotten food"
   :color 'red
   :iq-ix None  ; subtype of unknown potion
-  :points 0
+  :acquirement-points 0
 
   :hp-effect -100
   :eat-messages simalq.strings.rotten-food-messages
@@ -153,7 +154,7 @@
 (deftile Food "% " "an empty platter"
   :color 'black
   :iq-ix None  ; subtype of unknown potion
-  :points 0
+  :acquirement-points 0
 
   :hp-effect 0
   :eat-messages #("There's nothing to eat here. Rats.")
@@ -163,7 +164,7 @@
 (deftile Food "% " "some dessert"
   :color 'rose
   :iq-ix 155  ; super-healing potion
-  :points 0
+  :acquirement-points 0
 
   :hp-set-min 500
   :eat-messages simalq.strings.dessert-messages
@@ -174,7 +175,7 @@
 (deftile Food "☠ " "a jar of poison"
   :color 'dark-green
   :iq-ix 86
-  :points 0
+  :acquirement-points 0
 
   :hp-effect -50
   :eat-messages #("You drink a jar of poison. It tastes pretty bad.")
@@ -198,7 +199,7 @@
 
 (deftile Item "⚷ " "a key"
   :iq-ix 19
-  :points 50
+  :acquirement-points 50
 
   :hook-player-walk-to (meth [origin]
     (when (>= G.player.keys G.rules.max-keys)
@@ -216,7 +217,7 @@
 (deftile Item "↑ " "some magic arrows"
   :color 'purple
   :iq-ix 27
-  :points 100
+  :acquirement-points 100
 
   :pick-up (meth []
     (doc f"Gives you {G.rules.magic-arrows-pickup-size} magic arrows. Magic arrows are fired in place of regular arrows. They do {G.rules.player-shot-damage-magic} damage, and hurt some monsters that are immune to mundane arrows. If a magic arrow destroys a monster or object, it continues on its path and can keep doing damage.")
@@ -229,7 +230,7 @@
   :iq-ix 138
     ; IQ uses an hourglass. We use a clock instead because it's hard
     ; to get a non-emoji hourglass.
-  :points 0
+  :acquirement-points 0
 
   :pick-up (meth []
     (doc f"Adds {G.rules.time-bonus} turns to the current time limit.")
@@ -255,7 +256,7 @@
 (deftile StatusEffectItem "! " "an amulet of invulnerability"
   :color 'dark-yellow
   :iq-ix 26
-  :points 100
+  :acquirement-points 100
 
   :effect 'Ivln
   :duration 20
@@ -267,7 +268,7 @@
 (deftile StatusEffectItem "! " "a potion of speed"
   :color 'dark-green
   :iq-ix 34
-  :points 100
+  :acquirement-points 100
 
   :effect 'Fast
   :duration 10
@@ -279,7 +280,7 @@
 (deftile StatusEffectItem "! " "a cloak of invisibility"
   :color 'blue
   :iq-ix 25
-  :points 100
+  :acquirement-points 100
 
   :effect 'Ivis
   :duration 25
@@ -328,7 +329,7 @@
 
 (deftile Usable "/ " "a wand of nothing"
   :iq-ix 147  ; wand of light
-  :points 50
+  :acquirement-points 50
 
   :targeted F
   :use (meth []
@@ -342,7 +343,7 @@
 (deftile Usable "/ " "a wand of shielding"
   :color 'orange
   :iq-ix 200
-  :points 100
+  :acquirement-points 100
 
   :targeted F
   :use (meth []
@@ -355,7 +356,7 @@
 (deftile Usable "/ " "a wall-making wand"
   :color 'red
   :iq-ix 33
-  :points 150
+  :acquirement-points 150
 
   :use (meth [target]
     "Creates one tile of ordinary wall."
@@ -366,7 +367,7 @@
 (deftile Usable "/ " "a passwall wand"
   :color 'dark-green
   :iq-ix 32
-  :points 150
+  :acquirement-points 150
 
   :use (meth [target]
     "Destroys one tile of wall, or other scenery types noted as destructible with a passwall wand."
@@ -401,7 +402,7 @@
 (deftile FireBomb "0 " "a standard bomb"
   :color 'dark-green
   :iq-ix 31  ; Just called a "bomb" in IQ
-  :points 100
+  :acquirement-points 100
 
   :use-blast-damage #(3 2 1)
   :shot-blast-damage #(2 1)
@@ -411,7 +412,7 @@
 (deftile FireBomb "0 " "a strong bomb"
   :color 'blue
   :iq-ix 84
-  :points 150
+  :acquirement-points 150
 
   :use-blast-damage #(3 3 2 1)
   :shot-blast-damage #(3 2 1)
@@ -421,7 +422,7 @@
 (deftile FireBomb "0 " "a super-bomb"
   :color 'red
   :iq-ix 85
-  :points 200
+  :acquirement-points 200
 
   :use-blast-damage #(3 3 2 2 1 1)
   :shot-blast-damage #(3 3 2 1)
@@ -441,7 +442,7 @@
 
 (deftile Artifact "[ " "the Magic Shield"
   :iq-ix 28
-  :points 3,000
+  :acquirement-points 3,000
 
   :help (meth []
     f"Permanently reduces all damage from monsters' attacks to {G.rules.artifact-shield-factor} the normal value, rounded up. Damage from other sources is unaffected.")
@@ -449,7 +450,7 @@
 
 (deftile Artifact "( " "the Elven Bow"
   :iq-ix 29
-  :points 4,000
+  :acquirement-points 4,000
 
   :help (meth []
     f"Permanently increases your shot damage (with mundane arrows) to {G.rules.player-shot-damage-artifact}.")
@@ -457,7 +458,7 @@
 
 (deftile Artifact ") " "the Holy Sword"
   :iq-ix 30
-  :points 5,000
+  :acquirement-points 5,000
 
   :help (meth []
     f"Permanently increases your melee damage to {G.rules.player-melee-damage-artifact}.")

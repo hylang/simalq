@@ -106,9 +106,6 @@
       ;   ["hp" {1 2  3 4  5 6}]
       ; where the first element is a field name and the second is a
       ; dictionary mapping IQ values to values for the field.
-    points 0
-      ; Points awarded for picking up an object, killing a monster,
-      ; etc.
     blocks-player-shots T
       ; Whether the player's arrows are stopped by this tile.
     blocks-monster-shots T
@@ -309,6 +306,8 @@
     weaknesses #()
       ; Damage types that can instantly destroy the tile. Immunities
       ; apply first.
+    destruction-points 0
+      ; Points awarded for destroying the tile.
     score-for-damaging F)
       ; If true, you get the tile's point value per HP of damage you
       ; do to it (with no points for overkill). Otherwise, you get
@@ -335,14 +334,14 @@
       (setv amount @hp))
     (-= @hp amount)
     (when @score-for-damaging
-      (+= G.score (* @points (min amount (+ @hp amount)))))
+      (+= G.score (* @destruction-points (min amount (+ @hp amount)))))
         ; No extra points are awarded for overkill damage.
     (when (<= @hp 0)
       (@be-thus-destroyed)))
 
   (defmeth be-thus-destroyed []
     (unless @score-for-damaging
-      (+= G.score @points))
+      (+= G.score @destruction-points))
     (destroy-tile @))
 
   (defmeth info-bullets [#* extra]
@@ -355,7 +354,10 @@
         #("Takes no more than 1 damage from" (.join ", " (gfor  x @resists  x.value))))
       (when @weaknesses
         #("Instantly destroyed by" (.join ", " (gfor  x @weaknesses  x.value))))
-       #* extra)))
+      #* extra
+      #("Point value" (.format "{:,}{}"
+        @destruction-points
+        (if @score-for-damaging " (scored per HP lost)" ""))))))
 
 
 (import
