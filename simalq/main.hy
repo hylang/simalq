@@ -190,7 +190,7 @@
 (defn print-main-screen [focus #** kwargs]
   (print
     :flush T :sep "" :end ""
-    B.home B.clear
+    B.home
     (.join "\n" (map (fn [x] (bless-colorstr B x)) (draw-screen
       B.width B.height focus #** kwargs)))))
 
