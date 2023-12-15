@@ -84,7 +84,7 @@
         <  hp-was)
       (msg "Princess needs food badly!")))
 
-  :be-thus-destroyed (meth []
+  :destroy (meth []
     (raise (GameOverException 'dead)))
 
   :flavor "People who've met Tris and Argonn separately are sometimes surprised to learn that they're siblings. They don't look much alike.")

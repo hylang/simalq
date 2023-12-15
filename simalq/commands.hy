@@ -10,7 +10,7 @@
   simalq.util [CommandError DamageType msg player-shot-damage flash-map menu-letters player-status]
   simalq.geometry [Direction Pos pos+ at dist]
   simalq.game-state [G]
-  simalq.tile [Damageable mv-tile destroy-tile]
+  simalq.tile [Damageable mv-tile]
   simalq.tile.scenery [walkability]
   simalq.save-load [save-game-to-slot get-saves-list load-game])
 (setv  T True  F False)
@@ -315,8 +315,7 @@
           (when target
             (raise (CommandError "That item can't use a target.")))
           (.use item)))
-      (setv (get G.player.inventory action.item-ix) None)
-      (destroy-tile item))))
+      (setv (get G.player.inventory action.item-ix) None))))
 
 
 (defn help-text []

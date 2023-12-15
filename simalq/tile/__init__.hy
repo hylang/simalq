@@ -158,16 +158,12 @@
     "Called when the player successfully walks into this tile. Return
     true to end her turn."
     None)
-  (setv hook-player-shot None)
+  (setv hook-player-shot None))
     ; Called when the player hits this tile with an arrow. If this
     ; hook exists at all, that means an arrow can hit the tile, and
     ; further processing of this arrow against this tile will stop
     ; after the hook is called. (A magic arrow might still keep going
     ; to other tiles.)
-  (defmeth hook-destroyed [pos]
-    "Called when the tile is destroyed by damage. The tile has already
-    been removed, but its previous position is given by `pos`."
-    None))
 
 
 (defn deftile [superclasses mapsym name #** kwargs]
@@ -231,11 +227,6 @@
 
   cls)
 
-
-(defn destroy-tile [tile]
-  (setv pos-was tile.pos)
-  (.rm-from-map tile)
-  (.hook-destroyed tile pos-was))
 
 (defn mv-tile [tile pos]
   (.rm-from-map tile)
@@ -340,12 +331,12 @@
       (+= G.score (* @destruction-points (min amount (+ @hp amount)))))
         ; No extra points are awarded for overkill damage.
     (when (<= @hp 0)
-      (@be-thus-destroyed)))
+      (@destroy)))
 
-  (defmeth be-thus-destroyed []
+  (defmeth destroy []
     (unless @score-for-damaging
       (+= G.score @destruction-points))
-    (destroy-tile @))
+    (@rm-from-map))
 
   (defmeth info-bullets [#* extra]
     (.info-bullets (super)

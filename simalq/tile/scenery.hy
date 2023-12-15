@@ -5,7 +5,7 @@
   simalq.color :as color
   simalq.util [CommandError DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction pos+ at burst dist dir-to]
-  simalq.tile [Tile EachTurner Damageable deftile replace-tile mv-tile destroy-tile]
+  simalq.tile [Tile EachTurner Damageable deftile replace-tile mv-tile]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -167,7 +167,7 @@
     (-= G.player.keys 1)
     (if @result-when-opened
       (replace-tile @ @result-when-opened)
-      (destroy-tile @))
+      (@rm-from-map))
     True))
 
 (deftile LockedDoor "++" "a locked door"
@@ -420,7 +420,7 @@
             (or (= @wallnum 0) (in tile.wallnum [0 @wallnum])))
           (and (= tile.stem "wallfall trap")
             (or (= @wallnum 0) (= tile.wallnum @wallnum))))
-        (destroy-tile tile))))
+        (.rm-from-map tile))))
 
   :flavor #[[Easy there, Admiral Ackbar. This kind of trap isn't necessarily dangerous. Well, admittedly, the key word here is "necessarily".]])
 
@@ -476,7 +476,7 @@
     (doc f"The tile is destroyed, but you're paralyzed for {G.rules.paralysis-duration} turns.")
     (+= (get G.player.status-effects StatusEffect.Para)
       G.rules.paralysis-duration)
-    (destroy-tile @))
+    (@rm-from-map))
 
   :flavor "This spiderweb is the size of a really big spiderweb. Until Idok cleans up the dungeon properly, you'll have to tediously carve your way through the webs with your sword. Got any recommendations for a good smitemaster?")
 
@@ -497,7 +497,7 @@
 
   :hook-player-walked-into (meth []
     "The tile is destroyed."
-    (destroy-tile @))
+    (@rm-from-map))
 
   :flavor "Dungeon trash like sawdust, loose stones, pebbles, greasy chicken bones left over from goblin feasts, broken wands, and maybe a dead body, all bunched together into a small mound. Running through it will knock it over and get your boots really gross.")
 
@@ -516,7 +516,7 @@
   :each-turn (meth []
     (-= @time-remaining 1)
     (unless @time-remaining
-      (destroy-tile @)))
+      (@rm-from-map)))
 
   :info-bullets (meth [#* extra]
     (Scenery.info-bullets @

@@ -5,7 +5,7 @@
   simalq.util [CommandError]
   simalq.game-state [G]
   simalq.geometry [pos-seed turn-and-pos-seed burst at]
-  simalq.tile [Tile deftile destroy-tile]
+  simalq.tile [Tile deftile]
   simalq.tile.scenery [Scenery]
   simalq.util [CommandError DamageType StatusEffect msg burst-damage refactor-hp])
 (setv  T True  F False)
@@ -15,14 +15,12 @@
   "An object the player can pick up."
 
   (setv
-    destroy-after-pickup T
     acquirement-points 0)
 
   (defmeth hook-player-walked-into []
     (+= G.score @acquirement-points)
     (@pick-up)
-    (when @destroy-after-pickup
-      (destroy-tile @)))
+    (@rm-from-map))
   (defmeth pick-up [])
 
   (defmeth info-bullets [#* extra] [
@@ -83,7 +81,7 @@
 
   (defmeth hook-player-shot []
     "The item is destroyed."
-    (destroy-tile @)
+    (@rm-from-map)
     (msg "Someone shot the food."))
 
   (defmeth pick-up []
@@ -188,7 +186,7 @@
         (+ 1 (get poison-burst "size")))
       :color 'moss-green
       :player-amount (get poison-burst "dmg_player"))
-    (destroy-tile @))
+    (@rm-from-map))
 
   :flavor "I think you're not supposed to drink this.")
 (setv poison-burst (dict
@@ -295,7 +293,6 @@
   consumed as an action."
 
   (setv
-    destroy-on-pickup F
     targeted T)
       ; Whether the item should be used with a target. The argument
       ; `target` is provided to `use` only if this is true.
@@ -307,7 +304,7 @@
   (defmeth pick-up []
     (doc f"Adds the item to your inventory. If you're at the maximum number
       of usable items ({G.rules.max-usables}), you can't step on its square.")
-    (.rm-from-map @)
+    (@rm-from-map)
     (setv
       (get G.player.inventory (next (gfor
         [ix item] (enumerate G.player.inventory)
@@ -373,7 +370,7 @@
     "Destroys one tile of wall, or other scenery types noted as destructible with a passwall wand."
     (for [tile (at target)]
       (when (and (isinstance tile Scenery) tile.destructible-by-passwall-wand)
-        (destroy-tile tile)
+        (.rm-from-map tile)
         (return)))
      (raise (CommandError "There isn't a destructible tile there.")))
 
@@ -397,7 +394,7 @@
   (defmeth hook-player-shot []
     (doc f"Explodes in a weaker size-{(- (len @shot-blast-damage) 1)} burst, with these damages: {(.join ", " (map str @shot-blast-damage))}.")
     (@bomb-burst @pos @shot-blast-damage)
-    (destroy-tile @)))
+    (@rm-from-map)))
 
 (deftile FireBomb "0 " "a standard bomb"
   :color 'dark-green

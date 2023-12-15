@@ -9,7 +9,7 @@
   simalq.util [DamageType next-in-cycle mixed-number player-status]
   simalq.geometry [Direction pos+ at dist adjacent? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
-  simalq.tile [Tile Actor Damageable deftile mv-tile destroy-tile]
+  simalq.tile [Tile Actor Damageable deftile mv-tile]
   simalq.tile.scenery [Scenery walkability nogo?])
 (setv  T True  F False)
 
@@ -81,8 +81,8 @@
         #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
       (when @sees-invisible
         #("Invisibility detection" "The monster is unaffected by you being invisible."))
-      (unless (= @hook-destroyed.__doc__ Tile.hook-destroyed.__doc__)
-        #("Effect on death" @hook-destroyed.__doc__))
+      (unless (= @destroy.__doc__ Damageable.destroy.__doc__)
+        #("Effect on death" @destroy.__doc__))
       #* extra
       #("Behavior" (or
         @act.__doc__
@@ -131,12 +131,12 @@
     (not (adjacent? (or mon-pos mon.pos) G.player.pos))
     (not mon.sees-invisible)))
 
-(defn try-to-attack-player [mon [dry-run F] [shots-ignore-obstacles F] [from-pos None]]
+(defn try-to-attack-player [mon [dry-run F] [shots-ignore-obstacles F]]
   "Try to melee or shoot the player, if the monster can. Return true
   if it succeeded. If `dry-run` is true, the attack isn't actually
   made."
 
-  (setv p (or from-pos mon.pos))
+  (setv p mon.pos)
   (setv d (dir-to p G.player.pos))
   (setv attack None)
 
@@ -179,10 +179,8 @@
   (.damage G.player :attacker mon
     (damage-by-hp mon (if (= attack 'shot) mon.damage-shot mon.damage-melee))
     (if (= attack 'shot) MonsterShot MonsterMelee))
-  (when (and mon.kamikaze mon.pos)
-    ; We check `mon.pos` so as not to call `destroy-tile` when we're
-    ; already being called by it.
-    (destroy-tile mon))
+  (when mon.kamikaze
+    (.rm-from-map mon))
   T)
 
 (defn stationary [mon]
@@ -552,9 +550,6 @@
   :iq-ix 47
   :destruction-points 2
 
-  :field-defaults (dict :kamikazed F)
-  :mutable-fields #("kamikazed")
-
   :damage-shot 10
   :shot-range 1
   :kamikaze T
@@ -564,14 +559,13 @@
     (when (adjacent? @pos G.player.pos)
       (+= G.player.floater-disturbance floater-disturbance-increment)
       (when (pop-integer-part G.player.floater-disturbance)
-        (setv @kamikazed T)
         (return (try-to-attack-player @))))
     (wander @ :implicit-attack F))
 
-  :hook-destroyed (meth [pos]
+  :destroy (meth []
     "The monster can attempt a free attack, unless it killed itself by kamikaze."
-    (unless @kamikazed
-      (try-to-attack-player @ :from-pos pos)))
+    (try-to-attack-player @)
+    (Damageable.destroy @))
 
   :flavor "A giant aerial jellyfish, kept aloft by a foul-smelling and highly reactive gas. It doesn't fly so much as float about in the dungeon drafts. If disturbed, it readily explodes, and its explosions have the remarkable property of harming you and nobody else.")
 (setv floater-disturbance-increment (f/ 1 5))
