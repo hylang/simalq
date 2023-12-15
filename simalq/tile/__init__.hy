@@ -73,6 +73,13 @@
         f"{k} {v}")))
       "")))
 
+  (defmeth [classmethod] make [pos stem [stack-ix 0] #** kwargs]
+    "Create a new tile."
+    (setv t ((get Tile.types stem) :pos pos #** kwargs))
+    (when pos
+      (.insert (at pos) stack-ix t))
+    t)
+
   ; The below variables and methods may be overridden by subclasses.
 
   (setv
@@ -217,12 +224,6 @@
 
   cls)
 
-
-(defn add-tile [pos stem [stack-ix 0] #** kwargs]
-  (setv t ((get Tile.types stem) :pos pos #** kwargs))
-  (when pos
-    (.insert (at pos) stack-ix t))
-  t)
 
 (defn rm-tile [tile]
   (when (is-not tile.pos None)

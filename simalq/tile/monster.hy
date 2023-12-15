@@ -9,7 +9,7 @@
   simalq.util [DamageType next-in-cycle mixed-number player-status]
   simalq.geometry [Direction pos+ at dist adjacent? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
-  simalq.tile [Tile Actor Damageable deftile mv-tile add-tile destroy-tile]
+  simalq.tile [Tile Actor Damageable deftile mv-tile destroy-tile]
   simalq.tile.scenery [Scenery walkability nogo?])
 (setv  T True  F False)
 
@@ -95,7 +95,7 @@
     damage))
 
 (defn make-monster [pos stem #** kwargs]
-  (add-tile pos stem #** kwargs)
+  (Tile.make pos stem #** kwargs)
   ; Newly created monsters don't get to act on the turn they come
   ; into being.
   (setv (. (at pos) [-1] last-acted) G.turn-n))
@@ -644,7 +644,7 @@
     ; Spin a web in our new position, if there isn't one there
     ; already.
     (unless (any (gfor  tile (at @pos)  (= tile.stem "web")))
-      (add-tile @pos "web" :stack-ix (+ 1 (.index (at @pos) @)))))
+      (Tile.make @pos "web" :stack-ix (+ 1 (.index (at @pos) @)))))
 
   :flavor "This eight-legged beastie has powerful jaws, high-speed spinnerets, and the mark of a white skull embedded in the brown fur of its big fat abdomen. It's definitely giant and ambiguously intelligent, but not friendly or talkative.")
 (setv spider-approach-range 2)

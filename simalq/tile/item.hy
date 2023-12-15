@@ -5,7 +5,7 @@
   simalq.util [CommandError]
   simalq.game-state [G]
   simalq.geometry [pos-seed turn-and-pos-seed burst at]
-  simalq.tile [Tile deftile destroy-tile rm-tile add-tile]
+  simalq.tile [Tile deftile destroy-tile rm-tile]
   simalq.tile.scenery [Scenery]
   simalq.util [CommandError DamageType StatusEffect msg burst-damage refactor-hp])
 (setv  T True  F False)
@@ -349,7 +349,7 @@
   :use (meth []
     "Creates a magical energy shield in each square adjacent to you. These shield tiles block monsters and their shots, but not you or your shots."
     (for [p (burst G.player.pos 1 :exclude-center T)]
-      (add-tile p "magical energy shield")))
+      (Tile.make p "magical energy shield")))
 
   :flavor "Cowardice is the better part of valor.")
 
@@ -360,7 +360,7 @@
 
   :use (meth [target]
     "Creates one tile of ordinary wall."
-    (add-tile target "wall"))
+    (Tile.make target "wall"))
 
   :flavor "This device is detested by the stonemason's union, but valued by homeowners and combat engineers, not to mention tyrants who desire vast dungeons.")
 

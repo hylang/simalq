@@ -17,7 +17,7 @@ quest definitions from other files in this directory."
   simalq.game-state [G]
   simalq.geometry [Map Pos pos+ Direction]
   simalq.quest [Quest Level]
-  simalq.tile [Tile add-tile])
+  simalq.tile [Tile])
 
 ;; --------------------------------------------------
 ;; * Helpers
@@ -144,7 +144,7 @@ quest definitions from other files in this directory."
     (when (> (len matches) 1)
       (raise (ValueError f"Ambiguous `target`: {mapsym}")))
     (setv (get d "target") (Pos map-object #* (get matches 0))))
-  (add-tile (locate locator) stem #** d))
+  (Tile.make (locate locator) stem #** d))
 
 ;; --------------------------------------------------
 ;; * Load built-in quests
