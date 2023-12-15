@@ -92,6 +92,11 @@
     (.insert (at pos) 0 @)
     (object.__setattr__ @ "pos" pos))
 
+  (defmeth replace [new-stem]
+    (setv
+      (get (at @pos) (.index (at @pos) @))
+      ((get Tile.types new-stem) :pos @pos)))
+
   ; The below variables and methods may be overridden by subclasses.
 
   (setv
@@ -231,12 +236,6 @@
       (.format ":{} {}" (hy.unmangle s) (hy.repr (getattr x s))))))))
 
   cls)
-
-
-(defn replace-tile [old new-stem]
-  (setv
-    (get (at old.pos) (.index (at old.pos) old))
-    ((get Tile.types new-stem) :pos old.pos)))
 
 
 (defclass Actor [Tile]

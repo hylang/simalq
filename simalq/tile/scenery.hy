@@ -5,7 +5,7 @@
   simalq.color :as color
   simalq.util [CommandError DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction pos+ at burst dist dir-to]
-  simalq.tile [Tile EachTurner Damageable deftile replace-tile]
+  simalq.tile [Tile EachTurner Damageable deftile]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -166,7 +166,7 @@
       (raise (CommandError "It's locked, and you're keyless at the moment.")))
     (-= G.player.keys 1)
     (if @result-when-opened
-      (replace-tile @ @result-when-opened)
+      (@replace @result-when-opened)
       (@rm-from-map))
     True))
 
