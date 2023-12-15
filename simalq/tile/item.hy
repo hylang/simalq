@@ -5,7 +5,7 @@
   simalq.util [CommandError]
   simalq.game-state [G]
   simalq.geometry [pos-seed turn-and-pos-seed burst at]
-  simalq.tile [Tile deftile destroy-tile rm-tile]
+  simalq.tile [Tile deftile destroy-tile]
   simalq.tile.scenery [Scenery]
   simalq.util [CommandError DamageType StatusEffect msg burst-damage refactor-hp])
 (setv  T True  F False)
@@ -307,7 +307,7 @@
   (defmeth pick-up []
     (doc f"Adds the item to your inventory. If you're at the maximum number
       of usable items ({G.rules.max-usables}), you can't step on its square.")
-    (rm-tile @)
+    (.rm-from-map @)
     (setv
       (get G.player.inventory (next (gfor
         [ix item] (enumerate G.player.inventory)

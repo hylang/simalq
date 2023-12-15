@@ -4,7 +4,7 @@
   simalq.geometry [Pos at Direction]
   simalq.un-iq [iq-quest]
   simalq.game-state [G]
-  simalq.tile [rm-tile mv-tile]
+  simalq.tile [mv-tile]
   simalq.commands [Walk Wait Shoot UseItem]
   simalq.quest [start-quest start-level]
   simalq.quest-definition [mk-quest mk-tile locate]
@@ -39,7 +39,7 @@
   requested."
   (setv p (locate locator))
   (for [tile (at p)]
-    (rm-tile tile))
+    (.rm-from-map tile))
   (for [tile-spec (reversed tile-specs)]
     (mk-tile p tile-spec)))
 

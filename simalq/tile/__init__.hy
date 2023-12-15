@@ -80,6 +80,13 @@
       (.insert (at pos) stack-ix t))
     t)
 
+  (defmeth rm-from-map []
+    "If this tile is on a map, remove it from the map. Otherwise, do
+    nothing."
+    (when (is-not @pos None)
+      (.remove (at @pos) @)
+      (object.__setattr__ @ "pos" None)))
+
   ; The below variables and methods may be overridden by subclasses.
 
   (setv
@@ -225,18 +232,13 @@
   cls)
 
 
-(defn rm-tile [tile]
-  (when (is-not tile.pos None)
-    (.remove (at tile.pos) tile)
-    (object.__setattr__ tile "pos" None)))
-
 (defn destroy-tile [tile]
   (setv pos-was tile.pos)
-  (rm-tile tile)
+  (.rm-from-map tile)
   (.hook-destroyed tile pos-was))
 
 (defn mv-tile [tile pos]
-  (rm-tile tile)
+  (.rm-from-map tile)
   (.insert (at pos) 0 tile)
   (object.__setattr__ tile "pos" pos))
 

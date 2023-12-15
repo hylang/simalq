@@ -312,12 +312,12 @@
   the coordinates of where (0, 0) of the new level should be placed in
   `old`."
   (import
-    simalq.tile [mv-tile rm-tile]
+    simalq.tile [mv-tile]
     simalq.quest-definition [mk-level])
 
   (setv new (mk-level #** mk-level-args))
   (for [xn (range new.map.width)  yn (range new.map.height)]
     (for [tile (get old.map.data (+ xn x) (+ yn y))]
-      (rm-tile tile))
+      (.rm-from-map tile))
     (for [tile (get new.map.data xn yn)]
       (mv-tile tile (Pos old.map (+ xn x) (+ yn y))))))
