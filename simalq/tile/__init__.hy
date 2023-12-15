@@ -87,6 +87,11 @@
       (.remove (at @pos) @)
       (object.__setattr__ @ "pos" None)))
 
+  (defmeth move [pos]
+    (@rm-from-map)
+    (.insert (at pos) 0 @)
+    (object.__setattr__ @ "pos" pos))
+
   ; The below variables and methods may be overridden by subclasses.
 
   (setv
@@ -227,11 +232,6 @@
 
   cls)
 
-
-(defn mv-tile [tile pos]
-  (.rm-from-map tile)
-  (.insert (at pos) 0 tile)
-  (object.__setattr__ tile "pos" pos))
 
 (defn replace-tile [old new-stem]
   (setv

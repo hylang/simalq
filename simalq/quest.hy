@@ -4,7 +4,6 @@
 (import
   simalq.game-state [G Rules]
   simalq.util [StatusEffect refactor-hp GameOverException]
-  simalq.tile [mv-tile]
   simalq.tile.player [Player]
   copy [deepcopy])
 (setv  T True  F False)
@@ -54,7 +53,7 @@
       ; The default behavior of `deepcopy` is smart enough to make all
       ; the references to `G.level.map` in tiles point to the new map.
     G.time-left G.level.time-limit)
-  (mv-tile G.player G.level.player-start)
+  (.move G.player G.level.player-start)
   (unless G.states
     ; If we haven't saved any states yet (because the game just
     ; started), save this as the first state in the history.

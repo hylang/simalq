@@ -4,7 +4,6 @@
   simalq.geometry [Pos at Direction]
   simalq.un-iq [iq-quest]
   simalq.game-state [G]
-  simalq.tile [mv-tile]
   simalq.commands [Walk Wait Shoot UseItem]
   simalq.quest [start-quest start-level]
   simalq.quest-definition [mk-quest mk-tile locate]
@@ -57,7 +56,7 @@
         thing)))))
 
 (defn mv-player [x y]
-  (mv-tile G.player (Pos G.map x y)))
+  (.move G.player (Pos G.map x y)))
 
 (defn assert-player-at [x y]
   (assert (= G.player.pos (Pos G.map x y))))

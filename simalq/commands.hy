@@ -10,7 +10,7 @@
   simalq.util [CommandError DamageType msg player-shot-damage flash-map menu-letters player-status]
   simalq.geometry [Direction Pos pos+ at dist]
   simalq.game-state [G]
-  simalq.tile [Damageable mv-tile]
+  simalq.tile [Damageable]
   simalq.tile.scenery [walkability]
   simalq.save-load [save-game-to-slot get-saves-list load-game])
 (setv  T True  F False)
@@ -238,7 +238,7 @@
       (for [tile (at target)]
         (.hook-player-walk-to tile G.player.pos))
       ; No exceptions have stopped us, so go.
-      (mv-tile G.player target)
+      (.move G.player target)
       (for [tile (at target)]
         (when (.hook-player-walked-into tile)
           (return))))

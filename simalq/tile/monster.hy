@@ -9,7 +9,7 @@
   simalq.util [DamageType next-in-cycle mixed-number player-status]
   simalq.geometry [Direction pos+ at dist adjacent? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
-  simalq.tile [Tile Actor Damageable deftile mv-tile]
+  simalq.tile [Tile Actor Damageable deftile]
   simalq.tile.scenery [Scenery walkability nogo?])
 (setv  T True  F False)
 
@@ -248,7 +248,7 @@
       (return F)))
 
   ; We're clear to move.
-  (mv-tile mon target)
+  (.move mon target)
   (return T))
 (setv Monster.act approach)
 
@@ -276,7 +276,7 @@
     (return))
   (when (> (dist G.player.pos target) G.rules.reality-bubble-size)
     (return))
-  (mv-tile mon target))
+  (.move mon target))
 
 
 (defclass Generated [Monster]

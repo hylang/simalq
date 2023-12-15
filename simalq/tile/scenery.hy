@@ -5,7 +5,7 @@
   simalq.color :as color
   simalq.util [CommandError DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction pos+ at burst dist dir-to]
-  simalq.tile [Tile EachTurner Damageable deftile replace-tile mv-tile]
+  simalq.tile [Tile EachTurner Damageable deftile replace-tile]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -276,7 +276,7 @@
   :hook-player-walked-into (meth []
     "You push the block in the same direction that you entered the square. The destination square must be empty, or else you won't be able to step on the original square."
     (setv target (pos+ @pos G.action.direction))
-    (mv-tile @ target)
+    (@move target)
     F)
 
   :flavor "Where do video games get all their crates from? There must be entire warehouses full of 'em, am I right?")
@@ -314,7 +314,7 @@
     (dict :dest @target))
   :hook-player-walked-into (meth []
     (doc f"Teleports you to {@target}. Anything already there is unaffected.")
-    (mv-tile G.player @target)
+    (.move G.player @target)
     T)
 
   :flavor "A small stone arch containing a rippling, sparkling sheet of violet light. It functions as a magic portal that can send you elsewhere on this level. Sadly, arrows in flight won't survive the trip.")
@@ -379,7 +379,7 @@
       (.damage tile Inf None))
 
     ; Now actually move the player.
-    (mv-tile G.player target)
+    (.move G.player target)
 
     T)
 
