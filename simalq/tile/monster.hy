@@ -25,8 +25,8 @@
 
   (field-defaults
     movement-state None)
-        ; A bit of memory or plan that the monster uses to choose
-        ; its movements. Its meaning depends on `ai`.
+      ; A bit of memory or plan that the monster uses to choose
+      ; its movements.
   (setv
     mutable-fields #("hp" "movement_state")
     damage-melee None
