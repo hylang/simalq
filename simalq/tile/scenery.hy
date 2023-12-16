@@ -251,9 +251,6 @@
   :iq-ix-mapper ["hp"
     {3 4  4 2  15 6}]
 
-  :suffix-dict (meth []
-    (dict :HP @hp))
-
   :blocks-move T :blocks-diag T :blocks-player-shots F
   :destructible-by-passwall-wand T
   :immune #(DamageType.Poison DamageType.Fire DamageType.DeathMagic)

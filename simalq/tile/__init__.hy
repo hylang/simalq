@@ -337,6 +337,9 @@
       (+= G.score @destruction-points))
     (@rm-from-map))
 
+  (defmeth suffix-dict []
+    (dict :HP @hp))
+
   (defmeth info-bullets [#* extra]
     (.info-bullets (super)
       #("Hit points" @hp)

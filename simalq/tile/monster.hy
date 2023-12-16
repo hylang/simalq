@@ -56,9 +56,6 @@
   (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
     (dict :hp v2))
 
-  (defmeth suffix-dict []
-    (dict :HP @hp))
-
   (defmeth info-bullets [#* extra]
     (defn damage-array [damage]
       (if (isinstance damage tuple)
