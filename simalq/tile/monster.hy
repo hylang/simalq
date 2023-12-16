@@ -183,9 +183,11 @@
     (.rm-from-map mon))
   T)
 
-(defn stationary [mon]
-  "Stationary — The monster attacks if it can, but is otherwise immobile."
-  (try-to-attack-player mon))
+
+(defclass Stationary [Monster]
+  (defmeth act []
+    "Stationary — The monster attacks if it can, but is otherwise immobile."
+    (try-to-attack-player @)))
 
 
 (defclass Approacher [Monster]
@@ -513,7 +515,7 @@
 (setv imp-shot-charge (f/ 4 5))
 
 
-(deftile Monster "T " "a thorn tree"
+(deftile Stationary "T " "a thorn tree"
   :iq-ix 51
   :destruction-points 10
 
@@ -522,7 +524,6 @@
     ; the IQ manual suggests otherwise.
   :weaknesses #(Fire)
   :damage-melee 4
-  :act stationary
 
   :flavor "From a distance, you can safely giggle at the ghostly. Up close, this arboreal abomination will rake you with its twisted, spiny boughs. Arrows snag in its branches and glance off its gnarled bark, so an intimate encounter may be unavoidable. On the other hand, it's rather flammable. Remember, only you can start forest fires.")
 
