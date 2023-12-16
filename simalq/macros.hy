@@ -38,7 +38,10 @@
 
 (defmacro field-defaults [#* items]
   (import toolz [partition])
-  (setv fields (dfor  [k v] (partition 2 items)  (hy.mangle k) v))
+  (setv fields (dfor
+    [k v] (partition 2 items)
+    :do (assert (isinstance k hy.models.Symbol))
+    (hy.mangle k) v))
   `(setv
     fields [~@(.keys fields)]
     field-defaults ~fields))
