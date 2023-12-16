@@ -631,16 +631,13 @@
       "O " ["blob" :hp 5]}])
 
   (wait 9)
-  (assert-at [2 0] "blob")
-  (assert-hp [2 0] 5)
+  (assert-full-name [2 0] f"a blob (HP 5, pw 9/10)")
   (assert-at [3 1] 'floor)
   ; After 10 turns, the blob splits. The child has half the parent's
   ; HP, rounded down, and the parent's HP is reduced by this number.
   (wait)
-  (assert-at [2 0] "blob")
-  (assert-hp [2 0] 3)
-  (assert-at [3 1] "blob")
-  (assert-hp [3 1] 2))
+  (assert-full-name [2 0] f"a blob (HP 3, pw 0)")
+  (assert-full-name [3 1] f"a blob (HP 2, pw 0)"))
 
 
 (defn test-specter []

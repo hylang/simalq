@@ -44,8 +44,6 @@
       ; If true, the monster kills itself upon attacking.
     sees-invisible F
       ; If true, the monster is unaffected by the player being invisible.
-    summon-frequency (f/ 1 4)
-      ; How often the monster summons other monsters (if it can).
     flavor-for-generator "In defiance of thermodynamics, this device pumps out monsters endlessly.")
       ; Flavor text for generators of this monster type.
 
@@ -96,31 +94,6 @@
   ; Newly created monsters don't get to act on the turn they come
   ; into being.
   (setv (. (at pos) [-1] last-acted) G.turn-n))
-
-(defn summon [mon stem hp [direction-field "summon_direction"]]
-  "Increment summon power. Then, try to generate one or more monsters
-  in adjacent spaces. Return true if power was expended."
-
-  (+= mon.summon-power mon.summon-frequency)
-  (when (< mon.summon-power 1)
-    (return F))
-  (do-n (pop-integer-part mon.summon-power)
-    ; Find an empty square to place the new monster.
-    (do-n (len Direction.all)
-      (setattr mon direction-field
-        (next-in-cycle Direction.all (getattr mon direction-field)))
-      (setv target (pos+ mon.pos (getattr mon direction-field)))
-      (unless target
-        (continue))
-      (when (= (at target) [])
-        (break))
-      (else
-        ; We couldn't find anywhere to place this monster. Just
-        ; end summoning, wasting the consumed summon power.
-        (return)))
-    ; We have a target. Place the monster.
-    (make-monster target stem :hp hp))
-  T)
 
 (defn player-invisible-to [mon [mon-pos None]]
   (and
@@ -304,6 +277,50 @@
       #* extra)))
 
 
+(defclass Summoner [Monster]
+
+  (field-defaults
+    summon-dir None
+    summon-power (f/ 0))
+      ; A per-turn accumulator of summoning frequency.
+  (setv mutable-fields #("summon_dir" "summon_power"))
+
+  (defmeth summon [stem frequency hp]
+    "Increment summon power. Then, try to generate one or more monsters
+    in adjacent spaces. Return true if power was expended."
+
+    (+= @summon-power frequency)
+    (when (< @summon-power 1)
+      (return F))
+    (do-n (pop-integer-part @summon-power)
+      ; Find an empty square to place the new monster.
+      (do-n (len Direction.all)
+        (setv @summon-dir (next-in-cycle Direction.all @summon-dir))
+        (setv target (pos+ @pos @summon-dir))
+        (unless target
+          (continue))
+        (when (= (at target) [])
+          (break))
+        (else
+          ; We couldn't find anywhere to place this monster. Just
+          ; end summoning, wasting the consumed summon power.
+          (return)))
+      ; We have a target. Place the monster.
+      (make-monster target stem :hp hp))
+    T)
+
+  (defmeth suffix-dict []
+    (dict
+      #** (.suffix-dict (super))
+     :pw (mixed-number @summon-power)))
+
+  (defmeth info-bullets [#* extra]
+    (.info-bullets (super)
+      #("Summoning power" (mixed-number @summon-power))
+      #("Summoning direction" @summon-dir)
+      #* extra)))
+
+
 (defclass Generated [Monster]
   "A monster that can be produced by a generator in IQ."
 
@@ -313,18 +330,15 @@
 (defmacro self-sc [#* rest]
   `(. Tile.types [self.summon-class] ~@rest))
 
-(deftile Monster :name "generator"
+(deftile Summoner :name "generator"
   ; An immobile structure that creates monsters nearby.
 
   :field-defaults (dict
     :summon-class "orc"
       ; The stem of the monster type to generate.
     :summon-frequency (f/ 1 4)
-    :summon-hp 1
+    :summon-hp 1)
       ; How many hit points each monster will be summoned with.
-    :summon-power (f/ 0))
-      ; A per-turn accumulator of `summon-frequency`.
-  :mutable-fields #("summon_power")
 
   :mapsym (property (meth []
     (+ "☉" (self-sc mapsym [0]))))
@@ -345,21 +359,19 @@
       (Tile.full-name.fget @))))
   :suffix-dict (meth []
     (dict
-      :HP @hp
-      :pw (mixed-number @summon-power)
+      #** (Summoner.suffix-dict @)
       :freq (mixed-number @summon-frequency)
       :sHP @summon-hp))
-  :info-bullets (meth [#* extra]
-    (Monster.info-bullets @
-      #("Summoning power" (mixed-number @summon-power))
+
+  :info-bullets (meth []
+    (Summoner.info-bullets @
       #("Summoning frequency" (mixed-number @summon-frequency))
       #("Type of summoned monsters" @summon-class)
-      #("Hit points of summoned monsters" @summon-hp)
-      #* extra))
+      #("Hit points of summoned monsters" @summon-hp)))
 
   :act (meth []
     "Generate — The generator adds its summon frequency to its summon power. If the total is more than 1, the integer part is removed and a corresponding number of monsters are generated in adjacent empty squares. If there are no adjacent empty squares, the expended summon power is wasted. The square that the generator attempts to target rotates through the compass with each summon or failed attempt."
-    (summon @ @summon-class @summon-hp "movement_state"))
+    (@summon @summon-class @summon-frequency @summon-hp))
 
   :flavor (property (meth []
     (self-sc flavor-for-generator))))
@@ -588,35 +600,27 @@
 (setv floater-disturbance-increment (f/ 1 5))
 
 
-(deftile Wanderer "O " "a blob"
+(deftile [Summoner Wanderer] "O " "a blob"
   :iq-ix 48
   :destruction-points 0
 
-  :field-defaults (dict :summon-direction None :summon-power (f/ 0))
-  :mutable-fields #("summon_direction" "summon_power")
-
   :immune #(MundaneArrow MagicArrow)
   :damage-melee 6
-  :summon-frequency (f/ 1 10)
-
-  :info-bullets (meth [#* extra]
-    (Wanderer.info-bullets @
-      #("Summoning power" (mixed-number @summon-power))
-      #("Summoning direction" @summon-direction)
-      #* extra))
 
   :act (meth []
-    (doc f"Blob – If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {@summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
+    (doc f"Blob – If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {blob-summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
     (when (try-to-attack-player @)
       (return))
     (when (and
         (> @hp 1)
-        (summon @ "blob" (// @hp 2)))
+        (@summon @stem blob-summon-frequency (// @hp 2)))
       (-= @hp (// @hp 2))
       (return))
     (@wander :implicit-attack F))
 
   :flavor "What looks like a big mobile puddle of slime is actually a man-sized amoeba. It retains the ability to divide (but not, fortunately, to grow), and its lack of distinct internal anatomy makes arrows pretty useless. It has just enough intelligence to notice that you're standing next to it and try to envelop you in its gloppy bulk.")
+(setv blob-summon-frequency (f/ 1 10))
+
 
 (deftile Approacher "S " "a specter"
   :iq-ix 50
