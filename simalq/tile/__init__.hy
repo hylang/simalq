@@ -253,7 +253,7 @@
       (setv @last-acted G.turn-n)))
 
   (defmeth act []
-    (raise (TypeError f"No `act` method defined for actor {(type @)}"))))
+    (raise NotImplementedError)))
 
 
 (defclass EachTurner [Tile]
@@ -274,7 +274,7 @@
       (.each-turn o)))
 
   (defmeth each-turn []
-    (raise (NotImplementedError))))
+    (raise NotImplementedError)))
 
 
 (defclass Damageable [Tile]
