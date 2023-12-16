@@ -184,32 +184,6 @@
   "Stationary — The monster attacks if it can, but is otherwise immobile."
   (try-to-attack-player mon))
 
-(defn wander [mon [state-field "movement_state"] [implicit-attack T] [ethereal-to #()]]
-  "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
-
-  (when (and implicit-attack (try-to-attack-player mon))
-    (return))
-
-  ; Use a linear congruential generator. Each seed should have a
-  ; decent period coprime to the number of options (9)—long enough
-  ; to look randomish, but not long.
-  ; https://en.wikipedia.org/w/index.php?title=Linear_congruential_generator&oldid=1140372972#c_%E2%89%A0_0
-  (setv  m (** 8 3)  c 1  a (+ 2 1))
-  (when (= (getattr mon state-field) None)
-    ; Seed the RNG.
-    (setattr mon state-field (% (turn-and-pos-seed mon.pos) m)))
-  (setv options (+ Direction.all #(None)))
-  (setv d (get options (% (getattr mon state-field) (len options))))
-  (setattr mon state-field (% (+ (* a (getattr mon state-field)) c) m))
-  (unless d
-    (return))
-  (setv [target wly] (walkability mon.pos d :monster? T :ethereal-to ethereal-to))
-  (unless (= wly 'walk)
-    (return))
-  (when (> (dist G.player.pos target) G.rules.reality-bubble-size)
-    (return))
-  (.move mon target))
-
 
 (defclass Approacher [Monster]
 
@@ -286,6 +260,46 @@
   (defmeth info-bullets [#* extra]
     (.info-bullets (super)
       #("Approach direction" @approach-dir))))
+
+
+(defclass Wanderer [Monster]
+
+  (field-defaults
+    wander-state None)
+  (setv mutable-fields #("wander_state"))
+
+  (defmeth wander [[implicit-attack T] [ethereal-to #()]]
+    "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
+
+    (when (and implicit-attack (try-to-attack-player @))
+      (return))
+
+    ; Use a linear congruential generator. Each seed should have a
+    ; decent period coprime to the number of options (9)—long enough
+    ; to look randomish, but not long.
+    ; https://en.wikipedia.org/w/index.php?title=Linear_congruential_generator&oldid=1140372972#c_%E2%89%A0_0
+    (setv  m (** 8 3)  c 1  a (+ 2 1))
+    (when (= @wander-state None)
+      ; Seed the RNG.
+      (setv @wander-state (% (turn-and-pos-seed @pos) m)))
+    (setv options (+ Direction.all #(None)))
+    (setv d (get options (% @wander-state (len options))))
+    (setv @wander-state (% (+ (* a @wander-state) c) m))
+    (unless d
+      (return))
+    (setv [target wly] (walkability @pos d :monster? T :ethereal-to ethereal-to))
+    (unless (= wly 'walk)
+      (return))
+    (when (> (dist G.player.pos target) G.rules.reality-bubble-size)
+      (return))
+    (@move target))
+
+  (setv act wander)
+
+  (defmeth info-bullets [#* extra]
+    (.info-bullets (super)
+      #("Wandering RNG state" @wander-state)
+      #* extra)))
 
 
 (defclass Generated [Monster]
@@ -422,22 +436,20 @@
   :flavor-mon "A spooky apparition bearing a striking resemblance to a man with a sheet draped over him. Giggle at your peril: it can discharge the negative energy that animates it to bring you closer to the grave yourself.\n\n    Lemme tell ya something: bustin' makes me feel good!"
   :flavor-gen "This big heap of human bones raises several questions, but sadly it appears you must treat the dead with even less respect in order to get rid of those ghosts.")
 
-(defgenerated [] "b " "a bat"
+(defgenerated Wanderer "b " "a bat"
   :iq-ix-mon [45 71 72] :iq-ix-gen [46 73 74]
   :points-mon 1 :points-gen 3
 
   :damage-melee #(1 2 3)
-  :act wander
 
   :flavor-mon "Dusk! With a creepy, tingling sensation, you hear the fluttering of leathery wings! Bats! With glowing red eyes and glistening fangs, these unspeakable giant bugs drop onto… wait. These aren't my lecture notes."
   :flavor-gen #[[A faint singing echoes out of the depths of this cave. They sound like they're saying "na na na".]])
 
-(defgenerated [] "B " "a giant bee"
+(defgenerated Wanderer "B " "a giant bee"
   :iq-ix-mon [123 124 125] :iq-ix-gen [126 127 128]
   :points-mon 5 :points-gen 15
 
   :damage-melee #(5 7 9)
-  :act wander
 
   :flavor-mon "Bees bafflingly being bigger'n bats. This is the kind that can survive stinging you. You might not be so lucky."
   :flavor-gen #[[The ancients call this place "the Plounge".]])
@@ -472,14 +484,13 @@
   :flavor-mon #[[A dark spirit with mastery of its semi-corporeal form, allowing ordinary arrows to pass right through it. As it approaches, it hisses "Death!"]]
   :flavor-gen "Oh dear. Considering what's been done to this grave, destroying it would be a mercy.")
 
-(defgenerated Approacher "i " "an imp"
+(defgenerated [Approacher Wanderer] "i " "an imp"
   :iq-ix-mon [43 67 68] :iq-ix-gen [44 69 70]
   :points-mon 4 :points-gen 15
 
   :field-defaults (dict
-    :shot-power (f/ 0)
-    :wander-state None)
-  :mutable-fields #("shot_power" "wander_state")
+    :shot-power (f/ 0))
+  :mutable-fields #("shot_power")
 
   :damage-shot #(1 2 3)
   :act (meth []
@@ -494,12 +505,11 @@
       (when (pop-integer-part @.shot-power)
         (try-to-attack-player @ :shots-ignore-obstacles T)
         (return)))
-    (wander @ "wander_state" :implicit-attack F))
+    (@wander :implicit-attack F))
 
   :info-bullets (meth [#* extra]
     (Generated.info-bullets @
-      #("Shot power" @shot-power)
-      #("Wandering state" @wander-state)))
+      #("Shot power" @shot-power)))
 
   :flavor-mon #[[Weak but incredibly annoying, this snickering little fiend is called a "lobber" in the tongue of the ancients. It throws hellstones, cursed missiles that can pierce most any obstacle. In close quarters, it resorts to cowering helplessly and begging for mercy, but, being a literal demon, it has no compunctions about getting right back to firing at you the moment it feels safe.]]
   :flavor-gen "They don't make ziggurats like they used to.")
@@ -559,7 +569,7 @@
 
   :flavor "A quantum of negative energy motivated only by a hatred of princess-based life forms. It can expend its entire payload in a single attack, and, being essentially mindless, it has no qualms about doing so. Magic arrows are pretty much the only thing strong enough to hurt it.")
 
-(deftile NonGen "f " "a floater"
+(deftile [NonGen Wanderer] "f " "a floater"
   :iq-ix 47
   :destruction-points 2
 
@@ -573,7 +583,7 @@
       (+= G.player.floater-disturbance floater-disturbance-increment)
       (when (pop-integer-part G.player.floater-disturbance)
         (return (try-to-attack-player @))))
-    (wander @ :implicit-attack F))
+    (@wander :implicit-attack F))
 
   :destroy (meth []
     "The monster can attempt a free attack, unless it killed itself by kamikaze."
@@ -584,7 +594,7 @@
 (setv floater-disturbance-increment (f/ 1 5))
 
 
-(deftile NonGen "O " "a blob"
+(deftile [NonGen Wanderer] "O " "a blob"
   :iq-ix 48
   :destruction-points 0
 
@@ -610,7 +620,7 @@
         (summon @ "blob" (// @hp 2)))
       (-= @hp (// @hp 2))
       (return))
-    (wander @ :implicit-attack F))
+    (@wander :implicit-attack F))
 
   :flavor "What looks like a big mobile puddle of slime is actually a man-sized amoeba. It retains the ability to divide (but not, fortunately, to grow), and its lack of distinct internal anatomy makes arrows pretty useless. It has just enough intelligence to notice that you're standing next to it and try to envelop you in its gloppy bulk.")
 
@@ -631,12 +641,9 @@
   :flavor "Yet another evil undead phantasm. This one's a real piece of work: it has a powerful heat-drain attack and the ability to teleport past obstacles.")
 
 
-(deftile [NonGen Approacher] "S " "a giant spider"
+(deftile [NonGen Approacher Wanderer] "S " "a giant spider"
   :color 'brown
   :destruction-points 50
-
-  :field-defaults (dict :wander-state None)
-  :mutable-fields #("wander_state")
 
   :damage-melee 10
 
@@ -647,7 +654,7 @@
         (<= (dist G.player.pos @pos) spider-approach-range)
         (not (player-invisible-to @)))
       (@approach :ethereal-to ["web"])
-      (wander @ "wander_state" :ethereal-to ["web"]))
+      (@wander :ethereal-to ["web"]))
     ; Spin a web in our new position, if there isn't one there
     ; already.
     (unless (any (gfor  tile (at @pos)  (= tile.stem "web")))
