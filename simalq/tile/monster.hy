@@ -53,8 +53,6 @@
     "How many points the monster's generator is worth."
     (* 4 cls.destruction-points))
 
-  (setv act 'approach)
-
   (defmeth suffix-dict []
     (dict :HP @hp))
 
@@ -86,8 +84,7 @@
       #* extra
       #("Behavior" (or
         @act.__doc__
-        (@act.dynadoc @)))
-      #("Movement state" @movement-state))))
+        (@act.dynadoc @))))))
 
 (defn damage-by-hp [monster damage]
   (if (isinstance damage tuple)
@@ -187,71 +184,6 @@
   "Stationary — The monster attacks if it can, but is otherwise immobile."
   (try-to-attack-player mon))
 
-(defn approach [mon
-    [implicit-attack T]
-    [advance-movement-state T]
-    [reverse F]
-    [jump F]
-    [ethereal-to #()]]
-  "Approach — If the monster can attack, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its movement state. If it can't move that way, it wastes its turn, and its movement state advances to the next cardinal direction."
-  ; Return true if we successfully moved or attacked; false otherwise.
-
-  (when (and implicit-attack (try-to-attack-player mon))
-    (return T))
-  (when (player-invisible-to mon)
-    (return F))
-
-  ; Try to get closer to the player.
-  (setv d (dir-to mon.pos G.player.pos))
-  (when (is d None)
-    ; The player is in our square. Just give up.
-    (return F))
-  (when reverse
-    (setv d d.opposite))
-
-  (setv target None)
-  (defn ok-target []
-    (nonlocal target)
-    (if jump
-      ; In jump mode, we move two squares, mostly ignoring tiles on
-      ; the intermediate square, and ignoring all diagonal blocking.
-      (and
-        (setx intermediate (pos+ mon.pos d))
-        (not (any (gfor
-          tile (at intermediate)
-          (and (isinstance tile Scenery) tile.superblock))))
-        (setx target (pos+ intermediate d))
-        (not (nogo? target :monster? T :ethereal-to ethereal-to)))
-      (do
-        (setv [target wly] (walkability mon.pos d :monster? T :ethereal-to ethereal-to))
-        (= wly 'walk))))
-
-  (unless (ok-target)
-    ; We can't go that way. Try a different direction.
-    ; Use a non-random equivalent of IQ's `ApproachHero`.
-    (setv movement-state
-      (next-in-cycle Direction.orths mon.movement-state))
-    (when advance-movement-state
-      (setv mon.movement-state movement-state))
-    (setv d (tuple (gfor c ["x" "y"]
-      (if (getattr movement-state c)
-        (if (getattr d c)
-          0
-          (getattr movement-state c))
-        (getattr d c)))))
-    ; Per IQ, we make only one attempt to find a new direction.
-    ; So if this fails, give up.
-    (when (= d #(0 0))
-      (return F))
-    (setv d (get Direction.from-coords d))
-    (unless (ok-target)
-      (return F)))
-
-  ; We're clear to move.
-  (.move mon target)
-  (return T))
-(setv Monster.act approach)
-
 (defn wander [mon [state-field "movement_state"] [implicit-attack T] [ethereal-to #()]]
   "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
 
@@ -277,6 +209,83 @@
   (when (> (dist G.player.pos target) G.rules.reality-bubble-size)
     (return))
   (.move mon target))
+
+
+(defclass Approacher [Monster]
+
+  (field-defaults
+    approach-dir None)
+  (setv mutable-fields #("approach_dir"))
+
+  (defmeth approach [
+      [implicit-attack T]
+      [advance-approach-dir T]
+      [reverse F]
+      [jump F]
+      [ethereal-to #()]]
+    "Approach — If the monster can attack, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its approach direction. If it can't move that way, it wastes its turn, and its approach direction advances to the next cardinal direction."
+    ; Return true if we successfully moved or attacked; false otherwise.
+
+    (when (and implicit-attack (try-to-attack-player @))
+      (return T))
+    (when (player-invisible-to @)
+      (return F))
+
+    ; Try to get closer to the player.
+    (setv d (dir-to @pos G.player.pos))
+    (when (is d None)
+      ; The player is in our square. Just give up.
+      (return F))
+    (when reverse
+      (setv d d.opposite))
+
+    (setv target None)
+    (defn ok-target []
+      (nonlocal target)
+      (if jump
+        ; In jump mode, we move two squares, mostly ignoring tiles on
+        ; the intermediate square, and ignoring all diagonal blocking.
+        (and
+          (setx intermediate (pos+ @pos d))
+          (not (any (gfor
+            tile (at intermediate)
+            (and (isinstance tile Scenery) tile.superblock))))
+          (setx target (pos+ intermediate d))
+          (not (nogo? target :monster? T :ethereal-to ethereal-to)))
+        (do
+          (setv [target wly] (walkability @pos d :monster? T :ethereal-to ethereal-to))
+          (= wly 'walk))))
+
+    (unless (ok-target)
+      ; We can't go that way. Try a different direction.
+      ; Use a non-random equivalent of IQ's `ApproachHero`.
+      (setv approach-dir
+        (next-in-cycle Direction.orths @approach-dir))
+      (when advance-approach-dir
+        (setv @approach-dir approach-dir))
+      (setv d (tuple (gfor c ["x" "y"]
+        (if (getattr approach-dir c)
+          (if (getattr d c)
+            0
+            (getattr approach-dir c))
+          (getattr d c)))))
+      ; Per IQ, we make only one attempt to find a new direction.
+      ; So if this fails, give up.
+      (when (= d #(0 0))
+        (return F))
+      (setv d (get Direction.from-coords d))
+      (unless (ok-target)
+        (return F)))
+
+    ; We're clear to move.
+    (@move target)
+    (return T))
+
+  (setv act approach)
+
+  (defmeth info-bullets [#* extra]
+    (.info-bullets (super)
+      #("Approach direction" @approach-dir))))
 
 
 (defclass Generated [Monster]
@@ -340,6 +349,7 @@
     (self-sc flavor-for-generator))))
 
 (defn defgenerated [
+    superclasses
     mapsym name *
     iq-ix-mon iq-ix-gen
     points-mon points-gen
@@ -348,7 +358,10 @@
     #** kwargs]
   "Shorthand for defining both a generated monster and its generator."
 
-  (setv mon-cls (deftile Generated mapsym name
+  (unless (isinstance superclasses list)
+    (setv superclasses [superclasses]))
+
+  (setv mon-cls (deftile [Generated #* superclasses] mapsym name
     :iq-ix-mapper ["hp"
       (dict (zip iq-ix-mon [1 2 3]))]
     :immune immune
@@ -380,7 +393,7 @@
     (dict :hp v2)))
 
 
-(defgenerated "o " "an orc"
+(defgenerated Approacher "o " "an orc"
   :iq-ix-mon [39 59 60] :iq-ix-gen [40 61 62]
   :points-mon 3 :points-gen 12
 
@@ -389,7 +402,7 @@
   :flavor-mon "A green-skinned, muscle-bound, porcine humanoid with a pointy spear and a bad attitude."
   :flavor-gen "A sort of orcish clown car, facetiously called a village.")
 
-(defgenerated "g " "a goblin"
+(defgenerated Approacher "g " "a goblin"
   :iq-ix-mon [95 96 97] :iq-ix-gen [98 99 100]
   :points-mon 2 :points-gen 8
 
@@ -398,7 +411,7 @@
   :flavor-mon "Goblins are a smaller, uglier, smellier, and worse-equipped cousin of orcs that try to make up for it with even more sadistic malice. It almost works."
   :flavor-gen "Oops, somebody gave the goblins a bath. Now there's a lot more of them, and they still stink.")
 
-(defgenerated "G " "a ghost"
+(defgenerated Approacher "G " "a ghost"
   :iq-ix-mon [37 55 56] :iq-ix-gen [38 57 58]
   :points-mon 5 :points-gen 25
 
@@ -409,7 +422,7 @@
   :flavor-mon "A spooky apparition bearing a striking resemblance to a man with a sheet draped over him. Giggle at your peril: it can discharge the negative energy that animates it to bring you closer to the grave yourself.\n\n    Lemme tell ya something: bustin' makes me feel good!"
   :flavor-gen "This big heap of human bones raises several questions, but sadly it appears you must treat the dead with even less respect in order to get rid of those ghosts.")
 
-(defgenerated "b " "a bat"
+(defgenerated [] "b " "a bat"
   :iq-ix-mon [45 71 72] :iq-ix-gen [46 73 74]
   :points-mon 1 :points-gen 3
 
@@ -419,7 +432,7 @@
   :flavor-mon "Dusk! With a creepy, tingling sensation, you hear the fluttering of leathery wings! Bats! With glowing red eyes and glistening fangs, these unspeakable giant bugs drop onto… wait. These aren't my lecture notes."
   :flavor-gen #[[A faint singing echoes out of the depths of this cave. They sound like they're saying "na na na".]])
 
-(defgenerated "B " "a giant bee"
+(defgenerated [] "B " "a giant bee"
   :iq-ix-mon [123 124 125] :iq-ix-gen [126 127 128]
   :points-mon 5 :points-gen 15
 
@@ -429,7 +442,7 @@
   :flavor-mon "Bees bafflingly being bigger'n bats. This is the kind that can survive stinging you. You might not be so lucky."
   :flavor-gen #[[The ancients call this place "the Plounge".]])
 
-(defgenerated "d " "a devil"
+(defgenerated Approacher "d " "a devil"
   :iq-ix-mon [41 63 64] :iq-ix-gen [42 65 66]
   :points-mon 5 :points-gen 25
 
@@ -439,7 +452,7 @@
   :flavor-mon "A crimson-skinned, vaguely humanoid monster. Its eyes glow with the malevolent fires of hell, which it can hurl at you from a distance. Its claws are sharp, but don't hurt quite as much as getting roasted. To its enduring shame, it has no protection whatsoever against fire damage."
   :flavor-gen "A tunnel that goes all the way down to the Bad Place. It stinks of sulfur and invites the innumerable ill-spirited inhabitants of the inferno to ruin your day.")
 
-(defgenerated "w " "a wizard"
+(defgenerated Approacher "w " "a wizard"
   :iq-ix-mon [87 88 89] :iq-ix-gen [90 91 92]
   :points-mon 5 :points-gen 25
 
@@ -449,7 +462,7 @@
   :flavor-mon "This fresh-faced would-be scholar has finished sewing the stars onto his robe and is starting to grow a beard. Idok has told the whole class that whoever kills you gets tenure. Considering what the rest of the academic job market is like, the offer has proven irresistible to many."
   :flavor-gen "The Pigpimples Institute of Thaumaturgy and Dweomercraft: a shameless diploma mill that happily takes students' money to teach them one spell, then sends them on a suicide mission against a much smarter and tougher opponent.")
 
-(defgenerated "s " "a shade"
+(defgenerated Approacher "s " "a shade"
   :iq-ix-mon [171 172 173] :iq-ix-gen [174 175 176]
   :points-mon 6 :points-gen 24
 
@@ -459,7 +472,7 @@
   :flavor-mon #[[A dark spirit with mastery of its semi-corporeal form, allowing ordinary arrows to pass right through it. As it approaches, it hisses "Death!"]]
   :flavor-gen "Oh dear. Considering what's been done to this grave, destroying it would be a mercy.")
 
-(defgenerated "i " "an imp"
+(defgenerated Approacher "i " "an imp"
   :iq-ix-mon [43 67 68] :iq-ix-gen [44 69 70]
   :points-mon 4 :points-gen 15
 
@@ -475,7 +488,7 @@
     (when (and
         (<= (dist G.player.pos @pos) imp-flee-range)
         (not (player-invisible-to @)))
-      (return (approach @ :reverse T :implicit-attack F)))
+      (return (@approach :reverse T :implicit-attack F)))
     (when (try-to-attack-player @ :dry-run T :shots-ignore-obstacles T)
       (+= @shot-power imp-shot-charge)
       (when (pop-integer-part @.shot-power)
@@ -507,7 +520,7 @@
 
   :flavor "From a distance, you can safely giggle at the ghostly. Up close, this arboreal abomination will rake you with its twisted, spiny boughs. Arrows snag in its branches and glance off its gnarled bark, so an intimate encounter may be unavoidable. On the other hand, it's rather flammable. Remember, only you can start forest fires.")
 
-(deftile NonGen "K " "a Dark Knight"
+(deftile [NonGen Approacher] "K " "a Dark Knight"
   :iq-ix 53
   :destruction-points 75
 
@@ -515,7 +528,7 @@
 
   :flavor "This dread warrior wears ink-black armor and carries a heavy chain mace. His devotion to the powers of evil (not to mention his willingness, nay, eagerness to kill you) makes his appropriation of Batman's epithet questionable at best. When you get down to it, he's just trying to distract you from the fact that he's the most basic enemy in the whole dungeon.")
 
-(deftile NonGen "t " "a Tricorn"
+(deftile [NonGen Approacher] "t " "a Tricorn"
   :iq-ix 54
   :destruction-points 10
 
@@ -525,7 +538,7 @@
 
   :flavor "Named not for a hat, but for the three horns projecting from their equine heads, Tricorns spend decades mediating while cocooned in woolen blankets. Their richly cultivated spirituality allows them to unleash a spark of static electricity from a fair distance, albeit still not as far as your arrows can fly. Up close, they can poke you with their horns for slightly less damage.")
 
-(deftile NonGen "D " "Death"
+(deftile [NonGen Approacher] "D " "Death"
   :iq-ix 49
   :destruction-points 200
 
@@ -535,7 +548,7 @@
 
   :flavor "A shadowy hooded figure bearing a wicked scythe who speaks in all capital letters. It can be destroyed, but don't expect that to be easy.")
 
-(deftile NonGen "N " "a negaton"
+(deftile [NonGen Approacher] "N " "a negaton"
   :iq-ix 52
   :destruction-points 50
 
@@ -601,7 +614,7 @@
 
   :flavor "What looks like a big mobile puddle of slime is actually a man-sized amoeba. It retains the ability to divide (but not, fortunately, to grow), and its lack of distinct internal anatomy makes arrows pretty useless. It has just enough intelligence to notice that you're standing next to it and try to envelop you in its gloppy bulk.")
 
-(deftile NonGen "S " "a specter"
+(deftile [NonGen Approacher] "S " "a specter"
   :iq-ix 50
   :destruction-points 100
 
@@ -612,13 +625,13 @@
   :act (meth []
      "Try to attack or approach per `Approach`. If that fails, try moving with a variation of `Approach` that allows skipping one intermediate tile."
      (or
-       (approach @ :advance-movement-state F)
-       (approach @ :implicit-attack F :jump T)))
+       (@approach :advance-approach-dir F)
+       (@approach :implicit-attack F :jump T)))
 
   :flavor "Yet another evil undead phantasm. This one's a real piece of work: it has a powerful heat-drain attack and the ability to teleport past obstacles.")
 
 
-(deftile NonGen "S " "a giant spider"
+(deftile [NonGen Approacher] "S " "a giant spider"
   :color 'brown
   :destruction-points 50
 
@@ -633,7 +646,7 @@
     (if (and
         (<= (dist G.player.pos @pos) spider-approach-range)
         (not (player-invisible-to @)))
-      (approach @ :ethereal-to ["web"])
+      (@approach :ethereal-to ["web"])
       (wander @ "wander_state" :ethereal-to ["web"]))
     ; Spin a web in our new position, if there isn't one there
     ; already.
