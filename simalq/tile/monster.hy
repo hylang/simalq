@@ -602,7 +602,7 @@
       #* extra))
 
   :act (meth []
-    (doc f"If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {@summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
+    (doc f"Blob – If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {@summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
     (when (try-to-attack-player @)
       (return))
     (when (and
@@ -623,7 +623,7 @@
   :sees-invisible T
 
   :act (meth []
-     "Try to attack or approach per `Approach`. If that fails, try moving with a variation of `Approach` that allows skipping one intermediate tile."
+     "Haunt — Try to attack or approach per `Approach`. If that fails, try moving with a variation of `Approach` that allows skipping one intermediate tile."
      (or
        (@approach :advance-approach-dir F)
        (@approach :implicit-attack F :jump T)))
@@ -641,7 +641,7 @@
   :damage-melee 10
 
   :act (meth []
-    (doc f"If the monster is within {spider-approach-range} squares of you, it approaches (per `Approach`). Otherwise, it wanders (per `Wander`). In both cases, it can move through webs, and it creates a web on its square afterwards if no web is there already.")
+    (doc f"Webcrawl — If the monster is within {spider-approach-range} squares of you, it approaches (per `Approach`). Otherwise, it wanders (per `Wander`). In both cases, it can move through webs, and it creates a web on its square afterwards if no web is there already.")
     ; Move or attack.
     (if (and
         (<= (dist G.player.pos @pos) spider-approach-range)
