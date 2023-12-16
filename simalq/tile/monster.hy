@@ -53,6 +53,9 @@
     "How many points the monster's generator is worth."
     (* 4 cls.destruction-points))
 
+  (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
+    (dict :hp v2))
+
   (defmeth suffix-dict []
     (dict :HP @hp))
 
@@ -400,13 +403,6 @@
           (- (& te-v2 0b1111) 1)))]))))
 
 
-(defclass NonGen [Monster]
-  "A monster that has no generators in IQ."
-
-  (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
-    (dict :hp v2)))
-
-
 (defgenerated Approacher "o " "an orc"
   :iq-ix-mon [39 59 60] :iq-ix-gen [40 61 62]
   :points-mon 3 :points-gen 12
@@ -517,7 +513,7 @@
 (setv imp-shot-charge (f/ 4 5))
 
 
-(deftile NonGen "T " "a thorn tree"
+(deftile Monster "T " "a thorn tree"
   :iq-ix 51
   :destruction-points 10
 
@@ -530,7 +526,7 @@
 
   :flavor "From a distance, you can safely giggle at the ghostly. Up close, this arboreal abomination will rake you with its twisted, spiny boughs. Arrows snag in its branches and glance off its gnarled bark, so an intimate encounter may be unavoidable. On the other hand, it's rather flammable. Remember, only you can start forest fires.")
 
-(deftile [NonGen Approacher] "K " "a Dark Knight"
+(deftile Approacher "K " "a Dark Knight"
   :iq-ix 53
   :destruction-points 75
 
@@ -538,7 +534,7 @@
 
   :flavor "This dread warrior wears ink-black armor and carries a heavy chain mace. His devotion to the powers of evil (not to mention his willingness, nay, eagerness to kill you) makes his appropriation of Batman's epithet questionable at best. When you get down to it, he's just trying to distract you from the fact that he's the most basic enemy in the whole dungeon.")
 
-(deftile [NonGen Approacher] "t " "a Tricorn"
+(deftile Approacher "t " "a Tricorn"
   :iq-ix 54
   :destruction-points 10
 
@@ -548,7 +544,7 @@
 
   :flavor "Named not for a hat, but for the three horns projecting from their equine heads, Tricorns spend decades mediating while cocooned in woolen blankets. Their richly cultivated spirituality allows them to unleash a spark of static electricity from a fair distance, albeit still not as far as your arrows can fly. Up close, they can poke you with their horns for slightly less damage.")
 
-(deftile [NonGen Approacher] "D " "Death"
+(deftile Approacher "D " "Death"
   :iq-ix 49
   :destruction-points 200
 
@@ -558,7 +554,7 @@
 
   :flavor "A shadowy hooded figure bearing a wicked scythe who speaks in all capital letters. It can be destroyed, but don't expect that to be easy.")
 
-(deftile [NonGen Approacher] "N " "a negaton"
+(deftile Approacher "N " "a negaton"
   :iq-ix 52
   :destruction-points 50
 
@@ -569,7 +565,7 @@
 
   :flavor "A quantum of negative energy motivated only by a hatred of princess-based life forms. It can expend its entire payload in a single attack, and, being essentially mindless, it has no qualms about doing so. Magic arrows are pretty much the only thing strong enough to hurt it.")
 
-(deftile [NonGen Wanderer] "f " "a floater"
+(deftile Wanderer "f " "a floater"
   :iq-ix 47
   :destruction-points 2
 
@@ -594,7 +590,7 @@
 (setv floater-disturbance-increment (f/ 1 5))
 
 
-(deftile [NonGen Wanderer] "O " "a blob"
+(deftile Wanderer "O " "a blob"
   :iq-ix 48
   :destruction-points 0
 
@@ -606,7 +602,7 @@
   :summon-frequency (f/ 1 10)
 
   :info-bullets (meth [#* extra]
-    (NonGen.info-bullets @
+    (Wanderer.info-bullets @
       #("Summoning power" (mixed-number @summon-power))
       #("Summoning direction" @summon-direction)
       #* extra))
@@ -624,7 +620,7 @@
 
   :flavor "What looks like a big mobile puddle of slime is actually a man-sized amoeba. It retains the ability to divide (but not, fortunately, to grow), and its lack of distinct internal anatomy makes arrows pretty useless. It has just enough intelligence to notice that you're standing next to it and try to envelop you in its gloppy bulk.")
 
-(deftile [NonGen Approacher] "S " "a specter"
+(deftile Approacher "S " "a specter"
   :iq-ix 50
   :destruction-points 100
 
@@ -641,7 +637,7 @@
   :flavor "Yet another evil undead phantasm. This one's a real piece of work: it has a powerful heat-drain attack and the ability to teleport past obstacles.")
 
 
-(deftile [NonGen Approacher Wanderer] "S " "a giant spider"
+(deftile [Approacher Wanderer] "S " "a giant spider"
   :color 'brown
   :destruction-points 50
 
