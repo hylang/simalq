@@ -1,4 +1,5 @@
 (import
+  metadict [MetaDict]
   simalq.color
   simalq.game-state [G]
   simalq.tile [Tile Player]
@@ -7,8 +8,40 @@
 (setv  T True  F False)
 
 
+(defn get-info []
+  "Compile all the tile info screens into a dictionary."
+
+  (start-quest None)  ; Initialize `G`.
+  (setv tiles (lfor
+    tt (.values Tile.types)
+    (if (is tt Player) G.player (tt))))
+
+  (MetaDict (dfor
+    [name superclass] (.items Tile.superclasses)
+    name (lfor
+      tile tiles
+      :if (isinstance tile superclass)
+      (dict
+        :id (.replace tile.stem " " "-")
+        :long-name tile.name-with-article
+        :mapsym (lfor
+          cc (color-tile tile)
+          (dict
+            :char cc.char
+            :colors (lfor
+              color [
+                (or cc.fg simalq.color.default-fg)
+                (or cc.bg simalq.color.default-bg)]
+              (get simalq.color.by-name color))))
+        :bullets (lfor
+          bullet (.info-bullets tile)
+          :if bullet
+          bullet)
+        :flavor tile.flavor)))))
+
+
 (defn html []
-  "Compile all the tile info screens into an HTML document."
+  "Use `info` to construct an HTML document."
 
   (import
     ; The depenency on `lxml` isn't declared in `setup.py` because it
@@ -16,24 +49,18 @@
     lxml.html
     lxml.builder)
 
-  (start-quest None)  ; Initialize `G`.
-  (setv tiles (lfor
-    tt (.values Tile.types)
-    (if (is tt Player) G.player (tt))))
-
   (setv E (lxml.builder.ElementMaker
     :makeelement lxml.html.html-parser.makeelement))
 
   (defn mapsym [tile]
     (E.code :class "mapsym" #* (gfor
-      cc (color-tile tile)
+      cc tile.mapsym
       (E.span cc.char :style
         (.format "color: {}; background-color: {}" #* (gfor
-          color [
-            (or cc.fg simalq.color.default-fg)
-            (or cc.bg simalq.color.default-bg)]
-          (.format "#{:02x}{:02x}{:02x}" #*
-            (get simalq.color.by-name color))))))))
+          rgb cc.colors
+          (.format "#{:02x}{:02x}{:02x}" #* rgb)))))))
+
+  (setv info (get-info))
 
   (setv doc (E.html :lang "en"
 
@@ -64,24 +91,21 @@
     (E.nav
       (E.h2 "Contents")
       (E.ul #* (gfor
-        [name superclass] (.items Tile.superclasses)
-        (E.li name (E.ul #* (gfor
+        [superclass-name tiles] (.items info)
+        (E.li superclass-name (E.ul #* (gfor
           tile tiles
-          :if (isinstance tile superclass)
-          (E.li (mapsym tile) (E.a tile.name-with-article
-            :href (+ "#" (.replace tile.stem " " "-"))))))))))
+          (E.li (mapsym tile) (E.a tile.long-name
+            :href (+ "#" tile.id)))))))))
 
     ; One section of info screens per superclass
     #* (cat (gfor
-      [name superclass] (.items Tile.superclasses)
-      [(E.h2 name) #* (cat (gfor
+      [superclass-name tiles] (.items info)
+      [(E.h2 superclass-name) #* (cat (gfor
         ; One info screen per tile type
         tile tiles
-        :if (isinstance tile superclass)
-        [(E.h3 (mapsym tile) tile.name-with-article :id (.replace tile.stem " " "-"))
+        [(E.h3 (mapsym tile) tile.long-name :id tile.id)
           (E.ul #* (gfor
-            bullet (.info-bullets tile)
-            :if bullet
+            bullet tile.bullets
             (E.li #* (if (isinstance bullet tuple)
               [(E.strong (get bullet 0) ": ") (str (get bullet 1))]
               [(E.strong bullet)]))))
