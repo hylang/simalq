@@ -23,10 +23,6 @@
 (defclass Monster [Actor Damageable]
   "A non-player character, typically out to kill the player."
 
-  (field-defaults
-    movement-state None)
-      ; A bit of memory or plan that the monster uses to choose
-      ; its movements.
   (setv
     mutable-fields #("hp" "movement_state")
     damage-melee None
