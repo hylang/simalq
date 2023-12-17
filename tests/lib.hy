@@ -31,7 +31,13 @@
   (assert (= (top locator 'hp) value)))
 
 (defn assert-full-name [locator value]
-  (assert (= (top locator 'full-name) value)))
+  (setv actual (top locator 'full-name))
+  ; Check for string equality, except that a period in `value` can be
+  ; any one character.
+  (assert (= (len actual) (len value)))
+  (assert (all (gfor
+    [a v] (zip actual value)
+    (or (= v ".") (= a v))))))
 
 (defn set-square [locator #* tile-specs]
   "Remove all tiles at the given square, then add new ones as

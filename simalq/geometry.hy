@@ -42,11 +42,8 @@
     ["north" "east" "south" "west"]
     [0       1       0      -1]
     [1       0      -1       0])))
-  (setv arrows
-    ["↑"     "→"    "↓"     "←"])
   (for [d Direction.orths]
     (setattr Direction (.upper (get d.name 0)) d))
-  (setv Direction.arrows (dict (zip Direction.orths arrows)))
   (setv Direction.diags (tuple (gfor
     d1 [Direction.N Direction.S]
     d2 [Direction.E Direction.W]
@@ -56,6 +53,10 @@
   (setv Direction.all #(
      Direction.N Direction.NE Direction.E Direction.SE
      Direction.S Direction.SW Direction.W Direction.NW))
+  (setv arrows [
+     "↑"         "↗"          "→"         "↘"
+     "↓"         "↙"          "←"         "↖"])
+  (setv Direction.arrows (dict (zip Direction.all arrows)))
   (setv Direction.from-coords (dfor
     d Direction.all
     #(d.x d.y) d))
@@ -157,12 +158,14 @@
 (defn pos-seed [pos]
   "Using a `Pos`, get a number you could use as an RNG seed. Nearby
   `Pos`es should return different values."
-  (+
-    (* G.level-n 1,000,003)
-      ; The multiplier is chosen to be (a) prime and (b) bigger
-      ; than the area of most levels.
-    pos.x
-    (* G.map.width pos.y)))
+  (if (is G.level-n None)
+    0
+    (+
+      (* G.level-n 1,000,003)
+        ; The multiplier is chosen to be (a) prime and (b) bigger
+        ; than the area of most levels.
+      pos.x
+      (* G.map.width pos.y))))
 
 (defn turn-and-pos-seed [pos]
   "Like `pos-seed`, but also uses `G.turn-n`."
