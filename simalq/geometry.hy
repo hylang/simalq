@@ -53,6 +53,11 @@
   (setv Direction.all #(
      Direction.N Direction.NE Direction.E Direction.SE
      Direction.S Direction.SW Direction.W Direction.NW))
+  (setv Direction.abbr (property (meth []
+    (next (gfor
+      [k v] (.items (vars Direction))
+      :if (is v @)
+      k)))))
   (setv arrows [
      "↑"         "↗"          "→"         "↘"
      "↓"         "↙"          "←"         "↖"])

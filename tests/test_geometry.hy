@@ -119,6 +119,8 @@
 (defn test-direction []
   (assert (= Direction.N.opposite Direction.S))
   (assert (= Direction.SW.opposite Direction.NE))
+  (assert (= Direction.SW.abbr "SW"))
+  (assert (= Direction.SW.name "southwest"))
   (assert (= (len Direction.all) 8)))
 
 
