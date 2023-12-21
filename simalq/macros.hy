@@ -62,11 +62,6 @@
     (setv decorators []  [fname params #* body] args))
   (_defmeth decorators fname params body))
 
-(defmacro meth [params #* body]
-  "As `defmeth`, for an anonymous function."
-  (setv fname (hy.gensym "meth"))
-  (+ (_defmeth [] fname params body) `(~fname)))
-
 (defn _defmeth [decorators fname params body]
   (defn f [x]
     (cond

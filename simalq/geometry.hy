@@ -1,6 +1,6 @@
 (require
   hyrule [unless do-n]
-  simalq.macros [defdataclass defmeth meth])
+  simalq.macros [defdataclass defmeth])
 (import
   itertools [chain]
   toolz [unique]
@@ -53,10 +53,10 @@
   (setv Direction.all #(
      Direction.N Direction.NE Direction.E Direction.SE
      Direction.S Direction.SW Direction.W Direction.NW))
-  (setv Direction.abbr (property (meth []
+  (setv Direction.abbr (property (fn [self]
     (next (gfor
       [k v] (.items (vars Direction))
-      :if (is v @)
+      :if (is v self)
       k)))))
   (setv arrows [
      "↑"         "↗"          "→"         "↘"
@@ -71,8 +71,8 @@
     d2 Direction.all
     :if (and (= d1.x (- d2.x)) (= d1.y (- d2.y)))
     d1 d2))
-  (setv Direction.opposite (property (meth []
-    (get opposites @))))))
+  (setv Direction.opposite (property (fn [self]
+    (get opposites self))))))
 
 
 (defdataclass Pos []
