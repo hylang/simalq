@@ -384,7 +384,7 @@
     T)
 
   :info-bullets (meth [#* extra]
-    (Scenery.info-bullets @
+    (.info-bullets (super)
       #("Times entered" @times-entered)
       #("Output direction" @output-dir)))
 
@@ -440,7 +440,7 @@
   :blocks-move T :blocks-diag T
   :destructible-by-passwall-wand T
   :info-bullets (meth [#* extra]
-    (Scenery.info-bullets @
+    (.info-bullets (super)
       #("Wallfall type" @wallnum)))
 
   :flavor "The special thing about this wall is that it can be destroyed by wallfall traps of the corresponding type.\n\nWhat's the deal with monster closets? Monsters are proud of who they are, am I right? I'll be here all week.")
@@ -519,7 +519,7 @@
       (@rm-from-map)))
 
   :info-bullets (meth [#* extra]
-    (Scenery.info-bullets @
+    (.info-bullets (super)
       #("Turns remaining" @time-remaining)))
 
   :flavor "These glittering barriers of orange plasma offer you plenty of protection and monsters none at all. Enjoy 'em while they last.")

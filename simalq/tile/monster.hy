@@ -377,12 +377,12 @@
       (Tile.full-name.fget @)))
   :suffix-dict (meth []
     (dict
-      #** (Summoner.suffix-dict @)
+      #** (.suffix-dict (super))
       :freq (mixed-number @summon-frequency)
       :sHP @summon-hp))
 
   :info-bullets (meth []
-    (Summoner.info-bullets @
+    (.info-bullets (super)
       #("Summoning frequency" (mixed-number @summon-frequency))
       #("Type of summoned monsters" @summon-class)
       #("Hit points of summoned monsters" @summon-hp)))
@@ -535,7 +535,7 @@
     (@wander :implicit-attack F))
 
   :info-bullets (meth [#* extra]
-    (Generated.info-bullets @
+    (.info-bullets (super)
       #("Shot power" @shot-power)))
 
   :flavor-mon #[[Weak but incredibly annoying, this snickering little fiend is called a "lobber" in the tongue of the ancients. It throws hellstones, cursed missiles that can pierce most any obstacle. In close quarters, it resorts to cowering helplessly and begging for mercy, but, being a literal demon, it has no compunctions about getting right back to firing at you the moment it feels safe.]]
