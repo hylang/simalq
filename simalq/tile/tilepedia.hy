@@ -41,7 +41,7 @@
 
 
 (defn html []
-  "Use `info` to construct an HTML document."
+  "Use `get-info` to construct an HTML document."
 
   (import
     ; The depenency on `lxml` isn't declared in `setup.py` because it
