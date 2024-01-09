@@ -1,11 +1,12 @@
 (require
   hyrule [unless]
-  simalq.macros [defmeth meth])
+  simalq.macros [defmeth]
+  simalq.tile [deftile])
 (import
   simalq.color :as color
   simalq.util [CommandError DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction pos+ at burst dist dir-to]
-  simalq.tile [Tile EachTurner Damageable deftile]
+  simalq.tile [Tile EachTurner Damageable]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -198,35 +199,37 @@
          [((get Tile.types-by-iq-ix te-v1) :pos pos)])]))
 
 
-((fn []
+(defclass OneWayDoor [Scenery]
 
-  (defclass OneWayDoor [Scenery]
+  (setv
+    blocks-monster T
+    direction None
+    color #('brown 'red))
 
-    (setv
-      blocks-monster T
-      direction None
-      color #('brown 'red))
+  (defmeth hook-player-walk-from [target]
+    (doc f"Only allows you to walk {@direction.name}.")
+    (unless (= (pos+ @pos @direction) target)
+      (raise (CommandError f"You can only go {@direction.name} from this one-way door."))))
+  (defmeth hook-player-walk-to [origin]
+    (doc f"Only allows you to enter from the
+      {@direction.opposite.name}.")
+    (unless (= (pos+ origin @direction) @pos)
+      (raise (CommandError (.format "That one-way door must be entered from the {}."
+        @direction.opposite.name)))))
 
-    (defmeth hook-player-walk-from [target]
-      (doc f"Only allows you to walk {@direction.name}.")
-      (unless (= (pos+ @pos @direction) target)
-        (raise (CommandError f"You can only go {@direction.name} from this one-way door."))))
-    (defmeth hook-player-walk-to [origin]
-      (doc f"Only allows you to enter from the
-        {@direction.opposite.name}.")
-      (unless (= (pos+ origin @direction) @pos)
-        (raise (CommandError (.format "That one-way door must be entered from the {}."
-          @direction.opposite.name)))))
+  (setv flavor "My way or the highway!"))
 
-    (setv flavor "My way or the highway!"))
-
-  (for [[direction iq-ix] [
+(do-mac
+  (import simalq.geometry [Direction])
+  `(do ~@(lfor
+    [direction iq-ix] [
       [Direction.N 8] [Direction.E 11]
-      [Direction.S 9] [Direction.W 10]]]
-    (setv c (get Direction.arrows direction))
-    (deftile OneWayDoor f"+{c}" f"a one-way door ({direction.name})"
-      :iq-ix iq-ix
-      :direction direction))))
+      [Direction.S 9] [Direction.W 10]]
+    :setv c (get Direction.arrows direction)
+    `(deftile OneWayDoor ~f"+{c}" ~f"a one-way door ({direction.name})"
+      :iq-ix ~iq-ix
+      :direction (. Direction ~(hy.models.Symbol direction.abbr))))))
+
 
 (deftile Scenery "> " "the exit"
   :color-bg 'lime
@@ -398,13 +401,13 @@
   :color 'dark-yellow
   :field-defaults (dict
     :wallnum 1)
-  :iq-ix-mapper ["wallnum" (do
+  :iq-ix-mapper ["wallnum" (do-mac
     ; These are just called "traps" in IQ.
     (setv x [115 13 75 76 77 111 112 113 114])
     (dict (zip x (range (len x)))))]
 
-  :mapsym (property (meth []
-    (+ "<" (if (< @wallnum 10) (str @wallnum) "^"))))
+  :mapsym (property-meth []
+    (+ "<" (if (< @wallnum 10) (str @wallnum) "^")))
   :suffix-dict (meth []
     (dict :type @wallnum))
   :hook-player-walked-into (meth []
@@ -426,12 +429,12 @@
   :color-bg #(None 'black)
   :field-defaults (dict
     :wallnum 1)
-  :iq-ix-mapper ["wallnum" (do
+  :iq-ix-mapper ["wallnum" (do-mac
     (setv x [120 14 78 79 80 116 117 118 119])
     (dict (zip x (range (len x)))))]
 
-  :mapsym (property (meth []
-    (+ "█" (if (< @wallnum 10) (str @wallnum) "^"))))
+  :mapsym (property-meth []
+    (+ "█" (if (< @wallnum 10) (str @wallnum) "^")))
   :suffix-dict (meth []
     (dict :type @wallnum))
   :blocks-move T :blocks-diag T

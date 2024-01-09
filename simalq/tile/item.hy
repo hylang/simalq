@@ -1,11 +1,12 @@
 (require
-  simalq.macros [unless meth defmeth])
+  simalq.macros [unless defmeth]
+  simalq.tile [deftile])
 (import
   simalq.strings
   simalq.util [CommandError]
   simalq.game-state [G]
   simalq.geometry [pos-seed turn-and-pos-seed burst at]
-  simalq.tile [Tile deftile]
+  simalq.tile [Tile]
   simalq.tile.scenery [Scenery]
   simalq.util [CommandError DamageType StatusEffect msg burst-damage refactor-hp])
 (setv  T True  F False)

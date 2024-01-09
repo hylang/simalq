@@ -1,6 +1,6 @@
 (require
   hyrule [unless]
-  simalq.macros [field-defaults defmeth])
+  simalq.macros [field-defaults defmeth defmacro-kwargs])
 (import
   copy [deepcopy]
   re
@@ -176,54 +176,69 @@
     ; to other tiles.)
 
 
-(defn deftile [superclasses mapsym name #** kwargs]
+(defmacro-kwargs deftile [superclasses mapsym name #** kwargs]
   "Declare and return a new concrete and final tile type. Superclasses
   of tiles not meant to themselves be instantiated should be declared
   with `defclass`."
 
-  (setv superclasses (if (isinstance superclasses #(list tuple))
-    (tuple superclasses)
-    #(superclasses)))
+  (setv superclasses (if (isinstance superclasses hy.models.List)
+    superclasses
+    `[~superclasses]))
 
-  (setv article None)
-  (setv stem (re.sub r"\A(a|an|the|some) "
-    (fn [m] (nonlocal article) (setv article (.group m 1)) "")
+  (setv (get kwargs "article") None)
+  (setv (get kwargs "stem") (re.sub r"\A(a|an|the|some) "
+    (fn [m] (setv (get kwargs "article") (.group m 1)) "")
     name))
-  (assert (or (isinstance mapsym property) (= (len mapsym) 2)))
+
+  `(defclass
+    [hy.I.simalq/tile.tiletype]
+    ~(hy.models.Symbol (+ "TileType_" (.join "" (gfor
+      c (get kwargs "stem")
+      (if (or (= c " ") (in c hy.reader.HyReader.NON_IDENT)) "_" c)))))
+    ~superclasses
+    ~@(gfor
+      [k v] (.items (dict :mapsym mapsym #** kwargs))
+      ; Treat `(meth …)` and `(property-meth …)` forms specially.
+      (cond
+        (and (isinstance v hy.models.Expression) (= (get v 0) 'meth))
+          `(hy.R.simalq/macros.defmeth ~(hy.models.Symbol k)
+            ~@(cut v 1 None))
+        (and (isinstance v hy.models.Expression) (= (get v 0) 'property-meth))
+          `(hy.R.simalq/macros.defmeth [property] ~(hy.models.Symbol k)
+            ~@(cut v 1 None))
+        True
+          `(setv ~(hy.models.Symbol k) ~v)))))
+
+
+(defn tiletype [cls]
+  "A decorator used by `deftile`."
+
+  (assert (or (isinstance cls.mapsym property) (= (len cls.mapsym) 2)))
 
   (setv new-attrs (lfor
-    k kwargs
-    :if (not (any (gfor  c superclasses  (hasattr c k))))
+    k (dir cls)
+    :if (not (any (gfor
+      c cls.__mro__
+      :if (is-not c cls)
+      (in k c.__dict__))))
     k))
   (when new-attrs
     (raise (TypeError f"Unknown attributes: {new-attrs}")))
-      ; New attributes should be introduced in a superclass. Otherwise,
-      ; you're probably just typoing an attribute name.
-  (when (and (in "field_defaults" kwargs) (not-in "fields" kwargs))
-    (setv (get kwargs "fields") (tuple (.keys (get kwargs "field_defaults")))))
+      ; New attributes should be introduced in a superclass.
+      ; Otherwise, you're probably just typoing an attribute name.
 
-  (setv cls (type
-    stem
-    superclasses
-    (dict
-      :article article
-      :stem stem
-      :mapsym mapsym
-      #** kwargs)))
+  (when (and (in "field_defaults" cls.__dict__) (not-in "fields" cls.__dict__))
+    (setv cls.fields (tuple (.keys cls.field-defaults))))
 
-  (assert (not-in stem Tile.types))
-  (setv (get Tile.types stem) cls)
+  (assert (not-in cls.stem Tile.types))
+  (setv (get Tile.types cls.stem) cls)
 
-  ; Also add the new class as a global variable of `simalq.tile` so
-  ; `pickle` can find it.
-  (setv (get (globals) stem) cls)
-
-  (when (setx iq-ix (.get kwargs "iq_ix"))
+  (when (setx iq-ix cls.iq-ix)
     (for [i (if (isinstance iq-ix int) [iq-ix] iq-ix)]
       (assert (not-in i Tile.types-by-iq-ix))
       (setv (get Tile.types-by-iq-ix i) cls)))
-  (when (in "iq_ix_mapper" kwargs)
-    (setv [field d] (get kwargs "iq_ix_mapper"))
+  (when cls.iq-ix-mapper
+    (setv [field d] cls.iq-ix-mapper)
     (assert (in field (.all-fields cls)))
     (for [[iq-ix field-value] (.items d)]
       (assert (not-in iq-ix Tile.types-by-iq-ix))

@@ -1,19 +1,17 @@
 (require
   hyrule [unless]
-  simalq.macros [meth])
+  simalq.tile [deftile])
 (import
   fractions [Fraction]
   simalq.game-state [G]
   simalq.color :as colors
   simalq.util [GameOverException DamageType msg refactor-hp hp-warning-threshold player-status flash-map]
   simalq.geometry [ray dir-to dist]
-  simalq.tile [Tile Damageable deftile])
+  simalq.tile [Tile Damageable])
 (setv  T True  F False)
 
 
-(setv character-name "Princess Triskaidecagonn XIII")
-
-(deftile [Damageable] "@ " character-name
+(deftile [Damageable] "@ " "Princess Triskaidecagonn XIII"
   ; A type representing the player-character.
 
   :field-defaults (dict
@@ -89,4 +87,4 @@
 
   :flavor "People who've met Tris and Argonn separately are sometimes surprised to learn that they're siblings. They don't look much alike.")
 
-(setv Player (get Tile.types character-name))
+(setv Player (get Tile.types "Princess Triskaidecagonn XIII"))

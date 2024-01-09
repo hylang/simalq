@@ -1,6 +1,7 @@
 (require
   hyrule [unless do-n list-n]
-  simalq.macros [field-defaults pop-integer-part meth defmeth])
+  simalq.macros [field-defaults pop-integer-part defmeth defmacro-kwargs]
+  simalq.tile [deftile])
 (import
   re
   fractions [Fraction :as f/]
@@ -9,7 +10,7 @@
   simalq.util [DamageType next-in-cycle mixed-number player-status]
   simalq.geometry [Direction pos+ at dist adjacent? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
-  simalq.tile [Tile Actor Damageable deftile]
+  simalq.tile [Tile Actor Damageable]
   simalq.tile.scenery [Scenery walkability nogo?])
 (setv  T True  F False)
 
@@ -357,23 +358,23 @@
     :summon-hp 1)
       ; How many hit points each monster will be summoned with.
 
-  :mapsym (property (meth []
-    (+ "☉" (self-sc mapsym [0]))))
-  :destruction-points (property (meth []
-    (self-sc (points-for-generator))))
+  :mapsym (property-meth []
+    (+ "☉" (self-sc mapsym [0])))
+  :destruction-points (property-meth []
+    (self-sc (points-for-generator)))
 
-  :score-for-damaging (property (meth []
-    (self-sc score-for-damaging)))
-  :immune (property (meth []
+  :score-for-damaging (property-meth []
+    (self-sc score-for-damaging))
+  :immune (property-meth []
     (setv x (self-sc immune))
-    (+ x (if (in Poison x) #() #(Poison)))))
+    (+ x (if (in Poison x) #() #(Poison))))
 
-  :full-name (property (meth []
+  :full-name (property-meth []
     (setv sc (self-sc))
     (.format "{}{} {}"
       (if sc.article (+ sc.article " ") "")
       (.replace sc.stem " " "-")
-      (Tile.full-name.fget @))))
+      (Tile.full-name.fget @)))
   :suffix-dict (meth []
     (dict
       #** (Summoner.suffix-dict @)
@@ -390,45 +391,47 @@
     "Generate — The generator adds its summon frequency to its summon power. If the total is more than 1, the integer part is removed and a corresponding number of monsters are generated in adjacent empty squares. If there are no adjacent empty squares, the expended summon power is wasted. The square that the generator attempts to target rotates through the compass with each summon or failed attempt."
     (@summon @summon-class @summon-frequency @summon-hp))
 
-  :flavor (property (meth []
-    (self-sc flavor-for-generator))))
+  :flavor (property-meth []
+    (self-sc flavor-for-generator)))
 
-(defn defgenerated [
+(defmacro-kwargs defgenerated [
     superclasses
-    mapsym name *
+    mapsym name
     iq-ix-mon iq-ix-gen
     points-mon points-gen
     flavor-mon flavor-gen
-    [immune #()]
     #** kwargs]
   "Shorthand for defining both a generated monster and its generator."
 
-  (unless (isinstance superclasses list)
+  (unless (isinstance superclasses hy.models.List)
     (setv superclasses [superclasses]))
 
-  (setv mon-cls (deftile [Generated #* superclasses] mapsym name
-    :iq-ix-mapper ["hp"
-      (dict (zip iq-ix-mon [1 2 3]))]
-    :immune immune
-    :destruction-points points-mon
-    :points-for-generator (classmethod (fn [cls] points-gen))
-    :flavor flavor-mon
-    :flavor-for-generator flavor-gen
-    #** kwargs))
+  `(do
 
-  (for [[iq-ix hp] (zip iq-ix-gen [1 2 3])]
-    (setv (get Tile.types-by-iq-ix iq-ix) (fn [pos _ te-v2 [hp hp]]
-      ; We need `[hp hp]` above to be sure we get a separate variable
-      ; for each closure.
-      [((get Tile.types "generator")
-        :pos pos
-        :hp hp
-        :summon-class mon-cls.stem
-        :summon-hp (>> te-v2 5)
-        :summon-frequency (get
-          #(1 (f/ 1 2) (f/ 1 3) (f/ 1 4) (f/ 1 5) (f/ 1 6) (f/ 2 5) (f/ 1 10) (f/ 3 5) (+ 1 (f/ 1 3)) (+ 1 (f/ 1 2)) (+ 1 (f/ 2 3)) 2 (f/ 2 3) (f/ 3 4) (f/ 4 5) (f/ 5 6) (f/ 9 10))
-            ; These come from IQ's `SetGenFreq`.
-          (- (& te-v2 0b1111) 1)))]))))
+    (deftile [Generated ~@superclasses] ~mapsym ~name
+      :iq-ix-mapper ["hp"
+        ~(dict (zip iq-ix-mon [1 2 3]))]
+      :destruction-points ~points-mon
+      :points-for-generator (classmethod (fn [cls] ~points-gen))
+      :flavor ~flavor-mon
+      :flavor-for-generator ~flavor-gen
+      ~@(sum :start [] (gfor
+        [k v] (.items kwargs)
+        [(hy.models.Keyword k) v])))
+
+    ((fn [] (for [[iq-ix hp] (zip ~iq-ix-gen [1 2 3])]
+      (setv (get Tile.types-by-iq-ix iq-ix) (fn [pos _ te-v2 [hp hp]]
+        ; We need `[hp hp]` above to be sure we get a separate variable
+        ; for each closure.
+        [((get Tile.types "generator")
+          :pos pos
+          :hp hp
+          :summon-class ~(get (.partition name " ") 2)
+          :summon-hp (>> te-v2 5)
+          :summon-frequency (get
+            #(1 (f/ 1 2) (f/ 1 3) (f/ 1 4) (f/ 1 5) (f/ 1 6) (f/ 2 5) (f/ 1 10) (f/ 3 5) (+ 1 (f/ 1 3)) (+ 1 (f/ 1 2)) (+ 1 (f/ 2 3)) 2 (f/ 2 3) (f/ 3 4) (f/ 4 5) (f/ 5 6) (f/ 9 10))
+              ; These come from IQ's `SetGenFreq`.
+            (- (& te-v2 0b1111) 1)))])))))))
 
 
 (defgenerated Approacher "o " "an orc"
