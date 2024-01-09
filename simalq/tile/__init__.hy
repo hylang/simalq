@@ -176,14 +176,14 @@
     ; to other tiles.)
 
 
-(defmacro-kwargs deftile [superclasses mapsym name #** kwargs]
+(defmacro-kwargs deftile [mapsym name superc #** kwargs]
   "Declare and return a new concrete and final tile type. Superclasses
   of tiles not meant to themselves be instantiated should be declared
   with `defclass`."
 
-  (setv superclasses (if (isinstance superclasses hy.models.List)
-    superclasses
-    `[~superclasses]))
+  (setv superc (if (isinstance superc hy.models.List)
+    superc
+    `[~superc]))
 
   (setv (get kwargs "article") None)
   (setv (get kwargs "stem") (re.sub r"\A(a|an|the|some) "
@@ -195,7 +195,7 @@
     ~(hy.models.Symbol (+ "TileType_" (.join "" (gfor
       c (get kwargs "stem")
       (if (or (= c " ") (in c hy.reader.HyReader.NON_IDENT)) "_" c)))))
-    ~superclasses
+    ~superc
     ~@(gfor
       [k v] (.items (dict :mapsym mapsym #** kwargs))
       ; Treat `(meth …)` and `(property-meth …)` forms specially.

@@ -348,7 +348,7 @@
 (defmacro self-sc [#* rest]
   `(. Tile.types [self.summon-class] ~@rest))
 
-(deftile Summoner :name "generator"
+(deftile :name "generator" :superc Summoner
   ; An immobile structure that creates monsters nearby.
 
   :field-defaults (dict
@@ -395,20 +395,20 @@
     (self-sc flavor-for-generator)))
 
 (defmacro-kwargs defgenerated [
-    superclasses
     mapsym name
+    superc
     iq-ix-mon iq-ix-gen
     points-mon points-gen
     flavor-mon flavor-gen
     #** kwargs]
   "Shorthand for defining both a generated monster and its generator."
 
-  (unless (isinstance superclasses hy.models.List)
-    (setv superclasses [superclasses]))
+  (unless (isinstance superc hy.models.List)
+    (setv superc [superc]))
 
   `(do
 
-    (deftile [Generated ~@superclasses] ~mapsym ~name
+    (deftile ~mapsym ~name [Generated ~@superc]
       :iq-ix-mapper ["hp"
         ~(dict (zip iq-ix-mon [1 2 3]))]
       :destruction-points ~points-mon
@@ -434,7 +434,7 @@
             (- (& te-v2 0b1111) 1)))])))))))
 
 
-(defgenerated Approacher "o " "an orc"
+(defgenerated "o " "an orc" Approacher
   :iq-ix-mon [39 59 60] :iq-ix-gen [40 61 62]
   :points-mon 3 :points-gen 12
 
@@ -443,7 +443,7 @@
   :flavor-mon "A green-skinned, muscle-bound, porcine humanoid with a pointy spear and a bad attitude."
   :flavor-gen "A sort of orcish clown car, facetiously called a village.")
 
-(defgenerated Approacher "g " "a goblin"
+(defgenerated "g " "a goblin" Approacher
   :iq-ix-mon [95 96 97] :iq-ix-gen [98 99 100]
   :points-mon 2 :points-gen 8
 
@@ -452,7 +452,7 @@
   :flavor-mon "Goblins are a smaller, uglier, smellier, and worse-equipped cousin of orcs that try to make up for it with even more sadistic malice. It almost works."
   :flavor-gen "Oops, somebody gave the goblins a bath. Now there's a lot more of them, and they still stink.")
 
-(defgenerated Approacher "G " "a ghost"
+(defgenerated "G " "a ghost" Approacher
   :iq-ix-mon [37 55 56] :iq-ix-gen [38 57 58]
   :points-mon 5 :points-gen 25
 
@@ -463,7 +463,7 @@
   :flavor-mon "A spooky apparition bearing a striking resemblance to a man with a sheet draped over him. Giggle at your peril: it can discharge the negative energy that animates it to bring you closer to the grave yourself.\n\n    Lemme tell ya something: bustin' makes me feel good!"
   :flavor-gen "This big heap of human bones raises several questions, but sadly it appears you must treat the dead with even less respect in order to get rid of those ghosts.")
 
-(defgenerated Wanderer "b " "a bat"
+(defgenerated "b " "a bat" Wanderer
   :iq-ix-mon [45 71 72] :iq-ix-gen [46 73 74]
   :points-mon 1 :points-gen 3
 
@@ -472,7 +472,7 @@
   :flavor-mon "Dusk! With a creepy, tingling sensation, you hear the fluttering of leathery wings! Bats! With glowing red eyes and glistening fangs, these unspeakable giant bugs drop onto… wait. These aren't my lecture notes."
   :flavor-gen #[[A faint singing echoes out of the depths of this cave. They sound like they're saying "na na na".]])
 
-(defgenerated Wanderer "B " "a giant bee"
+(defgenerated "B " "a giant bee" Wanderer
   :iq-ix-mon [123 124 125] :iq-ix-gen [126 127 128]
   :points-mon 5 :points-gen 15
 
@@ -481,7 +481,7 @@
   :flavor-mon "Bees bafflingly being bigger'n bats. This is the kind that can survive stinging you. You might not be so lucky."
   :flavor-gen #[[The ancients call this place "the Plounge".]])
 
-(defgenerated Approacher "d " "a devil"
+(defgenerated "d " "a devil" Approacher
   :iq-ix-mon [41 63 64] :iq-ix-gen [42 65 66]
   :points-mon 5 :points-gen 25
 
@@ -491,7 +491,7 @@
   :flavor-mon "A crimson-skinned, vaguely humanoid monster. Its eyes glow with the malevolent fires of hell, which it can hurl at you from a distance. Its claws are sharp, but don't hurt quite as much as getting roasted. To its enduring shame, it has no protection whatsoever against fire damage."
   :flavor-gen "A tunnel that goes all the way down to the Bad Place. It stinks of sulfur and invites the innumerable ill-spirited inhabitants of the inferno to ruin your day.")
 
-(defgenerated Approacher "w " "a wizard"
+(defgenerated "w " "a wizard" Approacher
   :iq-ix-mon [87 88 89] :iq-ix-gen [90 91 92]
   :points-mon 5 :points-gen 25
 
@@ -501,7 +501,7 @@
   :flavor-mon "This fresh-faced would-be scholar has finished sewing the stars onto his robe and is starting to grow a beard. Idok has told the whole class that whoever kills you gets tenure. Considering what the rest of the academic job market is like, the offer has proven irresistible to many."
   :flavor-gen "The Pigpimples Institute of Thaumaturgy and Dweomercraft: a shameless diploma mill that happily takes students' money to teach them one spell, then sends them on a suicide mission against a much smarter and tougher opponent.")
 
-(defgenerated Approacher "s " "a shade"
+(defgenerated "s " "a shade" Approacher
   :iq-ix-mon [171 172 173] :iq-ix-gen [174 175 176]
   :points-mon 6 :points-gen 24
 
@@ -511,7 +511,7 @@
   :flavor-mon #[[A dark spirit with mastery of its semi-corporeal form, allowing ordinary arrows to pass right through it. As it approaches, it hisses "Death!"]]
   :flavor-gen "Oh dear. Considering what's been done to this grave, destroying it would be a mercy.")
 
-(defgenerated [Approacher Wanderer] "i " "an imp"
+(defgenerated "i " "an imp" [Approacher Wanderer]
   :iq-ix-mon [43 67 68] :iq-ix-gen [44 69 70]
   :points-mon 4 :points-gen 15
 
@@ -544,7 +544,7 @@
 (setv imp-shot-charge (f/ 4 5))
 
 
-(deftile Stationary "T " "a thorn tree"
+(deftile "T " "a thorn tree" Stationary
   :iq-ix 51
   :destruction-points 10
 
@@ -556,7 +556,7 @@
 
   :flavor "From a distance, you can safely giggle at the ghostly. Up close, this arboreal abomination will rake you with its twisted, spiny boughs. Arrows snag in its branches and glance off its gnarled bark, so an intimate encounter may be unavoidable. On the other hand, it's rather flammable. Remember, only you can start forest fires.")
 
-(deftile Approacher "K " "a Dark Knight"
+(deftile "K " "a Dark Knight" Approacher
   :iq-ix 53
   :destruction-points 75
 
@@ -564,7 +564,7 @@
 
   :flavor "This dread warrior wears ink-black armor and carries a heavy chain mace. His devotion to the powers of evil (not to mention his willingness, nay, eagerness to kill you) makes his appropriation of Batman's epithet questionable at best. When you get down to it, he's just trying to distract you from the fact that he's the most basic enemy in the whole dungeon.")
 
-(deftile Approacher "t " "a Tricorn"
+(deftile "t " "a Tricorn" Approacher
   :iq-ix 54
   :destruction-points 10
 
@@ -574,7 +574,7 @@
 
   :flavor "Named not for a hat, but for the three horns projecting from their equine heads, Tricorns spend decades mediating while cocooned in woolen blankets. Their richly cultivated spirituality allows them to unleash a spark of static electricity from a fair distance, albeit still not as far as your arrows can fly. Up close, they can poke you with their horns for slightly less damage.")
 
-(deftile Approacher "D " "Death"
+(deftile "D " "Death" Approacher
   :iq-ix 49
   :destruction-points 200
 
@@ -584,7 +584,7 @@
 
   :flavor "A shadowy hooded figure bearing a wicked scythe who speaks in all capital letters. It can be destroyed, but don't expect that to be easy.")
 
-(deftile Approacher "N " "a negaton"
+(deftile "N " "a negaton" Approacher
   :iq-ix 52
   :destruction-points 50
 
@@ -595,7 +595,7 @@
 
   :flavor "A quantum of negative energy motivated only by a hatred of princess-based life forms. It can expend its entire payload in a single attack, and, being essentially mindless, it has no qualms about doing so. Magic arrows are pretty much the only thing strong enough to hurt it.")
 
-(deftile Wanderer "f " "a floater"
+(deftile "f " "a floater" Wanderer
   :iq-ix 47
   :destruction-points 2
 
@@ -620,7 +620,7 @@
 (setv floater-disturbance-increment (f/ 1 5))
 
 
-(deftile [Summoner Wanderer] "O " "a blob"
+(deftile "O " "a blob" [Summoner Wanderer]
   :iq-ix 48
   :destruction-points 0
 
@@ -642,7 +642,7 @@
 (setv blob-summon-frequency (f/ 1 10))
 
 
-(deftile Approacher "S " "a specter"
+(deftile "S " "a specter" Approacher
   :iq-ix 50
   :destruction-points 100
 
@@ -659,7 +659,7 @@
   :flavor "Yet another evil undead phantasm. This one's a real piece of work: it has a powerful heat-drain attack and the ability to teleport past obstacles.")
 
 
-(deftile [Approacher Wanderer] "S " "a giant spider"
+(deftile "S " "a giant spider" [Approacher Wanderer]
   :color 'brown
   :destruction-points 50
 

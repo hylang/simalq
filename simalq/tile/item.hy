@@ -37,7 +37,7 @@
     #("Point value" (format @acquirement-points ","))]))
 
 
-(deftile Item "$ " "a lump of fool's gold"
+(deftile "$ " "a lump of fool's gold" Item
   :color 'orange
   :iq-ix 110
     ; The candle, which doen't take an inventory slot and is worth no
@@ -45,7 +45,7 @@
   :acquirement-points 0
   :flavor "Whoa! This is worthless. But no less than worthless, at least.")
 
-(deftile Item "$ " "a pile of silver"
+(deftile "$ " "a pile of silver" Item
   :color 'dark-gray
   :iq-ix 153
     ; The amulet of sight, which doesn't take an inventory slot and is
@@ -53,13 +53,13 @@
   :acquirement-points 50
   :flavor "Ooh, not quite as shiny.")
 
-(deftile Item "$ " "a pile of gold"
+(deftile "$ " "a pile of gold" Item
   :color 'dark-yellow
   :iq-ix 18
   :acquirement-points 100
   :flavor "Ooh, shiny.")
 
-(deftile Item "$ " "a handful of gems"
+(deftile "$ " "a handful of gems" Item
   :color 'red
   :iq-ix 109
   :acquirement-points 250
@@ -120,7 +120,7 @@
       (get ["meal" "empty platter" "rotten food"] (- te-v2 1)))
     :pos pos)]))
 
-(deftile Food "% " "a meal"
+(deftile "% " "a meal" Food
   :color 'red
   :iq-ix 20  ; healing potion
   :acquirement-points 0
@@ -130,7 +130,7 @@
 
   :flavor "Food, glorious food!")
 
-(deftile Food "% " "a snack"
+(deftile "% " "a snack" Food
   :color 'navy
   :iq-ix 83  ; healing salve
   :acquirement-points 0
@@ -140,7 +140,7 @@
 
   :flavor "A little something to tide you over.")
 
-(deftile Food "☠ " "some rotten food"
+(deftile "☠ " "some rotten food" Food
   :color 'red
   :iq-ix None  ; subtype of unknown potion
   :acquirement-points 0
@@ -150,7 +150,7 @@
 
   :flavor #[[Idok was hoping to fool you with this, but he forgot to take off the label that says "POISON: Do Not Eat".]])
 
-(deftile Food "% " "an empty platter"
+(deftile "% " "an empty platter" Food
   :color 'black
   :iq-ix None  ; subtype of unknown potion
   :acquirement-points 0
@@ -160,7 +160,7 @@
 
   :flavor #[[It looks like one of the monsters got to this food first.]])
 
-(deftile Food "% " "some dessert"
+(deftile "% " "some dessert" Food
   :color 'rose
   :iq-ix 155  ; super-healing potion
   :acquirement-points 0
@@ -171,7 +171,7 @@
 
   :flavor "In the gustatory tradition of Tris's kingdom, saving room for dessert became so highly valued that there arose a practice of eating dessert as the first course.")
 
-(deftile Food "☠ " "a jar of poison"
+(deftile "☠ " "a jar of poison" Food
   :color 'dark-green
   :iq-ix 86
   :acquirement-points 0
@@ -196,7 +196,7 @@
   :dmg-monster 3))
 
 
-(deftile Item "⚷ " "a key"
+(deftile "⚷ " "a key" Item
   :iq-ix 19
   :acquirement-points 50
 
@@ -213,7 +213,7 @@
   :flavor "Idok uses only the worst locks and keys that money can buy. The keys are bulky and heavy, yet immediately snap into pieces on being used once, and every lock can be opened by any old key.")
 
 
-(deftile Item "↑ " "some magic arrows"
+(deftile "↑ " "some magic arrows" Item
   :color 'purple
   :iq-ix 27
   :acquirement-points 100
@@ -225,7 +225,7 @@
   :flavor "Now we're talkin'! These missiles engraved with mystical runes hit hard and keep on going. Sadly, Tris is so excited to use them that she can't shoot mundane arrows until she's used them all up.")
 
 
-(deftile Item "⏲ " "a clock"
+(deftile "⏲ " "a clock" Item
   :iq-ix 138
     ; IQ uses an hourglass. We use a clock instead because it's hard
     ; to get a non-emoji hourglass.
@@ -252,7 +252,7 @@
         (getattr StatusEffect (str @effect)))
       @duration)))
 
-(deftile StatusEffectItem "! " "an amulet of invulnerability"
+(deftile "! " "an amulet of invulnerability" StatusEffectItem
   :color 'dark-yellow
   :iq-ix 26
   :acquirement-points 100
@@ -264,7 +264,7 @@
     f"Makes you invulnerable for {@duration} more turns, protecting you from all damage and ambient poison, but not harmful status effects or disenchantment.")
   :flavor "A star-shaped pendant with two black spots in the center. Its magic is short-lived but potent indeed.")
 
-(deftile StatusEffectItem "! " "a potion of speed"
+(deftile "! " "a potion of speed" StatusEffectItem
   :color 'dark-green
   :iq-ix 34
   :acquirement-points 100
@@ -276,7 +276,7 @@
     f"Lets you act twice per turn for {@duration} more turns.")
   :flavor "This cool concoction puts a pep in your step and a swiftness in your sword-swings.")
 
-(deftile StatusEffectItem "! " "a cloak of invisibility"
+(deftile "! " "a cloak of invisibility" StatusEffectItem
   :color 'blue
   :iq-ix 25
   :acquirement-points 100
@@ -325,7 +325,7 @@
         (@use.dynadoc @)))
       #* extra)))
 
-(deftile Usable "/ " "a wand of nothing"
+(deftile "/ " "a wand of nothing" Usable
   :iq-ix 147  ; wand of light
   :acquirement-points 50
 
@@ -338,7 +338,7 @@
 
   :flavor "Technically magical, but not terribly useful.")
 
-(deftile Usable "/ " "a wand of shielding"
+(deftile "/ " "a wand of shielding" Usable
   :color 'orange
   :iq-ix 200
   :acquirement-points 100
@@ -351,7 +351,7 @@
 
   :flavor "Cowardice is the better part of valor.")
 
-(deftile Usable "/ " "a wall-making wand"
+(deftile "/ " "a wall-making wand" Usable
   :color 'red
   :iq-ix 33
   :acquirement-points 150
@@ -362,7 +362,7 @@
 
   :flavor "This device is detested by the stonemason's union, but valued by homeowners and combat engineers, not to mention tyrants who desire vast dungeons.")
 
-(deftile Usable "/ " "a passwall wand"
+(deftile "/ " "a passwall wand" Usable
   :color 'dark-green
   :iq-ix 32
   :acquirement-points 150
@@ -397,7 +397,7 @@
     (@bomb-burst @pos @shot-blast-damage)
     (@rm-from-map)))
 
-(deftile FireBomb "0 " "a standard bomb"
+(deftile "0 " "a standard bomb" FireBomb
   :color 'dark-green
   :iq-ix 31  ; Just called a "bomb" in IQ
   :acquirement-points 100
@@ -407,7 +407,7 @@
 
   :flavor "Medieval-esque swordsmen tossing the occasional explosive has been a tradition since 1986. But you shouldn't expect to find a lot of these, so make 'em count.")
 
-(deftile FireBomb "0 " "a strong bomb"
+(deftile "0 " "a strong bomb" FireBomb
   :color 'blue
   :iq-ix 84
   :acquirement-points 150
@@ -417,7 +417,7 @@
 
   :flavor "A bigger bomb for the discerning bomber.")
 
-(deftile FireBomb "0 " "a super-bomb"
+(deftile "0 " "a super-bomb" FireBomb
   :color 'red
   :iq-ix 85
   :acquirement-points 200
@@ -438,7 +438,7 @@
     (doc (@help))
     (setv (get G.player.artifacts @stem) T)))
 
-(deftile Artifact "[ " "the Magic Shield"
+(deftile "[ " "the Magic Shield" Artifact
   :iq-ix 28
   :acquirement-points 3,000
 
@@ -446,7 +446,7 @@
     f"Permanently reduces all damage from monsters' attacks to {G.rules.artifact-shield-factor} the normal value, rounded up. Damage from other sources is unaffected.")
   :flavor "The best defense is a good defense.")
 
-(deftile Artifact "( " "the Elven Bow"
+(deftile "( " "the Elven Bow" Artifact
   :iq-ix 29
   :acquirement-points 4,000
 
@@ -454,7 +454,7 @@
     f"Permanently increases your shot damage (with mundane arrows) to {G.rules.player-shot-damage-artifact}.")
   :flavor "A mighty weapon carved from sacred wood in the realm of maple syrup and free healthcare.")
 
-(deftile Artifact ") " "the Holy Sword"
+(deftile ") " "the Holy Sword" Artifact
   :iq-ix 30
   :acquirement-points 5,000
 

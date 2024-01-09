@@ -11,7 +11,7 @@
 (setv  T True  F False)
 
 
-(deftile [Damageable] "@ " "Princess Triskaidecagonn XIII"
+(deftile "@ " "Princess Triskaidecagonn XIII" Damageable
   ; A type representing the player-character.
 
   :field-defaults (dict

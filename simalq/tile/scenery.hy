@@ -115,38 +115,38 @@
         tile.blocks-move)))))))
 
 
-(deftile Scenery "██" "a wall"
+(deftile "██" "a wall" Scenery
   :iq-ix 2
   :blocks-move T :blocks-diag T
   :destructible-by-passwall-wand T
   :flavor "Among the most numerous and persistent of the obstacles that stand in the way of your inevitable victory.\n\n    This man, with lime and rough-cast, doth present\n    Wall, that vile Wall which did these lovers sunder;\n    And through Wall's chink, poor souls, they are content\n    To whisper, at the which let no man wonder.")
 
-(deftile Scenery "██" "the Void"
+(deftile "██" "the Void" Scenery
   :color color.void
   :iq-ix 17
   :blocks-move T :blocks-diag T
   :superblock T
   :flavor "Unshaped matter of the realm outside time and space. Mortal magic can't so much as make a dent in it.")
 
-(deftile Scenery "| " "a pillar"
+(deftile "| " "a pillar" Scenery
   :iq-ix 12
   :blocks-move T
   :destructible-by-passwall-wand T
   :flavor "A structure of vaguely Roman style.")
 
-(deftile Scenery "╷ " "a broken pillar"
+(deftile "╷ " "a broken pillar" Scenery
   :iq-ix 82
   :blocks-move T :blocks-player-shots F
   :destructible-by-passwall-wand T
   :flavor "It's just a chest-high half of a pillar now. Good thing it wasn't load-bearing, huh? It makes for good cover against enemy shots.")
 
-(deftile Scenery "◀▶" "a hole"
+(deftile "◀▶" "a hole" Scenery
   :color 'dark-gray
   :iq-ix 107  ; crevasse
   :blocks-move T :blocks-player-shots F :blocks-monster-shots F
   :flavor "Watch your step.")
 
-(deftile Scenery "++" "a door"
+(deftile "++" "a door" Scenery
   :color 'brown
   :iq-ix 5
   :blocks-monster T
@@ -171,19 +171,19 @@
       (@rm-from-map))
     True))
 
-(deftile LockedDoor "++" "a locked door"
+(deftile "++" "a locked door" LockedDoor
   :color 'navy
   :iq-ix 6
   :result-when-opened "door"
   :flavor "Fortunately, Tris knows how to pick locks. Unfortunately, she was wearing her hair down when she got whisked away to the dungeon, so she doesn't have any hairpins. You may have to use a key.")
 
-(deftile LockedDoor "++" "a locked disappearing door"
+(deftile "++" "a locked disappearing door" LockedDoor
   :color 'steel-blue
   :iq-ix 81
   :result-when-opened None
   :flavor "This advanced door destroys not only the key used to unlock it, but also itself. A true marvel of engineering.")
 
-(deftile LockedDoor " +" "a treasure chest"
+(deftile " +" "a treasure chest" LockedDoor
   ; This unusual mapsym, having a space on the left but not the right,
   ; allows one character of the contained item to be visible.
   :color 'steel-blue
@@ -226,12 +226,12 @@
       [Direction.N 8] [Direction.E 11]
       [Direction.S 9] [Direction.W 10]]
     :setv c (get Direction.arrows direction)
-    `(deftile OneWayDoor ~f"+{c}" ~f"a one-way door ({direction.name})"
+    `(deftile ~f"+{c}" ~f"a one-way door ({direction.name})" OneWayDoor
       :iq-ix ~iq-ix
       :direction (. Direction ~(hy.models.Symbol direction.abbr))))))
 
 
-(deftile Scenery "> " "the exit"
+(deftile "> " "the exit" Scenery
   :color-bg 'lime
   :iq-ix 7
   :blocks-monster T
@@ -248,7 +248,7 @@
   :flavor "Get me outta here.")
 
 
-(deftile [Scenery Damageable] "##" "a cracked wall"
+(deftile "##" "a cracked wall" [Scenery Damageable]
   :field-defaults (dict
     :hp 2)
   :iq-ix-mapper ["hp"
@@ -261,7 +261,7 @@
   :flavor "I think this dungeon might not be up to code.")
 
 
-(deftile Scenery "■ " "a pushblock"
+(deftile "■ " "a pushblock" Scenery
   :iq-ix 22
     ; Called a "moveable wall" in IQ. I think "wall" is misleading
     ; because it's not a diagonal blocker.
@@ -282,7 +282,7 @@
   :flavor "Where do video games get all their crates from? There must be entire warehouses full of 'em, am I right?")
 
 
-(deftile Scenery "{ " "a water fountain"
+(deftile "{ " "a water fountain" Scenery
   :color 'steel-blue
   :iq-ix 108
 
@@ -291,7 +291,7 @@
 
   :flavor "An ornate decorative fountain featuring a statue of a particularly homely goblin. The fountain's spray fills the air about it with a refreshing mist.")
 
-(deftile Scenery "{ " "a poisonous fountain"
+(deftile "{ " "a poisonous fountain" Scenery
   :color 'dark-green
   :iq-ix 137
 
@@ -301,7 +301,7 @@
   :flavor "An ornate decorative fountain featuring a statue of Death himself. The fountain's spray fills the air about it with a suffocating miasma.")
 
 
-(deftile Scenery "{}" "a gate"
+(deftile "{}" "a gate" Scenery
   :color 'purple
   :field-defaults (dict
     :target None)
@@ -320,7 +320,7 @@
   :flavor "A small stone arch containing a rippling, sparkling sheet of violet light. It functions as a magic portal that can send you elsewhere on this level. Sadly, arrows in flight won't survive the trip.")
 
 
-(deftile Scenery "┣┫" "a teleporter"
+(deftile "┣┫" "a teleporter" Scenery
   :color 'purple
   :field-defaults (dict
     :times-entered 0
@@ -397,7 +397,7 @@
     blocks-player-shots F
     blocks-monster-shots F))
 
-(deftile Trap :name "a wallfall trap"
+(deftile :name "a wallfall trap"  :superc Trap
   :color 'dark-yellow
   :field-defaults (dict
     :wallnum 1)
@@ -424,7 +424,7 @@
 
   :flavor #[[Easy there, Admiral Ackbar. This kind of trap isn't necessarily dangerous. Well, admittedly, the key word here is "necessarily".]])
 
-(deftile Scenery :name "a trapped wall"
+(deftile :name "a trapped wall" :superc Scenery
   :color #('black 'pale-yellow)
   :color-bg #(None 'black)
   :field-defaults (dict
@@ -445,7 +445,7 @@
 
   :flavor "The special thing about this wall is that it can be destroyed by wallfall traps of the corresponding type.\n\nWhat's the deal with monster closets? Monsters are proud of who they are, am I right? I'll be here all week.")
 
-(deftile Trap "<>" "a fixed damaging trap"
+(deftile "<>" "a fixed damaging trap" Trap
   :color 'red
   :iq-ix 35  ; damage-causing trap
 
@@ -456,7 +456,7 @@
   :flavor "A dense assortment of pointy, painful objects that can penetrate the toughest footwear.")
 (setv trap-damage 5)
 
-(deftile Trap "<>" "a paralysis trap"
+(deftile "<>" "a paralysis trap" Trap
   :color 'purple
   :iq-ix 36
 
@@ -467,7 +467,7 @@
 
   :flavor "A magical field that causes you to vividly remember something embarrassing that you did as a teenager, forcing you to briefly freeze in horror. The problem with being royalty is that awkward adolescent moments all too easily become international incidents.")
 
-(deftile Scenery "##" "a web"
+(deftile "##" "a web" Scenery
   :color 'dark-gray
   :iq-ix 136
 
@@ -480,7 +480,7 @@
 
   :flavor "This spiderweb is the size of a really big spiderweb. Until Idok cleans up the dungeon properly, you'll have to tediously carve your way through the webs with your sword. Got any recommendations for a good smitemaster?")
 
-(deftile Trap ", " "a broken trap"
+(deftile ", " "a broken trap" Trap
   :iq-ix #(
     ; Removed trap-like tiles that stick around after stepping on them.
      93   ; false exit
@@ -488,7 +488,7 @@
 
   :flavor "This once-vicious trap has decayed from neglect and is now pointlessly collecting dust. It was probably implemented in Flash or something.")
 
-(deftile Trap ", " "a pile of debris"
+(deftile ", " "a pile of debris" Trap
   :color 'navy
   :iq-ix #(
     ; Removed trap-like tiles that are destroyed when you step on them.
@@ -502,7 +502,7 @@
   :flavor "Dungeon trash like sawdust, loose stones, pebbles, greasy chicken bones left over from goblin feasts, broken wands, and maybe a dead body, all bunched together into a small mound. Running through it will knock it over and get your boots really gross.")
 
 
-(deftile [Scenery EachTurner] "()" "a magical energy shield"
+(deftile "()" "a magical energy shield" [Scenery EachTurner]
   :color 'dark-orange
   :field-defaults (dict
     :time-remaining 12)
