@@ -8,6 +8,7 @@
   json
   pickle
   zipfile [ZipFile ZIP-STORED ZIP-DEFLATED]
+  metadict [MetaDict]
   simalq.game-state [G]
   simalq.util [menu-letters saved-games-dir mixed-number])
 (setv  T True  F False)
@@ -96,14 +97,14 @@
         (list (.iterdir (/ saved-games-dir (or quest-name G.quest.name))))
         (except [FileNotFoundError]
           []))
-      (dict
+      (MetaDict
         :path path
         :main (= path.stem "main")
         :time (. path (stat) st-mtime)
         #** (get-saved-game-meta path)))
     :key (fn [d] #(
-      (not (get d "main"))
-      (get d "time")))))
+      (not d.main)
+      d.time))))
 
   (setv display-lines [
     "                       Date  DL   Turn    HP   Score  HP f.  Poison f."
@@ -111,13 +112,13 @@
       [i save] (enumerate saves)
       (.format " ({}) {:4} {:%Y %b %d %H:%M} {:3d} {:6,} {:5,} {:7,} {:>6} {:>10}"
         (get menu-letters i)
-        (if (get save "main") "main" "")
-        (datetime.fromtimestamp (get save "time"))
-        (get save "level_n")
-        (get save "turn_n")
-        (get save "player_hp")
-        (get save "score")
-        (mixed-number (f/ #* (get save "player_hp_factor")))
-        (mixed-number (f/ #* (get save "poison_factor")))))])
+        (if save.main "main" "")
+        (datetime.fromtimestamp save.time)
+        save.level-n
+        save.turn-n
+        save.player-hp
+        save.score
+        (mixed-number (f/ #* save.player-hp-factor))
+        (mixed-number (f/ #* save.poison-factor))))])
 
   #(saves display-lines))

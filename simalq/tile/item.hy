@@ -2,6 +2,7 @@
   simalq.macros [unless defmeth]
   simalq.tile [deftile])
 (import
+  metadict [MetaDict]
   simalq.strings
   simalq.util [CommandError]
   simalq.game-state [G]
@@ -180,17 +181,17 @@
   :eat-messages #("You drink a jar of poison. It tastes pretty bad.")
 
   :hook-player-shot (meth []
-    (doc #[f[Explodes in a size-{(get poison-burst "size")} burst of poison, which does {(get poison-burst "dmg_monster")} poison damage to monsters and {(get poison-burst "dmg_player")} to you.]f])
+    (doc #[f[Explodes in a size-{poison-burst.size} burst of poison, which does {poison-burst.dmg-monster} poison damage to monsters and {poison-burst.dmg-player} to you.]f])
     (burst-damage @pos :damage-type DamageType.Poison
       :amount (*
-        [(get poison-burst "dmg_monster")]
-        (+ 1 (get poison-burst "size")))
+        [poison-burst.dmg-monster]
+        (+ 1 poison-burst.size))
       :color 'moss-green
-      :player-amount (get poison-burst "dmg_player"))
+      :player-amount poison-burst.dmg-player)
     (@rm-from-map))
 
   :flavor "I think you're not supposed to drink this.")
-(setv poison-burst (dict
+(setv poison-burst (MetaDict
   :size 2
   :dmg-player 20
   :dmg-monster 3))
