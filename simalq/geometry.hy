@@ -110,19 +110,6 @@
 
 (hy.repr-register Pos str)
 
-(defn ray [pos direction length]
-  "Return a line of `length` points in `direction` from `pos`, not
-  including `pos`. If it wraps far enough that it would get to `pos`,
-  it stops just before it."
-
-  (setv out [pos])
-  (do-n length
-    (setv new (+ (get out -1) direction))
-    (when (or (is new None) (= new pos))
-      (break))
-    (.append out new))
-  (tuple (cut out 1 None)))
-
 (defn at [pos]
   (get pos.map.data pos.x pos.y))
 
@@ -160,26 +147,18 @@
     (*= dy -1))
   (get Direction.from-coords #((sign dx) (sign dy))))
 
-(defn pos-seed [pos]
-  "Using a `Pos`, get a number you could use as an RNG seed. Nearby
-  `Pos`es should return different values."
-  (if (is G.level-n None)
-    0
-    (+
-      (* G.level-n 1,000,003)
-        ; The multiplier is chosen to be (a) prime and (b) bigger
-        ; than the area of most levels.
-      pos.x
-      (* G.map.width pos.y))))
+(defn ray [pos direction length]
+  "Return a line of `length` points in `direction` from `pos`, not
+  including `pos`. If it wraps far enough that it would get to `pos`,
+  it stops just before it."
 
-(defn turn-and-pos-seed [pos]
-  "Like `pos-seed`, but also uses `G.turn-n`."
-  (+
-    (pos-seed pos)
-    (* G.turn-n 1,000,000,007)))
-      ; The multiplier is chosen to be (a) prime and (b) bigger
-      ; than typical reasonable `pos-seed` values.
-
+  (setv out [pos])
+  (do-n length
+    (setv new (+ (get out -1) direction))
+    (when (or (is new None) (= new pos))
+      (break))
+    (.append out new))
+  (tuple (cut out 1 None)))
 
 (defn burst [center size [exclude-center False]]
   "Return a generator of all distinct points within distance `size` of
@@ -212,6 +191,26 @@
       (except [GeometryError]))
     :if (and p (not (and exclude-center (= p center))))
     p)))
+
+(defn pos-seed [pos]
+  "Using a `Pos`, get a number you could use as an RNG seed. Nearby
+  `Pos`es should return different values."
+  (if (is G.level-n None)
+    0
+    (+
+      (* G.level-n 1,000,003)
+        ; The multiplier is chosen to be (a) prime and (b) bigger
+        ; than the area of most levels.
+      pos.x
+      (* G.map.width pos.y))))
+
+(defn turn-and-pos-seed [pos]
+  "Like `pos-seed`, but also uses `G.turn-n`."
+  (+
+    (pos-seed pos)
+    (* G.turn-n 1,000,000,007)))
+      ; The multiplier is chosen to be (a) prime and (b) bigger
+      ; than typical reasonable `pos-seed` values.
 
 
 (defclass GeometryError [Exception])
