@@ -103,6 +103,8 @@
     mutable-fields #()
       ; Fields whose values should be freely adjustable with `setv`,
       ; `+=`, etc.
+    declare #()
+      ; New class variables to introduce in a `deftile`.
     article None
       ; "a", "the", etc.
     stem None
@@ -190,12 +192,22 @@
     (fn [m] (setv (get kwargs "article") (.group m 1)) "")
     name))
 
+  (defn un! [x]
+    (.removeprefix x "hyx_Xexclamation_markX"))
+
   `(defclass
     [hy.I.simalq/tile.tiletype]
     ~(hy.models.Symbol (+ "TileType_" (.join "" (gfor
       c (get kwargs "stem")
       (if (or (= c " ") (in c hy.reader.HyReader.NON_IDENT)) "_" c)))))
     ~superc
+    ; Attributes whose names begin with a exclamation point, as in
+    ; `:!length 5`, are considered to be newly declared and so
+    ; exempted from the unknown-attributes check.
+    (setv declare ~(tuple (gfor
+      k (.keys kwargs)
+      :if (!= k (un! k))
+      (un! k))))
     ~@(gfor
       [k v] (.items (dict :mapsym mapsym #** kwargs))
       ; Treat `(meth …)` and `(property-meth …)` forms specially.
@@ -207,7 +219,7 @@
           `(hy.R.simalq/macros.defmeth [property] ~(hy.models.Symbol k)
             ~@(cut v 1 None))
         True
-          `(setv ~(hy.models.Symbol k) ~v)))))
+          `(setv ~(hy.models.Symbol (un! k)) ~v)))))
 
 
 (defn tiletype [cls]
@@ -215,17 +227,18 @@
 
   (assert (or (isinstance cls.mapsym property) (= (len cls.mapsym) 2)))
 
-  (setv new-attrs (lfor
+  (setv unknown-attrs (lfor
     k (dir cls)
+    :if (not-in k cls.declare)
     :if (not (any (gfor
       c cls.__mro__
       :if (is-not c cls)
       (in k c.__dict__))))
     k))
-  (when new-attrs
-    (raise (TypeError f"Unknown attributes: {new-attrs}")))
-      ; New attributes should be introduced in a superclass.
-      ; Otherwise, you're probably just typoing an attribute name.
+  (when unknown-attrs
+    (raise (TypeError f"Unknown attributes: {unknown-attrs}")))
+      ; New attributes should be introduced in a superclass or declared with
+      ; an exclamation point.
 
   (when (and (in "field_defaults" cls.__dict__) (not-in "fields" cls.__dict__))
     (setv cls.fields (tuple (.keys cls.field-defaults))))

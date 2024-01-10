@@ -520,16 +520,19 @@
   :mutable-fields #("shot_power")
 
   :damage-shot #(1 2 3)
+  :!flee-range 2
+  :!shot-frequency (f/ 4 5)
+
   :act (meth []
-    (doc f"Coward — If the monster is within {imp-flee-range} squares of you, it flees (per `Approach` in reverse). Otherwise, if it has line of sight to you (ignoring all obstacles) it adds {imp-shot-charge} to its shot power. If this is ≥1, it subtracts 1 to shoot you. Otherwise, it wanders (per `Wander`).")
+    (doc f"Coward — If the monster is within {@flee-range} squares of you, it flees (per `Approach` in reverse). Otherwise, if it has line of sight to you (ignoring all obstacles) it adds {@shot-frequency} to its shot power. If this is ≥1, it subtracts 1 to shoot you. Otherwise, it wanders (per `Wander`).")
 
     (when (and
-        (<= (dist G.player.pos @pos) imp-flee-range)
+        (<= (dist G.player.pos @pos) @flee-range)
         (not (player-invisible-to @)))
       (return (@approach :reverse T :implicit-attack F)))
     (when (try-to-attack-player @ :dry-run T :shots-ignore-obstacles T)
-      (+= @shot-power imp-shot-charge)
-      (when (pop-integer-part @.shot-power)
+      (+= @shot-power @shot-frequency)
+      (when (pop-integer-part @shot-power)
         (try-to-attack-player @ :shots-ignore-obstacles T)
         (return)))
     (@wander :implicit-attack F))
@@ -540,9 +543,6 @@
 
   :flavor-mon #[[Weak but incredibly annoying, this snickering little fiend is called a "lobber" in the tongue of the ancients. It throws hellstones, cursed missiles that can pierce most any obstacle. In close quarters, it resorts to cowering helplessly and begging for mercy, but, being a literal demon, it has no compunctions about getting right back to firing at you the moment it feels safe.]]
   :flavor-gen "They don't make ziggurats like they used to.")
-(setv imp-flee-range 2)
-(setv imp-shot-charge (f/ 4 5))
-
 
 (deftile "T " "a thorn tree" Stationary
   :iq-ix 51
@@ -602,11 +602,12 @@
   :damage-shot 10
   :shot-range 1
   :kamikaze T
+  :!disturbance-increment (f/ 1 5)
 
   :act (meth []
-    (doc f"Float — If you're adjacent, increases your floater disturbance by {floater-disturbance-increment}. If your floater disturbance reaches 1, it's cleared and the monster attacks. Otherwise, the monster wanders per `Wander`.")
+    (doc f"Float — If you're adjacent, increases your floater disturbance by {@disturbance-increment}. If your floater disturbance reaches 1, it's cleared and the monster attacks. Otherwise, the monster wanders per `Wander`.")
     (when (adjacent? @pos G.player.pos)
-      (+= G.player.floater-disturbance floater-disturbance-increment)
+      (+= G.player.floater-disturbance @disturbance-increment)
       (when (pop-integer-part G.player.floater-disturbance)
         (return (try-to-attack-player @))))
     (@wander :implicit-attack F))
@@ -617,7 +618,6 @@
     (Damageable.destroy @))
 
   :flavor "A giant aerial jellyfish, kept aloft by a foul-smelling and highly reactive gas. It doesn't fly so much as float about in the dungeon drafts. If disturbed, it readily explodes, and its explosions have the remarkable property of harming you and nobody else.")
-(setv floater-disturbance-increment (f/ 1 5))
 
 
 (deftile "O " "a blob" [Summoner Wanderer]
@@ -626,20 +626,20 @@
 
   :immune #(MundaneArrow MagicArrow)
   :damage-melee 6
+  :!summon-frequency (f/ 1 10)
 
   :act (meth []
-    (doc f"Blob – If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {blob-summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
+    (doc f"Blob – If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {@summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
     (when (try-to-attack-player @)
       (return))
     (when (and
         (> @hp 1)
-        (@summon @stem blob-summon-frequency (// @hp 2)))
+        (@summon @stem @summon-frequency (// @hp 2)))
       (-= @hp (// @hp 2))
       (return))
     (@wander :implicit-attack F))
 
   :flavor "What looks like a big mobile puddle of slime is actually a man-sized amoeba. It retains the ability to divide (but not, fortunately, to grow), and its lack of distinct internal anatomy makes arrows pretty useless. It has just enough intelligence to notice that you're standing next to it and try to envelop you in its gloppy bulk.")
-(setv blob-summon-frequency (f/ 1 10))
 
 
 (deftile "S " "a specter" Approacher
@@ -664,12 +664,13 @@
   :destruction-points 50
 
   :damage-melee 10
+  :!approach-range 2
 
   :act (meth []
-    (doc f"Webcrawl — If the monster is within {spider-approach-range} squares of you, it approaches (per `Approach`). Otherwise, it wanders (per `Wander`). In both cases, it can move through webs, and it creates a web on its square afterwards if no web is there already.")
+    (doc f"Webcrawl — If the monster is within {@approach-range} squares of you, it approaches (per `Approach`). Otherwise, it wanders (per `Wander`). In both cases, it can move through webs, and it creates a web on its square afterwards if no web is there already.")
     ; Move or attack.
     (if (and
-        (<= (dist G.player.pos @pos) spider-approach-range)
+        (<= (dist G.player.pos @pos) @approach-range)
         (not (player-invisible-to @)))
       (@approach :ethereal-to ["web"])
       (@wander :ethereal-to ["web"]))
@@ -679,7 +680,6 @@
       (Tile.make @pos "web" :stack-ix (+ 1 (.index (at @pos) @)))))
 
   :flavor "This eight-legged beastie has powerful jaws, high-speed spinnerets, and the mark of a white skull embedded in the brown fur of its big fat abdomen. It's definitely giant and ambiguously intelligent, but not friendly or talkative.")
-(setv spider-approach-range 2)
 (setv (get Tile.types-by-iq-ix 135) (fn [pos _ te-v2]
   ; Unlike IQ, we represent the spider and its web separately.
   [
