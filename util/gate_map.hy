@@ -49,7 +49,8 @@ teleportation gate goes where."
        (round (* c 255)))))))
 
   (setv d (drawing
-    :width (* mapo.width size-factor x-factor) :height (* mapo.height size-factor)
+    :width (* mapo.width size-factor x-factor)
+    :height (* mapo.height size-factor)
     (group
       :transform f"scale({size-factor}) translate(.5 .5)"
       ; Draw base tiles.
@@ -62,14 +63,14 @@ teleportation gate goes where."
             #** (dict (zip "xy" (map + (xy tile.pos) [-.5 .25])))
             :font-size "1px"
             :align "left")))
-      ; Draw gate destinations
+      ; Draw gate destinations.
       (group :fill-opacity .4 #* (gfor
         [tile color] gates
         (dw.Circle
           #* (xy tile.target)
           :r .5
           :fill color)))
-      ; Draw gate connection lines
+      ; Draw gate connection lines.
       (group :stroke-width .2 :stroke-opacity .4 #* (gfor
         [tile color] gates
         (dw.Line
