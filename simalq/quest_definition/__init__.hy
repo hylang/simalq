@@ -15,7 +15,7 @@ quest definitions from other files in this directory."
   fractions [Fraction]
   toolz [partition]
   simalq.game-state [G]
-  simalq.geometry [Map Pos pos+ Direction]
+  simalq.geometry [Map Pos Direction]
   simalq.quest [Quest Level]
   simalq.tile [Tile])
 
@@ -33,7 +33,7 @@ quest definitions from other files in this directory."
     (= locator 'here)
       G.player.pos
     (isinstance locator hy.models.Symbol)
-      (pos+ G.player.pos (getattr Direction (str locator)))
+      (+ G.player.pos (getattr Direction (str locator)))
     (isinstance locator list)
       (Pos G.map #* locator)
     (isinstance locator Pos)

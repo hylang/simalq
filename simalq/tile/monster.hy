@@ -8,7 +8,7 @@
   enum [Enum]
   toolz [unique]
   simalq.util [DamageType next-in-cycle mixed-number player-status]
-  simalq.geometry [Direction pos+ at dist adjacent? dir-to turn-and-pos-seed ray]
+  simalq.geometry [Direction at dist adjacent? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
   simalq.tile [Tile Actor Damageable]
   simalq.tile.scenery [Scenery walkability nogo?])
@@ -194,11 +194,11 @@
         ; In jump mode, we move two squares, mostly ignoring tiles on
         ; the intermediate square, and ignoring all diagonal blocking.
         (and
-          (setx intermediate (pos+ @pos d))
+          (setx intermediate (+ @pos d))
           (not (any (gfor
             tile (at intermediate)
             (and (isinstance tile Scenery) tile.superblock))))
-          (setx target (pos+ intermediate d))
+          (setx target (+ intermediate d))
           (not (nogo? target :monster? T :ethereal-to ethereal-to)))
         (do
           (setv [target wly] (walkability @pos d :monster? T :ethereal-to ethereal-to))
@@ -316,7 +316,7 @@
       ; Find an empty square to place the new monster.
       (do-n (len Direction.all)
         (setv @summon-dir (next-in-cycle Direction.all @summon-dir))
-        (setv target (pos+ @pos @summon-dir))
+        (setv target (+ @pos @summon-dir))
         (unless target
           (continue))
         (when (= (at target) [])

@@ -101,14 +101,14 @@
     (hash #(@x @y (id @map))))
 
   (defmeth [property] xy []
-    #(@x @y)))
+    #(@x @y))
+
+  (defmeth __add__ [direction]
+    (try
+      (Pos @map (+ @x direction.x) (+ @y direction.y))
+      (except [GeometryError]))))
 
 (hy.repr-register Pos str)
-
-(defn pos+ [pos direction]
-  (try
-    (Pos pos.map (+ direction.x pos.x) (+ direction.y pos.y))
-    (except [GeometryError])))
 
 (defn ray [pos direction length]
   "Return a line of `length` points in `direction` from `pos`, not
@@ -117,7 +117,7 @@
 
   (setv out [pos])
   (do-n length
-    (setv new (pos+ (get out -1) direction))
+    (setv new (+ (get out -1) direction))
     (when (or (is new None) (= new pos))
       (break))
     (.append out new))

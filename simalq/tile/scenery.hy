@@ -5,7 +5,7 @@
 (import
   simalq.color :as color
   simalq.util [CommandError DamageType next-in-cycle StatusEffect]
-  simalq.geometry [Pos Direction pos+ at burst dist dir-to]
+  simalq.geometry [Pos Direction at burst dist dir-to]
   simalq.tile [Tile EachTurner Damageable]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -83,7 +83,7 @@
   - 'bump (you can bump something there, but not go there)
   - 'walk (you can walk there)"
 
-  (setv target (pos+ p direction))
+  (setv target (+ p direction))
   (unless target
     (return #(None 'out-of-bounds)))
   #(target (cond
@@ -208,12 +208,12 @@
 
   (defmeth hook-player-walk-from [target]
     (doc f"Only allows you to walk {@direction.name}.")
-    (unless (= (pos+ @pos @direction) target)
+    (unless (= (+ @pos @direction) target)
       (raise (CommandError f"You can only go {@direction.name} from this one-way door."))))
   (defmeth hook-player-walk-to [origin]
     (doc f"Only allows you to enter from the
       {@direction.opposite.name}.")
-    (unless (= (pos+ origin @direction) @pos)
+    (unless (= (+ origin @direction) @pos)
       (raise (CommandError (.format "That one-way door must be entered from the {}."
         @direction.opposite.name)))))
 
@@ -269,13 +269,13 @@
   :blocks-monster T
   :destructible-by-passwall-wand T
   :hook-player-walk-to (meth [origin]
-    (setv target (pos+ @pos (dir-to origin @pos)))
+    (setv target (+ @pos (dir-to origin @pos)))
     (when (or (not target) (at target))
       (raise (CommandError "There's no room to push the block there."))))
 
   :hook-player-walked-into (meth []
     "You push the block in the same direction that you entered the square. The destination square must be empty, or else you won't be able to step on the original square."
-    (setv target (pos+ @pos G.action.direction))
+    (setv target (+ @pos G.action.direction))
     (@move target)
     F)
 
@@ -369,7 +369,7 @@
       (setv other-porter.output-dir
         (next-in-cycle Direction.all other-porter.output-dir))
       (when (in
-          (setx target (pos+ other-porter.pos other-porter.output-dir))
+          (setx target (+ other-porter.pos other-porter.output-dir))
           neighbors)
         (break)))
 

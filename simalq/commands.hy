@@ -8,7 +8,7 @@
   toolz [partition]
   simalq.color :as color
   simalq.util [CommandError DamageType msg player-shot-damage flash-map menu-letters player-status]
-  simalq.geometry [Direction Pos pos+ at dist]
+  simalq.geometry [Direction Pos at dist]
   simalq.game-state [G]
   simalq.tile [Damageable]
   simalq.tile.scenery [walkability]
@@ -109,7 +109,7 @@
         (setv dir-v (read-dir-key key))
         (cond
           (and dir-v (!= dir-v 'center))
-            (setv focus (or (pos+ focus dir-v) focus))
+            (setv focus (or (+ focus dir-v) focus))
           (or (= dir-v 'center) (= (str key) ";"))
             (when (target-callback focus)
               'done)
@@ -261,7 +261,7 @@
           targets
           {}))
       (do-n G.rules.reality-bubble-size
-        (setv target (pos+ target d))
+        (setv target (+ target d))
         (unless target
           ; An arrow that hits the level border stops.
           (animate)

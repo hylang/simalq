@@ -5,7 +5,7 @@
   pytest
   simalq.util [seq]
   simalq.geometry [
-    Map Pos Direction pos+ ray adjacent? dir-to dist burst
+    Map Pos Direction ray adjacent? dir-to dist burst
     GeometryError])
 (setv  T True  F False)
 
@@ -60,32 +60,32 @@
   (assert (!= (Pos m 0 1) (Pos m2 0 1))))
 
 
-(defn test-pos+ []
+(defn test-pos-add []
   (setv map-data (* #((* #([T]) 5)) 5))
 
   (setv m (Map.from-data :data map-data :wrap-x F :wrap-y F))
   (assert (=
-    (pos+ (Pos m 0 0) Direction.N)
+    (+ (Pos m 0 0) Direction.N)
     (Pos m 0 1)))
   (assert (=
-    (pos+ (Pos m 2 2) Direction.W)
+    (+ (Pos m 2 2) Direction.W)
     (Pos m 1 2)))
   (assert (=
-    (pos+ (Pos m 0 0) Direction.NE)
+    (+ (Pos m 0 0) Direction.NE)
     (Pos m 1 1)))
   (assert (is
-    (pos+ (Pos m 0 0) Direction.W)
+    (+ (Pos m 0 0) Direction.W)
     None))
 
   (setv m (Map.from-data :data map-data :wrap-x T :wrap-y F))
   (assert (=
-    (pos+ (Pos m 0 0) Direction.W)
+    (+ (Pos m 0 0) Direction.W)
     (Pos m 4 0)))
   (assert (=
-    (pos+ (Pos m 4 0) Direction.E)
+    (+ (Pos m 4 0) Direction.E)
     (Pos m 0 0)))
   (assert (is
-    (pos+ (Pos m 0 0) Direction.S)
+    (+ (Pos m 0 0) Direction.S)
     None)))
 
 
