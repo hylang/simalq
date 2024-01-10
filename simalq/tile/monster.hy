@@ -51,12 +51,77 @@
   (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
     (dict :hp v2))
 
+  (defmeth damage-by-hp [damage]
+    "Get the element from a damage tuple or single damage value
+    (typically assigned to `@damage-melee` or `@damage-shot`) that
+    should be used given the monster's current HP."
+    (if (isinstance damage tuple)
+      (get damage (- (min @hp (len damage)) 1))
+      damage))
+
+  (defmeth player-invisible-to? [[mon-pos None]]
+    (and
+      (player-status 'Ivis)
+      (not (adjacent? (or mon-pos @pos) G.player.pos))
+      (not @sees-invisible)))
+
+  (defmeth try-to-attack-player [[dry-run F] [shots-ignore-obstacles F]]
+    "Try to melee or shoot the player, if the monster can. Return true
+    if it succeeded. If `dry-run` is true, the attack isn't actually
+    made."
+
+    (setv d (dir-to @pos G.player.pos))
+    (setv attack None)
+
+    (when (= @pos G.player.pos)
+      ; If we're on the player's square, we can't attack her.
+      (return F))
+
+    (when (@player-invisible-to?)
+      (return F))
+
+    ; Try a melee attack first.
+    (when (and
+        @damage-melee
+        (adjacent? @pos G.player.pos)
+        (in (get (walkability @pos d :monster? T) 1)
+          ['bump 'walk]))
+      (setv attack 'melee))
+
+    ; Otherwise, try a ranged attack.
+    (when (and (not attack) @damage-shot)
+      (for [target (ray :pos @pos :direction d :length
+          (min (or @shot-range Inf) G.rules.reality-bubble-size))]
+        (when (= target G.player.pos)
+          (setv attack 'shot)
+          (break))
+        (when (any (gfor
+            tile (at target)
+            (or tile.superblock (and
+              tile.blocks-monster-shots
+              (not shots-ignore-obstacles)))))
+          (break))))
+
+    ; If we can't attack, bail out.
+    (unless attack
+      (return F))
+
+    ; Execute the attack.
+    (when dry-run
+      (return T))
+    (.damage G.player :attacker @
+      (@damage-by-hp (if (= attack 'shot) @damage-shot @damage-melee))
+      (if (= attack 'shot) MonsterShot MonsterMelee))
+    (when @kamikaze
+      (@rm-from-map))
+    T)
+
   (defmeth info-bullets [#* extra]
     (defn damage-array [damage]
       (if (isinstance damage tuple)
         (.join " / " (gfor
           d damage
-          (if (= d (damage-by-hp @ damage))
+          (if (= d (@damage-by-hp damage))
             f"[{d}]"
             (str d))))
         damage))
@@ -81,80 +146,17 @@
         @act.__doc__
         (@act.dynadoc @))))))
 
-(defn damage-by-hp [monster damage]
-  (if (isinstance damage tuple)
-    (get damage (- (min monster.hp (len damage)) 1))
-    damage))
-
 (defn make-monster [pos stem #** kwargs]
   (Tile.make pos stem #** kwargs)
   ; Newly created monsters don't get to act on the turn they come
   ; into being.
   (setv (. (at pos) [-1] last-acted) G.turn-n))
 
-(defn player-invisible-to [mon [mon-pos None]]
-  (and
-    (player-status 'Ivis)
-    (not (adjacent? (or mon-pos mon.pos) G.player.pos))
-    (not mon.sees-invisible)))
-
-(defn try-to-attack-player [mon [dry-run F] [shots-ignore-obstacles F]]
-  "Try to melee or shoot the player, if the monster can. Return true
-  if it succeeded. If `dry-run` is true, the attack isn't actually
-  made."
-
-  (setv p mon.pos)
-  (setv d (dir-to p G.player.pos))
-  (setv attack None)
-
-  (when (= p G.player.pos)
-    ; If we're on the player's square, we can't attack her.
-    (return F))
-
-  (when (player-invisible-to mon p)
-    (return F))
-
-  ; Try a melee attack first.
-  (when (and
-      mon.damage-melee
-      (adjacent? p G.player.pos)
-      (in (get (walkability p d :monster? T) 1)
-        ['bump 'walk]))
-    (setv attack 'melee))
-
-  ; Otherwise, try a ranged attack.
-  (when (and (not attack) mon.damage-shot)
-    (for [target (ray :pos p :direction d :length
-        (min (or mon.shot-range Inf) G.rules.reality-bubble-size))]
-      (when (= target G.player.pos)
-        (setv attack 'shot)
-        (break))
-      (when (any (gfor
-          tile (at target)
-          (or tile.superblock (and
-            tile.blocks-monster-shots
-            (not shots-ignore-obstacles)))))
-        (break))))
-
-  ; If we can't attack, bail out.
-  (unless attack
-    (return F))
-
-  ; Execute the attack.
-  (when dry-run
-    (return T))
-  (.damage G.player :attacker mon
-    (damage-by-hp mon (if (= attack 'shot) mon.damage-shot mon.damage-melee))
-    (if (= attack 'shot) MonsterShot MonsterMelee))
-  (when mon.kamikaze
-    (.rm-from-map mon))
-  T)
-
 
 (defclass Stationary [Monster]
   (defmeth act []
     "Stationary — The monster attacks if it can, but is otherwise immobile."
-    (try-to-attack-player @)))
+    (@try-to-attack-player)))
 
 
 (defclass Approacher [Monster]
@@ -172,9 +174,9 @@
     "Approach — If the monster can attack, it does. Otherwise, it tries to get closer to you in a straight line. If its path to you is blocked, it will try to adjust its direction according to its approach direction. If it can't move that way, it wastes its turn, and its approach direction advances to the next cardinal direction."
     ; Return true if we successfully moved or attacked; false otherwise.
 
-    (when (and implicit-attack (try-to-attack-player @))
+    (when (and implicit-attack (@try-to-attack-player))
       (return T))
-    (when (player-invisible-to @)
+    (when (@player-invisible-to?)
       (return F))
 
     ; Try to get closer to the player.
@@ -243,7 +245,7 @@
   (defmeth wander [[implicit-attack T] [ethereal-to #()]]
     "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
 
-    (when (and implicit-attack (try-to-attack-player @))
+    (when (and implicit-attack (@try-to-attack-player))
       (return))
 
     (setv [d @wander-state] (@pseudorandom-dirs @wander-state))
@@ -528,12 +530,12 @@
 
     (when (and
         (<= (dist G.player.pos @pos) @flee-range)
-        (not (player-invisible-to @)))
+        (not (@player-invisible-to?)))
       (return (@approach :reverse T :implicit-attack F)))
-    (when (try-to-attack-player @ :dry-run T :shots-ignore-obstacles T)
+    (when (@try-to-attack-player :dry-run T :shots-ignore-obstacles T)
       (+= @shot-power @shot-frequency)
       (when (pop-integer-part @shot-power)
-        (try-to-attack-player @ :shots-ignore-obstacles T)
+        (@try-to-attack-player :shots-ignore-obstacles T)
         (return)))
     (@wander :implicit-attack F))
 
@@ -609,13 +611,13 @@
     (when (adjacent? @pos G.player.pos)
       (+= G.player.floater-disturbance @disturbance-increment)
       (when (pop-integer-part G.player.floater-disturbance)
-        (return (try-to-attack-player @))))
+        (return (@try-to-attack-player))))
     (@wander :implicit-attack F))
 
   :destroy (meth []
     "The monster can attempt a free attack, unless it killed itself by kamikaze."
-    (try-to-attack-player @)
-    (Damageable.destroy @))
+    (@try-to-attack-player)
+    (.destroy (super)))
 
   :flavor "A giant aerial jellyfish, kept aloft by a foul-smelling and highly reactive gas. It doesn't fly so much as float about in the dungeon drafts. If disturbed, it readily explodes, and its explosions have the remarkable property of harming you and nobody else.")
 
@@ -630,7 +632,7 @@
 
   :act (meth []
     (doc f"Blob – If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {@summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
-    (when (try-to-attack-player @)
+    (when (@try-to-attack-player)
       (return))
     (when (and
         (> @hp 1)
@@ -671,7 +673,7 @@
     ; Move or attack.
     (if (and
         (<= (dist G.player.pos @pos) @approach-range)
-        (not (player-invisible-to @)))
+        (not (@player-invisible-to?)))
       (@approach :ethereal-to ["web"])
       (@wander :ethereal-to ["web"]))
     ; Spin a web in our new position, if there isn't one there
