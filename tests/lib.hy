@@ -6,7 +6,7 @@
   simalq.game-state [G]
   simalq.commands [Walk Wait Shoot UseItem]
   simalq.quest [start-quest start-level]
-  simalq.quest-definition [mk-quest mk-tile locate]
+  simalq.quest-definition [mk-quest mk-tile locate parse-text-map]
   simalq.main [take-turn])
 
 
@@ -60,6 +60,20 @@
           tile stack
           (if (is tile G.player) 'player tile.stem))
         thing)))))
+
+(defn assert-textmap [#* args #** kwargs]
+  "Check that the current map looks like the given text map: it has the same
+  dimensions and the same stack of stems on each square."
+  (setv [model [player-x player-y]] (parse-text-map #* args #** kwargs))
+  (.append
+    (get model.data player-x player-y)
+    (hy.I.simalq/tile.Player :pos (Pos model player-x player-y)))
+  (assert (= G.map.width model.width))
+  (assert (= G.map.height model.height))
+  (for [[stack-actual stack-expected] (zip (sum :start #() G.map.data) (sum :start #() model.data))]
+    (assert (= (len stack-actual) (len stack-expected)))
+    (for [[t-actual t-expected] (zip stack-actual stack-expected)]
+      (assert (= t-actual.stem t-expected.stem)))))
 
 (defn mv-player [x y]
   (.move G.player (Pos G.map x y)))

@@ -4,7 +4,7 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init init-boot-camp assert-at assert-full-name set-square mv-player assert-player-at wk wait shoot]
+  tests.lib [init init-boot-camp assert-at assert-full-name assert-textmap set-square mv-player assert-player-at wk wait shoot]
   simalq.util [GameOverException StatusEffect]
   simalq.geometry [at Pos]
   simalq.game-state [G]
@@ -352,34 +352,28 @@
   (setv G.rules.reality-bubble-size 0)
     ; Wallfall traps are unaffected by the reality bubble.
 
-  (defn check [#* ts]
-    (for [[t [x y]] (zip ts (lfor
-        y (reversed (range G.map.height))
-        x (range G.map.width)
-        [x y]))]
-      (assert-at [x y] (ecase t
-        "." 'floor
-        "@" 'player
-        "t" "wallfall trap"
-        "W" "trapped wall"))))
+  (defn check [text]
+    (assert-textmap text {
+      "t " "wallfall trap"
+      "W " "trapped wall"}))
 
-  (check
-    "@" "t" "t" "t"
-    "." "t" "t" "t"
-    "." "W" "W" "W")
+  (check "
+    @ t t t
+    . t t t
+    . W W W")
   ; Traps of type 1 destroy matching walls, type-0 walls, and other
   ; traps of type 1.
   (wk 'E)
-  (check
-    "." "@" "t" "t"
-    "." "." "t" "t"
-    "." "." "." "W")
+  (check "
+    . @ t t
+    . . t t
+    . . . W")
   ; Traps of type 0 destroy all wallfall traps and walls.
   (wk 'E)
-  (check
-    "." "." "@" "."
-    "." "." "." "."
-    "." "." "." "."))
+  (check "
+    . . @ .
+    . . . .
+    . . . ."))
 
 
 (defn test-damaging-trap []
