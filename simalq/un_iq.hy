@@ -244,7 +244,7 @@
     ["New Nightmare" 1] (do
       ; Replace the large central swastika.
       (replace-map-rect level 10 10
-        :map "
+        :text "
           . . . . . ██{}██. . . . .
           . . . ██##██{}██##██. . .
           . . ████d ██☉G██d ████. .
@@ -277,7 +277,7 @@
       ; Replace the 5-by-5 trap swastikas.
       (for [[x y] [[12 29] [25 30] [25 18] [11 7] [26 6]]]
         (replace-map-rect level x y
-          :map "
+          :text "
             <>. . . <>
             <>. . . <>
             <><><><><>
@@ -287,7 +287,7 @@
             "<>" "fixed damaging trap"}))
       ; Reconfigure the room in the northwest corner.
       (replace-map-rect level 2 32
-        :map "
+        :text "
           <1█1█1K █1█1█1
           <>█1█1G █1█1K
           <>█1█1G █1█1G
@@ -307,15 +307,15 @@
 
   level)
 
-(defn replace-map-rect [old x y #** mk-level-args]
+(defn replace-map-rect [old x y text map-marks]
   "Replace a rectangular region of the level `old`. `x` and `y` are
   the coordinates of where (0, 0) of the new level should be placed in
   `old`."
-  (import simalq.quest-definition [mk-level])
+  (import simalq.quest-definition [parse-text-map])
 
-  (setv new (mk-level #** mk-level-args))
-  (for [xn (range new.map.width)  yn (range new.map.height)]
+  (setv [new-map _] (parse-text-map text map-marks))
+  (for [xn (range new-map.width)  yn (range new-map.height)]
     (for [tile (get old.map.data (+ xn x) (+ yn y))]
       (.rm-from-map tile))
-    (for [tile (get new.map.data xn yn)]
+    (for [tile (get new-map.data xn yn)]
       (.move tile (Pos old.map (+ xn x) (+ yn y))))))

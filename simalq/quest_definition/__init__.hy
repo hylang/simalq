@@ -74,40 +74,7 @@ quest definitions from other files in this directory."
     [poison-intensity (Fraction 0)]
     [time-limit None] [exit-speed None] [moving-exit-start None]]
   (if map
-    (do
-      (setv map (dedent
-        (re.sub r"\A( *\n)*" "" (re.sub r"( *\n)*\Z" "" map))))
-      (setv height (+ 1 (.count map "\n")))
-      (setv width (ceil (/
-        (try (.index map "\n") (except [ValueError] (len map)))
-        2)))
-      (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
-      (setv mapsyms (dfor
-        [y row] (enumerate (reversed (.split map "\n")))
-        :do (when (% (len row) 2) (setv row (+ row " ")))
-        [x mapsym] (enumerate (partition 2 row))
-        #(x y) (.join "" mapsym)))
-      (for [[[x y] mapsym] (.items mapsyms)]
-        (setv p (Pos m x y))
-        (cond
-          (in mapsym map-marks)
-            (mk-tile p (get map-marks mapsym) m mapsyms)
-          (= mapsym "@ ")
-            (setv player-start #(x y))
-          (= mapsym ". ")
-            None
-          (= mapsym "██")
-            (mk-tile p "wall")
-          True (do
-            (setv types (lfor
-              t (.values Tile.types)
-              :if (= t.mapsym mapsym)
-              t))
-            (unless types
-              (raise (ValueError f"No match for {mapsym !r}")))
-            (when (> (len types) 1)
-              (raise (ValueError f"Ambiguous: {mapsym !r} - {types !r}")))
-            (mk-tile p (. types [0] stem))))))
+    (setv [m player-start] (parse-text-map map map-marks wrap-x wrap-y))
     (do
       (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
       (for [[i tile-spec] (enumerate tiles)]
@@ -124,6 +91,43 @@ quest definitions from other files in this directory."
     :time-limit time-limit
     :exit-speed exit-speed
     :moving-exit-start moving-exit-start))
+
+(defn parse-text-map [text [map-marks #()] [wrap-x False] [wrap-y False]]
+  (setv text (dedent
+    (re.sub r"\A( *\n)*" "" (re.sub r"( *\n)*\Z" "" text))))
+  (setv height (+ 1 (.count text "\n")))
+  (setv width (ceil (/
+    (try (.index text "\n") (except [ValueError] (len text)))
+    2)))
+  (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
+  (setv mapsyms (dfor
+    [y row] (enumerate (reversed (.split text "\n")))
+    :do (when (% (len row) 2) (setv row (+ row " ")))
+    [x mapsym] (enumerate (partition 2 row))
+    #(x y) (.join "" mapsym)))
+  (setv player-start #(0 0))
+  (for [[[x y] mapsym] (.items mapsyms)]
+    (setv p (Pos m x y))
+    (cond
+      (in mapsym map-marks)
+        (mk-tile p (get map-marks mapsym) m mapsyms)
+      (= mapsym "@ ")
+        (setv player-start #(x y))
+      (= mapsym ". ")
+        None
+      (= mapsym "██")
+        (mk-tile p "wall")
+      True (do
+        (setv types (lfor
+          t (.values Tile.types)
+          :if (= t.mapsym mapsym)
+          t))
+        (unless types
+          (raise (ValueError f"No match for {mapsym !r}")))
+        (when (> (len types) 1)
+          (raise (ValueError f"Ambiguous: {mapsym !r} - {types !r}")))
+        (mk-tile p (. types [0] stem)))))
+  #(m player-start))
 
 (defn mk-tile [locator tile-spec [map-object None] [mapsyms None]]
   (when (= tile-spec 'floor)
