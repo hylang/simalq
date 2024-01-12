@@ -81,19 +81,18 @@
       (if player-can-shoot-through 1 2))
     (assert (= G.player.hp (if mon-can-shoot-through 90 100))))
 
-  (check 'floor            T T)
-  (check "wall"            F F)
-  (check "Void"            F F)
-  (check ["orc" :hp 2]     F F)
-  (check "door"            F F)
-  (check "exit"            T T)
-  (check "wallfall trap"   T T)
-  (check "hole"            T T)
-  (check "magical energy shield"
-                           T F)
-  (check "broken pillar"   T F)
-  (check "pile of gold"    F F)
-  (check "key"             F F))
+  (check 'floor                  T T)
+  (check "wall"                  F F)
+  (check "Void"                  F F)
+  (check ["orc" :hp 2]           F F)
+  (check "door"                  F F)
+  (check "exit"                  T T)
+  (check "wallfall trap"         T T)
+  (check "hole"                  T T)
+  (check "magical energy shield" T F)
+  (check "broken pillar"         T F)
+  (check "pile of gold"          F F)
+  (check "key"                   F F))
     ; In IQ, keys (including magical keys) are unlike all other
     ; pickups in that the player can shoot through them. The
     ; motivation for this exception is mysterious to me, so I decided
