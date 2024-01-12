@@ -13,8 +13,6 @@
 
     [94 "exit_to_level_"]
     [101 "fire_mage"]
-    [102 "open_portcullis"]
-    [103 "closed_portcullis"]
     [104 "wand_of_annihilation"]
     [105 "exit_making_wand"]
     [106 "wand_of_gating"]

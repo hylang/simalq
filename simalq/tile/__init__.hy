@@ -166,6 +166,9 @@
   (defmeth hook-player-walk-to [origin]
     "Analogous to `Tile.hook-player-walk-from`."
     None)
+  (defmeth hook-player-walked-from []
+    "Called when the player successfully walks off of this tile."
+    None)
   (defmeth hook-player-walked-into []
     "Called when the player successfully walks into this tile. Return
     true to end her turn."

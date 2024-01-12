@@ -62,6 +62,7 @@
       (@dod "Effect when trying to enter" 'hook-player-walk-to)
       (@dod "Effect when stepped onto" 'hook-player-walked-into)
       (@dod "Effect when trying to exit" 'hook-player-walk-from)
+      (@dod "Effect when stepped off of" 'hook-player-walked-from)
       (@dod "Effect when you shoot it" 'hook-player-shot)
       (when @protects-vs-poison-air
         #("Special effect" "If you end your turn within 1 square of this tile, you'll take no damage from ambient poison or poisonous fountains. Other sources of poison damage are unaffected."))
@@ -183,6 +184,24 @@
   :iq-ix 81
   :result-when-opened None
   :flavor "This advanced door destroys not only the key used to unlock it, but also itself. A true marvel of engineering.")
+
+(deftile "##" "a closed portcullis" LockedDoor
+  :color 'navy
+  :iq-ix 103
+  :blocks-player-shots F :blocks-monster-shots F
+  :result-when-opened "open portcullis"
+  :flavor "Finally, a kind of door that can be locked more than once. The keys are still really fragile, though.")
+
+(deftile #[[""]] "an open portcullis" Scenery
+  :color 'navy
+  :iq-ix 102
+  :blocks-player-shots F :blocks-monster-shots F
+
+  :hook-player-walked-from (meth []
+    "The portcullis closes."
+    (@replace "closed portcullis"))
+
+  :flavor "Open the gate! Close the gate! Open the gate a little!")
 
 (deftile " +" "a treasure chest" LockedDoor
   ; This unusual mapsym, having a space on the left but not the right,

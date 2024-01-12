@@ -96,6 +96,23 @@
   (assert (= G.player.keys 0)))
 
 
+(defn test-portcullis []
+  (init
+    [:tiles ["closed portcullis"]])
+
+  (cant (wk 'E) "It's locked, and you're keyless at the moment.")
+  (setv G.player.keys 1)
+  (wk 'E)
+  (assert-player-at 0 0)
+  (assert-at 'E "open portcullis")
+  (wk 'E)
+  (assert-at 'here ['player "open portcullis"])
+  ; After an open portcullis is walked off of, it closes.
+  (wk 'E)
+  (assert-player-at 2 0)
+  (assert-at 'W "closed portcullis"))
+
+
 (defn test-chest []
   (init [])
   (set-square [1 0] "treasure chest" "pile of gold")

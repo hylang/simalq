@@ -91,6 +91,10 @@
   (check "hole"                  T T)
   (check "magical energy shield" T F)
   (check "broken pillar"         T F)
+  (check "open portcullis"       T T)
+  (check "closed portcullis"     T T)
+    ; In IQ, portculli block all shots, even when open, which seems
+    ; pretty silly to me.
   (check "pile of gold"          F F)
   (check "key"                   F F))
     ; In IQ, keys (including magical keys) are unlike all other

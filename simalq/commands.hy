@@ -238,7 +238,10 @@
       (for [tile (at target)]
         (.hook-player-walk-to tile G.player.pos))
       ; No exceptions have stopped us, so go.
+      (setv pos-was G.player.pos)
       (.move G.player target)
+      (for [tile (at pos-was)]
+        (.hook-player-walked-from tile))
       (for [tile (at target)]
         (when (.hook-player-walked-into tile)
           (return))))
