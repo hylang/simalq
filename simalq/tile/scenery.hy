@@ -161,7 +161,7 @@
   (defmeth hook-player-bump [origin]
     (doc (+ "Consumes one key to "
       (if @result-when-opened
-        f"replace the tile with {(hy.repr @result-when-opened)}."
+        f"replace the tile with {(. Tile types [@result-when-opened] name-with-article)}."
         "destroy the tile.")))
 
     (unless G.player.keys
