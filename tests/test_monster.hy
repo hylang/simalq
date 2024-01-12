@@ -2,7 +2,7 @@
   hyrule [do-n])
 (import
   fractions [Fraction :as f/]
-  tests.lib [init assert-at assert-full-name assert-hp wait set-square wk shoot mv-player add-usable use-item top]
+  tests.lib [init assert-at assert-full-name assert-hp wait set-square wk shoot mv-player use-item top]
   simalq.geometry [Direction Pos ray at burst]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -491,8 +491,7 @@
   ; they die instantly.
   (assert-at [2 0] "thorn tree")
   (assert-at [3 0] "thorn tree")
-  (add-usable "standard bomb")
-  (use-item 0  2 0)
+  (use-item "standard bomb"  2 0)
   (assert-at [2 0] 'floor)
   (assert-at [3 0] 'floor))
 

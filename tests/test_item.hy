@@ -3,7 +3,7 @@
   tests.lib [cant])
 (import
   fractions [Fraction :as f/]
-  tests.lib [init init-boot-camp assert-at assert-hp set-square mv-player wk shoot wait use-item add-usable]
+  tests.lib [init init-boot-camp assert-at assert-hp set-square mv-player wk shoot wait use-item]
   simalq.geometry [Pos Direction at]
   simalq.game-state [G]
   simalq.quest-definition [mk-tile])
@@ -306,12 +306,11 @@
       $ @ ."
     :map-marks {
       "$ " "pile of gold"}])
-  (add-usable "wand of shielding" 2)
 
   ; A wand of shielding creates a shield on each adjacent square (even
   ; if something else is there, unlike IQ). Monsters can't move onto
   ; the shields.
-  (use-item 0)
+  (use-item "wand of shielding")
   (assert-at 'W ["magical energy shield" "pile of gold"])
   (assert-at 'NW ["magical energy shield" "wall"])
   (assert-at 'N "magical energy shield")
@@ -332,7 +331,7 @@
     (assert-at 'here ['player #* old])
     (assert-at 'NE [#* new])
     (assert-at 'E [#* old #* new]))
-  (use-item 1)
+  (use-item "wand of shielding")
   (check 3 T T)
   ; Shields protect for 12 turns, so the first set (created on turn 0,
   ; and therefore providing its first turn of protection on turn 0)
@@ -351,35 +350,32 @@
 
 (defn test-wand-wall-making []
   (init
-    :max-usables 4
     [:tiles ["orc" "wall"]])
-  (add-usable "wall-making wand" 4)
 
   ; Unlike IQ, walls can be added regardless of what's already on the
   ; target square.
-  (use-item 0  0 0)
+  (use-item "wall-making wand" 0 0)
   (assert-at [0 0] ["wall" 'player])
-  (use-item 1  1 0)
+  (use-item "wall-making wand" 1 0)
   (assert-at [1 0] ["wall" "orc"])
-  (use-item 2  2 0)
+  (use-item "wall-making wand" 2 0)
   (assert-at [2 0] ["wall" "wall"])
-  (use-item 3  3 0)
+  (use-item "wall-making wand" 3 0)
   (assert-at [3 0] "wall"))
 
 
 (defn test-wand-passwall []
   (init
     [:tiles ["orc" "wall" "pillar"]])
-  (add-usable "passwall wand" 3)
 
-  (cant (use-item 0  1 0) "There isn't a destructible tile there.")
-  (use-item 0  2 0)
+  (cant (use-item "passwall wand" 1 0) "There isn't a destructible tile there.")
+  (use-item "passwall wand" 2 0)
   (assert-at [2 0] 'floor)
-  (use-item 1  3 0)
+  (use-item "passwall wand" 3 0)
   (assert-at [3 0] 'floor)
   (set-square [3 0] "wall" "wall")
   (assert-at [3 0] ["wall" "wall"])
-  (use-item 2  3 0)
+  (use-item "passwall wand" 3 0)
   (assert-at [3 0] "wall"))
 
 
@@ -394,8 +390,7 @@
     (ecase usage
       'use (do
         ; Actually use the bomb.
-        (add-usable item-stem)
-        (use-item 0 1 0))
+        (use-item item-stem 1 0))
       'shoot (do
         ; Shoot the bomb while it's on the floor. This creates a
         ; less impressive explosion.

@@ -102,9 +102,13 @@
   (do-n n-times
     (take-turn (Shoot (getattr Direction (str direction-abbr))))))
 
-(defn use-item [item-ix [target-x None] [target-y None]]
-  (take-turn (UseItem item-ix target-x target-y)))
-
-(defn add-usable [stem [n 1]]
-  (do-n n
-    (.pick-up (mk-tile None stem))))
+(defn use-item [thing [target-x None] [target-y None]]
+  (when (isinstance thing int)
+    (return (take-turn (UseItem thing target-x target-y))))
+  (try
+    (setv inv-was (.copy G.player.inventory))
+    (setv (get G.player.inventory 0) None)
+    (.pick-up (mk-tile None thing))
+    (take-turn (UseItem 0 target-x target-y))
+    (finally
+      (setv (cut G.player.inventory) inv-was))))

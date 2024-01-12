@@ -4,7 +4,7 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init init-boot-camp assert-at assert-full-name assert-textmap set-square mv-player assert-player-at wk wait shoot add-usable use-item]
+  tests.lib [init init-boot-camp assert-at assert-full-name assert-textmap set-square mv-player assert-player-at wk wait shoot use-item]
   simalq.util [GameOverException StatusEffect]
   simalq.geometry [at Pos]
   simalq.game-state [G]
@@ -219,8 +219,7 @@
 
   ; Other means of destroying a wall don't cause chain reactions of breakage.
   (wk 'E)
-  (add-usable "passwall wand")
-  (use-item 0  3 2)
+  (use-item "passwall wand" 3 2)
   (assert-textmap :map-marks marks :text "
     . . . | .
     . . . . .
