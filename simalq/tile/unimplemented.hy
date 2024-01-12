@@ -30,8 +30,6 @@
     [141 "phasing_wall_trap"]
     [142 "phasing_wall_trigger"]
     [143 "phase_wand"]
-    [144 "unstable_moveable_wall_1"]
-    [145 "unstable_moveable_wall_2"]
     [146 "fire_fountain"]
     [149 "counterpoison_amulet"]
     [150 "poisonous_amulet"]

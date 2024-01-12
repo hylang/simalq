@@ -311,10 +311,22 @@
       :mapsym ~(.join "" (gfor  d directions  (get Direction.arrows d)))))))
 
 
-(deftile "■ " "a pushblock" Scenery
-  :iq-ix 22
+(deftile :name "a pushblock" :superc Scenery
+  :field-defaults (dict
+    :n-pushes None)
+  :mutable-fields #("n_pushes")
+  :iq-ix-mapper ["n_pushes"
     ; Called a "moveable wall" in IQ. I think "wall" is misleading
     ; because it's not a diagonal blocker.
+    {22 None  144 1  145 2}]
+
+  :mapsym (property-meth []
+    (+ "■" (cond
+      (is @n-pushes None) " "
+      (< @n-pushes 10)    (str @n-pushes)
+      True                "^")))
+  :suffix-dict (meth []
+    (if (is @n-pushes None) {} {"pushes left =" @n-pushes}))
 
   :blocks-monster T
   :destructible-by-passwall-wand T
@@ -324,9 +336,21 @@
       (raise (CommandError "There's no room to push the block there."))))
 
   :hook-player-walked-into (meth []
-    "You push the block in the same direction that you entered the square. The destination square must be empty, or else you won't be able to step on the original square."
+    (doc (+
+      "You push the block in the same direction that you entered the square. The destination square must be empty, or else you won't be able to step on the original square."
+      (cond
+        (is @n-pushes None)
+          ""
+        (= @n-pushes 1)
+          " The block then transforms into a normal wall."
+        True
+          f" After {(- @n-pushes 1)} more push{(if (> @n-pushes 2) "es" "")}, the block will transform into a normal wall.")))
     (setv target (+ @pos G.action.direction))
     (@move target)
+    (unless (is @n-pushes None)
+      (-= @n-pushes 1)
+      (unless @n-pushes
+        (@replace "wall")))
     F)
 
   :flavor "Where do video games get all their crates from? There must be entire warehouses full of 'em, am I right?")

@@ -243,6 +243,19 @@
   (assert-at [1 0] 'player))
 
 
+(defn test-pushblock-limited []
+  (init
+    [:tiles [["pushblock" :n-pushes 3]]])
+
+  (assert-full-name 'E f"a pushblock (pushes left = 3)")
+  (wk 'E)
+  (assert-full-name 'E f"a pushblock (pushes left = 2)")
+  (wk 'E)
+  (assert-full-name 'E f"a pushblock (pushes left = 1)")
+  (wk 'E)
+  (assert-at 'E "wall"))
+
+
 (defn test-fountains []
   (init [
     :poison-intensity (f/ 1 5)

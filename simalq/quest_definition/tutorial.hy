@@ -199,6 +199,7 @@
     "▒▒" "Void"
     "++" "door"
     "ld" "locked door"
+    "■ " "pushblock"
     "<1" ["wallfall trap" :wallnum 1]
     "█1" ["trapped wall" :wallnum 1]
     "{}" ["gate" :target "$ "]
@@ -321,6 +322,7 @@
   :map-marks {
     "++" "door"
     "ld" "locked door"
+    "■ " "pushblock"
     "<>" "paralysis trap"
     "$ " "pile of gold"
     "$$" "handful of gems"
