@@ -4,7 +4,7 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init init-boot-camp assert-at assert-full-name assert-textmap set-square mv-player assert-player-at wk wait shoot]
+  tests.lib [init init-boot-camp assert-at assert-full-name assert-textmap set-square mv-player assert-player-at wk wait shoot add-usable use-item]
   simalq.util [GameOverException StatusEffect]
   simalq.geometry [at Pos]
   simalq.game-state [G]
@@ -180,6 +180,52 @@
   (wk 'E)
   (assert-at 'E 'floor)
   (assert-player-at 0 0))
+
+
+(defn test-breakable-wall []
+  (setv marks {
+    "| " "breakable wall (meridional)"
+    "- " "breakable wall (zonal)"})
+  (init [
+    :map "
+      . | | | .
+      . | | | .
+      . | | | .
+      @ - - | -"
+    :map-marks marks])
+  (setv G.rules.reality-bubble-size 2)
+    ; Destruction propogates outside the reality bubble.
+
+  (wk 'E)
+  (assert-textmap :map-marks marks :text "
+    . | | | .
+    . | | | .
+    . | | | .
+    @ . . | -")
+
+  (wk 'NE)
+  (assert-textmap :map-marks marks :text "
+    . . | | .
+    . . | | .
+    . . | | .
+    @ . . | -")
+
+  (shoot 'NE)
+  (assert-textmap :map-marks marks :text "
+    . . . | .
+    . . . | .
+    . . . | .
+    @ . . | -")
+
+  ; Other means of destroying a wall don't cause chain reactions of breakage.
+  (wk 'E)
+  (add-usable "passwall wand")
+  (use-item 0  3 2)
+  (assert-textmap :map-marks marks :text "
+    . . . | .
+    . . . . .
+    . . . | .
+    . @ . | -"))
 
 
 (defn test-pushblock []

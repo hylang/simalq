@@ -5,7 +5,7 @@
 (import
   simalq.color :as color
   simalq.util [CommandError DamageType next-in-cycle StatusEffect]
-  simalq.geometry [Pos Direction at burst dist dir-to]
+  simalq.geometry [Pos Direction at burst dist dir-to ray]
   simalq.tile [Tile EachTurner Damageable]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -62,6 +62,7 @@
       (@dod "Effect when trying to enter" 'hook-player-walk-to)
       (@dod "Effect when stepped onto" 'hook-player-walked-into)
       (@dod "Effect when trying to exit" 'hook-player-walk-from)
+      (@dod "Effect when you shoot it" 'hook-player-shot)
       (when @protects-vs-poison-air
         #("Special effect" "If you end your turn within 1 square of this tile, you'll take no damage from ambient poison or poisonous fountains. Other sources of poison damage are unaffected."))
       (when @emits-poison-air
@@ -259,6 +260,55 @@
   :immune #(DamageType.Poison DamageType.Fire DamageType.DeathMagic)
 
   :flavor "I think this dungeon might not be up to code.")
+
+
+(defclass BreakableWall [Scenery]
+
+  (setv
+    blocks-monster T
+    blocks-diag T
+    destructible-by-passwall-wand T
+    color 'white
+    color-bg 'black)
+
+  (setv directions None)
+
+  (defmeth hook-player-bump [origin]
+    (doc f"Destroys the wall, along with all other walls of the same
+    type that are either on the same square, adjacent to the {(. self
+    directions [0] name)}, or adjacent to the {(. self directions [1]
+    name)}. Those walls can themselves destroy further walls,
+    propagating a chain reaction.")
+    (@breakdown)
+    True)
+
+  (defmeth hook-player-shot []
+    "As when walked into."
+    (@breakdown))
+
+  (defmeth breakdown []
+    (for [
+        group [
+          [@pos]
+          #* (gfor  direction @directions  (ray @pos direction Inf))]
+        p group]
+      (if (setx to-remove (lfor  t (at p)  :if (is (type t) (type @))  t))
+        (for [t to-remove]
+          (.rm-from-map t))
+        (break))))
+
+  (setv flavor "This dungeon is coming down like a house of cards."))
+
+(do-mac
+  (import simalq.geometry [Direction])
+  `(do ~@(lfor
+    [directions iq-ix name] [
+      [[Direction.N Direction.S] 160 "meridional"]
+      [[Direction.W Direction.E] 161 "zonal"]]
+    `(deftile :name ~f"a breakable wall ({name})" :superc BreakableWall
+      :iq-ix ~iq-ix
+      :directions ~(lfor  d directions `(. Direction ~(hy.models.Symbol d.abbr)))
+      :mapsym ~(.join "" (gfor  d directions  (get Direction.arrows d)))))))
 
 
 (deftile "■ " "a pushblock" Scenery

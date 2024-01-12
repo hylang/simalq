@@ -42,8 +42,6 @@
     [157 "earthquake_bomb"]
     [158 "ring_of_protection"]
     [159 "amulet_of_poisonous_touch"]
-    [160 "breakable_wall_north"]
-    [161 "breakable_wall_east"]
     [162 "one_shot_gate"]
     [163 "archmage"]
     [164 "cyclops"]
