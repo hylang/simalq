@@ -9,6 +9,7 @@
   simalq.geometry [at Pos]
   simalq.game-state [G]
   simalq.quest-definition [mk-tile])
+(setv  T True  F False)
 
 
 (defn test-unmodifiable-tiles []
@@ -280,19 +281,24 @@
 
 
 (defn test-gate []
-  (init [])
-  (defn t [] (Pos G.map 5 6))
+  (for [one-shot? [F T]]
 
-  (mk-tile [1 0] ["gate" :target (t)])
-  (assert-full-name [1 0] "a gate (dest <Pos 5,6>)")
-  (set-square (t) "orc" "pile of gold" "exit")
-  (assert (and (= G.turn-n 0) (= G.player.pos (Pos G.map 0 0))))
-  ; Walking into the gate warps us to the target square, but
-  ; preserves what's there, and doesn't trigger any tile effects
-  ; for walking into the target.
-  (wk 'E)
-  (assert (and (= G.turn-n 1) (= G.player.pos (t))))
-  (assert-at 'here ['player "orc" "pile of gold" "exit"]))
+    (setv stem (+ (if one-shot? "one-shot " "") "gate"))
+    (init [])
+    (defn t [] (Pos G.map 5 6))
+
+    (mk-tile [1 0] [stem :target (t)])
+    (assert-full-name [1 0] f"a {stem} (dest <Pos 5,6>)")
+    (set-square (t) "orc" "pile of gold" "exit")
+    (assert (and (= G.turn-n 0) (= G.player.pos (Pos G.map 0 0))))
+    ; Walking into the gate warps us to the target square, but
+    ; preserves what's there, and doesn't trigger any tile effects
+    ; for walking into the target.
+    (wk 'E)
+    (assert (and (= G.turn-n 1) (= G.player.pos (t))))
+    (assert-at 'here ['player "orc" "pile of gold" "exit"])
+    ; A one-shot gate is destroyed after use. A regular gate perseveres.
+    (assert-at [1 0] (if one-shot? 'floor "gate"))))
 
 
 (defn test-gate-mapsym-target []

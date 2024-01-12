@@ -351,23 +351,37 @@
   :flavor "An ornate decorative fountain featuring a statue of Death himself. The fountain's spray fills the air about it with a suffocating miasma.")
 
 
-(deftile "{}" "a gate" Scenery
-  :color 'purple
-  :field-defaults (dict
-    :target None)
-  :iq-ix 24
+(defclass Gate [Scenery]
+  (setv field-defaults (dict
+    :target None))
+  (setv fields #("target"))
 
-  :read-tile-extras (classmethod (fn [cls mk-pos v1 v2]
-    (dict :target (mk-pos #(v1 v2)))))
+  (setv one-shot? F)
 
-  :suffix-dict (meth []
+  (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
+    (dict :target (mk-pos #(v1 v2))))
+
+  (defmeth suffix-dict []
     (dict :dest @target))
-  :hook-player-walked-into (meth []
-    (doc f"Teleports you to {@target}. Anything already there is unaffected.")
+  (defmeth hook-player-walked-into []
+    (doc (+
+      f"Teleports you to {@target}. Anything already there is unaffected."
+      (if @one-shot? " The gate is then destroyed." "")))
     (.move G.player @target)
+    (when @one-shot?
+      (@rm-from-map))
     T)
 
-  :flavor "A small stone arch containing a rippling, sparkling sheet of violet light. It functions as a magic portal that can send you elsewhere on this level. Sadly, arrows in flight won't survive the trip.")
+  (setv flavor "A small stone arch containing a rippling, sparkling sheet of colored light. It functions as a magic portal that can send you elsewhere on this level. Sadly, arrows in flight won't survive the trip."))
+
+(deftile "{}" "a gate" Gate
+  :color 'purple
+  :iq-ix 24)
+
+(deftile "{}" "a one-shot gate" Gate
+  :color 'red
+  :iq-ix 162
+  :one-shot? T)
 
 
 (deftile "┣┫" "a teleporter" Scenery
