@@ -34,7 +34,6 @@
     [151 "passwall_amulet"]
     [152 "random_gate"]
     [154 "wand_of_flame"]
-    [156 "wand_of_death"]
     [157 "earthquake_bomb"]
     [158 "ring_of_protection"]
     [159 "amulet_of_poisonous_touch"]

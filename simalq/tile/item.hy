@@ -378,6 +378,21 @@
 
   :flavor #[[I always thought the phrase "open sesame" was a humorous deliberate corruption of "open says-a-me", but since it comes to us from French, if not from Arabic and then French, this is unlikely.]])
 
+(deftile "/ " "a wand of death" Usable
+  :color 'blue
+  :iq-ix 156
+  :acquirement-points 250
+
+  :!mon-damage #(Inf Inf Inf)
+  :!player-damage 25
+  :use (meth [target]
+    (doc f"Kills all monsters in a size-{(- (len @mon-damage) 1)} burst, except those immune to death magic. If you're in the burst, you take {@player-damage} damage.")
+    (burst-damage target :damage-type DamageType.DeathMagic
+      :amount @mon-damage :player-amount @player-damage
+      :color 'dark-gray))
+
+  :flavor "This fell device vibrates with the barely contained energies of Hades as they hunger for the souls of the living. Aim carefully.")
+
 
 (defclass FireBomb [Usable]
   (setv
