@@ -498,6 +498,33 @@
   :flavor "A bulky cubic device representing an early attempt at teleportation technology. Its operation is a bit convoluted. The fun part is, you can tele-frag with it.")
 
 
+(deftile "┣┫" "a controllable teleporter" Scenery
+  :color 'dark-green
+  :iq-ix 133
+  :blocks-diag T :blocks-monster T
+
+  :hook-player-walked-into (meth []
+    "Teleports you to an empty square of your choice within the reality bubble. You may choose to cancel this and not teleport."
+    (import simalq.commands [UseControllableTeleporter targeting-mode])
+    (defn ok [p]
+      (and
+        (not (at p))
+        (<= (dist @pos p) G.rules.reality-bubble-size)))
+    (unless (is (type G.action) UseControllableTeleporter)
+      (setv G.action (UseControllableTeleporter G.action.direction #* (.
+        (or
+          (targeting-mode (fn [target]
+            (or (= target G.player.pos) (ok target))))
+          G.player.pos)
+        xy))))
+    (setv target (Pos G.map G.action.target-x G.action.target-y))
+    (when (ok target)
+      (.move G.player target)
+      T))
+
+  :flavor "Go anywhere your heart desires! Restrictions apply.")
+
+
 (defclass Trap [Scenery]
   (setv
     blocks-move F

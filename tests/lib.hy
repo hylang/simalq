@@ -4,7 +4,7 @@
   simalq.geometry [Pos at Direction]
   simalq.un-iq [iq-quest]
   simalq.game-state [G]
-  simalq.commands [Walk Wait Shoot UseItem]
+  simalq.commands [Walk Wait Shoot UseItem UseControllableTeleporter]
   simalq.quest [start-quest start-level]
   simalq.quest-definition [mk-quest mk-tile locate parse-text-map]
   simalq.main [take-turn])
@@ -112,3 +112,7 @@
     (take-turn (UseItem 0 target-x target-y))
     (finally
       (setv (cut G.player.inventory) inv-was))))
+
+(defn use-cport [direction-abbr target-x target-y]
+   (take-turn (UseControllableTeleporter
+     (getattr Direction (str direction-abbr)) target-x target-y)))

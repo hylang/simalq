@@ -21,7 +21,6 @@
     [130 "exit_mobile"]
     [131 "invisible_wall"]
     [132 "golem"]
-    [133 "controllable_teleporter"]
     [134 "siren"]
     [139 "phasing_wall_in"]
     [140 "phasing_wall_out"]

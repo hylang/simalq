@@ -4,7 +4,7 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init init-boot-camp assert-at assert-full-name assert-textmap set-square mv-player assert-player-at wk wait shoot use-item]
+  tests.lib [init init-boot-camp assert-at assert-full-name assert-textmap set-square mv-player assert-player-at wk wait shoot use-item use-cport]
   simalq.util [GameOverException StatusEffect]
   simalq.geometry [at Pos]
   simalq.game-state [G]
@@ -359,11 +359,13 @@
   ; With multiple porters in range, you get sent to one of the
   ; nearest. Re-entering the original sends you to different nearest
   ; porters in sequence.
-  (init
-    [:map "
+  (init [
+    :map "
       ██┣┫████. . .
       ██. ██████┣┫.
-      @ ┣┫. ┣┫██. ."])
+      @ ┣┫. ┣┫██. ."
+    :map-marks
+      {"┣┫" "teleporter"}])
   (wk 'E)
   (assert-player-at 2 0)
   (mv-player 0 0)
@@ -404,6 +406,7 @@
       ████d 0 ┣┫
       @ ┣┫$ ┣┫++"
     :map-marks {
+      "┣┫" "teleporter"
       "$ " "pile of gold"
       "d " ["devil" :hp 3]
       "0 " "standard bomb"
@@ -412,6 +415,50 @@
    (assert-player-at 2 1)
    (assert-at 'here 'player)
    (assert (= G.score 15)))
+
+
+(defn test-controllable-teleporter []
+
+  (init [
+    :width 30 :height 1
+    :tiles ['floor "controllable teleporter" "wall" "orc" "pile of gold"]])
+  ; Usually, the `UseControllableTeleporter` action just does the same
+  ; thing as `Walk`. The user interface doesn't let you pick the
+  ; action if there's no teleporter there, though.
+  (use-cport 'E 0 0)
+  (assert-player-at 1 0)
+  ; You can't teleport into scenery, monsters, or items. Nor can you
+  ; go outside the reality bubble. There's no error; you just stay on
+  ; the teleporter's square, and a turn is used as normal. (Otherwise,
+  ; we'd end up with situations where we want to cancel the player's
+  ; action with an error, but we already changed the game state with
+  ; hooks triggered by the movement.)
+  (setv turn-n 1)
+  (for [x [3 4 5 20]]
+    (use-cport 'E x 0)
+    (assert-player-at 2 0)
+    (wk 'W)
+    (+= turn-n 2)
+    (assert (= G.turn-n turn-n)))
+  ; Here's a valid teleport.
+  (use-cport 'E 7 0)
+  (assert-player-at 7 0)
+  (assert (= G.turn-n (+ turn-n 1)))
+
+  (for [teleport? [F T]]
+    (init
+      [:tiles ["open portcullis" 'floor]])
+    (wk 'E)
+    (set-square 'E "controllable teleporter" "key")
+    (setv tx 5)
+    (use-cport 'E (if teleport? tx 2) 0)
+    (assert-player-at (if teleport? tx 2) 0)
+    ; Whether or not you actually teleport, hooks for walking off your
+    ; origin square run as normal.
+    (assert-at [1 0] "closed portcullis")
+    ; If you teleport, some hooks for tiles beneath the teleporter
+    ; don't run. If you don't, they do.
+    (assert (= G.player.keys (if teleport? 0 1)))))
 
 
 (defn test-wallfall-trap []

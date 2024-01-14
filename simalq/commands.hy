@@ -1,5 +1,5 @@
 (require
-  hyrule [case ecase do-n unless]
+  hyrule [case ecase ebranch do-n unless]
   simalq.macros [defdataclass])
 (import
   sys
@@ -36,6 +36,10 @@
 (defdataclass UseItem [Action]
   "Apply an item from your inventory."
   :fields [item-ix target-x target-y]
+  :frozen T)
+(defdataclass UseControllableTeleporter [Action]
+  "Walk towards a controllable teleporter and use it."
+  :fields [direction target-x target-y]
   :frozen T)
 
 (defdataclass Help [Command]
@@ -189,13 +193,13 @@
   (when (and (player-status 'Para) (is-not (type action) Wait))
     (raise (CommandError "You're paralyzed. You can only wait for it to pass.")))
 
-  (ecase (type action)
+  (ebranch (in (type action) it)
 
-    Wait
+    [Wait]
       ; Nothing to do. This action should always succeed.
       None
 
-    Walk (do
+    [Walk UseControllableTeleporter] (do
       (setv d action.direction)
       (setv [target wly] (walkability G.player.pos d :monster? F))
       (when (= wly 'out-of-bounds)
@@ -220,7 +224,7 @@
         (when (.hook-player-walked-into tile)
           (return))))
 
-    Shoot (do
+    [Shoot] (do
       (setv
         d action.direction
         target G.player.pos
@@ -275,7 +279,7 @@
           (return)))
       (animate))
 
-    UseItem (do
+    [UseItem] (do
       (setv item (get G.player.inventory action.item-ix))
       (unless item
         (raise (CommandError "That inventory slot is empty.")))
