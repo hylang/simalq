@@ -90,33 +90,7 @@
   "This function is only for commands that aren't actions; see
   `do-action` for actions."
   (import
-    simalq.keyboard [read-dir-key]
     simalq.main [io-mode text-screen print-main-screen info-screen inkey take-turn load-saved-game-screen])
-
-  (defn targeting-mode [target-callback]
-    "Allow the user to select a target square with the direction keys.
-    `target-callback` is called on the targeted `Pos` when the user
-    presses a selection key. It should return true if targeting mode
-    should then end.
-
-    Return a selected `Pos` or `None`."
-    (setv focus G.player.pos)
-    (io-mode
-      :draw (fn []
-        (print-main-screen focus :status-bar F :tile-list 'nonpickable))
-      :on-input (fn [key]
-        (nonlocal focus)
-        (setv dir-v (read-dir-key key))
-        (cond
-          (and dir-v (!= dir-v 'center))
-            (setv focus (or (+ focus dir-v) focus))
-          (or (= dir-v 'center) (= (str key) ";"))
-            (when (target-callback focus)
-              'done)
-          True (do
-            (setv focus None)
-            'done))))
-    focus)
 
   (defn menu [n-items draw]
     "Allow the user to select an item from a list. Return an index of
@@ -145,7 +119,7 @@
     GonnaShoot (do
       ; A direction key causes Tris to shoot in that direction.
       ; Any other key just cancels out of shooting mode.
-      (setv v (read-dir-key (inkey)))
+      (setv v (hy.I.simalq/keyboard.read-dir-key (inkey)))
       (when (isinstance v Direction)
         (take-turn (Shoot v))))
 
@@ -319,6 +293,32 @@
             (raise (CommandError "That item can't use a target.")))
           (.use item)))
       (setv (get G.player.inventory action.item-ix) None))))
+
+
+(defn targeting-mode [target-callback]
+  "Allow the user to select a target square with the direction keys.
+  `target-callback` is called on the targeted `Pos` when the user
+  presses a selection key. It should return true if targeting mode
+  should then end.
+
+  Return a selected `Pos` or `None`."
+  (setv focus G.player.pos)
+  (hy.I.simalq/main.io-mode
+    :draw (fn []
+      (hy.I.simalq/main.print-main-screen focus :status-bar F :tile-list 'nonpickable))
+    :on-input (fn [key]
+      (nonlocal focus)
+      (setv dir-v (hy.I.simalq/keyboard.read-dir-key key))
+      (cond
+        (and dir-v (!= dir-v 'center))
+          (setv focus (or (+ focus dir-v) focus))
+        (or (= dir-v 'center) (= (str key) ";"))
+          (when (target-callback focus)
+            'done)
+        True (do
+          (setv focus None)
+          'done))))
+  focus)
 
 
 (defn help-text []
