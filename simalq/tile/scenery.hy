@@ -302,7 +302,7 @@
     True)
 
   (defmeth hook-player-shot []
-    "As when walked into."
+    "As when bumped."
     (@breakdown))
 
   (defmeth breakdown []
@@ -369,7 +369,7 @@
     True)
 
   :hook-player-shot (meth []
-    "As when walked into."
+    "As when bumped."
     (Phaser.run-all))
 
   :flavor "An immobile switch that toggles phasing walls. Tris's expertise in target shooting allows her to trigger one of these with a single arrow.")
