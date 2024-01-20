@@ -6,7 +6,7 @@
   simalq.color :as color
   simalq.util [CommandError DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction at burst dist dir-to ray]
-  simalq.tile [Tile EachTurner Damageable]
+  simalq.tile [Tile PosHooked EachTurner Damageable]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -330,6 +330,51 @@
       :mapsym ~(.join "" (gfor  d directions  (get Direction.arrows d)))))))
 
 
+(defclass Phaser [Scenery PosHooked]
+
+  (setv map-attr "phasers")
+  (setv phase-replace None)
+
+  (defmeth poshooked-callback []
+    (@replace @phase-replace)))
+
+(deftile "☯█" "a phasing wall (in phase)" Phaser
+  :color #('white None)
+  :color-bg #('black None)
+  :iq-ix 139
+  :blocks-move T :blocks-diag T
+  :destructible-by-passwall-wand T
+
+  :phase-replace "phasing wall (out of phase)"
+
+  :flavor "An all but completely ordinary wall. It can be temporarily warped out of existence by various devices, such as a phase trigger.")
+
+(deftile "☯ " "a phasing wall (out of phase)" Phaser
+  :color 'light-gray
+  :iq-ix 140
+  :blocks-player-shots F
+  ; Per IQ, a phasing wall is unaffected by a wand of passwall while
+  ; out of phase.
+
+  :phase-replace "phasing wall (in phase)"
+
+  :flavor "A bit of gray fog betokening the ghost of a wall that was, and may be again. You can move and shoot through it freely. Monsters, on the other hand, can be a bit superstitious about it.")
+
+(deftile "☯|" "a phase trigger" Scenery
+  :iq-ix 142
+
+  :hook-player-bump (meth [origin]
+    (doc f"Phase-shifts all phasing walls on the level.")
+    (Phaser.run-all)
+    True)
+
+  :hook-player-shot (meth []
+    "As when walked into."
+    (Phaser.run-all))
+
+  :flavor "An immobile switch that toggles phasing walls. Tris's expertise in target shooting allows her to trigger one of these with a single arrow.")
+
+
 (deftile :name "a pushblock" :superc Scenery
   :field-defaults (dict
     :n-pushes None)
@@ -647,7 +692,7 @@
   :blocks-move F :blocks-monster T
   :blocks-player-shots F :blocks-monster-shots T
 
-  :each-turn (meth []
+  :poshooked-callback (meth []
     (-= @time-remaining 1)
     (unless @time-remaining
       (@rm-from-map)))

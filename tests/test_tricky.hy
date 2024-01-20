@@ -72,6 +72,10 @@
   "Test which tile types can be shot through by the player or monsters."
 
   (defn check [tile player-can-shoot-through mon-can-shoot-through]
+    (when (is (type tile) str)
+      (setv tile (. tile
+        (replace "(i)" "(in phase)")
+        (replace "(o)" "(out of phase)"))))
     (init
       [:tiles ['floor tile 'floor ["devil" :hp 2]]])
     (assert (= G.player.hp 100))
@@ -95,6 +99,8 @@
   (check "closed portcullis"     T T)
     ; In IQ, portculli block all shots, even when open, which seems
     ; pretty silly to me.
+  (check "phasing wall (i)"      F F)
+  (check "phasing wall (o)"      T F)
   (check "pile of gold"          F F)
   (check "key"                   F F))
     ; In IQ, keys (including magical keys) are unlike all other

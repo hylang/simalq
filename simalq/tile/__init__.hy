@@ -298,25 +298,30 @@
     (raise NotImplementedError)))
 
 
-(defclass EachTurner [Tile]
-  "Like `Actor`, but the method can still fire outside the reality
-  bubble, and it goes after all actors."
+(defclass PosHooked [Tile]
+  (setv map-attr None)
 
   (defmeth hook-pos-set [old new]
     (when (and (or old new) (not (and old new (is old.map new.map))))
       (when old
-        (.remove old.map.each-turn @))
+        (.remove (getattr old.map @map-attr) @))
       (when new
-        (.append new.map.each-turn @))))
+        (.append (getattr new.map @map-attr) @))))
 
   (defmeth [classmethod] run-all []
     "Run all hooks for items on the current map."
-    (for [o (list G.map.each-turn)]
-        ; Call `list` in case `G.map.each-turn` is mutated during the loop.
-      (.each-turn o)))
+    (for [o (list (getattr G.map @map-attr))]
+        ; Call `list` in case the list is mutated during the loop.
+      (.poshooked-callback o)))
 
-  (defmeth each-turn []
+  (defn poshooked-callback []
     (raise NotImplementedError)))
+
+(defclass EachTurner [PosHooked]
+  "Like `Actor`, but the method can still fire outside the reality
+  bubble, and it goes after all actors."
+
+  (setv map-attr "each_turn"))
 
 
 (defclass Damageable [Tile]

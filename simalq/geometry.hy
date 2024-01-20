@@ -21,19 +21,21 @@
       ; square. An empty stack means that the tile has only floor.
     width height
       ; Cached map dimensions for speed.
-    each-turn]
+    each-turn
       ; A list of objects on which to call `.each-turn` at the end of
       ; each turn.
+    phasers]
+      ; A list of objects affected by phasing.
 
   :frozen T :eq F
 
   (defmeth [classmethod] from-data [wrap-x wrap-y data]
     "Only to be used by `Map.make` or in tests; otherwise, `each-turn`
-    may not be set correctly."
+    and `phasers` may not be set correctly."
     (Map
       wrap-x wrap-y data
       :width (len data) :height (len (get data 0))
-      :each-turn []))
+      :each-turn [] :phasers []))
 
   (defmeth [classmethod] make [wrap-x wrap-y width height]
     "Create a new blank map."

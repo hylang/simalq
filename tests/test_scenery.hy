@@ -245,6 +245,47 @@
     . @ . | -"))
 
 
+(defn test-phasing []
+  (setv marks {
+    "X " "phasing wall (in phase)"
+    "o " "phasing wall (out of phase)"
+    "| " "phase trigger"})
+  (init [
+    :map "
+      X X X | X X o
+      o X o @ X o o "
+    :map-marks marks])
+  (setv G.rules.reality-bubble-size 1)
+    ; Phasing occurs across the whole level.
+
+  ; Phase triggers can be triggered by sword or by arrow.
+  (wk 'N)
+  (assert-textmap :map-marks marks :text "
+    o o o | o o X
+    X o X @ o X X ")
+  (shoot 'N)
+  (assert-textmap :map-marks marks :text "
+    X X X | X X o
+    o X o @ X o o ")
+  ; You can walk through out-of-phase walls, but not in-phase walls.
+  (cant (wk 'E) "Your way is blocked.")
+  (wk 'W)
+  (assert-at 'here ['player "phasing wall (out of phase)"]))
+
+
+(defn test-phasing-iq-quest []
+  "Tiles can be constructed a little differently for IQ quests, so ensure
+  that phasing hooks are still set correctly."
+
+  (init-boot-camp 16)
+  (mv-player 11 0)
+  (assert-at [10 0] "phasing wall (out of phase)")
+  (assert-at [11 3] "phasing wall (in phase)")
+  (shoot 'W)
+  (assert-at [10 0] "phasing wall (in phase)")
+  (assert-at [11 3] "phasing wall (out of phase)"))
+
+
 (defn test-pushblock []
   (init
     [:tiles ["pushblock" "pile of gold"]])
