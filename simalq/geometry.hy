@@ -12,15 +12,28 @@
 (defdataclass Map []
   "A level layout."
 
-  :fields [wrap-x wrap-y data width height]
-    ; `wrap-x` and `wrap-y` are Booleans.
-    ; `data` is a tuple of tuples representing the squares of the map.
-    ; Each tile is itself a list representing a stack of tiles on
-    ; that square. An empty stack means that the tile has only floor.
+  :fields [
+    wrap-x wrap-y
+      ; Booleans.
+    data
+      ; A tuple of tuples representing the squares of the map. Each
+      ; tile is itself a list representing a stack of tiles on that
+      ; square. An empty stack means that the tile has only floor.
+    width height
+      ; Cached map dimensions for speed.
+    each-turn]
+      ; A list of objects on which to call `.each-turn` at the end of
+      ; each turn.
+
   :frozen T :eq F
 
   (defmeth [classmethod] from-data [wrap-x wrap-y data]
-    (Map wrap-x wrap-y data (len data) (len (get data 0))))
+    "Only to be used by `Map.make` or in tests; otherwise, `each-turn`
+    may not be set correctly."
+    (Map
+      wrap-x wrap-y data
+      :width (len data) :height (len (get data 0))
+      :each-turn []))
 
   (defmeth [classmethod] make [wrap-x wrap-y width height]
     "Create a new blank map."

@@ -30,7 +30,9 @@
             :if (in field (getattr c "field_defaults" {}))
             (get c.field-defaults field)))))))
     (when kwargs
-      (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}"))))
+      (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}")))
+    (when @pos
+      (@hook-pos-set None @pos)))
 
   (defmeth __setattr__ [name value]
     (if (in name (@all-mutable-fields))
@@ -83,19 +85,23 @@
   (defmeth rm-from-map []
     "If this tile is on a map, remove it from the map. Otherwise, do
     nothing."
+    (@hook-pos-set @pos None)
     (when (is-not @pos None)
       (.remove (at @pos) @)
       (object.__setattr__ @ "pos" None)))
 
   (defmeth move [pos]
-    (@rm-from-map)
+    (@hook-pos-set @pos pos)
+    (when (is-not @pos None)
+      (.remove (at @pos) @))
     (.insert (at pos) 0 @)
     (object.__setattr__ @ "pos" pos))
 
   (defmeth replace [new-stem]
-    (setv
-      (get (at @pos) (.index (at @pos) @))
-      ((get Tile.types new-stem) :pos @pos)))
+    (setv t ((get Tile.types new-stem) :pos @pos))
+    (setv (get (at @pos) (.index (at @pos) @)) t)
+    (object.__setattr__ @ "pos" None)
+    (@hook-pos-set t.pos None))
 
   ; The below variables and methods may be overridden by subclasses.
 
@@ -153,6 +159,11 @@
     "Return a list of bulleted items for an info screen. `None`s
     in this list will be filtered out by the caller."
     bullets)
+
+  (defmeth hook-pos-set [old new]
+    "Called whenever `@pos` changes, or is set to a non-`None` value
+    for the first time."
+    None)
 
   (defmeth hook-player-bump [origin]
     "Called when the player tries to walk towards this tile. Return
@@ -291,17 +302,17 @@
   "Like `Actor`, but the method can still fire outside the reality
   bubble, and it goes after all actors."
 
-  (defmeth __init__ [#** kwargs]
-    (.__init__ (super) #** kwargs)
-    (.append G.each-turn @))
+  (defmeth hook-pos-set [old new]
+    (when (and (or old new) (not (and old new (is old.map new.map))))
+      (when old
+        (.remove old.map.each-turn @))
+      (when new
+        (.append new.map.each-turn @))))
 
   (defmeth [classmethod] run-all []
-    "Run all currently registered hooks. Unless an object is neither
-    on this level nor in the player's inventory, in which case, kick
-    the object off the list."
-    (for [o (list G.each-turn)]
-      (unless (or (in o G.player.inventory) (and o.pos (is o.pos.map G.map)))
-        (.remove G.each-turn o))
+    "Run all hooks for items on the current map."
+    (for [o (list G.map.each-turn)]
+        ; Call `list` in case `G.map.each-turn` is mutated during the loop.
       (.each-turn o)))
 
   (defmeth each-turn []
