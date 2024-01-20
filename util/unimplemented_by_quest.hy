@@ -25,8 +25,10 @@ each level."
   (do
     (setv v (get qts (get sys.argv 1)))
     (print "Tile types not implemented per level:")
+    (setv seen #{})
     (for [[i stems] (enumerate v)]
-      (print (+ i 1) stems)))
+      (print (+ i 1) (sorted (- (set stems) seen)))
+      (.update seen stems)))
   (do
     (print "Distinct tile types not implemented:")
     (print (.sort-values (pd.concat (gfor
