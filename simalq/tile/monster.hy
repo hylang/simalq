@@ -624,7 +624,11 @@
 
 (deftile "O " "a blob" [Summoner Wanderer]
   :iq-ix 48
-  :destruction-points 0
+  :destruction-points 3
+  :score-for-damaging T
+    ; In IQ, blobs are worth no points. I've given them points, but
+    ; enabled `score-for-damaging` so you aren't penalized for killing
+    ; them before they divide down to 1 HP.
 
   :immune #(MundaneArrow MagicArrow)
   :damage-melee 6
