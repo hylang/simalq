@@ -3,6 +3,7 @@
   simalq.macros [defmeth]
   simalq.tile [deftile])
 (import
+  fractions [Fraction :as f/]
   simalq.color :as color
   simalq.util [CommandError DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction at burst dist dir-to ray]
@@ -658,6 +659,33 @@
     (@rm-from-map))
 
   :flavor "This spiderweb is the size of a really big spiderweb. Until Idok cleans up the dungeon properly, you'll have to tediously carve your way through the webs with your sword. Got any recommendations for a good smitemaster?")
+
+
+(defclass PoisonPlate [Trap]
+  "A replacement for IQ's poisonous amulets and counterpoison amulets.
+  I've made them into traps so that it makes more sense that their
+  effect is level-limited rather than time-limited. The way the
+  numbers work are also pretty different for better compatibility with
+  arbitrary nonnegative poison intensities."
+
+  (setv poison-multiplier None)
+  (defmeth hook-player-walked-into []
+    (doc f"Multiplies this level's ambient poison factor by {@poison-multiplier} and destroys the tile.")
+    (*= G.level.poison-intensity @poison-multiplier)
+    (@rm-from-map))
+
+  (setv flavor "Finally, some controls for the poison vents. But it's not very precise, and it can only be triggered once."))
+
+(deftile "<>" "a poison pressure plate" PoisonPlate
+  :color 'dark-green
+  :iq-ix 150
+  :poison-multiplier (f/ 2))
+
+(deftile "<>" "a poison-protecting pressure plate" PoisonPlate
+  :color 'navy
+  :iq-ix 149
+  :poison-multiplier (f/ 1 2))
+
 
 (deftile ", " "a broken trap" Trap
   :iq-ix #(

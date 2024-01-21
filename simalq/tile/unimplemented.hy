@@ -24,8 +24,6 @@
     [141 "phasing_wall_trap"]
     [143 "phase_wand"]
     [146 "fire_fountain"]
-    [149 "counterpoison_amulet"]
-    [150 "poisonous_amulet"]
     [151 "passwall_amulet"]
     [152 "random_gate"]
     [154 "wand_of_flame"]

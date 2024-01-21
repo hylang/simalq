@@ -93,6 +93,9 @@
   (check "exit"                  T T)
   (check "wallfall trap"         T T)
   (check "hole"                  T T)
+  (check "poison pressure plate" T T)
+    ; The IQ equivalent of this tile, the poisonous amulet, is an item
+    ; and hence blocks shots.
   (check "magical energy shield" T F)
   (check "broken pillar"         T F)
   (check "open portcullis"       T T)

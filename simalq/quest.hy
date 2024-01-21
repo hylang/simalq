@@ -34,11 +34,10 @@
   :fields [
     n title player-start next-level
     poison-intensity time-limit exit-speed moving-exit-start
-    map]
+    map])
   ; Poison intensity is a fraction.Fraction, the amount of poison to
   ; dose the player with per turn, which converts to poison damage
   ; once it gets ≥ 1.
-  :frozen T)
 
 (defn start-level [level-n [show-title T]]
   (when (> level-n (len G.quest.levels))

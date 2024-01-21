@@ -587,3 +587,24 @@
   (wk 'E)
   (assert-at 'here 'player)
   (assert (= (get G.player.status-effects StatusEffect.Para) 2)))
+
+
+(defn test-poison-plate []
+  (init [
+    :tiles ["poison pressure plate" "poison-protecting pressure plate"]
+    :poison-intensity (f/ 3 7)])
+
+  (assert (= G.level.poison-intensity (f/ 3 7)))
+  ; Step on the poison plate, doubling the ambient poison and
+  ; destroying the plate.
+  (wk 'E)
+  (assert (= G.level.poison-intensity (f/ 6 7)))
+  (assert-at 'here ['player])
+  ; Halve it back.
+  (wk 'E)
+  (assert (= G.level.poison-intensity (f/ 3 7)))
+  (assert-at 'here ['player])
+  ; Tris took 6/7 poison at the end of turn 0 and 3/7 poison at the
+  ; end of turn 1. The sum is 1 + 2/7.
+  (assert (= G.player.hp (- 100 1)))
+  (assert (= G.player.poison-dose (f/ 2 7))))
