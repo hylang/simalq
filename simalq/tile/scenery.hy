@@ -630,16 +630,33 @@
 
   :flavor "The special thing about this wall is that it can be destroyed by wallfall traps of the corresponding type.\n\nWhat's the deal with monster closets? Monsters are proud of who they are, am I right? I'll be here all week.")
 
-(deftile "<>" "a fixed damaging trap" Trap
+
+(defclass DamagingTrap [Trap]
+
+  (setv trap-damage 5)
+  (setv one-shot? F)
+
+  (defmeth hook-player-walked-into []
+    (doc (+ f"Does {@trap-damage} damage." (if @one-shot?
+      " Then, the tile is destroyed."
+      "")))
+    (.damage G.player @trap-damage DamageType.Trap)
+    (when @one-shot?
+      (@rm-from-map))))
+
+(deftile "<>" "a fixed damaging trap" DamagingTrap
   :color 'red
   :iq-ix 35  ; damage-causing trap
 
-  :hook-player-walked-into (meth []
-    (doc f"Does {trap-damage} damage.")
-    (.damage G.player trap-damage DamageType.Trap))
-
   :flavor "A dense assortment of pointy, painful objects that can penetrate the toughest footwear.")
-(setv trap-damage 5)
+
+(deftile "<>" "a one-shot damaging trap" DamagingTrap
+  :color 'dark-orange
+  :iq-ix 199  ; random-damage trap
+
+  :one-shot? T
+  :flavor "A tiny hole in the floor that shoots a ball bearing in your eye with uncanny accuracy. Fortunately, it has only one shot.")
+
 
 (deftile "<>" "a paralysis trap" Trap
   :color 'purple

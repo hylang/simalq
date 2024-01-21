@@ -58,7 +58,6 @@
     [196 "wyrm"]
     [197 "dragon"]
     [198 "wand_of_remote_action"]
-    [199 "random_damage_trap"]
     [201 "weakness_trap"]
     [202 "rotation_trap"]
     [203 "krogg"]

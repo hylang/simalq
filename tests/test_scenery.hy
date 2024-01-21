@@ -547,7 +547,7 @@
 
 (defn test-damaging-trap []
   (init
-    [:tiles ["fixed damaging trap"]])
+    [:tiles ["fixed damaging trap" "one-shot damaging trap"]])
 
   (assert (= G.player.hp 100))
   ; Step on the trap, taking 5 damage.
@@ -557,7 +557,13 @@
   ; trap remains.
   (wait)
   (assert (= G.player.hp 95))
-  (assert-at 'here ['player "fixed damaging trap"]))
+  (assert-at 'here ['player "fixed damaging trap"])
+  ; The other kind of damaging trap is destroyed after being triggered
+  ; once.
+  (assert-at 'E "one-shot damaging trap")
+  (wk 'E)
+  (assert (= G.player.hp 90))
+  (assert-at 'here 'player))
 
 
 (defn test-paralysis-trap []
