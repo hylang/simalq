@@ -22,7 +22,6 @@
     [134 "siren"]
     [141 "phasing_wall_trap"]
     [143 "phase_wand"]
-    [146 "fire_fountain"]
     [151 "passwall_amulet"]
     [152 "random_gate"]
     [154 "wand_of_flame"]

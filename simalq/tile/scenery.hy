@@ -137,7 +137,12 @@
   :flavor "Unshaped matter of the realm outside time and space. Mortal magic can't so much as make a dent in it.")
 
 (deftile "| " "a pillar" Scenery
-  :iq-ix 12
+  :iq-ix #(
+    12   ; pillar
+    146) ; fire fountain
+      ; Replacing fire fountains with pillars is not entirely
+      ; cosmetic. For example, IQ's fire fountains aren't affected by
+      ; passwall wands.
   :blocks-move T
   :destructible-by-passwall-wand T
   :flavor "A structure of vaguely Roman style.")
