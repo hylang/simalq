@@ -387,14 +387,17 @@
   (init [
     :map "
       ██d ██☉G██D
-      G ██o ##i ██
-      ██t ██☉o██K
+      t ██o ##i ██
+      ██G ██☉o██K
       @ ██N ██s ██"
     :map-marks map-marks])
 
   (setv hp (int 1e20))
-  (for [x (range G.map.width)  y (range G.map.height)  :if (= (% (+ x y) 2) 0)]
-      (setv (. (top [x y]) hp) hp))
+  (for [
+      x (range G.map.width)
+      y (range G.map.height)
+      :if (= (% (+ x y) 2) 0)]
+    (setv (. (top [x y]) hp) hp))
 
   (use-item "wand of death" 2 2)
   ; Undead, undead generators, cracked walls, and (contra IQ) negatons
@@ -402,11 +405,13 @@
   ; burst radius.
   (assert-textmap :map-marks map-marks :text "
     ██. ██☉G██D
-    G ██. ##. ██
-    ██. ██. ██K
+    . ██. ##. ██
+    ██G ██. ██K
     @ ██N ██s ██")
   ; Tris doesn't die instantly, but she does take 25 damage.
-  (assert (= G.player.hp (- hp 25))))
+  (assert (= G.player.hp (- hp 25)))
+  ; Contra IQ, points are awarded for all kills.
+  (assert (= G.score (+ (* 12 hp) 10 (* 3 hp) (* 4 hp) (* 5 hp)))))
 
 
 (defn test-fire-bomb []
