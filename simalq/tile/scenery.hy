@@ -119,7 +119,12 @@
 
 
 (deftile "██" "a wall" Scenery
-  :iq-ix 2
+  :iq-ix #(
+    2    ; wall
+    131) ; invisible wall
+      ; Replacing invisible walls with walls is not entirely cosmetic:
+      ; IQ's invisible walls are specifically immune to passwall
+      ; amulets, albeit not passwall wands.
   :blocks-move T :blocks-diag T
   :destructible-by-passwall-wand T
   :flavor "Among the most numerous and persistent of the obstacles that stand in the way of your inevitable victory.\n\n    This man, with lime and rough-cast, doth present\n    Wall, that vile Wall which did these lovers sunder;\n    And through Wall's chink, poor souls, they are content\n    To whisper, at the which let no man wonder.")

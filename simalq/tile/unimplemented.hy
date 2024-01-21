@@ -18,7 +18,6 @@
     [121 "poison_gas_bomb"]
     [129 "archdevil"]
     [130 "exit_mobile"]
-    [131 "invisible_wall"]
     [132 "golem"]
     [134 "siren"]
     [141 "phasing_wall_trap"]

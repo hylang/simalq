@@ -202,3 +202,13 @@
   (assert-stem m 15  5 "pile of debris")  ; dimness trap
   (assert-stem m 10  3 "pile of debris")  ; darkness trap
   (assert-stem m 15 16 "broken trap"))    ; false exit
+
+
+(defn test-invisible-walls []
+  (setv m (get-level-map "Boot Camp 2" 3))
+
+  (assert-stem m  8 3 "Void")
+  (assert-stem m  9 3 "wall")
+  (assert-stem m 10 3 "wall")  ; This one is invisible in IQ.
+  (assert-stem m 11 3 "wall")
+  (assert-stem m 12 3 "Void"))
