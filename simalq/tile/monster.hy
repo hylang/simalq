@@ -691,3 +691,19 @@
   [
     ((get Tile.types "giant spider") :pos pos :hp te-v2)
     ((get Tile.types "web") :pos pos)]))
+
+
+(deftile "Z " "a turret" Stationary
+  :iq-ix 101
+    ; This is call a "fire mage" in IQ. I've reflavored it to better
+    ; fit the mechanics.
+  :destruction-points 150
+    ; In IQ, there's special code to give points for killing fire
+    ; mages with a wand of annihilation, but they're worth 0 points,
+    ; so it has no effect. I think managing to kill one should be
+    ; rewarded.
+
+  :immune #(PlayerMelee MundaneArrow MagicArrow Fire Poison)
+  :damage-shot 10
+
+  :flavor "A wretched organic structure, fashioned from fiendish flesh. It twists about to aim its toothy maw, from which it belches flame. It's immobile, but dark magics make it almost invulnerable… almost.")
