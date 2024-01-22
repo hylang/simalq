@@ -442,6 +442,31 @@
   (check  "super-bomb"    'use    3 3 2 2 1 1 0))
 
 
+(defn test-earthquake-bomb []
+  (init [
+    :map "
+       ██| #2█1
+       ↑↓#1←→.
+       @ ╷ o ."
+    :map-marks {
+      "o " ["orc" :hp 10]
+      "#1" ["cracked wall" :hp 10]
+      "#2" ["cracked wall" :hp  2]
+      "█1" "trapped wall"}])
+
+  ; An earthquake bomb does 3 damage to monsters and 2 to cracked
+  ; walls.
+  (use-item "earthquake bomb" 1 1)
+  (assert-textmap :map-marks {"##" "cracked wall"} :text "
+    ##╷ . ##
+    . ##. .
+    @ ╷ o .")
+  (assert-hp [2 0] 7)
+  (assert-hp [1 1] 8)
+  (assert-hp [0 2] 4)
+  (assert-hp [3 2] 4))
+
+
 (defn test-artifact-weapon []
 
   ; The sword artifact increases melee damage to 3. Multiple copies

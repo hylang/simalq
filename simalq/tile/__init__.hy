@@ -97,8 +97,8 @@
     (.insert (at pos) 0 @)
     (object.__setattr__ @ "pos" pos))
 
-  (defmeth replace [new-stem]
-    (setv t ((get Tile.types new-stem) :pos @pos))
+  (defmeth replace [new-stem #** kwargs]
+    (setv t ((get Tile.types new-stem) :pos @pos #** kwargs))
     (setv (get (at @pos) (.index (at @pos) @)) t)
     (object.__setattr__ @ "pos" None)
     (@hook-pos-set t.pos None))
@@ -224,6 +224,7 @@
       (un! k))))
     ~@(gfor
       [k v] (.items (dict :mapsym mapsym #** kwargs))
+      :setv k (un! k)
       ; Treat `(meth …)` and `(property-meth …)` forms specially.
       (cond
         (and (isinstance v hy.models.Expression) (= (get v 0) 'meth))
@@ -233,7 +234,7 @@
           `(hy.R.simalq/macros.defmeth [property] ~(hy.models.Symbol k)
             ~@(cut v 1 None))
         True
-          `(setv ~(hy.models.Symbol (un! k)) ~v)))))
+          `(setv ~(hy.models.Symbol k) ~v)))))
 
 
 (defn tiletype [cls]

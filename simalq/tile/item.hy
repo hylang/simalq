@@ -1,4 +1,5 @@
 (require
+  hyrule [branch]
   simalq.macros [unless defmeth]
   simalq.tile [deftile])
 (import
@@ -442,6 +443,46 @@
   :shot-blast-damage #(3 3 2 1)
 
   :flavor "Heavy ordnance. Kills monsters dead, with a bomb pattern that would put a feather in Colonel Cathcart's cap.\n\n    \"Kaboom?\"\n    \"Yes, Rico. Kaboom.\"")
+
+
+(deftile "0 " "an earthquake bomb" Usable
+  :color 'dark-orange
+  :iq-ix 157
+  :acquirement-points 200
+
+  :!quake-damage-monster 3
+  :!quake-damage-wall 2
+  :!new-cracked-wall-starting-hp 4
+  :!use-burst-size 2
+  :!shot-burst-size 1
+
+  :!bomb-burst (meth [target size]
+    (for [
+        p (burst-damage target :damage-type DamageType.Fire
+          :amount (* [@quake-damage-monster] (+ size 1))
+          :color 'dark-orange)
+        tile (list (at p))]
+      ; Contra IQ, we leave empty floor alone and don't create holes.
+      (branch (in tile.stem it)
+        ["wall" "trapped wall"]
+          (.replace tile "cracked wall" :hp @new-cracked-wall-starting-hp)
+        ["cracked wall"]
+          (.damage tile @quake-damage-wall None)
+        ["breakable wall (meridional)" "breakable wall (zonal)" "fading wall"]
+          (.rm-from-map tile)
+        ["pillar"]
+          (.replace tile "broken pillar"))))
+
+  :use (meth [target]
+    (doc f"Explodes in a size-{@use-burst-size} burst that does {@quake-damage-monster} fire damage to monsters and {@quake-damage-wall} damage to cracked walls. Furthermore, the blast turns normal walls and trapped walls into cracked walls with {@new-cracked-wall-starting-hp} HP, instantly destroys breakable walls and fading walls, and breaks pillars.")
+    (@bomb-burst target @use-burst-size))
+
+  :hook-player-shot (meth []
+    (doc f"As when used, but with a smaller size-{@shot-burst-size} burst.")
+    (@bomb-burst @pos @shot-burst-size)
+    (@rm-from-map))
+
+  :flavor "Magic and technology have combined into an explosive that can make the earth itself tremble in a limited area. The methodology was originally developed as an alternative to fracking, but it proved more useful in military applications.\n\n    You were too tricky for your own good, Thanos!")
 
 
 (defclass Artifact [Item]

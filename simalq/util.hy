@@ -155,7 +155,9 @@
   1]`, which means that 3 damage is dealt at the center, 2 damage is
   dealt at distance 1 from the center, and so on. But note that this
   damage is only dealt to non-player tiles. The player gets the
-  separate number `player-amount`, regardless of distance."
+  separate number `player-amount`, regardless of distance.
+
+  Return the result from `burst`."
 
   (import
     simalq.geometry [burst at dist]
@@ -172,4 +174,6 @@
   (for [p b  tile (at p)  :if (isinstance tile Damageable)]
     (.damage tile
       (if (is tile G.player) player-amount (get amount (dist center p)))
-      damage-type)))
+      damage-type))
+
+  b)
