@@ -262,17 +262,43 @@
       :direction (. Direction ~(hy.models.Symbol direction.abbr))))))
 
 
-(deftile "> " "the exit" Scenery
+(deftile :name "an exit" :superc Scenery
+  :field-defaults (dict
+    :level-n None)
   :color-bg 'lime
-  :iq-ix 7
+  :iq-ix [
+    7   ; normal exit
+    94] ; special exit
+
+  :mapsym (property-meth []
+    (setv n (- (@effective-level-n) G.level-n))
+    (cond
+      (< n -1) "< "
+      (= n -1) "< "
+      (= n 0)  "><"
+      (= n 1)  "> "
+      (> n 1)  ">>"))
+
+  :suffix-dict (meth []
+    {
+      (.format "{}to level" (if (<= (@effective-level-n) G.level-n)
+        "back "
+        ""))
+       (@effective-level-n)})
+
   :blocks-monster T
   :blocks-player-shots F :blocks-monster-shots F
 
-  :hook-player-walked-into (meth []
-    "Takes you to the next dungeon level. If there is no such level,
-    you win the quest."
+  :read-tile-extras (classmethod (fn [cls mk-pos v1 v2]
+    (dict :level-n v2)))
 
-    (hy.I.simalq/quest.start-level G.level.next-level)
+  :!effective-level-n (meth []
+    (if (is @level-n None) G.level.next-level @level-n))
+
+  :hook-player-walked-into (meth []
+    (doc f"Takes you to dungeon level {(@effective-level-n)}. If you're already on that level, it's refreshed. If there is no such level, you win the quest.")
+
+    (hy.I.simalq/quest.start-level (@effective-level-n))
     (setv G.player.just-exited T)
     True)
 

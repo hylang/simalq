@@ -212,3 +212,17 @@
   (assert-stem m 10 3 "wall")  ; This one is invisible in IQ.
   (assert-stem m 11 3 "wall")
   (assert-stem m 12 3 "Void"))
+
+
+(defn test-exits []
+  (setv m (get-level-map "Boot Camp 2" 14))
+
+  ; A normal exit
+  (setv [tile] (get m 10 8))
+  (assert (= tile.stem "exit"))
+  (assert (is tile.level-n None))
+
+  ; A special exit
+  (setv [tile] (get m 7 15))
+  (assert (= tile.stem "exit"))
+  (assert (= tile.level-n 15)))

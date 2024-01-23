@@ -210,7 +210,7 @@
 (defn pos-seed [pos]
   "Using a `Pos`, get a number you could use as an RNG seed. Nearby
   `Pos`es should return different values."
-  (if (is G.level-n None)
+  (if (is pos None)
     0
     (+
       (* G.level-n 1,000,003)

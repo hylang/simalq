@@ -142,7 +142,7 @@
   (assert (= G.level-n 1))
   (assert (= G.score 0))
   (setv map-was G.map)
-  (assert-at 'N "exit")
+  (assert-full-name 'N "an exit (to level 2)")
   (wk 'N)
   (assert (= G.level-n 2))
   (assert (= G.score 0))
@@ -173,7 +173,20 @@
   (init [] [] [])
   (set-square 'E #* (* ["exit"] 2))
   (wk 'E)
-  (assert (= G.level-n 2)))
+  (assert (= G.level-n 2))
+
+  ; The `level-n` field of an exit takes precedence over the
+  ; `next-level` field of the level itself.
+  (for [use-special-exit? [F T]]
+    (init
+      [
+        :map "> @ >1"
+        :map-marks {">1" ["exit" :level-n 1]}]
+      [])
+    (assert-full-name 'W "an exit (to level 2)")
+    (assert-full-name 'E "an exit (back to level 1)")
+    (wk (if use-special-exit? 'E 'W))
+    (assert (= G.level-n (if use-special-exit? 1 2)))))
 
 
 (defn test-cracked-wall []

@@ -117,6 +117,8 @@ quest definitions from other files in this directory."
         None
       (= mapsym "██")
         (mk-tile p "wall")
+      (= mapsym "> ")
+        (mk-tile p "exit")
       True (do
         (setv types (lfor
           t (.values Tile.types)

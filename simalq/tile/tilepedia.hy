@@ -3,15 +3,17 @@
   simalq.color
   simalq.game-state [G]
   simalq.tile [Tile Player]
-  simalq.display [color-tile]
-  simalq.quest [Quest start-quest])
+  simalq.display [color-tile])
 (setv  T True  F False)
 
 
 (defn get-info []
   "Compile all the tile info screens into a dictionary."
 
-  (start-quest None)  ; Initialize `G`.
+  ; Initialize `G`.
+  (hy.I.simalq/quest.start-quest (hy.I.simalq/un-iq.iq-quest "Boot Camp 2"))
+  (hy.I.simalq/quest.start-level 1)
+
   (setv tiles (lfor
     tt (.values Tile.types)
     (if (is tt Player) G.player (tt))))
