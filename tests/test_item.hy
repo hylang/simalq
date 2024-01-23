@@ -364,6 +364,31 @@
   (assert-at [3 0] "wall"))
 
 
+(defn test-wand-phase []
+  (init [])
+  (defn phase [start end]
+    (set-square 'E #* start)
+    (use-item "phase wand" 1 0)
+    (assert-at 'E #* end))
+
+  (phase
+    []
+    ["phasing wall (out of phase)"])
+  (phase
+    ["wall"]
+    ["phasing wall (out of phase)" "wall"])
+  (phase
+    ["phasing wall (out of phase)"]
+    ["phasing wall (in phase)"])
+  (phase
+    ["phasing wall (in phase)"]
+    ["phasing wall (out of phase)"])
+  ; Only the topmost phaser is affected.
+  (phase
+    ["wall" "phasing wall (in phase)" "wall" "phasing wall (out of phase)"]
+    ["wall" "phasing wall (out of phase)" "wall" "phasing wall (out of phase)"]))
+
+
 (defn test-wand-passwall []
   (init
     [:tiles ["orc" "wall" "pillar"]])

@@ -364,6 +364,20 @@
 
   :flavor "This device is detested by the stonemason's union, but valued by homeowners and combat engineers, not to mention tyrants who desire vast dungeons.")
 
+(deftile "/ " "a phase wand" Usable
+  :color 'brown
+  :iq-ix 143
+  :acquirement-points 50
+
+  :use (meth [target]
+    "If there's at least one phasing wall on the target square, then the topmost one is phase-shifted. Otherwise, a new out-of-phase wall is created."
+    (for [t (at target)  :if (isinstance t hy.I.simalq/tile/scenery.Phaser)]
+      (.phase-shift t)
+      (return))
+    (Tile.make target "phasing wall (out of phase)"))
+
+  :flavor "This attempt to create a portable phase trigger didn't entirely succeed.")
+
 (deftile "/ " "a passwall wand" Usable
   :color 'dark-green
   :iq-ix 32

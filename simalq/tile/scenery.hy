@@ -372,8 +372,11 @@
   (setv map-attr "phasers")
   (setv phase-replace None)
 
-  (defmeth poshooked-callback []
-    (@replace @phase-replace)))
+  (defmeth phase-shift []
+    (@replace @phase-replace))
+
+  (setv poshooked-callback phase-shift))
+
 
 (deftile "☯█" "a phasing wall (in phase)" Phaser
   :color #('white None)
