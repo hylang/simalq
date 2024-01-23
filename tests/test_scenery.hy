@@ -106,7 +106,7 @@
   (assert-player-at 0 0)
   (assert-at 'E "open portcullis")
   (wk 'E)
-  (assert-at 'here ['player "open portcullis"])
+  (assert-at 'here 'player "open portcullis")
   ; After an open portcullis is walked off of, it closes.
   (wk 'E)
   (assert-player-at 2 0)
@@ -129,7 +129,7 @@
   (assert (= G.score 100))
   ; Fire an arrow. Contra IQ, chests don't protect their contents
   ; from arrows.
-  (assert-at 'E ["treasure chest" "meal"])
+  (assert-at 'E "treasure chest" "meal")
   (shoot 'E)
   (assert-at 'E "treasure chest"))
 
@@ -283,7 +283,7 @@
   ; You can walk through out-of-phase walls, but not in-phase walls.
   (cant (wk 'E) "Your way is blocked.")
   (wk 'W)
-  (assert-at 'here ['player "phasing wall (out of phase)"]))
+  (assert-at 'here 'player "phasing wall (out of phase)"))
 
 
 (defn test-phasing-iq-quest []
@@ -380,7 +380,7 @@
     ; for walking into the target.
     (wk 'E)
     (assert (and (= G.turn-n 1) (= G.player.pos (t))))
-    (assert-at 'here ['player "orc" "pile of gold" "exit"])
+    (assert-at 'here 'player "orc" "pile of gold" "exit")
     ; A one-shot gate is destroyed after use. A regular gate perseveres.
     (assert-at [1 0] (if one-shot? 'floor "gate"))))
 
@@ -395,7 +395,7 @@
 
   (wk 'E)
   (assert-player-at 2 1)
-  (assert-at 'here ['player "orc"]))
+  (assert-at 'here 'player "orc"))
 
 
 (defn test-teleporter []
@@ -405,7 +405,7 @@
   (init
     [:tiles ["teleporter"]])
   (wk 'E)
-  (assert-at 'here ['player "teleporter"])
+  (assert-at 'here 'player "teleporter")
   ; Teleporters can't be walked past diagonally.
   (wk 'E)
   (cant (wk 'NW) "That diagonal is blocked by a neighbor.")
@@ -570,7 +570,7 @@
   ; trap remains.
   (wait)
   (assert (= G.player.hp 95))
-  (assert-at 'here ['player "fixed damaging trap"])
+  (assert-at 'here 'player "fixed damaging trap")
   ; The other kind of damaging trap is destroyed after being triggered
   ; once.
   (assert-at 'E "one-shot damaging trap")
@@ -618,11 +618,11 @@
   ; destroying the plate.
   (wk 'E)
   (assert (= G.level.poison-intensity (f/ 6 7)))
-  (assert-at 'here ['player])
+  (assert-at 'here 'player)
   ; Halve it back.
   (wk 'E)
   (assert (= G.level.poison-intensity (f/ 3 7)))
-  (assert-at 'here ['player])
+  (assert-at 'here 'player)
   ; Tris took 6/7 poison at the end of turn 0 and 3/7 poison at the
   ; end of turn 1. The sum is 1 + 2/7.
   (assert (= G.player.hp (- 100 1)))

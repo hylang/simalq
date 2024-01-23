@@ -45,13 +45,13 @@
   ; on the same square.
   (init [])
   (set-square 'E "key" "locked door")
-  (assert-at 'E ["key" "locked door"])
+  (assert-at 'E "key" "locked door")
   (setv G.player.keys G.rules.max-keys)
   (wk 'E)
-  (assert-at 'E ["key" "door"])
+  (assert-at 'E "key" "door")
   (assert (= G.player.keys (- G.rules.max-keys 1)))
   (wk 'E)
-  (assert-at 'here ['player "door"]))
+  (assert-at 'here 'player "door"))
 
 
 (defn test-magic-arrow []
@@ -311,8 +311,8 @@
   ; if something else is there, unlike IQ). Monsters can't move onto
   ; the shields.
   (use-item "wand of shielding")
-  (assert-at 'W ["magical energy shield" "pile of gold"])
-  (assert-at 'NW ["magical energy shield" "wall"])
+  (assert-at 'W "magical energy shield" "pile of gold")
+  (assert-at 'NW "magical energy shield" "wall")
   (assert-at 'N "magical energy shield")
   (assert-at 'NE "magical energy shield")
   (assert-at 'E "magical energy shield")
@@ -328,9 +328,9 @@
     (assert (= G.turn-n turn-n))
     (setv old (if old ["magical energy shield"] []))
     (setv new (if new ["magical energy shield"] []))
-    (assert-at 'here ['player #* old])
-    (assert-at 'NE [#* new])
-    (assert-at 'E [#* old #* new]))
+    (assert-at 'here 'player #* old)
+    (assert-at 'NE #* new)
+    (assert-at 'E #* old #* new))
   (use-item "wand of shielding")
   (check 3 T T)
   ; Shields protect for 12 turns, so the first set (created on turn 0,
@@ -355,11 +355,11 @@
   ; Unlike IQ, walls can be added regardless of what's already on the
   ; target square.
   (use-item "wall-making wand" 0 0)
-  (assert-at [0 0] ["wall" 'player])
+  (assert-at [0 0] "wall" 'player)
   (use-item "wall-making wand" 1 0)
-  (assert-at [1 0] ["wall" "orc"])
+  (assert-at [1 0] "wall" "orc")
   (use-item "wall-making wand" 2 0)
-  (assert-at [2 0] ["wall" "wall"])
+  (assert-at [2 0] "wall" "wall")
   (use-item "wall-making wand" 3 0)
   (assert-at [3 0] "wall"))
 
@@ -374,7 +374,7 @@
   (use-item "passwall wand" 3 0)
   (assert-at [3 0] 'floor)
   (set-square [3 0] "wall" "wall")
-  (assert-at [3 0] ["wall" "wall"])
+  (assert-at [3 0] "wall" "wall")
   (use-item "passwall wand" 3 0)
   (assert-at [3 0] "wall"))
 

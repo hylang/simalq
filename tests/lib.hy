@@ -48,18 +48,15 @@
   (for [tile-spec (reversed tile-specs)]
     (mk-tile p tile-spec)))
 
-(defn assert-at [locator thing]
+(defn assert-at [locator #* things]
   (setv stack (at (locate locator)))
-  (if (= thing 'floor)
+  (if (= things #('floor))
     (assert (= (len stack) 0))
-    (do
-      (unless (isinstance thing list)
-        (setv thing [thing]))
-      (assert (=
-        (lfor
-          tile stack
-          (if (is tile G.player) 'player tile.stem))
-        thing)))))
+    (assert (=
+      (tuple (gfor
+        tile stack
+        (if (is tile G.player) 'player tile.stem)))
+      things))))
 
 (defn assert-textmap [#* args #** kwargs]
   "Check that the current map looks like the given text map: it has the same

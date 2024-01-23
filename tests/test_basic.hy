@@ -46,7 +46,7 @@
   ; Walk into the (plain) door to the east.
   (wk 'NE)
   (wk 'E 3)
-  (assert-at 'here ['player "door"])
+  (assert-at 'here 'player "door")
   ; Try walking diagonally past the wall to the north.
   (cant (wk 'NE) "That diagonal is blocked by a neighbor.")
 
@@ -129,7 +129,7 @@
   ; without hitting anything in it.
   (mk-tile G.player.pos "orc")
   (shoot 'E)
-  (assert-at 'here ["orc" 'player]))
+  (assert-at 'here "orc" 'player))
 
 
 (defn test-ambient-poison []

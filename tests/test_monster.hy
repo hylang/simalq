@@ -170,7 +170,7 @@
       ; If dainty-monsters mode is off, they can step on e.g. items.
       (do
         (wait 1)
-        (assert-at 'E ["orc" "pile of gold"])))
+        (assert-at 'E "orc" "pile of gold")))
 
     ; Either way, monsters block each other.
     (assert-at [4 0] "orc")
@@ -685,10 +685,10 @@
     [:tiles ['floor "web" "giant spider"]])
   ; A spider can walk onto webs.
   (wk 'E)
-  (assert-at 'E ["giant spider" "web"])
+  (assert-at 'E "giant spider" "web")
   ; It also creates a web if it steps onto a tile without one.
   (wk 'W)
-  (assert-at 'E ["giant spider" "web"])
+  (assert-at 'E "giant spider" "web")
   ; The web is created where it goes to, not where it came from.
   (assert-at [3 0] 'floor)
 
@@ -697,7 +697,7 @@
     [:tiles ["wall" "giant spider"]])
   (assert-at [2 0] "giant spider")
   (wait)
-  (assert-at [2 0] ["giant spider" "web"]))
+  (assert-at [2 0] "giant spider" "web"))
 
 
 (defn test-turret []
