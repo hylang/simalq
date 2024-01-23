@@ -1,3 +1,6 @@
+(require
+  simalq.macros [defmeth]
+  simalq.tile [deftile])
 (import
   dataclasses [dataclass]
   simalq.tile [Tile])
@@ -6,10 +9,19 @@
 
 (defclass UnimplementedTile [Tile]
   "An IQ tile type that we don't yet meaningfully implement or
-  substitute, but we can put in `Tile.Tile.types-by-iq-ix` as a
-  stub.")
+  substitute, but we can put in `Tile.types-by-iq-ix` as a stub."
 
-(for [[iq-ix stem] [
+  (setv fields ["tile_extras"])
+
+  (defmeth __init__ [[pos None] [tile-extras None]]
+    (object.__setattr__ @ "pos" pos)
+    (object.__setattr__ @ "tile_extras" tile-extras))
+
+  (defn [classmethod] read-tile-extras [cls mk-pos a b]
+    (dict :tile-extras #(a b))))
+
+
+(do-mac `(do ~@(gfor [iq-ix stem] [
 
     [94 "exit_to_level_"]
     [104 "wand_of_annihilation"]
@@ -66,20 +78,7 @@
     [208 "wall_making_trap"]
     [209 "snitch"]
     [210 "dark_king"]
-    [211 "lord_of_the_undead"]]]
+    [211 "lord_of_the_undead"]]
 
-  (assert (not-in iq-ix Tile.types-by-iq-ix))
-  (setv cls (type
-    stem
-    #(UnimplementedTile)
-    (dict
-      :fields ["tile_extras"]
-      :__init__ (fn [self * pos [tile-extras None]]
-        (object.__setattr__ self "pos" pos)
-        (object.__setattr__ self "tile_extras" tile-extras))
-      :stem stem
-      :read-tile-extras (classmethod (fn [cls mk-pos a b]
-        (dict :tile-extras #(a b)))))))
-  (setv (get Tile.types-by-iq-ix iq-ix) cls)
-  ; Add a global variable for the class so `pickle` can find it.
-  (setv (get (globals) stem) cls))
+  `(deftile "� " ~stem UnimplementedTile
+    :iq-ix ~iq-ix))))
