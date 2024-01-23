@@ -715,9 +715,9 @@
   (set-square 'N "cloak of invisibility")
   (wk 'N)
   (assert (= G.player.hp 70))
-  (setv G.score 0)
 
   ; Contra IQ, killing a turret with a wand of death scores points.
+  (setv G.score 0)
   (use-item "wand of death" 0 0)
   (assert-at 'NE 'floor)
   (assert (= G.score 150)))
