@@ -240,7 +240,7 @@
       :summon-frequency (f/ 1)
       :summon-hp 3]}]
 
-9 [:title "Some levels have a time limit. When you run out of time, you automatically advance to the next level."
+9 [:title "Some levels have a time limit. When you run out of time, you automatically change to the dungeon level indicated in the status bar."
   :time-limit 15
   :map "
      ▒▒▒▒▒▒▒▒▒▒⏲ ▒▒▒▒▒▒▒▒▒▒

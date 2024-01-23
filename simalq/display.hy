@@ -241,7 +241,7 @@
       (when poison
         (+ "☠ " (mixed-number poison)))
       (when G.time-left
-        (.format "⏲ {:,}" G.time-left))
+        (.format "⏲ {:,} (→ DL {:,})" G.time-left G.level.next-level))
       (when G.player.keys
         (.format "⚷ {}" G.player.keys))
       (when G.player.magic-arrows (+
