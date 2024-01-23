@@ -25,10 +25,14 @@
       (object.__setattr__ @ field
         (if (in field kwargs)
           (.pop kwargs field)
-          (deepcopy (next (gfor
-            c (. (type @) __mro__)
-            :if (in field (getattr c "field_defaults" {}))
-            (get c.field-defaults field)))))))
+          (do
+            (setv defaults (lfor
+              c (. (type @) __mro__)
+              :if (in field (getattr c "field_defaults" {}))
+              (get c.field-defaults field)))
+            (if (len defaults)
+              (deepcopy (get defaults 0))
+              (raise (ValueError f"No value for field {field}")))))))
     (when kwargs
       (raise (TypeError f"Illegal arguments: {(hy.repr kwargs)}")))
     (when @pos
