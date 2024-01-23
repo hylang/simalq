@@ -43,7 +43,7 @@
   "Remove all tiles at the given square, then add new ones as
   requested."
   (setv p (locate locator))
-  (for [tile (at p)]
+  (for [tile (list (at p))]
     (.rm-from-map tile))
   (for [tile-spec (reversed tile-specs)]
     (mk-tile p tile-spec)))
