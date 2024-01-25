@@ -371,9 +371,10 @@
 
   :use (meth [target]
     "If there's at least one phasing wall on the target square, then the topmost one is phase-shifted. Otherwise, a new out-of-phase wall is created."
-    (for [t (at target)  :if (isinstance t hy.I.simalq/tile/scenery.Phaser)]
-      (.phase-shift t)
-      (return))
+    (for [t (at target)]
+      (when (isinstance t hy.I.simalq/tile/scenery.PhasingWall)
+        (.phase-shift t)
+        (return)))
     (Tile.make target "phasing wall (out of phase)"))
 
   :flavor "This attempt to create a portable phase trigger didn't entirely succeed.")

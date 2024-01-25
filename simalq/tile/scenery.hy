@@ -367,9 +367,9 @@
       :mapsym ~(.join "" (gfor  d directions  (get Direction.arrows d)))))))
 
 
-(defclass Phaser [Scenery PosHooked]
+(defclass PhasingWall [Scenery PosHooked]
 
-  (setv map-attr "phasers")
+  (setv map-attr "phasing_walls")
   (setv phase-replace None)
 
   (defmeth phase-shift []
@@ -377,8 +377,7 @@
 
   (setv poshooked-callback phase-shift))
 
-
-(deftile "☯█" "a phasing wall (in phase)" Phaser
+(deftile "☯█" "a phasing wall (in phase)" PhasingWall
   :color #('white None)
   :color-bg #('black None)
   :iq-ix 139
@@ -389,7 +388,7 @@
 
   :flavor "An all but completely ordinary wall. It can be temporarily warped out of existence by various devices, such as a phase trigger.")
 
-(deftile "☯ " "a phasing wall (out of phase)" Phaser
+(deftile "☯ " "a phasing wall (out of phase)" PhasingWall
   :color 'light-gray
   :iq-ix 140
   :blocks-player-shots F
@@ -405,12 +404,12 @@
 
   :hook-player-bump (meth [origin]
     (doc f"Phase-shifts all phasing walls on the level.")
-    (Phaser.run-all)
+    (PhasingWall.run-all)
     True)
 
   :hook-player-shot (meth []
     "As when bumped."
-    (Phaser.run-all))
+    (PhasingWall.run-all))
 
   :flavor "An immobile switch that toggles phasing walls. Tris's expertise in target shooting allows her to trigger one of these with a single arrow.")
 
