@@ -131,6 +131,7 @@
     Ivis  "invisibility"
     Fast  "haste"
     Pois  "poisonous touch"
+    Pass  "passwall"
     MKey  "magical key"
     Prot  "protection")
   (defmeth [property] bad []

@@ -79,12 +79,13 @@
   (assert (= G.player.pos (Pos G.map x y))))
 
 
-(defmacro cant [form msg-check]
+(defmacro cant [form [msg-check None]]
   (setv e (hy.gensym))
   `(do
     (with [~e (hy.I.pytest.raises hy.I.simalq/util.CommandError)]
       ~form)
-    (assert (= (. ~e value args [0]) ~msg-check))))
+    ~@(when msg-check
+      [`(assert (= (. ~e value args [0]) ~msg-check))])))
 
 
 (defn wk [direction-abbr [n-times 1]]

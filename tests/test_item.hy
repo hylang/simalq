@@ -3,7 +3,7 @@
   tests.lib [cant])
 (import
   fractions [Fraction :as f/]
-  tests.lib [init init-boot-camp assert-at assert-hp assert-textmap set-square mv-player wk shoot wait use-item top]
+  tests.lib [init init-boot-camp assert-at assert-player-at assert-hp assert-textmap set-square mv-player wk shoot wait use-item top]
   simalq.geometry [Pos Direction at]
   simalq.game-state [G]
   simalq.quest-definition [mk-tile])
@@ -202,6 +202,54 @@
   (check 40 100)
   (wait)
   (check 41 97))
+
+
+(defn test-passwall-amulet []
+
+  (defn ok [tile [can-pass-thru? True]]
+    (init
+      [:tiles ["passwall amulet" tile]])
+    (wk 'E)
+    (if can-pass-thru?
+      (do
+        (wk 'E 2)
+        (assert-player-at 3 0))
+      (cant (wk 'E))))
+
+  (ok "wall")
+  (ok "trapped wall")
+  (ok "cracked wall")
+  (ok "breakable wall (zonal)")
+  (ok "pillar")
+  (ok "broken pillar")
+  (ok "locked door")
+  (ok "locked disappearing door")
+  (ok "one-way door (west)")
+  (ok "closed portcullis")
+  (ok "phasing wall (in phase)")
+
+  (ok "Void" F)
+  (ok "water fountain" F)
+  (ok "treasure chest" F))
+
+
+(defn test-passwall-diag []
+  "Passwall allows you to ignore diagonal blockers that you would be
+  able to walk through, but not other diagonal blockers (contra IQ)."
+
+  (init [
+    :map "
+       . ██.
+       @ ! ██"
+    :map-marks
+      {"! " "passwall amulet"}])
+
+  (wk 'E)
+  (wk 'NE)
+  (assert-player-at 2 1)
+  (mv-player 1 0)
+  (set-square 'N "Void")
+  (cant (wk 'NE) "That diagonal is blocked by a neighbor."))
 
 
 (defn test-potion-of-speed []

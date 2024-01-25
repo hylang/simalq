@@ -5,7 +5,7 @@
 (import
   fractions [Fraction :as f/]
   simalq.color :as color
-  simalq.util [CommandError DamageType next-in-cycle StatusEffect]
+  simalq.util [CommandError DamageType next-in-cycle StatusEffect player-status]
   simalq.geometry [Pos Direction at burst dist dir-to ray]
   simalq.tile [Tile PosHooked EachTurner Damageable]
   simalq.game-state [G])
@@ -22,6 +22,7 @@
       ; Block diagonal movement between orthogonally adjacent squares.
     blocks-monster F
       ; Block monster movement, even if `blocks-move` is false.
+    passwallable F
     wand-destructible F
     protects-vs-poison-air F
     emits-poison-air F)
@@ -54,6 +55,8 @@
           "Blocks your shots, but not monsters' shots"
         @blocks-monster-shots
           "Blocks monsters' shots, but not your shots")
+      (when @passwallable
+        "Permeable with a passwall amulet")
       (when @wand-destructible
         "Destructible with a wall-destroying wand")
       (when @superblock
@@ -100,7 +103,8 @@
           (and
             (isinstance tile Scenery)
             tile.blocks-diag
-            (not-in tile.stem ethereal-to)))))
+            (not-in tile.stem ethereal-to)
+            (not (and tile.passwallable (player-status 'Pass)))))))
       'blocked-diag
     (nogo? target monster? ethereal-to)
       'bump
@@ -115,7 +119,8 @@
       (isinstance tile hy.I.simalq/tile.Monster)
       (and (isinstance tile Scenery) (or
         (and monster? tile.blocks-monster)
-        tile.blocks-move)))))))
+        (and tile.blocks-move (or monster?
+          (not (and tile.passwallable (player-status 'Pass))))))))))))
 
 
 (deftile "██" "a wall" Scenery
@@ -126,6 +131,7 @@
       ; IQ's invisible walls are specifically immune to passwall
       ; amulets, albeit not wall-destroying wands.
   :blocks-move T :blocks-diag T
+  :passwallable T
   :wand-destructible T
   :flavor "Among the most numerous and persistent of the obstacles that stand in the way of your inevitable victory.\n\n    This man, with lime and rough-cast, doth present\n    Wall, that vile Wall which did these lovers sunder;\n    And through Wall's chink, poor souls, they are content\n    To whisper, at the which let no man wonder.")
 
@@ -144,12 +150,14 @@
       ; cosmetic. For example, IQ's fire fountains aren't affected by
       ; wall-destroying wands.
   :blocks-move T
+  :passwallable T
   :wand-destructible T
   :flavor "A structure of vaguely Roman style.")
 
 (deftile "╷ " "a broken pillar" Scenery
   :iq-ix 82
   :blocks-move T :blocks-player-shots F
+  :passwallable T
   :wand-destructible T
   :flavor "It's just a chest-high half of a pillar now. Good thing it wasn't load-bearing, huh? It makes for good cover against enemy shots.")
 
@@ -187,12 +195,14 @@
 (deftile "++" "a locked door" LockedDoor
   :color 'navy
   :iq-ix 6
+  :passwallable T
   :result-when-opened "door"
   :flavor "Fortunately, Tris knows how to pick locks. Unfortunately, she was wearing her hair down when she got whisked away to the dungeon, so she doesn't have any hairpins. You may have to use a key.")
 
 (deftile "++" "a locked disappearing door" LockedDoor
   :color 'steel-blue
   :iq-ix 81
+  :passwallable T
   :result-when-opened None
   :flavor "This advanced door destroys not only the key used to unlock it, but also itself. A true marvel of engineering.")
 
@@ -200,6 +210,7 @@
   :color 'navy
   :iq-ix 103
   :blocks-player-shots F :blocks-monster-shots F
+  :passwallable T
   :result-when-opened "open portcullis"
   :flavor "Finally, a kind of door that can be locked more than once. The keys are still really fragile, though.")
 
@@ -234,6 +245,7 @@
 
   (setv
     blocks-monster T
+    passwallable T
     direction None
     color #('brown 'red))
 
@@ -312,6 +324,7 @@
     {3 4  4 2  15 6}]
 
   :blocks-move T :blocks-diag T :blocks-player-shots F
+  :passwallable T
   :wand-destructible T
   :immune #(DamageType.Poison DamageType.Fire DamageType.DeathMagic)
 
@@ -323,6 +336,7 @@
   (setv
     blocks-monster T
     blocks-diag T
+    passwallable T
     wand-destructible T
     color 'white
     color-bg 'black)
@@ -382,6 +396,7 @@
   :color-bg #('black None)
   :iq-ix 139
   :blocks-move T :blocks-diag T
+  :passwallable T
   :wand-destructible T
 
   :phase-replace "phasing wall (out of phase)"
@@ -656,6 +671,7 @@
   :suffix-dict (meth []
     (dict :type @wallnum))
   :blocks-move T :blocks-diag T
+  :passwallable T
   :wand-destructible T
   :info-bullets (meth [#* extra]
     (.info-bullets (super)

@@ -11,7 +11,7 @@
   simalq.geometry [Direction Pos at dist]
   simalq.game-state [G]
   simalq.tile [Damageable]
-  simalq.tile.scenery [walkability]
+  simalq.tile.scenery [Scenery walkability]
   simalq.save-load [save-game-to-slot get-saves-list load-game])
 (setv  T True  F False)
 
@@ -200,27 +200,36 @@
       None
 
     [Walk UseControllableTeleporter] (do
+      (defn pat [pos]
+        "`at`, but excluding tiles we should ignore due to passwall."
+        (gfor
+          tile (at pos)
+          :if (not (and
+            (isinstance tile Scenery)
+            tile.passwallable
+            (player-status 'Pass)))
+          tile))
       (setv d action.direction)
       (setv [target wly] (walkability G.player.pos d :monster? F))
       (when (= wly 'out-of-bounds)
         (raise (CommandError "The border of the dungeon blocks your movement.")))
       (when (= wly 'blocked-diag)
         (raise (CommandError "That diagonal is blocked by a neighbor.")))
-      (for [tile (at target)]
+      (for [tile (pat target)]
         (when (.hook-player-bump tile G.player.pos)
           (return)))
       (when (= wly 'bump)
         (raise (CommandError "Your way is blocked.")))
-      (for [tile (at G.player.pos)]
+      (for [tile (pat G.player.pos)]
         (.hook-player-walk-from tile target))
-      (for [tile (at target)]
+      (for [tile (pat target)]
         (.hook-player-walk-to tile G.player.pos))
       ; No exceptions have stopped us, so go.
       (setv pos-was G.player.pos)
       (.move G.player target)
-      (for [tile (at pos-was)]
+      (for [tile (pat pos-was)]
         (.hook-player-walked-from tile))
-      (for [tile (at target)]
+      (for [tile (pat target)]
         (when (.hook-player-walked-into tile)
           (return))))
 

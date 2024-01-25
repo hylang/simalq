@@ -266,6 +266,18 @@
     f"Makes you invulnerable for {@duration} more turns, protecting you from all damage and ambient poison, but not harmful status effects or disenchantment.")
   :flavor "A star-shaped pendant with two black spots in the center. Its magic is short-lived but potent indeed.")
 
+(deftile "! " "a passwall amulet" StatusEffectItem
+  :color 'dark-orange
+  :iq-ix 151
+  :acquirement-points 150
+
+  :effect 'Pass
+  :duration 20
+
+  :help (meth []
+    f"Makes you semi-material for {@duration} more turns, allowing you to walk through walls (plus other scenery types noted as affected by a passwall amulet). You ignore most properties of the affected scenery, such as a one-way door's restrictions on movement direction, or a locked door's consumption of a key.")
+  :flavor "Looks like the ethereal power of one of those many, many evil undead phantasms rubbed off onto this little trinket. Try not to let the magic run out when you're entirely surrounded by walls. Getting buried alive is a bad way to go.")
+
 (deftile "! " "a potion of speed" StatusEffectItem
   :color 'dark-green
   :iq-ix 34
