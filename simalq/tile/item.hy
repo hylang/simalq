@@ -379,15 +379,17 @@
 
   :flavor "This attempt to create a portable phase trigger didn't entirely succeed.")
 
-(deftile "/ " "a passwall wand" Usable
+(deftile "/ " "a wall-destroying wand" Usable
   :color 'dark-green
   :iq-ix 32
+    ; IQ calls this a "passwall wand", not to be confused with
+    ; passwall amulets, which follow different rules.
   :acquirement-points 150
 
   :use (meth [target]
-    "Destroys one tile of wall, or other scenery types noted as destructible with a passwall wand."
+    "Destroys one tile of wall, or other scenery types noted as affected by wall destruction."
     (for [tile (at target)]
-      (when (and (isinstance tile Scenery) tile.destructible-by-passwall-wand)
+      (when (and (isinstance tile Scenery) tile.wand-destructible)
         (.rm-from-map tile)
         (return)))
     (raise (CommandError "There isn't a destructible tile there.")))

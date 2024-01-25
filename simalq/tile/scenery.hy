@@ -22,7 +22,7 @@
       ; Block diagonal movement between orthogonally adjacent squares.
     blocks-monster F
       ; Block monster movement, even if `blocks-move` is false.
-    destructible-by-passwall-wand F
+    wand-destructible F
     protects-vs-poison-air F
     emits-poison-air F)
 
@@ -54,8 +54,8 @@
           "Blocks your shots, but not monsters' shots"
         @blocks-monster-shots
           "Blocks monsters' shots, but not your shots")
-      (when @destructible-by-passwall-wand
-        "Destructible by a wand of passwall")
+      (when @wand-destructible
+        "Destructible with a wall-destroying wand")
       (when @superblock
         "Not subject to magical transformation or passage")
       #* extra
@@ -124,9 +124,9 @@
     131) ; invisible wall
       ; Replacing invisible walls with walls is not entirely cosmetic:
       ; IQ's invisible walls are specifically immune to passwall
-      ; amulets, albeit not passwall wands.
+      ; amulets, albeit not wall-destroying wands.
   :blocks-move T :blocks-diag T
-  :destructible-by-passwall-wand T
+  :wand-destructible T
   :flavor "Among the most numerous and persistent of the obstacles that stand in the way of your inevitable victory.\n\n    This man, with lime and rough-cast, doth present\n    Wall, that vile Wall which did these lovers sunder;\n    And through Wall's chink, poor souls, they are content\n    To whisper, at the which let no man wonder.")
 
 (deftile "██" "the Void" Scenery
@@ -142,15 +142,15 @@
     146) ; fire fountain
       ; Replacing fire fountains with pillars is not entirely
       ; cosmetic. For example, IQ's fire fountains aren't affected by
-      ; passwall wands.
+      ; wall-destroying wands.
   :blocks-move T
-  :destructible-by-passwall-wand T
+  :wand-destructible T
   :flavor "A structure of vaguely Roman style.")
 
 (deftile "╷ " "a broken pillar" Scenery
   :iq-ix 82
   :blocks-move T :blocks-player-shots F
-  :destructible-by-passwall-wand T
+  :wand-destructible T
   :flavor "It's just a chest-high half of a pillar now. Good thing it wasn't load-bearing, huh? It makes for good cover against enemy shots.")
 
 (deftile "◀▶" "a hole" Scenery
@@ -312,7 +312,7 @@
     {3 4  4 2  15 6}]
 
   :blocks-move T :blocks-diag T :blocks-player-shots F
-  :destructible-by-passwall-wand T
+  :wand-destructible T
   :immune #(DamageType.Poison DamageType.Fire DamageType.DeathMagic)
 
   :flavor "I think this dungeon might not be up to code.")
@@ -323,7 +323,7 @@
   (setv
     blocks-monster T
     blocks-diag T
-    destructible-by-passwall-wand T
+    wand-destructible T
     color 'white
     color-bg 'black)
 
@@ -382,7 +382,7 @@
   :color-bg #('black None)
   :iq-ix 139
   :blocks-move T :blocks-diag T
-  :destructible-by-passwall-wand T
+  :wand-destructible T
 
   :phase-replace "phasing wall (out of phase)"
 
@@ -392,7 +392,7 @@
   :color 'light-gray
   :iq-ix 140
   :blocks-player-shots F
-  ; Per IQ, a phasing wall is unaffected by a wand of passwall while
+  ; Per IQ, a phasing wall is unaffected by a wall-destroying wand while
   ; out of phase.
 
   :phase-replace "phasing wall (in phase)"
@@ -432,7 +432,7 @@
     (if (is @n-pushes None) {} {"pushes left =" @n-pushes}))
 
   :blocks-monster T
-  :destructible-by-passwall-wand T
+  :wand-destructible T
   :hook-player-walk-to (meth [origin]
     (setv target (+ @pos (dir-to origin @pos)))
     (when (or (not target) (at target))
@@ -656,7 +656,7 @@
   :suffix-dict (meth []
     (dict :type @wallnum))
   :blocks-move T :blocks-diag T
-  :destructible-by-passwall-wand T
+  :wand-destructible T
   :info-bullets (meth [#* extra]
     (.info-bullets (super)
       #("Wallfall type" @wallnum)))

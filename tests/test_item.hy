@@ -389,18 +389,18 @@
     ["wall" "phasing wall (out of phase)" "wall" "phasing wall (out of phase)"]))
 
 
-(defn test-wand-passwall []
+(defn test-wand-wall-destroying []
   (init
     [:tiles ["orc" "wall" "pillar"]])
 
-  (cant (use-item "passwall wand" 1 0) "There isn't a destructible tile there.")
-  (use-item "passwall wand" 2 0)
+  (cant (use-item "wall-destroying wand" 1 0) "There isn't a destructible tile there.")
+  (use-item "wall-destroying wand" 2 0)
   (assert-at [2 0] 'floor)
-  (use-item "passwall wand" 3 0)
+  (use-item "wall-destroying wand" 3 0)
   (assert-at [3 0] 'floor)
   (set-square [3 0] "wall" "wall")
   (assert-at [3 0] "wall" "wall")
-  (use-item "passwall wand" 3 0)
+  (use-item "wall-destroying wand" 3 0)
   (assert-at [3 0] "wall"))
 
 
