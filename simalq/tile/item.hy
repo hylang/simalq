@@ -495,7 +495,7 @@
     (@bomb-burst target @use-burst-size))
 
   :hook-player-shot (meth []
-    (doc f"As when used, but with a smaller size-{@shot-burst-size} burst.")
+    (doc f"As when applied, but with a smaller size-{@shot-burst-size} burst.")
     (@bomb-burst @pos @shot-burst-size)
     (@rm-from-map))
 
