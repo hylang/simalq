@@ -390,7 +390,7 @@
       (when (and (isinstance tile Scenery) tile.destructible-by-passwall-wand)
         (.rm-from-map tile)
         (return)))
-     (raise (CommandError "There isn't a destructible tile there.")))
+    (raise (CommandError "There isn't a destructible tile there.")))
 
   :flavor #[[I always thought the phrase "open sesame" was a humorous deliberate corruption of "open says-a-me", but since it comes to us from French, if not from Arabic and then French, this is unlikely.]])
 
