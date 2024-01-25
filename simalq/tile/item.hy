@@ -364,21 +364,6 @@
 
   :flavor "This device is detested by the stonemason's union, but valued by homeowners and combat engineers, not to mention tyrants who desire vast dungeons.")
 
-(deftile "/ " "a phase wand" Usable
-  :color 'brown
-  :iq-ix 143
-  :acquirement-points 50
-
-  :use (meth [target]
-    "If there's at least one phasing wall on the target square, then the topmost one is phase-shifted. Otherwise, a new out-of-phase wall is created."
-    (for [t (at target)]
-      (when (isinstance t hy.I.simalq/tile/scenery.PhasingWall)
-        (.phase-shift t)
-        (return)))
-    (Tile.make target "phasing wall (out of phase)"))
-
-  :flavor "This attempt to create a portable phase trigger didn't entirely succeed.")
-
 (deftile "/ " "a wall-destroying wand" Usable
   :color 'dark-green
   :iq-ix 32
@@ -395,6 +380,21 @@
     (raise (CommandError "There isn't a destructible tile there.")))
 
   :flavor #[[I always thought the phrase "open sesame" was a humorous deliberate corruption of "open says-a-me", but since it comes to us from French, if not from Arabic and then French, this is unlikely.]])
+
+(deftile "/ " "a phase wand" Usable
+  :color 'brown
+  :iq-ix 143
+  :acquirement-points 50
+
+  :use (meth [target]
+    "If there's at least one phasing wall on the target square, then the topmost one is phase-shifted. Otherwise, a new out-of-phase wall is created."
+    (for [t (at target)]
+      (when (isinstance t hy.I.simalq/tile/scenery.PhasingWall)
+        (.phase-shift t)
+        (return)))
+    (Tile.make target "phasing wall (out of phase)"))
+
+  :flavor "This attempt to create a portable phase trigger didn't entirely succeed.")
 
 (deftile "/ " "a wand of death" Usable
   :color 'blue
