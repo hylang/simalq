@@ -47,6 +47,11 @@
     ; `inventory` and `artifacts` should be mutated directly rather
     ; reassigned.
 
+  :__init__ (meth [pos]
+    (.__init__ (super) :pos pos)
+    (setv (cut @inventory) (* [None] G.rules.max-usables))
+    (.update @status-effects (dfor  x StatusEffect  x 0)))
+
   :damage (meth [amount damage-type [animate T] [attacker None]]
     (unless amount
       (return))

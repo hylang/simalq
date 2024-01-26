@@ -22,11 +22,9 @@
     (for [[k v] (.items rules)]
       (setattr G.rules k v)))
   (.initialize-states G)
-  (setv
-     G.player (Player :pos None)
-     G.player.hp (or (when quest (refactor-hp quest.starting-hp)) 1)
-     (cut G.player.inventory) (* [None] G.rules.max-usables))
-  (.update G.player.status-effects (dfor  x StatusEffect  x 0)))
+  (setv G.player (Player :pos None))
+  (when quest
+    (setv G.player.hp (refactor-hp quest.starting-hp))))
 
 
 (defdataclass Level []
