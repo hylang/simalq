@@ -705,8 +705,7 @@
 
   :hook-player-walked-into (meth []
     (doc f"Paralyzes you for {G.rules.paralysis-duration} turns. While you're paralyzed, waiting is the only action you can take.")
-    (+= (get G.player.status-effects StatusEffect.Para)
-      G.rules.paralysis-duration))
+    (.add StatusEffect.Para G.rules.paralysis-duration))
 
   :flavor "A magical field that causes you to vividly remember something embarrassing that you did as a teenager, forcing you to briefly freeze in horror. The problem with being royalty is that awkward adolescent moments all too easily become international incidents.")
 
@@ -717,8 +716,7 @@
   :blocks-move F :blocks-monster T
   :hook-player-walked-into (meth []
     (doc f"The tile is destroyed, but you're paralyzed for {G.rules.paralysis-duration} turns.")
-    (+= (get G.player.status-effects StatusEffect.Para)
-      G.rules.paralysis-duration)
+    (.add StatusEffect.Para G.rules.paralysis-duration)
     (@rm-from-map))
 
   :flavor "This spiderweb is the size of a really big spiderweb. Until Idok cleans up the dungeon properly, you'll have to tediously carve your way through the webs with your sword. Got any recommendations for a good smitemaster?")

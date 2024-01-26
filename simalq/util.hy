@@ -139,6 +139,9 @@
     "Does the player have this status effect?"
     (bool (get G.player.status-effects @)))
 
+  (defmeth add [duration]
+    (+= (get G.player.status-effects @) duration))
+
   (defmeth bad? []
     (in @ [StatusEffect.Para StatusEffect.Weak])))
 

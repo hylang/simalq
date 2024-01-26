@@ -249,17 +249,14 @@
 
   (defmeth pick-up []
     (doc (@help))
-    (+=
-      (get G.player.status-effects
-        (getattr StatusEffect (str @effect)))
-      @duration)))
+    (.add @effect @duration)))
 
 (deftile "! " "an amulet of invulnerability" StatusEffectItem
   :color 'dark-yellow
   :iq-ix 26
   :acquirement-points 100
 
-  :effect 'Ivln
+  :effect StatusEffect.Ivln
   :duration 20
 
   :help (meth []
@@ -271,7 +268,7 @@
   :iq-ix 151
   :acquirement-points 150
 
-  :effect 'Pass
+  :effect StatusEffect.Pass
   :duration 20
 
   :help (meth []
@@ -283,7 +280,7 @@
   :iq-ix 34
   :acquirement-points 100
 
-  :effect 'Fast
+  :effect StatusEffect.Fast
   :duration 10
 
   :help (meth []
@@ -295,7 +292,7 @@
   :iq-ix 25
   :acquirement-points 100
 
-  :effect 'Ivis
+  :effect StatusEffect.Ivis
   :duration 25
 
   :help (meth []

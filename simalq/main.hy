@@ -107,9 +107,9 @@
       (.damage G.player G.rules.poison-emitter-damage DamageType.Poison)))
 
   ; Tick down status effects.
-  (for [se (list G.player.status-effects)]
-    (when (get G.player.status-effects se)
-      (-= (get G.player.status-effects se) 1)))
+  (for [se StatusEffect]
+    (when (.player-has? se)
+      (.add se -1)))
 
   ; Tick down the time limit.
   (when G.time-left
