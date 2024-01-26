@@ -134,14 +134,13 @@
     Pass  "passwall"
     MKey  "magical key"
     Prot  "protection")
+
+  (defmeth player-has? []
+    "Does the player have this status effect?"
+    (bool (get G.player.status-effects @)))
+
   (defmeth [property] bad []
     (in @ [StatusEffect.Para StatusEffect.Weak])))
-
-(defn player-status [abbreviation]
-  "Does the player have the given status effect?"
-  (bool (get
-    G.player.status-effects
-    (getattr StatusEffect (str abbreviation)))))
 
 
 (setv hp-warning-threshold 100)

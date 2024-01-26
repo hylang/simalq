@@ -5,7 +5,7 @@
   time [sleep]
   contextlib [contextmanager]
   simalq.strings
-  simalq.util [CommandError message-queue msg DamageType player-status GameOverException menu-letters]
+  simalq.util [CommandError StatusEffect message-queue msg DamageType GameOverException menu-letters]
   simalq.color :as color
   simalq.geometry [burst at turn-and-pos-seed]
   simalq.game-state [G]
@@ -69,7 +69,7 @@
     (return))
 
   (when (and
-      (player-status 'Fast)
+      (.player-has? StatusEffect.Fast)
       (not G.player.taking-extra-action))
     ; Let the player take a second action this turn. (Notice that
     ; this doesn't stack with the free action from using an exit.)
@@ -97,7 +97,7 @@
     (if (isinstance tile Scenery)
       #(tile.protects-vs-poison-air tile.emits-poison-air)
       #(F F))))))
-  (unless (or protected (player-status 'Ivln))
+  (unless (or protected (.player-has? StatusEffect.Ivln))
     (+= G.player.poison-dose
       (* G.rules.poison-factor G.level.poison-intensity))
     (.damage G.player :animate F

@@ -7,7 +7,7 @@
   fractions [Fraction :as f/]
   enum [Enum]
   toolz [unique]
-  simalq.util [DamageType next-in-cycle mixed-number player-status]
+  simalq.util [DamageType StatusEffect next-in-cycle mixed-number]
   simalq.geometry [Direction at dist adjacent? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
   simalq.tile [Tile Actor Damageable]
@@ -61,7 +61,7 @@
 
   (defmeth player-invisible-to? [[mon-pos None]]
     (and
-      (player-status 'Ivis)
+      (.player-has? StatusEffect.Ivis)
       (not (adjacent? (or mon-pos @pos) G.player.pos))
       (not @sees-invisible)))
 

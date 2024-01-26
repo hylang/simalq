@@ -5,7 +5,7 @@
 (import
   fractions [Fraction :as f/]
   simalq.color :as color
-  simalq.util [CommandError DamageType next-in-cycle StatusEffect player-status]
+  simalq.util [CommandError DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction at burst dist dir-to ray]
   simalq.tile [Tile PosHooked EachTurner Damageable]
   simalq.game-state [G])
@@ -104,7 +104,7 @@
             (isinstance tile Scenery)
             tile.blocks-diag
             (not-in tile.stem ethereal-to)
-            (not (and tile.passwallable (player-status 'Pass)))))))
+            (not (and tile.passwallable (.player-has? StatusEffect.Pass)))))))
       'blocked-diag
     (nogo? target monster? ethereal-to)
       'bump
@@ -120,7 +120,7 @@
       (and (isinstance tile Scenery) (or
         (and monster? tile.blocks-monster)
         (and tile.blocks-move (or monster?
-          (not (and tile.passwallable (player-status 'Pass))))))))))))
+          (not (and tile.passwallable (.player-has? StatusEffect.Pass))))))))))))
 
 
 (defclass Wallish [Scenery]

@@ -229,7 +229,7 @@
     (gfor
       se StatusEffect
       :if (= se.bad bad)
-      :if (get G.player.status-effects se)
+      :if (.player-has? se)
       (.format "{} {}" se.name (get G.player.status-effects se))))
 
   (setv poison (* G.rules.poison-factor G.level.poison-intensity))

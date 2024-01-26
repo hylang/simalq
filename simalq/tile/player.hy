@@ -5,7 +5,7 @@
   fractions [Fraction]
   simalq.game-state [G]
   simalq.color :as colors
-  simalq.util [GameOverException DamageType msg refactor-hp hp-warning-threshold player-status flash-map]
+  simalq.util [GameOverException DamageType StatusEffect msg refactor-hp hp-warning-threshold flash-map]
   simalq.geometry [ray dir-to dist]
   simalq.tile [Tile Damageable])
 (setv  T True  F False)
@@ -67,14 +67,14 @@
               (dir-to @pos attacker.pos)
               (dist @pos attacker.pos))
             #())
-          (if (player-status 'Ivln)
+          (if (.player-has? StatusEffect.Ivln)
             #()
             #(@pos)))
         {@pos (if (> amount 99) "OW" (format amount "2"))}
         :flash-time-s .2))
 
     (setv hp-was @hp)
-    (unless (player-status 'Ivln)
+    (unless (.player-has? StatusEffect.Ivln)
       (Damageable.damage @ amount damage-type))
     (when (chainc
            @hp

@@ -7,7 +7,7 @@
   copy [deepcopy]
   toolz [partition]
   simalq.color :as color
-  simalq.util [CommandError DamageType msg player-shot-damage flash-map menu-letters player-status]
+  simalq.util [CommandError DamageType StatusEffect msg player-shot-damage flash-map menu-letters]
   simalq.geometry [Direction Pos at dist]
   simalq.game-state [G]
   simalq.tile [Damageable]
@@ -190,7 +190,7 @@
       (ecase G.player.game-over-state
         'dead "You're dead"
         'won "You won the game")))))
-  (when (and (player-status 'Para) (is-not (type action) Wait))
+  (when (and (.player-has? StatusEffect.Para) (is-not (type action) Wait))
     (raise (CommandError "You're paralyzed. You can only wait for it to pass.")))
 
   (ebranch (in (type action) it)
@@ -207,7 +207,7 @@
           :if (not (and
             (isinstance tile Scenery)
             tile.passwallable
-            (player-status 'Pass)))
+            (.player-has? StatusEffect.Pass)))
           tile))
       (setv d action.direction)
       (setv [target wly] (walkability G.player.pos d :monster? F))
