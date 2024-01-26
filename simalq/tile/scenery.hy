@@ -123,16 +123,20 @@
           (not (and tile.passwallable (player-status 'Pass))))))))))))
 
 
-(deftile "██" "a wall" Scenery
+(defclass Wallish [Scenery]
+  (setv
+    blocks-move T blocks-diag T
+    passwallable T
+    wand-destructible T))
+
+
+(deftile "██" "a wall" Wallish
   :iq-ix #(
     2    ; wall
     131) ; invisible wall
       ; Replacing invisible walls with walls is not entirely cosmetic:
       ; IQ's invisible walls are specifically immune to passwall
       ; amulets, albeit not wall-destroying wands.
-  :blocks-move T :blocks-diag T
-  :passwallable T
-  :wand-destructible T
   :flavor "Among the most numerous and persistent of the obstacles that stand in the way of your inevitable victory.\n\n    This man, with lime and rough-cast, doth present\n    Wall, that vile Wall which did these lovers sunder;\n    And through Wall's chink, poor souls, they are content\n    To whisper, at the which let no man wonder.")
 
 (deftile "██" "the Void" Scenery
@@ -317,27 +321,21 @@
   :flavor "Get me outta here.")
 
 
-(deftile "##" "a cracked wall" [Scenery Damageable]
+(deftile "##" "a cracked wall" [Wallish Damageable]
   :field-defaults (dict
     :hp 2)
   :iq-ix-mapper ["hp"
     {3 4  4 2  15 6}]
 
-  :blocks-move T :blocks-diag T :blocks-player-shots F
-  :passwallable T
-  :wand-destructible T
+  :blocks-player-shots F
   :immune #(DamageType.Poison DamageType.Fire DamageType.DeathMagic)
 
   :flavor "I think this dungeon might not be up to code.")
 
 
-(defclass BreakableWall [Scenery]
+(defclass BreakableWall [Wallish]
 
   (setv
-    blocks-monster T
-    blocks-diag T
-    passwallable T
-    wand-destructible T
     color 'white
     color-bg 'black)
 
@@ -391,13 +389,10 @@
 
   (setv poshooked-callback phase-shift))
 
-(deftile "☯█" "a phasing wall (in phase)" PhasingWall
+(deftile "☯█" "a phasing wall (in phase)" [PhasingWall Wallish]
   :color #('white None)
   :color-bg #('black None)
   :iq-ix 139
-  :blocks-move T :blocks-diag T
-  :passwallable T
-  :wand-destructible T
 
   :phase-replace "phasing wall (out of phase)"
 
@@ -657,7 +652,7 @@
 
   :flavor #[[Easy there, Admiral Ackbar. This kind of trap isn't necessarily dangerous. Well, admittedly, the key word here is "necessarily".]])
 
-(deftile :name "a trapped wall" :superc Scenery
+(deftile :name "a trapped wall" :superc Wallish
   :color #('black 'pale-yellow)
   :color-bg #(None 'black)
   :field-defaults (dict
@@ -670,9 +665,6 @@
     (+ "█" (if (< @wallnum 10) (str @wallnum) "^")))
   :suffix-dict (meth []
     (dict :type @wallnum))
-  :blocks-move T :blocks-diag T
-  :passwallable T
-  :wand-destructible T
   :info-bullets (meth [#* extra]
     (.info-bullets (super)
       #("Wallfall type" @wallnum)))
