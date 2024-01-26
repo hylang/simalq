@@ -228,7 +228,7 @@
   (defn status-effects [bad]
     (gfor
       se StatusEffect
-      :if (= se.bad bad)
+      :if (= (.bad? se) bad)
       :if (.player-has? se)
       (.format "{} {}" se.name (get G.player.status-effects se))))
 

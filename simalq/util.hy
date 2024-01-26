@@ -139,7 +139,7 @@
     "Does the player have this status effect?"
     (bool (get G.player.status-effects @)))
 
-  (defmeth [property] bad []
+  (defmeth bad? []
     (in @ [StatusEffect.Para StatusEffect.Weak])))
 
 
