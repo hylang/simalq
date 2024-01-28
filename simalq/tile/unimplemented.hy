@@ -41,7 +41,6 @@
     [166 "blind_mage"]
     [167 "metal_door"]
     [168 "metal_door_control"]
-    [169 "anti_magic_trap"]
     [170 "wand_of_webs"]
     [177 "doppelganger"]
     [178 "magical_barrier_generator"]

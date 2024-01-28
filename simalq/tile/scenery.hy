@@ -727,6 +727,17 @@
 
   :flavor "This spiderweb is the size of a really big spiderweb. Until Idok cleans up the dungeon properly, you'll have to tediously carve your way through the webs with your sword. Got any recommendations for a good smitemaster?")
 
+(deftile "<>" "an anti-magic trap" Trap
+  :color 'blue
+  :iq-ix 169
+
+  :hook-player-walked-into (meth []
+    (doc (.format "Removes the first beneficial status effect that you have from the following list: {}."
+      (.join ", " (gfor  e (StatusEffect.disenchantable)  e.name))))
+    (StatusEffect.disenchant-player))
+
+  :flavor "May I take your cloak?")
+
 
 (defclass PoisonPlate [Trap]
   "A replacement for IQ's poisonous amulets and counterpoison amulets.

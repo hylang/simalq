@@ -142,6 +142,27 @@
   (defmeth add [duration]
     (+= (get G.player.status-effects @) duration))
 
+  (defn [classmethod] disenchantable [cls]
+    (lfor
+      effect cls
+      :if (not (.bad? effect))
+      :if (not-in effect [StatusEffect.Prot StatusEffect.MKey])
+        ; Protection itself prevents disenchantment.
+        ; `MKey` is excluded somewhat arbitrarily per IQ.
+      effect))
+
+  (defn [classmethod] disenchant-player [cls]
+    "Try to remove a beneficial status effect from the player. Return
+    `True` on success."
+    (when (.player-has? StatusEffect.Prot)
+      ; Protection prevents disenchantment.
+      (return F))
+    ; Remove the first eligible effect that the player actually has.
+    (for [effect (.disenchantable cls)  :if (.player-has? effect)]
+      (setv (get G.player.status-effects effect) 0)
+      (return T))
+    F)
+
   (defmeth bad? []
     (in @ [StatusEffect.Para StatusEffect.Weak])))
 

@@ -635,6 +635,32 @@
   (assert (= (get G.player.status-effects StatusEffect.Para) 2)))
 
 
+(defn test-anti-magic-trap []
+
+  (init [:tiles [
+    "cloak of invisibility"
+    "potion of speed"
+    "amulet of invulnerability"
+    "anti-magic trap"]])
+  (defn check [ivln ivis fast]
+    (assert (= (.player-has? StatusEffect.Ivln) ivln))
+    (assert (= (.player-has? StatusEffect.Ivis) ivis))
+    (assert (= (.player-has? StatusEffect.Fast) fast)))
+
+  (wk 'E 3)
+  (check T T T)
+  ; Disenchantment removes effects in a standard order, unlike IQ's
+  ; random order.
+  (wk 'E)
+  (check F T T)
+  (wk 'W)
+  (wk 'E)
+  (check F F T)
+  (wk 'W)
+  (wk 'E)
+  (check F F F))
+
+
 (defn test-poison-plate []
   (init [
     :tiles ["poison pressure plate" "poison-protecting pressure plate"]
