@@ -627,3 +627,17 @@
   ; end of turn 1. The sum is 1 + 2/7.
   (assert (= G.player.hp (- 100 1)))
   (assert (= G.player.poison-dose (f/ 2 7))))
+
+
+(defn test-phase-trap []
+  (init [:tiles [
+    "phase trap"
+    "phasing wall (out of phase)"
+    "phasing wall (in phase)"]])
+
+  ; A phase trap works like a phase trigger.
+  (wk 'E)
+  (assert-at [2 0] "phasing wall (in phase)")
+  (assert-at [3 0] "phasing wall (out of phase)")
+  ; It's destroyed after use.
+  (assert-at 'here 'player))

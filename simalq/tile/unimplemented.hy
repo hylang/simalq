@@ -31,7 +31,6 @@
     [130 "exit_mobile"]
     [132 "golem"]
     [134 "siren"]
-    [141 "phasing_wall_trap"]
     [152 "random_gate"]
     [154 "wand_of_flame"]
     [158 "ring_of_protection"]

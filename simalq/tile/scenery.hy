@@ -748,6 +748,18 @@
   :poison-multiplier (f/ 1 2))
 
 
+(deftile "<>" "a phase trap" Trap
+  :color 'brown
+  :iq-ix 141
+
+  :hook-player-walked-into (meth []
+    (doc f"Phase-shifts all phasing walls on the level. Then, the tile is destroyed.")
+    (PhasingWall.run-all)
+    (@rm-from-map))
+
+  :flavor "A pressure plate faintly inscribed with a ying-yang symbol.")
+
+
 (deftile ", " "a broken trap" Trap
   :iq-ix #(
     ; Removed trap-like tiles that stick around after stepping on them.
