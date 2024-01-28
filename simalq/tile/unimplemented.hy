@@ -54,7 +54,6 @@
     [185 "dark_brain"]
     [186 "invisible_mage"]
     [187 "magical_mirror"]
-    [188 "fading_wall"]
     [190 "wall_generator_north"]
     [191 "wall_generator_south"]
     [192 "wall_generator_west"]

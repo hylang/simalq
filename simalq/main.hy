@@ -80,7 +80,7 @@
   ; order.
   (for [
       pos (burst G.player.pos G.rules.reality-bubble-size)
-      tile (at pos)
+      tile (list (at pos))
       :if (isinstance tile hy.I.simalq/tile.Actor)]
     (.maybe-act tile))
 

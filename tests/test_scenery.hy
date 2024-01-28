@@ -258,6 +258,33 @@
     . @ . | -"))
 
 
+(defn test-fading-wall []
+  (init [
+    :map "
+      @ ^█^█^█^█{}. . . . . . x ^█"
+    :map-marks {
+      "{}" ["gate" :target "x "]
+      "x " 'floor}])
+
+  ; Fading walls near you at the very start of a level don't actually
+  ; get a chance to fade till the end of your first turn.
+  (setv marks {"{}" "gate"})
+  (assert-textmap :map-marks marks :text "
+    @ ^█^█^█^█{}. . . . . . . ^█")
+  (wait)
+  (assert-textmap :map-marks marks :text "
+    @ . . . ^█{}. . . . . . . ^█")
+  ; The fading radius is 3.
+  (wk 'E)
+  (assert-textmap :map-marks marks :text "
+    . @ . . . {}. . . . . . . ^█")
+  ; A fading wall will still fade if you approach it by teleportation
+  ; instead of walking.
+  (wk 'E 4)
+  (assert-textmap :map-marks marks :text "
+    . . . . . {}. . . . . . @ . "))
+
+
 (defn test-phasing []
   (setv marks {
     "X " "phasing wall (in phase)"

@@ -7,7 +7,7 @@
   simalq.color :as color
   simalq.util [CommandError DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction at burst dist dir-to ray]
-  simalq.tile [Tile PosHooked EachTurner Damageable]
+  simalq.tile [Tile Actor PosHooked EachTurner Damageable]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -27,12 +27,12 @@
     protects-vs-poison-air F
     emits-poison-air F)
 
-  (defmeth dod [prefix attr]
+  (defmeth dod [prefix attr [superc Tile]]
     "Invoke a dynadoc or get a regular docstring for an info bullet."
     (setv attr (hy.mangle attr))
-    (setv method (getattr (type @) attr))
     (when (and
-        (is-not method (getattr Tile attr))
+        (setx method (getattr (type @) attr None))
+        (or (not superc) (is-not method (getattr superc attr)))
         (setx string (if (hasattr method "dynadoc")
           (.dynadoc method @)
           method.__doc__)))
@@ -72,7 +72,8 @@
       (when @protects-vs-poison-air
         #("Special effect" "If you end your turn within 1 square of this tile, you'll take no damage from ambient poison or poisonous fountains. Other sources of poison damage are unaffected."))
       (when @emits-poison-air
-        #("Special effect" f"If you end your turn within 1 square of this tile, you'll take {G.rules.poison-emitter-damage} poison damage. This effect applies no more once per turn.")))))
+        #("Special effect" f"If you end your turn within 1 square of this tile, you'll take {G.rules.poison-emitter-damage} poison damage. This effect applies no more once per turn."))
+      (@dod "Behavior" 'act None))))
 
 
 (defn walkability [p direction monster? [ethereal-to #()]]
@@ -378,6 +379,21 @@
       :iq-ix ~iq-ix
       :directions ~(lfor  d directions `(. Direction ~(hy.models.Symbol d.abbr)))
       :mapsym ~(.join "" (gfor  d directions  (get Direction.arrows d)))))))
+
+
+(deftile "^█" "a fading wall" [Wallish Actor]
+  :color #('white None)
+  :color-bg #('black None)
+  :iq-ix 188
+
+  :!radius 3
+
+  :act (meth []
+    (doc f"Fade — If you're within {@radius} squares, the tile is destroyed.")
+    (when (<= (dist @pos G.player.pos) @radius)
+      (@rm-from-map)))
+
+  :flavor "A polite and bashful sort of wall that will opt to disappear into thin air rather than stand in the way of Her Royal Highness Princess Triskaidecagonn XIII. If only more of the dungeon was so mindful of your station.")
 
 
 (defclass PhasingWall [Scenery PosHooked]
