@@ -27,15 +27,16 @@
     protects-vs-poison-air F
     emits-poison-air F)
 
-  (defmeth dod [prefix attr-sym]
-    (setv m (getattr (type @) (hy.mangle attr-sym)))
-    (setv r None)
-    (when (is-not m (getattr Tile (hy.mangle attr-sym)))
-      (setv r (if (hasattr m "dynadoc")
-        (.dynadoc m @)
-        m.__doc__)))
-    (when r
-      #(prefix r)))
+  (defmeth dod [prefix attr]
+    "Invoke a dynadoc or get a regular docstring for an info bullet."
+    (setv attr (hy.mangle attr))
+    (setv method (getattr (type @) attr))
+    (when (and
+        (is-not method (getattr Tile attr))
+        (setx string (if (hasattr method "dynadoc")
+          (.dynadoc method @)
+          method.__doc__)))
+      #(prefix string)))
 
   (defmeth info-bullets [#* extra]
     (setv blocks-monster (or @blocks-monster @blocks-move))
