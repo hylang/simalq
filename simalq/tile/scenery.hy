@@ -27,17 +27,6 @@
     protects-vs-poison-air F
     emits-poison-air F)
 
-  (defmeth dod [prefix attr [superc Tile]]
-    "Invoke a dynadoc or get a regular docstring for an info bullet."
-    (setv attr (hy.mangle attr))
-    (when (and
-        (setx method (getattr (type @) attr None))
-        (or (not superc) (is-not method (getattr superc attr)))
-        (setx string (if (hasattr method "dynadoc")
-          (.dynadoc method @)
-          method.__doc__)))
-      #(prefix string)))
-
   (defmeth info-bullets [#* extra]
     (setv blocks-monster (or @blocks-monster @blocks-move))
     (.info-bullets (super)
@@ -73,7 +62,7 @@
         #("Special effect" "If you end your turn within 1 square of this tile, you'll take no damage from ambient poison or poisonous fountains. Other sources of poison damage are unaffected."))
       (when @emits-poison-air
         #("Special effect" f"If you end your turn within 1 square of this tile, you'll take {G.rules.poison-emitter-damage} poison damage. This effect applies no more once per turn."))
-      (@dod "Behavior" 'act None))))
+      (@dod "Behavior" 'act))))
 
 
 (defn walkability [p direction monster? [ethereal-to #()]]

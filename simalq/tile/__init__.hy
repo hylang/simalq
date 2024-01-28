@@ -107,6 +107,17 @@
     (object.__setattr__ @ "pos" None)
     (@hook-pos-set t.pos None))
 
+  (defmeth dod [prefix attr [superc None]]
+    "Invoke a dynadoc or get a regular docstring for an info bullet."
+    (setv attr (hy.mangle attr))
+    (when (and
+        (setx method (getattr (type @) attr None))
+        (is-not method (getattr (or superc Tile) attr None))
+        (setx string (if (hasattr method "dynadoc")
+          (.dynadoc method @)
+          method.__doc__)))
+      #(prefix string)))
+
   ; The below variables and methods may be overridden by subclasses.
 
   (setv

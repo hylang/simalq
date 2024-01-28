@@ -139,12 +139,10 @@
         #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
       (when @sees-invisible
         #("Invisibility detection" "The monster is unaffected by you being invisible."))
-      (unless (= @destroy.__doc__ Damageable.destroy.__doc__)
-        #("Effect on death" @destroy.__doc__))
+      (@dod "Effect on death" 'destroy Damageable)
       #* extra
-      #("Behavior" (or
-        @act.__doc__
-        (@act.dynadoc @))))))
+      (@dod "Behavior" 'act))))
+
 
 (defn make-monster [pos stem #** kwargs]
   (Tile.make pos stem #** kwargs)

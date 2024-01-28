@@ -27,15 +27,9 @@
   (defmeth pick-up [])
 
   (defmeth info-bullets [#* extra] [
-    (when (is-not (. (type @) pick-up) Item.pick-up)
-      #("Pickup effect" (or
-        @pick-up.__doc__
-        (@pick-up.dynadoc @))))
+    (@dod "Pickup effect" 'pick-up)
     #* extra
-    (when @hook-player-shot
-      #("Effect when you shoot it" (or
-        @hook-player-shot.__doc__
-        (@hook-player-shot.dynadoc @))))
+    (@dod "Effect when you shoot it" 'hook-player-shot)
     #("Point value" (format @acquirement-points ","))]))
 
 
@@ -331,9 +325,7 @@
 
   (defmeth info-bullets [#* extra]
     (.info-bullets (super)
-      #(f"Effect when applied ({(if @targeted "" "un")}targeted)" (or
-        @use.__doc__
-        (@use.dynadoc @)))
+      (@dod f"Effect when applied ({(if @targeted "" "un")}targeted)" 'use)
       #* extra)))
 
 (deftile "/ " "a wand of nothing" Usable
