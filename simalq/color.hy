@@ -45,6 +45,7 @@
 
   flash-label 'white
   flash-player-damaged 'red
+  flash-player-hit-by-special-attack 'orange
   flash-player-shot-mundane 'blue
   flash-player-shot-magic 'purple
 

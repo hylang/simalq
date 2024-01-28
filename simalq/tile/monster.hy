@@ -705,3 +705,24 @@
   :damage-shot 10
 
   :flavor "A wretched organic structure, fashioned from fiendish flesh. It twists about to aim its toothy maw, from which it belches flame. It's immobile, but dark magics make it almost invulnerable… almost.")
+
+
+(deftile "W " "an archmage" Approacher
+  :iq-ix 163
+  :destruction-points 75
+
+  :damage-melee 2
+  :damage-shot 12
+  :sees-invisible T
+
+  :act (meth []
+    (doc (.format "Disenchant — If it's not adjacent but has line of effect to you, the monster removes the first beneficial status effect that you have from the following list: {}. Otherwise, it behaves per `Approach`."
+      (.join ", " (gfor  e (StatusEffect.disenchantable)  e.name))))
+    (if (and
+        (not (adjacent? @pos G.player.pos))
+        (@try-to-attack-player :dry-run T)
+        (StatusEffect.disenchant-player))
+      (.animate-hit G.player @ "  " :special-color? T)
+      (@approach)))
+
+  :flavor "A professor emeritus whose killer instincts have been honed by decades of publishing and not perishing. His canny eye can detect the least visible academic politics, and his mastery of grant-review panels has bought him the reagents for powerful spells. But even with the best health insurance in the land, he's found that aging has taken its toll: he can no longer cane the young folk with the vigor of his early years.")

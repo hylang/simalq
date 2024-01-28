@@ -3,6 +3,7 @@
 (import
   fractions [Fraction :as f/]
   tests.lib [init assert-at assert-full-name assert-hp wait set-square wk shoot mv-player use-item top]
+  simalq.util [StatusEffect]
   simalq.geometry [Direction Pos ray at burst]
   simalq.game-state [G])
 (setv  T True  F False)
@@ -721,3 +722,30 @@
   (use-item "wand of death" 0 0)
   (assert-at 'NE 'floor)
   (assert (= G.score 150)))
+
+
+(defn test-archmage []
+  (init [:tiles [
+    "archmage"
+    'floor
+    "cloak of invisibility"
+    "cloak of invisibility"]])
+
+  (mv-player 2 0)
+  (assert (= G.player.hp 100))
+  ; The shot of an archmage can disenchant, in which case it does no
+  ; damage.
+  (wk 'E)
+  (assert (not (.player-has? StatusEffect.Ivis)))
+  (assert (= G.player.hp 100))
+  ; Without disenchantment, it does 12 damage.
+  (wait)
+  (assert (= G.player.hp 88))
+  ; The melee attack of an archmage always does 2 damage and never
+  ; disenchants.
+  (set-square [1 0])
+  (wk 'E)
+  (set-square 'E "archmage")
+  (wait)
+  (assert (.player-has? StatusEffect.Ivis))
+  (assert (= G.player.hp 86)))

@@ -63,20 +63,8 @@
         (* G.rules.artifact-shield-factor amount)))))
 
     (when animate
-      (flash-map
-        @pos
-        colors.flash-player-damaged
-        (+
-          (if (and attacker attacker.pos)
-            (ray @pos
-              (dir-to @pos attacker.pos)
-              (dist @pos attacker.pos))
-            #())
-          (if (.player-has? StatusEffect.Ivln)
-            #()
-            #(@pos)))
-        {@pos (if (> amount 99) "OW" (format amount "2"))}
-        :flash-time-s .2))
+      (@animate-hit attacker :show-ivln? F
+        :label (if (> amount 99) "OW" (format amount "2"))))
 
     (setv hp-was @hp)
     (unless (.player-has? StatusEffect.Ivln)
@@ -89,6 +77,25 @@
 
   :destroy (meth []
     (raise (GameOverException 'dead)))
+
+  :!animate-hit (meth [attacker label [special-color? F] [show-ivln? T]]
+    "Use `flash-map` to indicate that the player's been hit."
+    (flash-map
+      @pos
+      (if special-color?
+         colors.flash-player-hit-by-special-attack
+         colors.flash-player-damaged)
+      (+
+        (if (and attacker attacker.pos)
+          (ray @pos
+            (dir-to @pos attacker.pos)
+            (dist @pos attacker.pos))
+          #())
+        (if (and (not show-ivln?) (.player-has? StatusEffect.Ivln))
+          #()
+          #(@pos)))
+      {@pos label}
+      :flash-time-s .2))
 
   :flavor "People who've met Tris and Argonn separately are sometimes surprised to learn that they're siblings. They don't look much alike.")
 
