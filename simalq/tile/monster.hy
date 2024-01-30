@@ -139,7 +139,7 @@
         #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
       (when @sees-invisible
         #("Invisibility detection" "The monster is unaffected by you being invisible."))
-      (@dod "Effect on death" 'destroy Damageable)
+      (@dod "Effect on death" 'hook-normal-destruction Damageable)
       #* extra
       (@dod "Behavior" 'act))))
 
@@ -612,10 +612,9 @@
         (return (@try-to-attack-player))))
     (@wander :implicit-attack F))
 
-  :destroy (meth []
+  :hook-normal-destruction (meth []
     "The monster can attempt a free attack, unless it killed itself by kamikaze."
-    (@try-to-attack-player)
-    (.destroy (super)))
+    (@try-to-attack-player))
 
   :flavor "A giant aerial jellyfish, kept aloft by a foul-smelling and highly reactive gas. It doesn't fly so much as float about in the dungeon drafts. If disturbed, it readily explodes, and its explosions have the remarkable property of harming you and nobody else.")
 

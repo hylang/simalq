@@ -604,8 +604,8 @@
   (assert-at 'E 'floor)
   (assert (= G.player.floater-disturbance (f/ 0)))
 
-  ; Contra IQ, floaters can explode on death regardless of how
-  ; they're killed.
+  ; Contra IQ, floaters can explode on death when killed with e.g.
+  ; poison.
   (init [
     :map "
       ██f ██.
@@ -619,7 +619,17 @@
   (shoot 'E)
   (assert (= G.player.hp 90))
   (assert-at 'NE 'floor)
-  (assert-at [3 0] 'floor))
+  (assert-at [3 0] 'floor)
+
+  ; But instakills, like a wand of death, prevent the explosion.
+  (init [
+    :height 1
+    :tiles ["floater" "wall"]])
+  (assert-at 'E "floater")
+  (assert (= G.player.hp 100))
+  (use-item "wand of death" 3 0)
+  (assert-at 'E 'floor)
+  (assert (= G.player.hp 100)))
 
 
 (defn test-blob []

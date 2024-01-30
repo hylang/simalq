@@ -75,7 +75,7 @@
         <  hp-was)
       (msg "Princess needs food badly!")))
 
-  :destroy (meth []
+  :destroy (meth [was-instakill?]
     (raise (GameOverException 'dead)))
 
   :!animate-hit (meth [attacker label [special-color? F] [show-ivln? T]]

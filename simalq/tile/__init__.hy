@@ -385,20 +385,27 @@
       (return))
     (when (in damage-type @resists)
       (setv amount 1))
+    (setv instakill? F)
     (when (or (= amount Inf) (in damage-type @weaknesses))
-      ; This will be a one-hit kill.
+      (setv instakill? T)
       (setv amount @hp))
     (-= @hp amount)
     (when @score-for-damaging
       (+= G.score (* @destruction-points (min amount (+ @hp amount)))))
         ; No extra points are awarded for overkill damage.
     (when (<= @hp 0)
-      (@destroy)))
+      (@destroy instakill?)))
 
-  (defmeth destroy []
+  (defmeth destroy [was-instakill?]
+    (unless was-instakill?
+      (@hook-normal-destruction))
     (unless @score-for-damaging
       (+= G.score @destruction-points))
     (@rm-from-map))
+
+  (defmeth hook-normal-destruction []
+    "Called when the tile is about to be destroyed by finite damage."
+    None)
 
   (defmeth suffix-dict []
     (dict :HP @hp))
