@@ -342,7 +342,7 @@
   :flavor "Technically magical, but not terribly useful.")
 
 (deftile "/ " "a wand of shielding" Usable
-  :color 'orange
+  :color 'dark-orange
   :iq-ix 200
   :acquirement-points 100
 
@@ -411,6 +411,24 @@
       :color 'dark-gray))
 
   :flavor "This fell device vibrates with the barely contained energies of Hades as they hunger for the souls of the living. Aim carefully.")
+
+(deftile "/ " "a wand of flame" Usable
+  :color 'orange
+  :iq-ix 154
+  :acquirement-points 100
+
+  :!mon-damage #(2 1 1)
+  :use (meth [target]
+    (doc f"Does {(get @mon-damage 1)} fire damage to all monsters in a size-{(- (len @mon-damage) 1)} burst, except at the center square, where they take {(get @mon-damage 0)} fire damage. Futhermore, all webs in the burst are destroyed. You take no damage.")
+    (for [
+        pos (burst-damage target :damage-type DamageType.Fire
+          :amount @mon-damage
+          :color 'orange)
+        tile (list (at pos))
+        :if (= tile.stem "web")]
+      (.rm-from-map tile)))
+
+  :flavor "Clean out the cobwebs and have yourself some barbecued goblin.")
 
 
 (defclass FireBomb [Usable]

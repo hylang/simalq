@@ -488,6 +488,27 @@
   (assert (= G.score (+ (* 12 hp) 10 (* 3 hp) (* 4 hp) (* 5 hp)))))
 
 
+(defn test-wand-flame []
+  (init [
+    :height 1
+    :tiles ["wall" ["orc" :hp 10] ["orc" :hp 10] "web" "wall" ["orc" :hp 10]]])
+
+  (assert (= G.player.hp 100))
+  (use-item "wand of flame" 3 0)
+  ; The player is unhurt.
+  (assert (= G.player.hp 100))
+  ; Orc 1 takes 1 damage.
+  (assert-hp [2 0] 9)
+  ; Orc 2 takes 2 damage.
+  (assert-hp [3 0] 8)
+  ; The web is destroyed.
+  (assert-at [4 0] 'floor)
+  ; The wall is unaffected.
+  (assert-at [5 0] "wall")
+  ; Orc 3 is out of range and undamaged.
+  (assert-hp [6 0] 10))
+
+
 (defn test-fire-bomb []
   "Put some orcs in a line and check how much damage is done to each."
 
