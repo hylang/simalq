@@ -2,7 +2,7 @@
   hyrule [do-n])
 (import
   fractions [Fraction :as f/]
-  tests.lib [init assert-at assert-full-name assert-hp wait set-square wk shoot mv-player use-item top]
+  tests.lib [init assert-at assert-full-name assert-hp assert-textmap wait set-square wk shoot mv-player use-item top]
   simalq.util [StatusEffect]
   simalq.geometry [Direction Pos ray at burst]
   simalq.game-state [G])
@@ -648,6 +648,49 @@
   (wait)
   (assert-full-name [2 0] f"a blob (HP 3, wd ....., pw 0)")
   (assert-full-name [3 1] f"a blob (HP 2, wd ....., pw 0)"))
+
+
+(defn test-gunk []
+  (setv marks {
+    "O " "gunk"
+    "s " "gunk seed"})
+  (init [
+    :map "
+      O . . .
+      ████████
+      @ ██s . "
+    :map-marks marks])
+
+  ; Gunks take 5 turns to reproduce, and gunk seeds take 5 turns to
+  ; grow up.
+  (wait 4)
+  (assert-textmap :map-marks marks :text "
+    O . . .
+    ████████
+    @ ██s . ")
+  (wait)
+  (assert-textmap :map-marks marks :text "
+    O s . .
+    ████████
+    @ ██O . ")
+  ; The timing continues to all line up when gunks that are continuously in
+  ; the reality bubble grow or reproduce.
+  (wait 4)
+  (assert-textmap :map-marks marks :text "
+    O s . .
+    ████████
+    @ ██O . ")
+  (wait)
+  (assert-textmap :map-marks marks :text "
+    O O . .
+    ████████
+    @ ██O s ")
+  ; A slain adult gunk leaves behind a seed.
+  (use-item "standard bomb" 1 1)
+  (assert-textmap :map-marks marks :text "
+    s s . .
+    ████████
+    @ ██s . "))
 
 
 (defn test-specter []

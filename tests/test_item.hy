@@ -454,6 +454,7 @@
 
 (defn test-wand-death []
   (setv map-marks {
+    "s " "shade"
     "☉G" ["generator" :summon-class "ghost"]
     "☉o" ["generator" :summon-class "orc"]
     "##" "cracked wall"})

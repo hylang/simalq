@@ -645,6 +645,55 @@
   :flavor "What looks like a big mobile puddle of slime is actually a man-sized amoeba. It retains the ability to divide (but not, fortunately, to grow), and its lack of distinct internal anatomy makes arrows pretty useless. It has just enough intelligence to notice that you're standing next to it and try to envelop you in its gloppy bulk.")
 
 
+(deftile "s " "a gunk seed" Monster
+  :color 'dark-orange
+  :iq-ix 181
+  :destruction-points 10
+
+  :field-defaults (dict
+    :growth-timer 5)
+  :mutable-fields #("growth_timer")
+
+  :act (meth []
+    "Gunk Up — The monster's growth timer decreases by 1. If the timer has hit 0, it then transforms into an adult gunk."
+    (-= @growth-timer 1)
+    (when (= @growth-timer 0)
+      (make-monster @pos "gunk")
+      (@rm-from-map)))
+
+  :suffix-dict (meth []
+    (dict
+      #** (.suffix-dict (super))
+     :gt @growth-timer))
+  :info-bullets (meth [#* extra]
+    (.info-bullets (super)
+      #("Growth timer" @growth-timer)))
+
+  :flavor "A seed of discord the size of a basketball that can flood a room insde of a minute. Think fast.")
+
+(deftile "O " "a gunk" Summoner
+  :color 'dark-orange
+  :iq-ix 182
+  :destruction-points 0
+
+  :immune #(PlayerMelee MundaneArrow MagicArrow)
+  :damage-melee 2
+
+  :!summon-frequency (f/ 1 5)
+
+  :act (meth []
+    (doc f"Gunky — If the monster can attack, it does. Otherwise, it builds up {@summon-frequency} summoning power per turn, which it can use to summon gunk seeds per `Generate`.")
+    (or
+      (@try-to-attack-player)
+      (@summon :stem "gunk seed" :frequency @summon-frequency :hp 1)))
+
+  :hook-normal-destruction (meth []
+    "A gunk seed is created in its square."
+    (make-monster @pos "gunk seed"))
+
+  :flavor "A peevish and very prolific pile of puke that pokes with pseudopods. It resists most weapons, and even if you do manage to kill it, it leaves a seed behind.")
+
+
 (deftile "S " "a specter" Approacher
   :iq-ix 50
   :destruction-points 100
