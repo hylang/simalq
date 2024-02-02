@@ -23,7 +23,6 @@
 
 (do-mac `(do ~@(gfor [iq-ix stem] [
 
-    [104 "wand_of_annihilation"]
     [105 "exit_making_wand"]
     [106 "wand_of_gating"]
     [121 "poison_gas_bomb"]

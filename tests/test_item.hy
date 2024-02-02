@@ -488,6 +488,19 @@
   (assert (= G.score (+ (* 12 hp) 10 (* 3 hp) (* 4 hp) (* 5 hp)))))
 
 
+(defn test-wand-annihilation []
+  (init [])
+  (set-square 'E
+    "orc" "wall" "exit" "pile of gold" "negaton" "Void" "hole")
+  ; Everything except the Void is destroyed by annihilation.
+  (use-item "wand of annihilation" 1 0)
+  (assert-at 'E "Void")
+  ; Contra IQ, we allow the player to kill herself with a wand of
+  ; annihilation, because it's funny.
+  (use-item "wand of annihilation" 0 0)
+  (cant (wk 'E) "You're dead. You can undo or load a saved game."))
+
+
 (defn test-wand-flame []
   (init [
     :height 1

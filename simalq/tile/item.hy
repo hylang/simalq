@@ -8,7 +8,7 @@
   simalq.util [CommandError]
   simalq.game-state [G]
   simalq.geometry [pos-seed turn-and-pos-seed burst at]
-  simalq.tile [Tile]
+  simalq.tile [Tile Damageable]
   simalq.tile.scenery [Scenery]
   simalq.util [CommandError DamageType StatusEffect msg burst-damage refactor-hp])
 (setv  T True  F False)
@@ -411,6 +411,24 @@
       :color 'dark-gray))
 
   :flavor "This fell device vibrates with the barely contained energies of Hades as they hunger for the souls of the living. Aim carefully.")
+
+(deftile "/ " "a wand of annihilation" Usable
+  :color 'navy
+  :iq-ix 104
+  :acquirement-points 250
+
+  :use (meth [target]
+    "Utterly destroys everything at the target."
+    (for [t (list (at target))]
+      (cond
+        t.superblock
+          None
+        (isinstance t Damageable)
+          (.damage t Inf None)
+        T
+         (.rm-from-map t))))
+
+  :flavor "Now this is a real wand of nothing. A wand of nothingness. A wand of nothing left.")
 
 (deftile "/ " "a wand of flame" Usable
   :color 'orange
