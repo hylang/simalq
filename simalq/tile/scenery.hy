@@ -288,10 +288,12 @@
 
   :suffix-dict (meth []
     {
-      (.format "{}to level" (if (<= (@effective-level-n) G.level-n)
+      (.format "{}to" (if (<= (@effective-level-n) G.level-n)
         "back "
         ""))
-       (@effective-level-n)})
+      (if (> (@effective-level-n) (len G.quest.levels))
+        "victory"
+        f"level {(@effective-level-n)}")})
 
   :blocks-monster T
   :blocks-player-shots F :blocks-monster-shots F

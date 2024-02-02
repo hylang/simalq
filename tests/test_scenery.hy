@@ -163,7 +163,9 @@
   (assert-player-at 0 9)
 
   ; Exit from the last level, winning the game.
-  (wk 'E 15)
+  (wk 'E 14)
+  (assert-full-name 'E "an exit (to victory)")
+  (wk 'E)
   (assert (= G.player.game-over-state 'won))
   (cant (wk 'E) "You won the game. You can undo or load a saved game.")
 

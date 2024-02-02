@@ -241,7 +241,11 @@
       (when poison
         (+ "☠ " (mixed-number poison)))
       (when G.time-left
-        (.format "⏲ {:,} (→ DL {:,})" G.time-left G.level.next-level))
+        (.format "⏲ {:,} (→ {})"
+          G.time-left
+          (if (< G.level.next-level (len G.quest.levels))
+            (.format "DL {:,}" G.level.next-level)
+            "victory")))
       (when G.player.keys
         (.format "⚷ {}" G.player.keys))
       (when G.player.magic-arrows (+
