@@ -7,7 +7,7 @@
   simalq.color :as color
   simalq.util [CommandError DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction at burst dist dir-to ray]
-  simalq.tile [Tile Actor PosHooked EachTurner Damageable]
+  simalq.tile [Tile Actor PosHooked EachTurner Damageable annihilate]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -587,8 +587,7 @@
 
     ; At the target, tele-frag all tiles, which we already know must
     ; be monsters.
-    (for [tile (at target)]
-      (.damage tile Inf None))
+    (annihilate target)
 
     ; Now actually move the player.
     (.move G.player target)

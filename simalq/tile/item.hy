@@ -8,7 +8,7 @@
   simalq.util [CommandError]
   simalq.game-state [G]
   simalq.geometry [pos-seed turn-and-pos-seed burst at]
-  simalq.tile [Tile Damageable]
+  simalq.tile [Tile Damageable annihilate]
   simalq.tile.scenery [Scenery]
   simalq.util [CommandError DamageType StatusEffect msg burst-damage refactor-hp])
 (setv  T True  F False)
@@ -419,14 +419,7 @@
 
   :use (meth [target]
     "Utterly destroys everything at the target."
-    (for [t (list (at target))]
-      (cond
-        t.superblock
-          None
-        (isinstance t Damageable)
-          (.damage t Inf None)
-        T
-         (.rm-from-map t))))
+    (annihilate target))
 
   :flavor "Now this is a real wand of nothing. A wand of nothingness. A wand of nothing left.")
 

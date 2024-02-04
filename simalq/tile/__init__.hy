@@ -426,6 +426,18 @@
         (if @score-for-damaging " (scored per HP lost)" ""))))))
 
 
+(defn annihilate [pos]
+  "Destroy or remove everything at `pos`, except for superblockers."
+  (for [t (list (at pos))]
+    (cond
+      t.superblock
+        None
+      (isinstance t Damageable)
+        (.damage t Inf None)
+      T
+       (.rm-from-map t))))
+
+
 (import
   ; Chiefly for side-effects: namely, filling out `Tile.types` and
   ; `Tile.types-by-iq-ix`.
