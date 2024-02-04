@@ -13,7 +13,7 @@ Features of SQ include:
 
 - Playability on any platform with Python 3 and a compatible terminal emulator
 - Glorious roguelike-like console display, with no distracting graphics, sounds, or mouse support
-- Oodles of monsters, magic items, and tricky terrain
+- `Oodles of monsters, magic items, and tricky terrain <http://hylang.org/simalq/doc/tilepedia>`__
 - Deterministic, full-information gameplay
 - Undo with infinite history
 - Compatibility with quest (level) files in IQ's binary format
