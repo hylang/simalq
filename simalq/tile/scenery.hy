@@ -420,11 +420,12 @@
 (deftile "☯|" "a phase trigger" Scenery
   :iq-ix 142
 
+  :blocks-move T
+
   :hook-player-bump (meth [origin]
     (doc f"Phase-shifts all phasing walls on the level.")
     (PhasingWall.run-all)
     True)
-
   :hook-player-shot (meth []
     "As when bumped."
     (PhasingWall.run-all))
@@ -501,6 +502,7 @@
     :target None))
   (setv fields #("target"))
 
+  (setv blocks-monster T)
   (setv one-shot? F)
 
   (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
