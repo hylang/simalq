@@ -236,6 +236,39 @@
          [((get Tile.types-by-iq-ix te-v1) :pos pos)])]))
 
 
+(deftile "++" "a metal door" Scenery
+  :iq-ix 167
+
+  :blocks-move T
+
+  :flavor "This massive slab of steel will certainly not be opened with a sad little bargain-basement skeleton key. Your best bet is looking for a remote switch of some kind.")
+
+(deftile "+|" "a metal-door control" Scenery
+  :iq-ix 168
+  :field-defaults (dict
+    :target None)
+  :fields #("target")
+
+  :blocks-move T
+
+  :read-tile-extras (classmethod (fn [cls mk-pos v1 v2]
+    (dict :target (mk-pos #(v1 v2)))))
+  :suffix-dict (meth []
+    (dict :target @target))
+
+  :hook-player-bump (meth [origin]
+    (doc f"If there's a metal door at {@target}, it's destroyed. Otherwise, everything on the square is destroyed and a metal door is created there.")
+    (for [t (list (at @target))  :if (= t.stem "metal door")]
+      (.rm-from-map t)
+      (break)
+      (else
+        (annihilate @target)
+        (Tile.make @target "metal door")))
+    T)
+
+  :flavor "A switch (sadly too awkwardly designed to be flipped with an arrow from Tris's bow) that can open a metal door somewhere in the dungeon. It can also close the door, in case you want to bring half a ton of steel hurtling down on somebody's head.")
+
+
 (defclass OneWayDoor [Scenery]
 
   (setv

@@ -4,7 +4,7 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init init-boot-camp assert-at assert-full-name assert-textmap set-square mv-player assert-player-at wk wait shoot use-item use-cport]
+  tests.lib [init init-boot-camp locate assert-at assert-full-name assert-textmap set-square mv-player assert-player-at wk wait shoot use-item use-cport]
   simalq.util [GameOverException StatusEffect]
   simalq.geometry [at Pos]
   simalq.game-state [G]
@@ -132,6 +132,26 @@
   (assert-at 'E "treasure chest" "meal")
   (shoot 'E)
   (assert-at 'E "treasure chest"))
+
+
+(defn test-metal-door []
+  (init [:player-start [1 0]])
+
+  (set-square 'W ["metal-door control" :target (locate 'E)])
+  ; Use the control to create a door.
+  (wk 'W)
+  (assert-at 'E "metal door")
+  (cant (wk 'E) "Your way is blocked.")
+  ; Use the control to destroy the door.
+  (wk 'W)
+  (assert-at 'E 'floor)
+  ; Create the door again while other stuff is there, destroying it.
+  (set-square 'E "orc" "pile of gold" "wall")
+  (assert (= G.score 0))
+  (wk 'W)
+  (assert-at 'E "metal door")
+  ; Contra IQ, we get points for killing the orc this way.
+  (assert (= G.score 3)))
 
 
 (defn test-exit []
