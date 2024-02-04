@@ -409,6 +409,7 @@
 (deftile "☯ " "a phasing wall (out of phase)" PhasingWall
   :color 'light-gray
   :iq-ix 140
+
   :blocks-player-shots F
   ; Per IQ, a phasing wall is unaffected by a wall-destroying wand while
   ; out of phase.
