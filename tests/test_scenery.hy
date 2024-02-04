@@ -4,7 +4,7 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init init-boot-camp locate assert-at assert-full-name assert-textmap set-square mv-player assert-player-at wk wait shoot use-item use-cport]
+  tests.lib [init init-boot-camp locate assert-at assert-hp assert-full-name assert-textmap set-square mv-player assert-player-at wk wait shoot use-item use-cport]
   simalq.util [GameOverException StatusEffect]
   simalq.geometry [at Pos]
   simalq.game-state [G]
@@ -655,6 +655,41 @@
   (wk 'E)
   (assert-at 'here 'player)
   (assert (= (get G.player.status-effects StatusEffect.Para) 2)))
+
+
+(defn test-weakness-trap []
+
+  (init
+    [:tiles ["weakness trap" ["orc" :hp 10]]])
+  ; Get weakened.
+  (wk 'E)
+  ; The weakness trap is still there.
+  (assert-at 'here 'player "weakness trap")
+  ; Hit the orc. While Tris is weak, her sword does only 1 damage.
+  (assert-hp 'E 10)
+  (wk 'E)
+  (assert-hp 'E 9)
+  ; Arrows are unaffected; they still do 1 damage.
+  (shoot 'E)
+  (assert-hp 'E 8)
+  ; Likewise, magic arrows still do 3 damage.
+  (setv G.player.magic-arrows 1)
+  (shoot 'E)
+  (assert-hp 'E 5)
+
+  ; In IQ, the result of being weak while having the Holy Sword
+  ; depends on the order in which you get these effects. This is
+  ; undocumented and probably a bug. In SQ, the two effects cancel out
+  ; (making your sword do 2 damage), regardless of order.
+  (for [reverse? [F T]]
+    (setv ts ["Holy Sword" "weakness trap"])
+    (when reverse?
+      (setv ts (reversed ts)))
+    (init [
+      :height 1
+      :tiles [#* ts ["orc" :hp 10]]])
+    (wk 'E 3)
+    (assert-hp 'E 8)))
 
 
 (defn test-anti-magic-trap []

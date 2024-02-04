@@ -160,6 +160,9 @@
       ; How much damage the player does with her sword normally.
     player-melee-damage-artifact 3
       ; How much with the relevant artifact.
+    player-melee-damage-weakness-reduction 1
+      ; How much the player's sword damage is reduced by while she's
+      ; weak.
     player-shot-damage-base 1
       ; How much damage the player does with her bow normally.
     player-shot-damage-artifact 2

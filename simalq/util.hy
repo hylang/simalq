@@ -93,9 +93,13 @@
 
 (defn player-melee-damage []
   "Return how much damage the player does with her sword."
-  (if (get G.player.artifacts "Holy Sword")
-    G.rules.player-melee-damage-artifact
-    G.rules.player-melee-damage-base))
+  (-
+    (if (get G.player.artifacts "Holy Sword")
+      G.rules.player-melee-damage-artifact
+      G.rules.player-melee-damage-base)
+    (if (.player-has? StatusEffect.Weak)
+      G.rules.player-melee-damage-weakness-reduction
+      0)))
 
 (defn player-shot-damage [magic]
   "Return how much damage the player does with her bow."

@@ -764,6 +764,17 @@
 
   :flavor "This spiderweb is the size of a really big spiderweb. Until Idok cleans up the dungeon properly, you'll have to tediously carve your way through the webs with your sword. Got any recommendations for a good smitemaster?")
 
+(deftile "<>" "a weakness trap" Trap
+  :color 'magenta
+  :iq-ix 201
+
+  :!duration 12
+  :hook-player-walked-into (meth []
+    (doc f"Makes you weak for {@duration} more turns, reducing the damage of your sword strikes by {G.rules.player-melee-damage-weakness-reduction}.")
+    (.add StatusEffect.Weak @duration))
+
+  :flavor "This complex gadget swiftly adorns Tris with impractical hyperfeminine attire, including a frilly pink dress and stiletto heels. It will take more than that to extinguish Tris's indomitable tomboyish fighting spirit; still, the new duds make fighting a bit awkward. Fortunately, these are all disposable fast-fashion items made solely for the 'Gram #ootd, and will disintegrate in moments.")
+
 (deftile "<>" "an anti-magic trap" Trap
   :color 'blue
   :iq-ix 169
