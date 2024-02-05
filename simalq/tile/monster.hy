@@ -733,7 +733,7 @@
 
 (deftile "Z " "a turret" Stationary
   :iq-ix 101
-    ; This is call a "fire mage" in IQ. I've reflavored it to better
+    ; This is called a "fire mage" in IQ. I've reflavored it to better
     ; fit the mechanics.
   :destruction-points 150
     ; In IQ, there's special code to give points for killing fire
