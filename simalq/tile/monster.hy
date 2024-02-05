@@ -162,6 +162,9 @@
   (field-defaults
     approach-dir None)
   (setv mutable-fields #("approach_dir"))
+  (defmeth info-bullets [#* extra]
+    (.info-bullets (super)
+      #("Approach direction" @approach-dir)))
 
   (defmeth approach [
       [implicit-attack T]
@@ -227,11 +230,7 @@
     (@move target)
     (return T))
 
-  (setv act approach)
-
-  (defmeth info-bullets [#* extra]
-    (.info-bullets (super)
-      #("Approach direction" @approach-dir))))
+  (setv act approach))
 
 
 (defclass Wanderer [Monster]
@@ -239,6 +238,15 @@
   (field-defaults
     wander-state None)
   (setv mutable-fields #("wander_state"))
+  (defmeth suffix-dict []
+    (dict
+      #** (.suffix-dict (super))
+     :wd (@preview-dirs 5)))
+  (defmeth info-bullets [#* extra]
+    (.info-bullets (super)
+      #("Next few wandering directions" (+ (@preview-dirs 20)
+        (if @wander-state "" " (this monster is not yet seeded, so values will change if it first acts on a later turn)")))
+      #* extra))
 
   (defmeth wander [[implicit-attack T] [ethereal-to #()]]
     "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
@@ -281,18 +289,7 @@
         (setv [d state] (@pseudorandom-dir state))
         (if (is d None)
           "•"
-          (get d.arrows d))))))
-
-  (defmeth suffix-dict []
-    (dict
-      #** (.suffix-dict (super))
-     :wd (@preview-dirs 5)))
-
-  (defmeth info-bullets [#* extra]
-    (.info-bullets (super)
-      #("Next few wandering directions" (+ (@preview-dirs 20)
-        (if @wander-state "" " (this monster is not yet seeded, so values will change if it first acts on a later turn)")))
-      #* extra)))
+          (get d.arrows d)))))))
 
 
 (defclass Summoner [Monster]
@@ -302,6 +299,15 @@
     summon-power (f/ 0))
       ; A per-turn accumulator of summoning frequency.
   (setv mutable-fields #("summon_dir" "summon_power"))
+  (defmeth suffix-dict []
+    (dict
+      #** (.suffix-dict (super))
+     :pw (mixed-number @summon-power)))
+  (defmeth info-bullets [#* extra]
+    (.info-bullets (super)
+      #("Summoning power" (mixed-number @summon-power))
+      #("Summoning direction" @summon-dir)
+      #* extra))
 
   (defmeth summon [stem frequency hp]
     "Increment summon power. Then, try to generate one or more monsters
@@ -325,18 +331,7 @@
           (return)))
       ; We have a target. Place the monster.
       (make-monster target stem :hp hp))
-    T)
-
-  (defmeth suffix-dict []
-    (dict
-      #** (.suffix-dict (super))
-     :pw (mixed-number @summon-power)))
-
-  (defmeth info-bullets [#* extra]
-    (.info-bullets (super)
-      #("Summoning power" (mixed-number @summon-power))
-      #("Summoning direction" @summon-dir)
-      #* extra)))
+    T))
 
 
 (defclass Generated [Monster]
@@ -357,6 +352,16 @@
     :summon-frequency (f/ 1 4)
     :summon-hp 1)
       ; How many hit points each monster will be summoned with.
+  :suffix-dict (meth []
+    (dict
+      #** (.suffix-dict (super))
+      :freq (mixed-number @summon-frequency)
+      :sHP @summon-hp))
+  :info-bullets (meth []
+    (.info-bullets (super)
+      #("Summoning frequency" (mixed-number @summon-frequency))
+      #("Type of summoned monsters" @summon-class)
+      #("Hit points of summoned monsters" @summon-hp)))
 
   :mapsym (property-meth []
     (+ "☉" (self-sc mapsym [0])))
@@ -375,17 +380,6 @@
       (if sc.article (+ sc.article " ") "")
       (.replace sc.stem " " "-")
       (Tile.full-name.fget @)))
-  :suffix-dict (meth []
-    (dict
-      #** (.suffix-dict (super))
-      :freq (mixed-number @summon-frequency)
-      :sHP @summon-hp))
-
-  :info-bullets (meth []
-    (.info-bullets (super)
-      #("Summoning frequency" (mixed-number @summon-frequency))
-      #("Type of summoned monsters" @summon-class)
-      #("Hit points of summoned monsters" @summon-hp)))
 
   :act (meth []
     "Generate — The generator adds its summon frequency to its summon power. If the total is more than 1, the integer part is removed and a corresponding number of monsters are generated in adjacent empty squares. If there are no adjacent empty squares, the expended summon power is wasted. The square that the generator attempts to target rotates through the compass with each summon or failed attempt."
@@ -518,6 +512,9 @@
   :field-defaults (dict
     :shot-power (f/ 0))
   :mutable-fields #("shot_power")
+  :info-bullets (meth [#* extra]
+    (.info-bullets (super)
+      #("Shot power" @shot-power)))
 
   :damage-shot #(1 2 3)
   :!flee-range 2
@@ -536,10 +533,6 @@
         (@try-to-attack-player :shots-ignore-obstacles T)
         (return)))
     (@wander :implicit-attack F))
-
-  :info-bullets (meth [#* extra]
-    (.info-bullets (super)
-      #("Shot power" @shot-power)))
 
   :flavor-mon #[[Weak but incredibly annoying, this snickering little fiend is called a "lobber" in the tongue of the ancients. It throws hellstones, cursed missiles that can pierce most any obstacle. In close quarters, it resorts to cowering helplessly and begging for mercy, but, being a literal demon, it has no compunctions about getting right back to firing at you the moment it feels safe.]]
   :flavor-gen "They don't make ziggurats like they used to.")
@@ -653,14 +646,6 @@
   :field-defaults (dict
     :growth-timer 5)
   :mutable-fields #("growth_timer")
-
-  :act (meth []
-    "Gunk Up — The monster's growth timer decreases by 1. If the timer has hit 0, it then transforms into an adult gunk."
-    (-= @growth-timer 1)
-    (when (= @growth-timer 0)
-      (make-monster @pos "gunk")
-      (@rm-from-map)))
-
   :suffix-dict (meth []
     (dict
       #** (.suffix-dict (super))
@@ -668,6 +653,13 @@
   :info-bullets (meth [#* extra]
     (.info-bullets (super)
       #("Growth timer" @growth-timer)))
+
+  :act (meth []
+    "Gunk Up — The monster's growth timer decreases by 1. If the timer has hit 0, it then transforms into an adult gunk."
+    (-= @growth-timer 1)
+    (when (= @growth-timer 0)
+      (make-monster @pos "gunk")
+      (@rm-from-map)))
 
   :flavor "A seed of discord the size of a basketball that can flood a room insde of a minute. Think fast.")
 
