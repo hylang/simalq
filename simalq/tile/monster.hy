@@ -246,7 +246,7 @@
     (when (and implicit-attack (@try-to-attack-player))
       (return))
 
-    (setv [d @wander-state] (@pseudorandom-dirs @wander-state))
+    (setv [d @wander-state] (@pseudorandom-dir @wander-state))
     (unless d
       (return))
     (setv [target wly] (walkability @pos d :monster? T :ethereal-to ethereal-to))
@@ -258,18 +258,18 @@
 
   (setv act wander)
 
-  (defmeth pseudorandom-dirs [state]
+  (defmeth pseudorandom-dir [state]
     "Use a linear congruential generator. Each seed should have a
     decent period coprime to the number of options (9)—long enough
     to look randomish, but not long.
-    https://en.wikipedia.org/w/index.php?title=Linear_congruential_generator&oldid=1140372972#c_%E2%89%A0_0"
+    https://en.wikipedia.org/w/index.php?title=Linear_congruential_generator&oldid=1140372972#c_%E2%89%A0_0
+    Return the next value and the next state."
 
     (setv  m (** 8 3)  c 1  a (+ 2 1))
     (setv options (+ Direction.all #(None)))
     (when (is state None)
       ; Seed the RNG.
       (setv state (% (turn-and-pos-seed @pos) m)))
-    ; Return the next value and the next state.
     #(
       (get options (% state (len options)))
       (% (+ (* a state) c) m)))
@@ -278,7 +278,7 @@
     (.join "" (do
       (setv state @wander-state)
       (list-n n
-        (setv [d state] (@pseudorandom-dirs state))
+        (setv [d state] (@pseudorandom-dir state))
         (if (is d None)
           "•"
           (get d.arrows d))))))
