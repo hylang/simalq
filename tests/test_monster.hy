@@ -777,6 +777,45 @@
   (assert (= G.score 150)))
 
 
+(defn test-teleporting-mage []
+  (defn check [text-map]
+    (init [:map text-map :map-marks {
+      "1 " "teleporting mage"
+      "2 " 'floor}])
+    (wait)
+    (assert-textmap text-map :map-marks {
+      "1 " 'floor
+      "2 " "teleporting mage"}))
+
+  ; Teleporting mages prefer to be distance 2 to the north.
+  (check "
+    . . . . . . .
+    . . . 2 . . .
+    . . . . . . .
+    . . . @ . . .
+    . 1 . . . . .
+    . . . . . . .
+    . . . . . . .")
+  ; They'll try farther distances if they can't get distance 2.
+  (check "
+    . . . . . . .
+    . ██. ██. ██.
+    . . . . . . .
+    . ██. @ . ██.
+    . 1 . . . . .
+    . ██. ██. ◀▶.
+    . . . . . . 2")
+  ; And adjacency if they can't get farther.
+  (check "
+    . . . . . . .
+    . ██. ██. ██.
+    . . . ◀▶◀▶. .
+    . ██2 @ ◀▶██.
+    . 1 ◀▶◀▶◀▶. .
+    . ██. ██. ██.
+    . . . . . . ."))
+
+
 (defn test-archmage []
   (init [:tiles [
     "archmage"

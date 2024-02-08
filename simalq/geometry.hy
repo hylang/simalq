@@ -119,8 +119,11 @@
     #(@x @y))
 
   (defmeth __add__ [direction]
+    (@+n 1 direction))
+
+  (defmeth +n [n direction]
     (try
-      (Pos @map (+ @x direction.x) (+ @y direction.y))
+      (Pos @map (+ @x (* n direction.x)) (+ @y (* n direction.y)))
       (except [GeometryError]))))
 
 (hy.repr-register Pos str)

@@ -44,7 +44,6 @@
     [183 "magical_key"]
     [184 "giant_ant"]
     [185 "dark_brain"]
-    [186 "invisible_mage"]
     [187 "magical_mirror"]
     [190 "wall_generator_north"]
     [191 "wall_generator_south"]

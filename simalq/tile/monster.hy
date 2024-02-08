@@ -7,7 +7,7 @@
   fractions [Fraction :as f/]
   enum [Enum]
   toolz [unique]
-  simalq.util [DamageType StatusEffect next-in-cycle mixed-number]
+  simalq.util [DamageType StatusEffect next-in-cycle mixed-number seq]
   simalq.geometry [Direction at dist adjacent? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
   simalq.tile [Tile Actor Damageable]
@@ -65,15 +65,16 @@
       (not (adjacent? (or mon-pos @pos) G.player.pos))
       (not @sees-invisible)))
 
-  (defmeth try-to-attack-player [[dry-run F] [shots-ignore-obstacles F]]
+  (defmeth try-to-attack-player [[dry-run F] [shots-ignore-obstacles F] [pos None]]
     "Try to melee or shoot the player, if the monster can. Return true
     if it succeeded. If `dry-run` is true, the attack isn't actually
     made."
 
-    (setv d (dir-to @pos G.player.pos))
+    (setv pos (or pos @pos))
+    (setv d (dir-to pos G.player.pos))
     (setv attack None)
 
-    (when (= @pos G.player.pos)
+    (when (= pos G.player.pos)
       ; If we're on the player's square, we can't attack her.
       (return F))
 
@@ -83,14 +84,14 @@
     ; Try a melee attack first.
     (when (and
         @damage-melee
-        (adjacent? @pos G.player.pos)
-        (in (get (walkability @pos d :monster? T) 1)
+        (adjacent? pos G.player.pos)
+        (in (get (walkability pos d :monster? T) 1)
           ['bump 'walk]))
       (setv attack 'melee))
 
     ; Otherwise, try a ranged attack.
     (when (and (not attack) @damage-shot)
-      (for [target (ray :pos @pos :direction d :length
+      (for [target (ray :pos pos :direction d :length
           (min (or @shot-range Inf) G.rules.reality-bubble-size))]
         (when (= target G.player.pos)
           (setv attack 'shot)
@@ -745,6 +746,48 @@
   :damage-shot 10
 
   :flavor "A wretched organic structure, fashioned from fiendish flesh. It twists about to aim its toothy maw, from which it belches flame. It's immobile, but dark magics make it almost invulnerable… almost.")
+
+
+(deftile "W " "a teleporting mage" Monster
+  :color 'purple
+  :iq-ix 186  ; invisible mage
+  :destruction-points 100
+
+  :field-defaults (dict
+    :shot-power (f/ 0))
+  :mutable-fields #("shot_power")
+  :info-bullets (meth [#* extra]
+    (.info-bullets (super)
+      #("Shot power" @shot-power)))
+
+  :damage-shot 10
+  :!shot-frequency (f/ 3 4)
+
+  :act (meth []
+    (doc f"Teleport Attack — If the monster has line of sight to you, it adds {@shot-frequency} to its shot power. If this is ≥1, it subtracts 1 to shoot you. If it doesn't shoot you, it tries to teleport into line of sight, preferring to be as close as possible to you without being adjacent. Its destination must lie in the reality bubble.")
+    ; Teleporting mages' movement is much smarter than that of IQ's
+    ; invisible mages, which compensates for the loss of their main
+    ; ability.
+    (when (@player-invisible-to?)
+      (return))
+    (when (@try-to-attack-player :dry-run T)
+      (+= @shot-power @shot-frequency)
+      (when (pop-integer-part @shot-power)
+        (@try-to-attack-player)
+        (return)))
+    (for [
+        dist-from-player [#* (seq 2 G.rules.reality-bubble-size) 1]
+        direction Direction.all
+        :if (setx target (.+n G.player.pos dist-from-player direction))]
+      (when (and
+          (or
+            (= target @pos)
+            (not (nogo? target :monster? T :ethereal-to #())))
+          (@try-to-attack-player :dry-run T :pos target))
+        (@move target)
+        (return))))
+
+  :flavor "This academic has perfected the art of avoiding faculty meetings, thesis committees, institutional review boards, classes, and his own office hours, preferring instead to transport himself to conferences in tropical destinations. His strategy for evaluating students (such as yourself) is to observe them from afar and see how they perform under pressure.")
 
 
 (deftile "W " "an archmage" Approacher
