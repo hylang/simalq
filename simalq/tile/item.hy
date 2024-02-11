@@ -258,7 +258,7 @@
   :flavor "A star-shaped pendant with two black spots in the center. Its magic is short-lived but potent indeed.")
 
 (deftile "! " "a passwall amulet" StatusEffectItem
-  :color 'dark-orange
+  :color 'purple
   :iq-ix 151
   :acquirement-points 150
 
@@ -292,6 +292,18 @@
   :help (meth []
     f"Makes you invisible for {@duration} more turns. Most monsters can't track or shoot you while you're invisible, unless you're adjacent to them.")
   :flavor "A cape enchanted with the power of the night sky. Try not to get it snagged on any loose flagstones (especially when it's invisible).")
+
+(deftile "! " "a ring of protection" StatusEffectItem
+  :color 'dark-orange
+  :iq-ix 158
+  :acquirement-points 150
+
+  :effect StatusEffect.Prot
+  :duration 25
+
+  :help (meth []
+    f"Protects you (for {@duration} more turns) from harmful status effects and disenchantment.")
+  :flavor "Also known as a ring of anti-anti-magic. Fortunately, anti-anti-anti-magic traps are still in dungeon R&D.")
 
 
 (defclass Usable [Item]

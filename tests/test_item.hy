@@ -6,6 +6,7 @@
   tests.lib [init init-boot-camp assert-at assert-player-at assert-hp assert-textmap set-square mv-player wk shoot wait use-item top]
   simalq.geometry [Pos Direction at]
   simalq.game-state [G]
+  simalq.util [StatusEffect]
   simalq.quest-definition [mk-tile])
 (setv  T True  F False)
 
@@ -315,6 +316,41 @@
   (wk 'SW)
   (assert (= G.player.hp 97))
   (assert-at [1 4] "devil"))
+
+
+(defn test-ring-of-protection []
+  (init [
+    :height 1
+    :tiles [
+      "passwall amulet" "ring of protection"
+      "anti-magic trap" "weakness trap"
+      "pile of gold" "hole" "archmage"]])
+  (defn check [player-hp pass prot]
+    (assert (= G.player.hp player-hp))
+    (assert (= (.player-has? StatusEffect.Pass) pass))
+    (assert (= (.player-has? StatusEffect.Prot) prot)))
+
+  ; A ring of protection makes an anti-magic trap ineffective.
+  (wk 'E 3)
+  (check 100 T T)
+  ; Likewise a weakness trap.
+  (wk 'E)
+  (assert (not (.player-has? StatusEffect.Weak)))
+  ; The archmage's shots have no effect, since we have an effect to
+  ; disenchant (`Pass`), but he can't actually remove it due to
+  ; `Prot`.
+  (wk 'E)
+  (check 100 T T)
+  ; Just before `turn-n` advances to 20, `Pass` ends. `Prot` is still
+  ; in effect, but doesn't do anything about damaging shots from the
+  ; archmage.
+  (wait 14)
+  (assert (= G.turn-n 19))
+  (check 100 T T)
+  (wait)
+  (check 100 F T)
+  (wait)
+  (check 88 F T))
 
 
 (defn test-inventory []

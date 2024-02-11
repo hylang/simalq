@@ -780,7 +780,7 @@
   :iq-ix 169
 
   :hook-player-walked-into (meth []
-    (doc (.format "Removes the first beneficial status effect that you have from the following list: {}."
+    (doc (.format "Disenchants you, removing the first beneficial status effect that you have from the following list: {}."
       (.join ", " (gfor  e (StatusEffect.disenchantable)  e.name))))
     (StatusEffect.disenchant-player))
 

@@ -144,6 +144,9 @@
     (bool (get G.player.status-effects @)))
 
   (defmeth add [duration]
+    (when (and (@bad?) (.player-has? StatusEffect.Prot))
+      ; Protection prevents harmful effects.
+      (return))
     (+= (get G.player.status-effects @) duration))
 
   (defn [classmethod] disenchantable [cls]
@@ -157,13 +160,12 @@
 
   (defn [classmethod] disenchant-player [cls]
     "Try to remove a beneficial status effect from the player. Return
-    `True` on success."
-    (when (.player-has? StatusEffect.Prot)
-      ; Protection prevents disenchantment.
-      (return F))
+    `True` if there was a removable beneficial effect; under
+    protection, it still won't actually be removed."
     ; Remove the first eligible effect that the player actually has.
     (for [effect (.disenchantable cls)  :if (.player-has? effect)]
-      (setv (get G.player.status-effects effect) 0)
+      (unless (.player-has? StatusEffect.Prot)
+        (setv (get G.player.status-effects effect) 0))
       (return T))
     F)
 

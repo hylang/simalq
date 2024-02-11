@@ -31,7 +31,6 @@
     [132 "golem"]
     [134 "siren"]
     [152 "random_gate"]
-    [158 "ring_of_protection"]
     [159 "amulet_of_poisonous_touch"]
     [164 "cyclops"]
     [165 "dark_prince"]

@@ -799,7 +799,7 @@
   :sees-invisible T
 
   :act (meth []
-    (doc (.format "Disenchant — If it's not adjacent but has line of effect to you, the monster removes the first beneficial status effect that you have from the following list: {}. Otherwise, it behaves per `Approach`."
+    (doc (.format "Disenchant — If it's not adjacent but has line of effect to you, the monster disenchants you, removing the first beneficial status effect that you have from the following list: {}. Otherwise, it behaves per `Approach`."
       (.join ", " (gfor  e (StatusEffect.disenchantable)  e.name))))
     (if (and
         (not (adjacent? @pos G.player.pos))
