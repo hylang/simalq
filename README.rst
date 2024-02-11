@@ -22,7 +22,9 @@ Features of SQ include:
 Usage
 ============================================================
 
-You can install SQ via `pip <https://packaging.python.org/en/latest/tutorials/installing-packages/>`__ from the `Python Package Index (PyPI) <https://pypi.org/project/simalq/>`__ with the command ``pip install simalq``, or from source with  ``pip install .``. For the best display, you should use a terminal emulator that supports 24-bit color (I'm a fan of `Konsole <https://konsole.kde.org>`__), but SQ should be able to cope with less color support and use the best approximations available via its dependency `blessed <https://pypi.org/project/blessed/>`__. For improved speed, try PyPy instead of CPython.
+You can install SQ via `pip <https://packaging.python.org/en/latest/tutorials/installing-packages/>`__ from the `Python Package Index (PyPI) <https://pypi.org/project/simalq/>`__ with the command ``pip install simalq``, or from source with  ``pip install .``. For improved speed, try PyPy instead of CPython.
+
+For the best display, you should use a terminal emulator that supports 24-bit color (I'm a fan of `Konsole <https://konsole.kde.org>`__), but SQ should be able to cope with less color support and use the best approximations available via its dependency `blessed <https://pypi.org/project/blessed/>`__. For Windows, SheepsTooth (an SQ fan) has kindly put together `a little step-by-step guide <https://github.com/hylang/simalq/files/14231807/Simalq.instructions.odt>`__ on getting the game to look nice in PowerShell.
 
 Run SQ with ``python3 -m simalq``, or run the tests with ``pytest``. Use ``python3 -m simalq --help`` for options. A good way to start is Tutorial Quest: ``python3 -m simalq Tutorial_Quest``.
 
