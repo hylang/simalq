@@ -488,6 +488,26 @@
   (assert-at [3 0] "wall"))
 
 
+(defn test-wand-webs []
+  (init [
+    :height 1
+    :tiles ['floor "pile of gold" 'floor "wall" "giant spider" "wall" 'floor 'floor]])
+
+  (setv G.rules.reality-bubble-size 7)
+  (use-item "wand of webs")
+  ; Every free square in the reality bubble gets a web.
+  ; (The wand doesn't add a web under the spider, but the spider makes
+  ; one itself.)
+  (assert-at [1 0] "web")
+  (assert-at [2 0] "pile of gold")
+  (assert-at [3 0] "web")
+  (assert-at [4 0] "wall")
+  (assert-at [5 0] "giant spider" "web")
+  (assert-at [6 0] "wall")
+  (assert-at [7 0] "web")
+  (assert-at [8 0] 'floor))
+
+
 (defn test-wand-death []
   (setv map-marks {
     "s " "shade"

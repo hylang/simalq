@@ -409,6 +409,21 @@
 
   :flavor "This attempt to create a portable phase trigger didn't entirely succeed.")
 
+(deftile "/ " "a wand of webs" Usable
+  :color 'dark-gray
+  :iq-ix 170
+  :acquirement-points 150
+
+  :targeted F
+  :use (meth []
+    "Creates a web at every empty square in the reality bubble."
+    (for [
+        pos (burst G.player.pos G.rules.reality-bubble-size)
+        :if (not (at pos))]
+      (Tile.make pos "web")))
+
+  :flavor "Of all the wands you can find in the dungeon, this can truly be said to be one of them. It looks and feels awfully like a body part from an oversized arachnid, and it makes a huge mess, but it has its uses.")
+
 (deftile "/ " "a wand of death" Usable
   :color 'blue
   :iq-ix 156
