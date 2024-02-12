@@ -4,7 +4,7 @@
   fractions [Fraction :as f/]
   re
   hyrule [parse-args]
-  simalq [__version__]
+  simalq [version-string]
   simalq.un-iq [iq-quest iq-quests-raw]
   simalq.quest-definition [builtin-quests])
 
@@ -23,7 +23,6 @@
 
 
 (defn handle-cmdline-args [args]
-  (setv version-string f"Infinitesimal Quest 2 + ε version {__version__}")
   (setv p (parse-args :args args
     :prog "simalq"
     :description (+ version-string "\n" url)

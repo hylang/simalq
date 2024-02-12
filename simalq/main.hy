@@ -4,6 +4,7 @@
 (import
   time [sleep]
   contextlib [contextmanager]
+  simalq [version-string]
   simalq.strings
   simalq.util [CommandError StatusEffect message-queue msg DamageType GameOverException menu-letters]
   simalq.color :as color
@@ -319,4 +320,6 @@
     "You've escaped the dungeon and returned home to your kingdom, safe and sound. Congratulations!\n"
     "\n"
     f"Score: {G.score :10,}\n"
-    f"Turn:  {G.turn-n :10,}")))
+    f"Turn:  {G.turn-n :10,}\n"
+    "\n"
+    version-string)))
