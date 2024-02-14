@@ -85,7 +85,10 @@
     (with [~e (hy.I.pytest.raises hy.I.simalq/util.CommandError)]
       ~form)
     ~@(when msg-check
-      [`(assert (= (. ~e value args [0]) ~msg-check))])))
+      [`(assert (= (. ~e value args [0]) ~msg-check) (.format
+        "Expected CommandError {}; got {}"
+        (hy.repr (str ~msg-check))
+        (hy.repr (. ~e value args [0]))))])))
 
 
 (defn wk [direction-abbr [n-times 1]]
