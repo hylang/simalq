@@ -1,3 +1,7 @@
+;; --------------------------------------------------------------
+;; * Imports
+;; --------------------------------------------------------------
+
 (require
   hyrule [unless]
   simalq.macros [defmeth]
@@ -11,6 +15,9 @@
   simalq.game-state [G])
 (setv  T True  F False)
 
+;; --------------------------------------------------------------
+;; * The parent class
+;; --------------------------------------------------------------
 
 (defclass Scenery [Tile]
   "A mostly static part of the level, such as a wall or trap."
@@ -64,6 +71,9 @@
         #("Special effect" f"If you end your turn within 1 square of this tile, you'll take {G.rules.poison-emitter-damage} poison damage. This effect applies no more once per turn."))
       (@dod "Behavior" 'act))))
 
+;; --------------------------------------------------------------
+;; * Helpers
+;; --------------------------------------------------------------
 
 (defn walkability [p direction monster? [ethereal-to #()]]
   "Can an actor at `p` walk in `direction`, or at least bump something
@@ -113,13 +123,15 @@
         (and tile.blocks-move (or monster?
           (not (and tile.passwallable (.player-has? StatusEffect.Pass))))))))))))
 
-
 (defclass Wallish [Scenery]
   (setv
     blocks-move T blocks-diag T
     passwallable T
     wand-destructible T))
 
+;; --------------------------------------------------------------
+;; * Basic scenery
+;; --------------------------------------------------------------
 
 (deftile "██" "a wall" Wallish
   :iq-ix #(
@@ -167,6 +179,14 @@
   :iq-ix 5
   :blocks-monster T
   :flavor "Unlocked, but it just won't stay open. Maybe that's for the best, since monsters are too dumb to operate it.")
+
+;; --------------------------------------------------------------
+;; * Doors
+;; --------------------------------------------------------------
+
+;; --------------------------------------------------------------
+;; ** Locked doors
+;; --------------------------------------------------------------
 
 (defclass LockedDoor [Scenery]
   (setv
@@ -235,6 +255,9 @@
          ((get Tile.types-by-iq-ix te-v1) pos None te-v2)
          [((get Tile.types-by-iq-ix te-v1) :pos pos)])]))
 
+;; --------------------------------------------------------------
+;; ** Metal doors
+;; --------------------------------------------------------------
 
 (deftile "++" "a metal door" Scenery
   :iq-ix 167
@@ -268,6 +291,9 @@
 
   :flavor "A switch (sadly too awkwardly designed to be flipped with an arrow from Tris's bow) that can open a metal door somewhere in the dungeon. It can also close the door, in case you want to bring half a ton of steel hurtling down on somebody's head.")
 
+;; --------------------------------------------------------------
+;; ** One-way doors
+;; --------------------------------------------------------------
 
 (defclass OneWayDoor [Scenery]
 
@@ -301,6 +327,9 @@
       :iq-ix ~iq-ix
       :direction (. Direction ~(hy.models.Symbol direction.abbr))))))
 
+;; --------------------------------------------------------------
+;; * Exits
+;; --------------------------------------------------------------
 
 (deftile :name "an exit" :superc Scenery
   :field-defaults (dict
@@ -346,6 +375,9 @@
 
   :flavor "Get me outta here.")
 
+;; --------------------------------------------------------------
+;; * Disappearing walls
+;; --------------------------------------------------------------
 
 (deftile "##" "a cracked wall" [Wallish Damageable]
   :field-defaults (dict
@@ -466,6 +498,9 @@
 
   :flavor "An immobile switch that toggles phasing walls. Tris's expertise in target shooting allows her to trigger one of these with a single arrow.")
 
+;; --------------------------------------------------------------
+;; * Pushblocks
+;; --------------------------------------------------------------
 
 (deftile :name "a pushblock" :superc Scenery
   :field-defaults (dict
@@ -511,6 +546,9 @@
 
   :flavor "Where do video games get all their crates from? There must be entire warehouses full of 'em, am I right?")
 
+;; --------------------------------------------------------------
+;; * Fountains
+;; --------------------------------------------------------------
 
 (deftile "{ " "a water fountain" Scenery
   :color 'steel-blue
@@ -530,6 +568,13 @@
 
   :flavor "An ornate decorative fountain featuring a statue of Death himself. The fountain's spray fills the air about it with a suffocating miasma.")
 
+;; --------------------------------------------------------------
+;; * Teleportation
+;; --------------------------------------------------------------
+
+;; --------------------------------------------------------------
+;; ** Gates
+;; --------------------------------------------------------------
 
 (defclass Gate [Scenery]
   (setv field-defaults (dict
@@ -564,6 +609,9 @@
   :iq-ix 162
   :one-shot? T)
 
+;; --------------------------------------------------------------
+;; ** Teleporters
+;; --------------------------------------------------------------
 
 (deftile "┣┫" "a teleporter" Scenery
   :color 'purple
@@ -634,7 +682,6 @@
 
   :flavor "A bulky cubic device representing an early attempt at teleportation technology. Its operation is a bit convoluted. The fun part is, you can tele-frag with it.")
 
-
 (deftile "┣┫" "a controllable teleporter" Scenery
   :color 'dark-green
   :iq-ix 133
@@ -661,12 +708,19 @@
 
   :flavor "Go anywhere your heart desires! Restrictions apply.")
 
+;; --------------------------------------------------------------
+;; * Traps
+;; --------------------------------------------------------------
 
 (defclass Trap [Scenery]
   (setv
     blocks-move F
     blocks-player-shots F
     blocks-monster-shots F))
+
+;; --------------------------------------------------------------
+;; * Wallfall traps
+;; --------------------------------------------------------------
 
 (deftile :name "a wallfall trap"  :superc Trap
   :color 'dark-yellow
@@ -714,6 +768,9 @@
 
   :flavor "The special thing about this wall is that it can be destroyed by wallfall traps of the corresponding type.\n\nWhat's the deal with monster closets? Monsters are proud of who they are, am I right? I'll be here all week.")
 
+;; --------------------------------------------------------------
+;; ** Damaging traps
+;; --------------------------------------------------------------
 
 (defclass DamagingTrap [Trap]
 
@@ -741,6 +798,9 @@
   :one-shot? T
   :flavor "A tiny hole in the floor that shoots a ball bearing in your eye with uncanny accuracy. Fortunately, it has only one shot.")
 
+;; --------------------------------------------------------------
+;; ** Status-effect traps
+;; --------------------------------------------------------------
 
 (deftile "<>" "a paralysis trap" Trap
   :color 'purple
@@ -786,6 +846,9 @@
 
   :flavor "May I take your cloak?")
 
+;; --------------------------------------------------------------
+;; ** Poison plates
+;; --------------------------------------------------------------
 
 (defclass PoisonPlate [Trap]
   "A replacement for IQ's poisonous amulets and counterpoison amulets.
@@ -812,6 +875,9 @@
   :iq-ix 149
   :poison-multiplier (f/ 1 2))
 
+;; --------------------------------------------------------------
+;; ** Other traps
+;; --------------------------------------------------------------
 
 (deftile "<>" "a phase trap" Trap
   :color 'brown
@@ -823,7 +889,6 @@
     (@rm-from-map))
 
   :flavor "A pressure plate faintly inscribed with a ying-yang symbol.")
-
 
 (deftile ", " "a broken trap" Trap
   :iq-ix #(
@@ -846,6 +911,9 @@
 
   :flavor "Dungeon trash like sawdust, loose stones, pebbles, greasy chicken bones left over from goblin feasts, broken wands, and maybe a dead body, all bunched together into a small mound. Running through it will knock it over and get your boots really gross.")
 
+;; --------------------------------------------------------------
+;; * Magical energy shields
+;; --------------------------------------------------------------
 
 (deftile "()" "a magical energy shield" [Scenery EachTurner]
   :color 'dark-orange

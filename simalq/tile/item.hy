@@ -1,3 +1,7 @@
+;; --------------------------------------------------------------
+;; * Imports
+;; --------------------------------------------------------------
+
 (require
   hyrule [branch]
   simalq.macros [unless defmeth]
@@ -13,6 +17,9 @@
   simalq.util [CommandError DamageType StatusEffect msg burst-damage refactor-hp])
 (setv  T True  F False)
 
+;; --------------------------------------------------------------
+;; * The parent class
+;; --------------------------------------------------------------
 
 (defclass Item [Tile]
   "An object the player can pick up."
@@ -32,6 +39,9 @@
     (@dod "Effect when you shoot it" 'hook-player-shot)
     #("Point value" (format @acquirement-points ","))]))
 
+;; --------------------------------------------------------------
+;; * Treasure
+;; --------------------------------------------------------------
 
 (deftile "$ " "a lump of fool's gold" Item
   :color 'orange
@@ -61,6 +71,9 @@
   :acquirement-points 250
   :flavor "Ooh, shinier.")
 
+;; --------------------------------------------------------------
+;; * Food
+;; --------------------------------------------------------------
 
 (defclass Food [Item]
   (setv
@@ -191,6 +204,9 @@
   :dmg-player 20
   :dmg-monster 3))
 
+;; --------------------------------------------------------------
+;; * Miscellany
+;; --------------------------------------------------------------
 
 (deftile "⚷ " "a key" Item
   :iq-ix 19
@@ -208,7 +224,6 @@
 
   :flavor "Idok uses only the worst locks and keys that money can buy. The keys are bulky and heavy, yet immediately snap into pieces on being used once, and every lock can be opened by any old key.")
 
-
 (deftile "↑ " "some magic arrows" Item
   :color 'purple
   :iq-ix 27
@@ -219,7 +234,6 @@
     (+= G.player.magic-arrows G.rules.magic-arrows-pickup-size))
 
   :flavor "Now we're talkin'! These missiles engraved with mystical runes hit hard and keep on going. Sadly, Tris is so excited to use them that she can't shoot mundane arrows until she's used them all up.")
-
 
 (deftile "⏲ " "a clock" Item
   :iq-ix 138
@@ -233,6 +247,9 @@
 
   :flavor "Oh dear! Oh dear! I shall be late!")
 
+;; --------------------------------------------------------------
+;; * Status-effect items
+;; --------------------------------------------------------------
 
 (defclass StatusEffectItem [Item]
   (setv
@@ -305,6 +322,9 @@
     f"Protects you (for {@duration} more turns) from harmful status effects and disenchantment.")
   :flavor "Also known as a ring of anti-anti-magic. Fortunately, anti-anti-anti-magic traps are still in dungeon R&D.")
 
+;; --------------------------------------------------------------
+;; * Usables
+;; --------------------------------------------------------------
 
 (defclass Usable [Item]
   "An item that's added to your inventory and can thereafter be
@@ -339,6 +359,10 @@
     (.info-bullets (super)
       (@dod f"Effect when applied ({(if @targeted "" "un")}targeted)" 'use)
       #* extra)))
+
+;; --------------------------------------------------------------
+;; ** Wands
+;; --------------------------------------------------------------
 
 (deftile "/ " "a wand of nothing" Usable
   :iq-ix 147  ; wand of light
@@ -468,6 +492,9 @@
 
   :flavor "Clean out the cobwebs and have yourself some barbecued goblin.")
 
+;; --------------------------------------------------------------
+;; ** Bombs
+;; --------------------------------------------------------------
 
 (defclass FireBomb [Usable]
   (setv
@@ -558,6 +585,9 @@
 
   :flavor "Magic and technology have combined into an explosive that can make the earth itself tremble in a limited area. The methodology was originally developed as an alternative to fracking, but it proved more useful in military applications.\n\n    You were too tricky for your own good, Thanos!")
 
+;; --------------------------------------------------------------
+;; * Artifacts
+;; --------------------------------------------------------------
 
 (defclass Artifact [Item]
   (setv

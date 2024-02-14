@@ -1,3 +1,7 @@
+;; --------------------------------------------------------------
+;; * Imports
+;; --------------------------------------------------------------
+
 (require
   hyrule [unless do-n list-n]
   simalq.macros [field-defaults pop-integer-part defmeth defmacro-kwargs]
@@ -14,12 +18,18 @@
   simalq.tile.scenery [Scenery walkability nogo?])
 (setv  T True  F False)
 
+;; --------------------------------------------------------------
+;; * Declarations
+;; --------------------------------------------------------------
 
 ((fn [] (for [dt DamageType]
   (setv (get (globals) dt.name) dt))))
 
 (setv undead-immunities #(Poison DeathMagic))
 
+;; --------------------------------------------------------------
+;; * The parent class
+;; --------------------------------------------------------------
 
 (defclass Monster [Actor Damageable]
   "A non-player character, typically out to kill the player."
@@ -144,19 +154,20 @@
       #* extra
       (@dod "Behavior" 'act))))
 
-
 (defn make-monster [pos stem #** kwargs]
   (Tile.make pos stem #** kwargs)
   ; Newly created monsters don't get to act on the turn they come
   ; into being.
   (setv (. (at pos) [-1] last-acted) G.turn-n))
 
+;; --------------------------------------------------------------
+;; * Common behavior classes
+;; --------------------------------------------------------------
 
 (defclass Stationary [Monster]
   (defmeth act []
     "Stationary — The monster attacks if it can, but is otherwise immobile."
     (@try-to-attack-player)))
-
 
 (defclass Approacher [Monster]
 
@@ -233,7 +244,6 @@
 
   (setv act approach))
 
-
 (defclass Wanderer [Monster]
 
   (field-defaults
@@ -292,7 +302,6 @@
           "•"
           (get d.arrows d)))))))
 
-
 (defclass Summoner [Monster]
 
   (field-defaults
@@ -334,6 +343,9 @@
       (make-monster target stem :hp hp))
     T))
 
+;; --------------------------------------------------------------
+;; * Generated monsters
+;; --------------------------------------------------------------
 
 (defclass Generated [Monster]
   "A monster that can be produced by a generator in IQ."
@@ -427,7 +439,6 @@
             #(1 (f/ 1 2) (f/ 1 3) (f/ 1 4) (f/ 1 5) (f/ 1 6) (f/ 2 5) (f/ 1 10) (f/ 3 5) (+ 1 (f/ 1 3)) (+ 1 (f/ 1 2)) (+ 1 (f/ 2 3)) 2 (f/ 2 3) (f/ 3 4) (f/ 4 5) (f/ 5 6) (f/ 9 10))
               ; These come from IQ's `SetGenFreq`.
             (- (& te-v2 0b1111) 1)))])))))))
-
 
 (defgenerated "o " "an orc" Approacher
   :iq-ix-mon [39 59 60] :iq-ix-gen [40 61 62]
@@ -537,6 +548,10 @@
 
   :flavor-mon #[[Weak but incredibly annoying, this snickering little fiend is called a "lobber" in the tongue of the ancients. It throws hellstones, cursed missiles that can pierce most any obstacle. In close quarters, it resorts to cowering helplessly and begging for mercy, but, being a literal demon, it has no compunctions about getting right back to firing at you the moment it feels safe.]]
   :flavor-gen "They don't make ziggurats like they used to.")
+
+;; --------------------------------------------------------------
+;; * Non-generated monsters
+;; --------------------------------------------------------------
 
 (deftile "T " "a thorn tree" Stationary
   :iq-ix 51
