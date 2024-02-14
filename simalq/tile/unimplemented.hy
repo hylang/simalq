@@ -51,7 +51,6 @@
     [195 "dragon_egg"]
     [196 "wyrm"]
     [197 "dragon"]
-    [198 "wand_of_remote_action"]
     [202 "rotation_trap"]
     [203 "krogg"]
     [204 "vampire"]

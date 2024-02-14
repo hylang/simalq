@@ -34,6 +34,12 @@
     protects-vs-poison-air F
     emits-poison-air F)
 
+  (defmeth hook-remote-action []
+    "Called when the player tries to use a wand of remote action on
+    this tile. Return true to end her turn (which you should do if and
+    only if there was an effect on the game state)."
+    (@hook-player-bump None))
+
   (defmeth info-bullets [#* extra]
     (setv blocks-monster (or @blocks-monster @blocks-move))
     (.info-bullets (super)
@@ -388,6 +394,9 @@
   :blocks-player-shots F
   :immune #(DamageType.Poison DamageType.Fire DamageType.DeathMagic)
 
+  :hook-remote-action (meth []
+    None)
+
   :flavor "I think this dungeon might not be up to code.")
 
 
@@ -407,6 +416,8 @@
     propagating a chain reaction.")
     (@breakdown)
     True)
+  (defmeth hook-remote-action []
+    None)
 
   (defmeth hook-player-shot []
     "As when bumped."

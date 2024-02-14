@@ -33,6 +33,11 @@
     (@rm-from-map))
   (defmeth pick-up [])
 
+  (defmeth hook-remote-action []
+    (@hook-player-walk-to None)
+    (@hook-player-walked-into)
+    T)
+
   (defmeth info-bullets [#* extra] [
     (@dod "Pickup effect" 'pick-up)
     #* extra
@@ -491,6 +496,20 @@
       (.rm-from-map tile)))
 
   :flavor "Clean out the cobwebs and have yourself some barbecued goblin.")
+
+(deftile "/ " "a wand of remote action" Usable
+  :color 'medium-green
+  :iq-ix 198
+  :acquirement-points 50
+
+  :use (meth [target]
+    "Performs an action on the topmost applicable tile on the square. Scenery that has a special effect when bumped, such as phase triggers, can be activated, and items can be picked up."
+    (for [tile (at target)]
+      (when (.hook-remote-action tile)
+        (return)))
+    (raise (CommandError "There isn't anything you can affect there.")))
+
+  :flavor "This wand bears an uncanny resemblance to a grabber arm, and is nearly as useful. Many a wizard has used one to eat tortilla chips from across the room. Now this power is yours.")
 
 ;; --------------------------------------------------------------
 ;; ** Bombs

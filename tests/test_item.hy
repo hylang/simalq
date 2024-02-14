@@ -578,6 +578,50 @@
   (assert-hp [6 0] 10))
 
 
+(defn test-wand-remote-action []
+  (init [
+    :width 30 :height 1
+    :tiles [
+      "pile of gold" "treasure chest" "key"
+      "phase trigger" "phasing wall (in phase)" "cracked wall" "orc"]])
+  (defn remote [x]
+    (use-item "wand of remote action" x 0))
+  (setv G.rules.reality-bubble-size 20)
+  (setv nothing "There isn't anything you can affect there.")
+
+  ; Wands of remote action can do lots of things.
+  ; Pick up gold.
+  (remote 1)
+  (assert (= G.score 100))
+  ; Try to unlock a chest.
+  (set-square [2 0] "treasure chest" "pile of gold")
+  (cant (remote 2) "It's locked, and you're keyless at the moment.")
+  ; Get a key, unlock it, and get the gold.
+  (remote 3)
+  (assert (= G.player.keys 1))
+  (assert (= G.score 150))
+  (remote 2)
+  (assert (= G.player.keys 0))
+  (assert (= G.score 150))
+  (remote 2)
+  (assert (= G.score 250))
+  ; Hit a phase trigger.
+  (remote 4)
+  (assert-at [5 0] "phasing wall (out of phase)")
+
+  ; Things that wands of remote action can't do include:
+  ; - Break a cracked wall
+  (cant (remote 6) nothing)
+  ; - Attack a monster
+  (cant (remote 7) nothing)
+  ; - Affect an empty square
+  (cant (remote 15) nothing)
+  ; - Pick up a key when you're already full.
+  (setv G.player.keys G.rules.max-keys)
+  (set-square 'E "key")
+  (cant (remote 1) "Your keyring has no room for another key."))
+
+
 (defn test-fire-bomb []
   "Put some orcs in a line and check how much damage is done to each."
 

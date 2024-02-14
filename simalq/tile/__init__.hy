@@ -184,6 +184,11 @@
     "Called when the player tries to walk towards this tile. Return
     true to end her turn."
     None)
+  (defmeth hook-remote-action []
+    "Called when the player tries to use a wand of remote action on
+    this tile. Return true to end her turn (which you should do if and
+    only if there was an effect on the game state)."
+    None)
   (defmeth hook-player-walk-from [target]
     "Called when the player is about to walk from a square containing
     this tile. The hook shouldn't change the game state, but it can
