@@ -353,6 +353,31 @@
   (check 88 F T))
 
 
+(defn test-magical-key []
+
+  (setv becomes {
+    'floor                     'floor
+    "locked door"              "door"
+    "door"                     "door"
+    "locked disappearing door" 'floor
+    "closed portcullis"        "closed portcullis"
+      ; The portcullis will open, but then close again after we walk
+      ; through it.
+    "treasure chest"           'floor
+    "one-way door (east)"      "door"
+    "one-way door (north)"     "door"
+    "metal door"               'floor})
+  (init [:tiles [
+    "magical key" "magical key"
+    #* (.keys becomes)
+    'floor "wall"]])
+
+  (wk 'E 19)
+  (cant (wk 'E) "Your way is blocked.")
+  (for [[i result] (enumerate (.values becomes))]
+    (assert-at [(+ i 3) 0] result)))
+
+
 (defn test-inventory []
   (init [:tiles [
      "wand of shielding" "wall-making wand"

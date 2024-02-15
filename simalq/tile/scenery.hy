@@ -205,9 +205,10 @@
         f"replace the tile with {(. Tile types [@result-when-opened] name-with-article)}."
         "destroy the tile.")))
 
-    (unless G.player.keys
-      (raise (CommandError "It's locked, and you're keyless at the moment.")))
-    (-= G.player.keys 1)
+    (unless (.player-has? StatusEffect.MKey)
+      (unless G.player.keys
+        (raise (CommandError "It's locked, and you're keyless at the moment.")))
+      (-= G.player.keys 1))
     (if @result-when-opened
       (@replace @result-when-opened)
       (@rm-from-map))
@@ -270,6 +271,11 @@
 
   :blocks-move T
 
+  :hook-player-bump (meth [origin]
+    (when (.player-has? StatusEffect.MKey)
+      (@rm-from-map)
+      T))
+
   :flavor "This massive slab of steel will certainly not be opened with a sad little bargain-basement skeleton key. Your best bet is looking for a remote switch of some kind.")
 
 (deftile "+|" "a metal-door control" Scenery
@@ -308,6 +314,11 @@
     passwallable T
     direction None
     color #('brown 'red))
+
+  (defmeth hook-player-bump [origin]
+    (when (.player-has? StatusEffect.MKey)
+      (@replace "door")
+      T))
 
   (defmeth hook-player-walk-from [target]
     (doc f"Only allows you to walk {@direction.name}.")

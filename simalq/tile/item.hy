@@ -327,6 +327,18 @@
     f"Protects you (for {@duration} more turns) from harmful status effects and disenchantment.")
   :flavor "Also known as a ring of anti-anti-magic. Fortunately, anti-anti-anti-magic traps are still in dungeon R&D.")
 
+(deftile "⚷ " "a magical key" StatusEffectItem
+  :color 'purple
+  :iq-ix 183
+  :acquirement-points 100
+
+  :effect StatusEffect.MKey
+  :duration 12
+
+  :help (meth []
+    f"Grants you a magical key for {@duration} more turns. In this state, you can open scenery objects that would require a key without actually using one. Furthermore, you can open metal doors, and bumping into a one-way door turns it into a normal door (even if its direction is such that you could normally enter it).")
+  :flavor "A huge key blinged out with a nearly-as-huge finely cut amethyst. It's so powerful that within a few moments of being activated by your body heat, it opens itself, leaving only a shiny dust that has too many heavy metals to be useful as glitter.")
+
 ;; --------------------------------------------------------------
 ;; * Usables
 ;; --------------------------------------------------------------
