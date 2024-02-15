@@ -92,6 +92,7 @@
   (check "door"                  F F)
   (check "exit"                  T T)
   (check "wallfall trap"         T T)
+  (check "arrow trap"            F T)
   (check "hole"                  T T)
   (check "poison pressure plate" T T)
     ; The IQ equivalent of this tile, the poisonous amulet, is an item

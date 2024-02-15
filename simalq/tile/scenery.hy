@@ -890,6 +890,14 @@
 ;; ** Other traps
 ;; --------------------------------------------------------------
 
+(deftile "<>" "an arrow trap" Trap
+  :color 'dark-gray
+  :iq-ix 194
+
+  :blocks-player-shots T
+
+  :flavor #[[You'd think that something called an "arrow trap" would shoot arrows at you. But no, this thing traps arrows. A ghostly hand pops out of the occult sigil on the floor to grab your arrow midflight with unerring accuracy. Then the hand tears the arrow into bits, just so you can't recover it. How petty.]])
+
 (deftile "<>" "a phase trap" Trap
   :color 'brown
   :iq-ix 141

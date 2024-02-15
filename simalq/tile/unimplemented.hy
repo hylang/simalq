@@ -46,7 +46,6 @@
     [191 "wall_generator_south"]
     [192 "wall_generator_west"]
     [193 "wall_generator_east"]
-    [194 "arrow_trap"]
     [195 "dragon_egg"]
     [196 "wyrm"]
     [197 "dragon"]
