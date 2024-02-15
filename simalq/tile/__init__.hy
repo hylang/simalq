@@ -309,6 +309,12 @@
     last-acted None)
   (setv mutable-fields #("last_acted"))
 
+  (defmeth [classmethod] make [pos stem [stack-ix 0] #** kwargs]
+    (.make (super) pos stem stack-ix #** kwargs)
+    ; Newly created actors don't get to act on the turn they come into
+    ; being.
+    (setv (. (at pos) [stack-ix] last-acted) G.turn-n))
+
   (defmeth maybe-act []
     "Act, if we haven't already acted this turn."
     (when (or (is @last-acted None) (< @last-acted G.turn-n))

@@ -154,12 +154,6 @@
       #* extra
       (@dod "Behavior" 'act))))
 
-(defn make-monster [pos stem #** kwargs]
-  (Tile.make pos stem #** kwargs)
-  ; Newly created monsters don't get to act on the turn they come
-  ; into being.
-  (setv (. (at pos) [0] last-acted) G.turn-n))
-
 ;; --------------------------------------------------------------
 ;; * Common behavior classes
 ;; --------------------------------------------------------------
@@ -340,7 +334,7 @@
           ; end summoning, wasting the consumed summon power.
           (return)))
       ; We have a target. Place the monster.
-      (make-monster target stem :hp hp))
+      (@make target stem :hp hp))
     T))
 
 ;; --------------------------------------------------------------
@@ -674,7 +668,7 @@
     "Gunk Up — The monster's growth timer decreases by 1. If the timer has hit 0, it then transforms into an adult gunk."
     (-= @growth-timer 1)
     (when (= @growth-timer 0)
-      (make-monster @pos "gunk")
+      (@make @pos "gunk")
       (@rm-from-map)))
 
   :flavor "A seed of discord the size of a basketball that can flood a room insde of a minute. Think fast.")
@@ -697,7 +691,7 @@
 
   :hook-normal-destruction (meth []
     "A gunk seed is created in its square."
-    (make-monster @pos "gunk seed"))
+    (@make @pos "gunk seed"))
 
   :flavor "A peevish and very prolific pile of puke that pokes with pseudopods. It resists most weapons, and even if you do manage to kill it, it leaves a seed behind.")
 
