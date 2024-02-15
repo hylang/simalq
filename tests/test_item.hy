@@ -488,6 +488,18 @@
   (assert-at [3 0] "wall"))
 
 
+(defn test-wand-exit []
+  (init
+    [:next-level 3 :tiles ["pile of gold"]]
+    []
+    [])
+
+  (cant (use-item "wand of exit" 1 0) "You can only make an exit on an empty square.")
+  (use-item "wand of exit" 0 1)
+  (wk 'N)
+  (assert (= G.level-n 3)))
+
+
 (defn test-wand-webs []
   (init [
     :height 1

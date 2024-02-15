@@ -423,6 +423,19 @@
 
   :flavor #[[I always thought the phrase "open sesame" was a humorous deliberate corruption of "open says-a-me", but since it comes to us from French, if not from Arabic and then French, this is unlikely.]])
 
+(deftile "/ " "a wand of exit" Usable
+  :color-bg 'lime
+  :iq-ix 105  ; exit-making wand
+  :acquirement-points 200
+
+  :use (meth [target]
+    #[[Creates an exit on a free square. The exit's destination level will be equal to the default "next level" of the current level (which might actually be a previous level, or even the very same level).]]
+    (when (at target)
+      (raise (CommandError "You can only make an exit on an empty square.")))
+    (Tile.make target "exit"))
+
+  :flavor "Showmanship, George. When you hit that high note, you say goodnight and walk off.")
+
 (deftile "/ " "a phase wand" Usable
   :color 'brown
   :iq-ix 143
