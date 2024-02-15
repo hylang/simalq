@@ -651,6 +651,7 @@
 
 
 (defn test-gunk []
+
   (setv marks {
     "O " "gunk"
     "s " "gunk seed"})
@@ -660,7 +661,6 @@
       ████████
       @ ██s . "
     :map-marks marks])
-
   ; Gunks take 5 turns to reproduce, and gunk seeds take 5 turns to
   ; grow up.
   (wait 4)
@@ -690,7 +690,14 @@
   (assert-textmap :map-marks marks :text "
     s s . .
     ████████
-    @ ██s . "))
+    @ ██s . ")
+
+  ; Test for a bug where the game tried to set an attribute on the
+  ; wrong tile when there's more than one tile in a stack.
+  (init [])
+  (set-square 'E "gunk seed" "wall")
+  (wait 5)
+  (assert-at 'E "gunk" "wall"))
 
 
 (defn test-specter []

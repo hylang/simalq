@@ -158,7 +158,7 @@
   (Tile.make pos stem #** kwargs)
   ; Newly created monsters don't get to act on the turn they come
   ; into being.
-  (setv (. (at pos) [-1] last-acted) G.turn-n))
+  (setv (. (at pos) [0] last-acted) G.turn-n))
 
 ;; --------------------------------------------------------------
 ;; * Common behavior classes
