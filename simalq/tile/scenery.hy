@@ -730,7 +730,7 @@
     blocks-monster-shots F))
 
 ;; --------------------------------------------------------------
-;; * Wallfall traps
+;; ** Wallfall traps
 ;; --------------------------------------------------------------
 
 (deftile :name "a wallfall trap"  :superc Trap
