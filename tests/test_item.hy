@@ -7,6 +7,7 @@
   simalq.geometry [Pos Direction at]
   simalq.game-state [G]
   simalq.util [StatusEffect]
+  simalq.tile [Monster]
   simalq.quest-definition [mk-tile])
 (setv  T True  F False)
 
@@ -286,6 +287,27 @@
   (check 20 10)
   (wait)
   (check 21 11))
+
+
+(defn test-amulet-of-poison []
+  (init [
+    :map "
+      . @ .
+      o ! o
+      o o o"
+    :map-marks {
+      "o " ["orc" :hp 10]
+      "! " "amulet of poison"}])
+
+  ; Pick up the amulet, doing 3 damage to all the surrounding orcs.
+  (wk 'S)
+  ; Make another orc on our own square. Wait 1 turn, doing another
+  ; 3 damage to all of 'em.
+  (Monster.make G.player.pos "orc" :hp 10)
+  (wait)
+  (for [direction ['E 'SE 'S 'SW 'W]]
+    (assert-hp direction 4))
+  (assert-hp 'here 7))
 
 
 (defn test-cloak-of-invisibility []

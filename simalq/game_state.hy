@@ -169,6 +169,8 @@
       ; How much with the relevant artifact (and no magic arrows).
     player-shot-damage-magic 3
       ; How much damage the player does with magic arrows.
+    player-poison-damage 3
+      ; How much damage the player does with a poisonous aura.
     magic-arrows-pickup-size 10
       ; How many magic arrows come in a pickup.
     time-bonus 25
@@ -178,7 +180,7 @@
     paralysis-duration 3
       ; How many rounds paralysis lasts for.
     poison-emitter-damage 2
-      ; Damage per turn from poisonous fountains.
+      ; Damage per turn (to the player) from poisonous fountains.
     dainty-monsters T])
       ; Whether monsters will only step on empty floor (with some
       ; exceptions, like spiders walking on webs). Otherwise,

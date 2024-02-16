@@ -6,7 +6,7 @@
   contextlib [contextmanager]
   simalq [version-string]
   simalq.strings
-  simalq.util [CommandError StatusEffect message-queue msg DamageType GameOverException menu-letters]
+  simalq.util [CommandError StatusEffect message-queue msg DamageType GameOverException menu-letters burst-damage]
   simalq.color :as color
   simalq.geometry [burst at turn-and-pos-seed]
   simalq.game-state [G]
@@ -106,6 +106,16 @@
       DamageType.Poison)
     (when extra-poison
       (.damage G.player G.rules.poison-emitter-damage DamageType.Poison)))
+
+  ; The player herself deals out passive poison damage, if she's
+  ; poisonous.
+  (when (.player-has? StatusEffect.Pois)
+    (burst-damage G.player.pos
+      :damage-type DamageType.Poison
+      :amount (* [G.rules.player-poison-damage] 2)
+      :color 'moss-green
+      :quick-flash T))
+        ; This is happening every turn, so it should be fast.
 
   ; Tick down status effects.
   (for [se StatusEffect]

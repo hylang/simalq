@@ -180,7 +180,7 @@
 
 
 (defn burst-damage [
-    center color amount damage-type [player-amount 0]]
+    center color amount damage-type [player-amount 0] [quick-flash F]]
   "Damage every tile in a burst. `amount` should be a list like `[3 2
   1]`, which means that 3 damage is dealt at the center, 2 damage is
   dealt at distance 1 from the center, and so on. But note that this
@@ -199,7 +199,7 @@
     color
     :ps b
     :labels {}
-    :flash-time-s .5)
+    :flash-time-s (if quick-flash .125 .5))
 
   (for [p b  tile (at p)  :if (isinstance tile Damageable)]
     (.damage tile

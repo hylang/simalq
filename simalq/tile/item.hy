@@ -292,7 +292,7 @@
   :flavor "Looks like the ethereal power of one of those many, many evil undead phantasms rubbed off onto this little trinket. Try not to let the magic run out when you're entirely surrounded by walls. Getting buried alive is a bad way to go.")
 
 (deftile "! " "a potion of speed" StatusEffectItem
-  :color 'dark-green
+  :color 'red
   :iq-ix 34
   :acquirement-points 100
 
@@ -302,6 +302,21 @@
   :help (meth []
     f"Lets you act twice per turn for {@duration} more turns.")
   :flavor "This cool concoction puts a pep in your step and a swiftness in your sword-swings.")
+
+(deftile "! " "an amulet of poison" StatusEffectItem
+  :color 'dark-green
+  :iq-ix 159
+    ; IQ calls this an "amulet of poisonous touch", but no real
+    ; touching is required, and IQ's poisonous amulets have also been
+    ; renamed, so there should be no danger of confusion there.
+  :acquirement-points 250
+
+  :effect StatusEffect.Pois
+  :duration 15
+
+  :help (meth []
+    f"Surrounds you in a cloud of poison for {@duration} more turns. You are immune to the effect, but all monsters within 1 square take {G.rules.player-poison-damage} damage.")
+  :flavor "Finally, somebody concoted a poison that hurts monsters but not you. This handy wearable fumigator lets you apply it hands-free.")
 
 (deftile "! " "a cloak of invisibility" StatusEffectItem
   :color 'blue
