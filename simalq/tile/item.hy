@@ -315,7 +315,7 @@
   :duration 15
 
   :help (meth []
-    f"Surrounds you in a cloud of poison for {@duration} more turns. You are immune to the effect, but all monsters within 1 square take {G.rules.player-poison-damage} damage.")
+    f"Surrounds you in a cloud of poison for {@duration} more turns. You are immune to the effect, but all monsters within 1 square take {G.rules.player-poison-damage} damage at the end of each turn.")
   :flavor "Finally, somebody concoted a poison that hurts monsters but not you. This handy wearable fumigator lets you apply it hands-free.")
 
 (deftile "! " "a cloak of invisibility" StatusEffectItem
