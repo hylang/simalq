@@ -136,8 +136,8 @@
     Fast  "haste"
     Pois  "poisonous touch"
     Pass  "passwall"
-    MKey  "magical key"
-    Prot  "protection")
+    Prot  "protection"
+    MKey  "magical key")
 
   (defmeth player-has? []
     "Does the player have this status effect?"

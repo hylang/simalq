@@ -279,17 +279,17 @@
     f"Makes you invulnerable for {@duration} more turns, protecting you from all damage and ambient poison, but not harmful status effects or disenchantment.")
   :flavor "A star-shaped pendant with two black spots in the center. Its magic is short-lived but potent indeed.")
 
-(deftile "! " "a passwall amulet" StatusEffectItem
-  :color 'purple
-  :iq-ix 151
-  :acquirement-points 150
+(deftile "! " "a cloak of invisibility" StatusEffectItem
+  :color 'blue
+  :iq-ix 25
+  :acquirement-points 100
 
-  :effect StatusEffect.Pass
-  :duration 20
+  :effect StatusEffect.Ivis
+  :duration 25
 
   :help (meth []
-    f"Makes you semi-material for {@duration} more turns, allowing you to walk through walls (plus other scenery types noted as affected by a passwall amulet). You ignore most properties of the affected scenery, such as a one-way door's restrictions on movement direction, or a locked door's consumption of a key.")
-  :flavor "Looks like the ethereal power of one of those many, many evil undead phantasms rubbed off onto this little trinket. Try not to let the magic run out when you're entirely surrounded by walls. Getting buried alive is a bad way to go.")
+    f"Makes you invisible for {@duration} more turns. Most monsters can't track or shoot you while you're invisible, unless you're adjacent to them.")
+  :flavor "A cape enchanted with the power of the night sky. Try not to get it snagged on any loose flagstones (especially when it's invisible).")
 
 (deftile "! " "a potion of speed" StatusEffectItem
   :color 'red
@@ -318,17 +318,17 @@
     f"Surrounds you in a cloud of poison for {@duration} more turns. You are immune to the effect, but all monsters within 1 square take {G.rules.player-poison-damage} damage at the end of each turn.")
   :flavor "Finally, somebody concoted a poison that hurts monsters but not you. This handy wearable fumigator lets you apply it hands-free.")
 
-(deftile "! " "a cloak of invisibility" StatusEffectItem
-  :color 'blue
-  :iq-ix 25
-  :acquirement-points 100
+(deftile "! " "a passwall amulet" StatusEffectItem
+  :color 'purple
+  :iq-ix 151
+  :acquirement-points 150
 
-  :effect StatusEffect.Ivis
-  :duration 25
+  :effect StatusEffect.Pass
+  :duration 20
 
   :help (meth []
-    f"Makes you invisible for {@duration} more turns. Most monsters can't track or shoot you while you're invisible, unless you're adjacent to them.")
-  :flavor "A cape enchanted with the power of the night sky. Try not to get it snagged on any loose flagstones (especially when it's invisible).")
+    f"Makes you semi-material for {@duration} more turns, allowing you to walk through walls (plus other scenery types noted as affected by a passwall amulet). You ignore most properties of the affected scenery, such as a one-way door's restrictions on movement direction, or a locked door's consumption of a key.")
+  :flavor "Looks like the ethereal power of one of those many, many evil undead phantasms rubbed off onto this little trinket. Try not to let the magic run out when you're entirely surrounded by walls. Getting buried alive is a bad way to go.")
 
 (deftile "! " "a ring of protection" StatusEffectItem
   :color 'dark-orange
