@@ -194,20 +194,20 @@
   :eat-messages #("You drink a jar of poison. It tastes pretty bad.")
 
   :hook-player-shot (meth []
-    (doc #[f[Explodes in a size-{poison-burst.size} burst of poison, which does {poison-burst.dmg-monster} poison damage to monsters and {poison-burst.dmg-player} to you.]f])
+    (doc #[f[Explodes in a size-{poison-burst.size} burst of poison, which does {poison-burst.mon-damage} poison damage to monsters and {poison-burst.player-damage} to you.]f])
     (burst-damage @pos :damage-type DamageType.Poison
       :amount (*
-        [poison-burst.dmg-monster]
+        [poison-burst.mon-damage]
         (+ 1 poison-burst.size))
       :color 'moss-green
-      :player-amount poison-burst.dmg-player)
+      :player-amount poison-burst.player-damage)
     (@rm-from-map))
 
   :flavor "I think you're not supposed to drink this.")
 (setv poison-burst (MetaDict
   :size 2
-  :dmg-player 20
-  :dmg-monster 3))
+  :player-damage 20
+  :mon-damage 3))
 
 ;; --------------------------------------------------------------
 ;; * Miscellany
