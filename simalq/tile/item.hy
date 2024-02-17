@@ -193,21 +193,15 @@
   :hp-effect -50
   :eat-messages #("You drink a jar of poison. It tastes pretty bad.")
 
+  ; Define the shot effect in terms of poison-gas bombs.
+  :!pb (meth []
+    (get Tile.types "poison-gas bomb"))
   :hook-player-shot (meth []
-    (doc #[f[Explodes in {(burst-size poison-burst.size)} of poison, which does {poison-burst.mon-damage} poison damage to monsters and {poison-burst.player-damage} to you.]f])
-    (burst-damage @pos :damage-type DamageType.Poison
-      :amount (*
-        [poison-burst.mon-damage]
-        (+ 1 poison-burst.size))
-      :color 'moss-green
-      :player-amount poison-burst.player-damage)
+    (doc (.dynadoc (. (@pb) use) (@pb)))
+    (.use (@pb) ((@pb)) @pos)
     (@rm-from-map))
 
   :flavor "I think you're not supposed to drink this.")
-(setv poison-burst (MetaDict
-  :size 2
-  :player-damage 20
-  :mon-damage 3))
 
 ;; --------------------------------------------------------------
 ;; * Miscellany
@@ -575,7 +569,7 @@
     (@rm-from-map)))
 
 (deftile "0 " "a standard bomb" FireBomb
-  :color 'dark-green
+  :color 'brown
   :iq-ix 31  ; Just called a "bomb" in IQ
   :acquirement-points 100
 
@@ -603,6 +597,34 @@
   :shot-blast-damage #(3 3 2 1)
 
   :flavor "Heavy ordnance. Kills monsters dead, with a bomb pattern that would put a feather in Colonel Cathcart's cap.\n\n    \"Kaboom?\"\n    \"Yes, Rico. Kaboom.\"")
+
+
+(deftile "0 " "a poison-gas bomb" Usable
+  :color 'dark-green
+  :iq-ix 121
+  :acquirement-points 150
+
+  :!player-damage 20
+  :!mon-damage 3
+  :!use-burst-size 3
+  :!shot-burst-size 2
+
+  :!bomb-burst (meth [pos size]
+    (burst-damage pos :damage-type DamageType.Poison
+      :amount (* [@mon-damage] size)
+      :color 'moss-green
+      :player-amount @player-damage))
+
+  :use (meth [target]
+    (doc f"Explodes in {(burst-size @use-burst-size)} of poison, which does {@mon-damage} poison damage to monsters and {@player-damage} to you.")
+    (@bomb-burst target @use-burst-size))
+
+  :hook-player-shot (meth []
+    (doc f"As when applied, but with a smaller {(burst-size @shot-burst-size :article? F)}.")
+    (@bomb-burst @pos @shot-burst-size)
+    (@rm-from-map))
+
+  :flavor "A lot of highly concentrated toxic gas, coupled with an explosive that quickly disperses it. Such poisons are indiscriminate in their death-dealing. Well, that's not true. They discriminate thoroughly in favor of the many poison-proof monsters. They just won't hold back on you.\n\n    Chemical Weapons Convention? More like Chemical Weapons Suggestion.")
 
 
 (deftile "0 " "an earthquake bomb" Usable

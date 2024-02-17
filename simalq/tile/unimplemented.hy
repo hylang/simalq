@@ -24,7 +24,6 @@
 (do-mac `(do ~@(gfor [iq-ix stem] [
 
     [106 "wand_of_gating"]
-    [121 "poison_gas_bomb"]
     [129 "archdevil"]
     [130 "exit_mobile"]
     [132 "golem"]

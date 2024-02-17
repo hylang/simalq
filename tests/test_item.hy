@@ -137,40 +137,48 @@
 
 
 (defn test-food-shoot []
+  "We also test poison-gas bombs here, because they have the same
+  effect when used as a jar of poison does when shot."
+
   (init [
-    :map "
-      @ % ☠ ██o o
-      ████##██G ██
-      ████o ██████"
-    :map-marks {
-      "% " "snack"
-      "☠ " "jar of poison"
-      "##" ["cracked wall" :hp 2]
-      "o " ["orc" :hp 4]}])
+    :tiles ["snack"]])
   ; Shooting a snack (or most other foods) just destroys it.
   (assert-at 'E "snack")
   (shoot 'E)
   (assert-at 'E 'floor)
-  ; Shooting a jar of poison creates a 5 × 5 cloud of poison, which
-  ; can damage both the player and monsters. It goes through walls.
-  (wk 'E)
-  (assert-at 'E "jar of poison")
-  (assert (= G.player.hp 100))
-  (shoot 'E)
-  (assert-at 'E 'floor)
-  ; The player takes 20 damage.
-  (assert (= G.player.hp 80))
-  ; The two orcs in the blast radius take 3 damage each.
-  (assert-hp [2 0] 1)
-  (assert-hp [4 2] 1)
-  ; The ghost, being undead, takes no damage from poison.
-  (assert-hp [4 1] 1)
-  ; Cracked walls are also immune to poison.
-  (assert-hp [2 1] 2)
-  ; The third orc is outside of the blast radius.
-  (assert-hp [5 2] 4)
-  ; Points are earned for all damage dealt.
-  (assert (= G.score (py "3*3 + 3*3"))))
+
+  (for [use-bomb? [F T]]
+    (init [
+      :map "
+        @ ☠ ██o o
+        ██##██G ██
+        ██o ██████"
+      :map-marks {
+        "☠ " "jar of poison"
+        "##" ["cracked wall" :hp 2]
+        "o " ["orc" :hp 4]}])
+    ; Shooting a jar of poison (or using a poison-gas bomb) creates a
+    ; 5 × 5 cloud of poison, which can damage both the player and
+    ; monsters. It goes through walls.
+    (assert-at 'E "jar of poison")
+    (assert (= G.player.hp 100))
+    (if use-bomb?
+      (use-item "poison-gas bomb" 1 2)
+      (shoot 'E))
+    (assert-at 'E (if use-bomb? "jar of poison" 'floor))
+    ; The player takes 20 damage.
+    (assert (= G.player.hp 80))
+    ; The two orcs in the blast radius take 3 damage each.
+    (assert-hp [1 0] 1)
+    (assert-hp [3 2] 1)
+    ; The ghost, being undead, takes no damage from poison.
+    (assert-hp [3 1] 1)
+    ; Cracked walls are also immune to poison.
+    (assert-hp [1 1] 2)
+    ; The third orc is outside of the blast radius.
+    (assert-hp [4 2] 4)
+    ; Points are earned for all damage dealt.
+    (assert (= G.score (py "3*3 + 3*3")))))
 
 
 (defn test-amulet-of-invulnerability []
