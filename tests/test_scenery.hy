@@ -272,7 +272,7 @@
 
   ; Other means of destroying a wall don't cause chain reactions of breakage.
   (wk 'E)
-  (use-item "wall-destroying wand" 3 2)
+  (use-item "wall-destroying wand" [3 2])
   (assert-textmap :map-marks marks :text "
     . . . | .
     . . . . .

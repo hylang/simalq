@@ -1,6 +1,7 @@
 (require
   hyrule [do-n unless])
 (import
+  metadict [MetaDict]
   simalq.geometry [Pos at Direction]
   simalq.un-iq [iq-quest]
   simalq.game-state [G]
@@ -103,14 +104,17 @@
   (do-n n-times
     (take-turn (Shoot (getattr Direction (str direction-abbr))))))
 
-(defn use-item [thing [target-x None] [target-y None]]
+(defn use-item [thing [locator None]]
+  (setv target (if locator
+    (locate locator)
+    (MetaDict :x None :y None)))
   (when (isinstance thing int)
-    (return (take-turn (UseItem thing target-x target-y))))
+    (return (take-turn (UseItem thing target.x target.y))))
   (try
     (setv inv-was (.copy G.player.inventory))
     (setv (get G.player.inventory 0) None)
     (.pick-up (mk-tile None thing))
-    (take-turn (UseItem 0 target-x target-y))
+    (take-turn (UseItem 0 target.x target.y))
     (finally
       (setv (cut G.player.inventory) inv-was))))
 

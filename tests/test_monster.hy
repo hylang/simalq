@@ -492,7 +492,7 @@
   ; they die instantly.
   (assert-at [2 0] "thorn tree")
   (assert-at [3 0] "thorn tree")
-  (use-item "standard bomb"  2 0)
+  (use-item "standard bomb" 'here)
   (assert-at [2 0] 'floor)
   (assert-at [3 0] 'floor))
 
@@ -627,7 +627,7 @@
     :tiles ["floater" "wall"]])
   (assert-at 'E "floater")
   (assert (= G.player.hp 100))
-  (use-item "wand of death" 3 0)
+  (use-item "wand of death" [3 0])
   (assert-at 'E 'floor)
   (assert (= G.player.hp 100)))
 
@@ -686,7 +686,7 @@
     ████████
     @ ██O s ")
   ; A slain adult gunk leaves behind a seed.
-  (use-item "standard bomb" 1 1)
+  (use-item "standard bomb" [1 1])
   (assert-textmap :map-marks marks :text "
     s s . .
     ████████
@@ -779,7 +779,7 @@
 
   ; Contra IQ, killing a turret with a wand of death scores points.
   (setv G.score 0)
-  (use-item "wand of death" 0 0)
+  (use-item "wand of death" 'here)
   (assert-at 'NE 'floor)
   (assert (= G.score 150)))
 

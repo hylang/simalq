@@ -163,7 +163,7 @@
     (assert-at 'E "jar of poison")
     (assert (= G.player.hp 100))
     (if use-bomb?
-      (use-item "poison-gas bomb" 1 2)
+      (use-item "poison-gas bomb" 'E)
       (shoot 'E))
     (assert-at 'E (if use-bomb? "jar of poison" 'floor))
     ; The player takes 20 damage.
@@ -493,13 +493,13 @@
 
   ; Unlike IQ, walls can be added regardless of what's already on the
   ; target square.
-  (use-item "wall-making wand" 0 0)
+  (use-item "wall-making wand" [0 0])
   (assert-at [0 0] "wall" 'player)
-  (use-item "wall-making wand" 1 0)
+  (use-item "wall-making wand" [1 0])
   (assert-at [1 0] "wall" "orc")
-  (use-item "wall-making wand" 2 0)
+  (use-item "wall-making wand" [2 0])
   (assert-at [2 0] "wall" "wall")
-  (use-item "wall-making wand" 3 0)
+  (use-item "wall-making wand" [3 0])
   (assert-at [3 0] "wall"))
 
 
@@ -507,7 +507,7 @@
   (init [])
   (defn phase [start end]
     (set-square 'E #* start)
-    (use-item "phase wand" 1 0)
+    (use-item "phase wand" 'E)
     (assert-at 'E #* end))
 
   (phase
@@ -532,14 +532,14 @@
   (init
     [:tiles ["orc" "wall" "pillar"]])
 
-  (cant (use-item "wall-destroying wand" 1 0) "There isn't a destructible tile there.")
-  (use-item "wall-destroying wand" 2 0)
+  (cant (use-item "wall-destroying wand" 'E) "There isn't a destructible tile there.")
+  (use-item "wall-destroying wand" [2 0])
   (assert-at [2 0] 'floor)
-  (use-item "wall-destroying wand" 3 0)
+  (use-item "wall-destroying wand" [3 0])
   (assert-at [3 0] 'floor)
   (set-square [3 0] "wall" "wall")
   (assert-at [3 0] "wall" "wall")
-  (use-item "wall-destroying wand" 3 0)
+  (use-item "wall-destroying wand" [3 0])
   (assert-at [3 0] "wall"))
 
 
@@ -549,8 +549,8 @@
     []
     [])
 
-  (cant (use-item "wand of exit" 1 0) "You can only make an exit on an empty square.")
-  (use-item "wand of exit" 0 1)
+  (cant (use-item "wand of exit" 'E) "You can only make an exit on an empty square.")
+  (use-item "wand of exit" 'N)
   (wk 'N)
   (assert (= G.level-n 3)))
 
@@ -596,7 +596,7 @@
       :if (= (% (+ x y) 2) 0)]
     (setv (. (top [x y]) hp) hp))
 
-  (use-item "wand of death" 2 2)
+  (use-item "wand of death" [2 2])
   ; Undead, undead generators, cracked walls, and (contra IQ) negatons
   ; are immune to wands of death. The rightmost column is outside the
   ; burst radius.
@@ -616,11 +616,11 @@
   (set-square 'E
     "orc" "wall" "exit" "pile of gold" "negaton" "Void" "hole")
   ; Everything except the Void is destroyed by annihilation.
-  (use-item "wand of annihilation" 1 0)
+  (use-item "wand of annihilation" 'E)
   (assert-at 'E "Void")
   ; Contra IQ, we allow the player to kill herself with a wand of
   ; annihilation, because it's funny.
-  (use-item "wand of annihilation" 0 0)
+  (use-item "wand of annihilation" 'here)
   (cant (wk 'E) "You're dead. You can undo or load a saved game."))
 
 
@@ -630,7 +630,7 @@
     :tiles ["wall" ["orc" :hp 10] ["orc" :hp 10] "web" "wall" ["orc" :hp 10]]])
 
   (assert (= G.player.hp 100))
-  (use-item "wand of flame" 2 0)
+  (use-item "wand of flame" [2 0])
   ; The player is unhurt.
   (assert (= G.player.hp 100))
   ; The wall is unaffected.
@@ -652,7 +652,7 @@
       "pile of gold" "treasure chest" "key"
       "phase trigger" "phasing wall (in phase)" "cracked wall" "orc"]])
   (defn remote [x]
-    (use-item "wand of remote action" x 0))
+    (use-item "wand of remote action" [x 0]))
   (setv G.rules.reality-bubble-size 20)
   (setv nothing "There isn't anything you can affect there.")
 
@@ -700,11 +700,11 @@
     (ecase usage
       'use (do
         ; Actually use the bomb.
-        (use-item item-stem 1 0))
+        (use-item item-stem 'E))
       'shoot (do
         ; Shoot the bomb while it's on the floor. This creates a
         ; less impressive explosion.
-        (mk-tile [1 0] item-stem)
+        (mk-tile 'E item-stem)
         (shoot 'E)))
      (for [[i dmg] (enumerate damages)]
        (assert-hp [(+ i 1) 0] (- starting-orc-hp dmg))))
@@ -731,7 +731,7 @@
 
   ; An earthquake bomb does 3 damage to monsters and 2 to cracked
   ; walls.
-  (use-item "earthquake bomb" 1 1)
+  (use-item "earthquake bomb" [1 1])
   (assert-textmap :map-marks {"##" "cracked wall"} :text "
     ##╷ . ##
     . ##. .
