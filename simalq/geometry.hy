@@ -210,6 +210,16 @@
     :if (and p (not (and exclude-center (= p center))))
     p)))
 
+(defn burst-size [size [article? True]]
+  "Describes the size of a `burst`."
+  (setv n (- (* 2 size) 1))
+  (.format "{}{}-by-{} burst"
+    (if article?
+      (.format "a{} " (if (in (get (str n) 0) "18") "n" ""))
+      "")
+    n
+    n))
+
 (defn pos-seed [pos]
   "Using a `Pos`, get a number you could use as an RNG seed. Nearby
   `Pos`es should return different values."

@@ -11,7 +11,7 @@
   simalq.strings
   simalq.util [CommandError]
   simalq.game-state [G]
-  simalq.geometry [pos-seed turn-and-pos-seed burst at]
+  simalq.geometry [pos-seed turn-and-pos-seed burst burst-size at]
   simalq.tile [Tile Damageable annihilate]
   simalq.tile.scenery [Scenery]
   simalq.util [CommandError DamageType StatusEffect msg burst-damage refactor-hp])
@@ -194,7 +194,7 @@
   :eat-messages #("You drink a jar of poison. It tastes pretty bad.")
 
   :hook-player-shot (meth []
-    (doc #[f[Explodes in a size-{poison-burst.size} burst of poison, which does {poison-burst.mon-damage} poison damage to monsters and {poison-burst.player-damage} to you.]f])
+    (doc #[f[Explodes in {(burst-size poison-burst.size)} of poison, which does {poison-burst.mon-damage} poison damage to monsters and {poison-burst.player-damage} to you.]f])
     (burst-damage @pos :damage-type DamageType.Poison
       :amount (*
         [poison-burst.mon-damage]
@@ -501,7 +501,7 @@
   :!mon-damage #(Inf Inf Inf)
   :!player-damage 25
   :use (meth [target]
-    (doc f"Kills all monsters in a size-{(- (len @mon-damage) 1)} burst, except those immune to death magic. If you're in the burst, you take {@player-damage} damage.")
+    (doc f"Kills all monsters in {(burst-size (len @mon-damage))}, except those immune to death magic. If you're in the burst, you take {@player-damage} damage.")
     (burst-damage target :damage-type DamageType.DeathMagic
       :amount @mon-damage :player-amount @player-damage
       :color 'dark-gray))
@@ -526,7 +526,7 @@
 
   :!mon-damage #(2 1 1)
   :use (meth [target]
-    (doc f"Does {(get @mon-damage 1)} fire damage to all monsters in a size-{(- (len @mon-damage) 1)} burst, except at the center square, where they take {(get @mon-damage 0)} fire damage. Futhermore, all webs in the burst are destroyed. You take no damage.")
+    (doc f"Does {(get @mon-damage 1)} fire damage to all monsters in {(burst-size (len @mon-damage))}, except at the center square, where they take {(get @mon-damage 0)} fire damage. Futhermore, all webs in the burst are destroyed. You take no damage.")
     (for [
         pos (burst-damage target :damage-type DamageType.Fire
           :amount @mon-damage
@@ -566,11 +566,11 @@
       :color 'orange))
 
   (defmeth use [target]
-    (doc f"Explodes in a size-{(- (len @use-blast-damage) 1)} burst of fire, damaging monsters according to their distance from the center. The amounts of damage at the center and each successive distance are: {(.join ", " (map str @use-blast-damage))}. You take no damage.")
+    (doc f"Explodes in {(burst-size (len @use-blast-damage))} of fire, damaging monsters according to their distance from the center. The amounts of damage at the center and each successive distance are: {(.join ", " (map str @use-blast-damage))}. You take no damage.")
     (@bomb-burst target @use-blast-damage))
 
   (defmeth hook-player-shot []
-    (doc f"Explodes in a weaker size-{(- (len @shot-blast-damage) 1)} burst, with these damages: {(.join ", " (map str @shot-blast-damage))}.")
+    (doc f"Explodes in a weaker {(burst-size (len @shot-blast-damage) :article? F)}, with these damages: {(.join ", " (map str @shot-blast-damage))}.")
     (@bomb-burst @pos @shot-blast-damage)
     (@rm-from-map)))
 
@@ -634,11 +634,11 @@
           (.replace tile "broken pillar"))))
 
   :use (meth [target]
-    (doc f"Explodes in a size-{@use-burst-size} burst that does {@quake-damage-monster} fire damage to monsters and {@quake-damage-wall} damage to cracked walls. Furthermore, the blast turns normal walls and trapped walls into cracked walls with {@new-cracked-wall-starting-hp} HP, instantly destroys breakable walls and fading walls, and breaks pillars.")
+    (doc f"Explodes in {(burst-size @use-burst-size)} that does {@quake-damage-monster} fire damage to monsters and {@quake-damage-wall} damage to cracked walls. Furthermore, the blast turns normal walls and trapped walls into cracked walls with {@new-cracked-wall-starting-hp} HP, instantly destroys breakable walls and fading walls, and breaks pillars.")
     (@bomb-burst target @use-burst-size))
 
   :hook-player-shot (meth []
-    (doc f"As when applied, but with a smaller size-{@shot-burst-size} burst.")
+    (doc f"As when applied, but with a smaller {(burst-size @shot-burst-size :article? F)}.")
     (@bomb-burst @pos @shot-burst-size)
     (@rm-from-map))
 
