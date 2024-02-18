@@ -289,18 +289,18 @@
       ; Reconfigure the room in the northwest corner.
       (replace-map-rect level 2 32
         :text "
-          <1█1█1K █1█1█1
-          <>█1█1G █1█1K
-          <>█1█1G █1█1G
-          ++G G k █1k G
-          <>█1█1█1█1G █1
-          <>█1█1█1█1G █1
+          <1████K ██████
+          <>████G ████K
+          <>████G ████G
+          ++G G k ██k G
+          <>████████G ██
+          <>████████G ██
           <><><><><>dd<>"
         :map-marks {
           "++" "door"
           "dd" "locked disappearing door"
           "<1" ["wallfall trap" :wallnum 1]
-          "█1" ["trapped wall" :wallnum 1]
+          "██" ["trapped wall" :wallnum 1]
           "<>" "fixed damaging trap"
           "k " "key"
           "G " ["ghost" :hp 3]
