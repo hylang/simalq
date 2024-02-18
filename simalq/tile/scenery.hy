@@ -447,16 +447,13 @@
 
   (setv flavor "This dungeon is coming down like a house of cards."))
 
-(do-mac
-  (import simalq.geometry [Direction])
-  `(do ~@(lfor
-    [directions iq-ix name] [
-      [[Direction.N Direction.S] 160 "meridional"]
-      [[Direction.W Direction.E] 161 "zonal"]]
-    `(deftile :name ~f"a breakable wall ({name})" :superc BreakableWall
-      :iq-ix ~iq-ix
-      :directions ~(lfor  d directions `(. Direction ~(hy.models.Symbol d.abbr)))
-      :mapsym ~(.join "" (gfor  d directions  (get Direction.arrows d)))))))
+(deftile "↑↓" "a breakable wall (meridional)" BreakableWall
+  :iq-ix 160
+  :directions #(Direction.N Direction.S))
+
+(deftile "←→" "a breakable wall (zonal)" BreakableWall
+  :iq-ix 161
+  :directions #(Direction.W Direction.E))
 
 
 (deftile "^█" "a fading wall" [Wallish Actor]
