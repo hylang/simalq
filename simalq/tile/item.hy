@@ -452,7 +452,7 @@
   :use (meth [target]
     #[[Creates an exit on a free square. The exit's destination level will be equal to the default "next level" of the current level (which might actually be a previous level, or even the very same level).]]
     (when (at target)
-      (raise (CommandError "You can only make an exit on an empty square.")))
+      (raise (CommandError "This wand can only target an empty square.")))
     (Tile.make target "exit"))
 
   :flavor "Showmanship, George. When you hit that high note, you say goodnight and walk off.")
@@ -530,6 +530,19 @@
       (.rm-from-map tile)))
 
   :flavor "Clean out the cobwebs and have yourself some barbecued goblin.")
+
+(deftile "/ " "a wand of teleportation" Usable
+  :color 'purple
+  :iq-ix 106  ; wand of gating
+  :acquirement-points 150
+
+  :use (meth [target]
+    #[[Teleports you to a free square.]]
+    (when (at target)
+      (raise (CommandError "This wand can only target an empty square.")))
+    (.move G.player target))
+
+  :flavor "A disposable controllable teleporter in convenient portable form, to get you in or out of trouble as the situation demands.")
 
 (deftile "/ " "a wand of remote action" Usable
   :color 'medium-green

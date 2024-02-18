@@ -549,7 +549,7 @@
     []
     [])
 
-  (cant (use-item "wand of exit" 'E) "You can only make an exit on an empty square.")
+  (cant (use-item "wand of exit" 'E) "This wand can only target an empty square.")
   (use-item "wand of exit" 'N)
   (wk 'N)
   (assert (= G.level-n 3)))
@@ -643,6 +643,16 @@
   (assert-at [4 0] 'floor)
   ; Orc 3 is out of range and undamaged.
   (assert-hp [6 0] 10))
+
+
+(defn test-wand-teleportation []
+  (init [
+    :tiles ["orc"]])
+
+  (cant (use-item "wand of teleportation" 'E) "This wand can only target an empty square.")
+    ; You can't tele-frag with a wand.
+  (use-item "wand of teleportation" [3 4])
+  (assert-player-at 3 4))
 
 
 (defn test-wand-remote-action []
