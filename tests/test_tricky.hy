@@ -75,7 +75,8 @@
     (when (is (type tile) str)
       (setv tile (. tile
         (replace "(i)" "(in phase)")
-        (replace "(o)" "(out of phase)"))))
+        (replace "(o)" "(out of phase)")
+        (replace "(z)" "(zonal)"))))
     (init
       [:tiles ['floor tile 'floor ["devil" :hp 2]]])
     (assert (= G.player.hp 100))
@@ -105,6 +106,7 @@
     ; pretty silly to me.
   (check "phasing wall (i)"      F F)
   (check "phasing wall (o)"      T F)
+  (check "magical barrier (z)"   F F)
   (check "pile of gold"          F F)
   (check "key"                   F F))
     ; In IQ, keys (including magical keys) are unlike all other

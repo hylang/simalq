@@ -33,8 +33,6 @@
     [166 "blind_mage"]
     [177 "doppelganger"]
     [178 "magical_barrier_generator"]
-    [179 "magical_barrier_east"]
-    [180 "magical_barrier_north"]
     [184 "giant_ant"]
     [185 "dark_brain"]
     [187 "magical_mirror"]

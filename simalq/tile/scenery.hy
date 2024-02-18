@@ -939,8 +939,34 @@
   :flavor "Dungeon trash like sawdust, loose stones, pebbles, greasy chicken bones left over from goblin feasts, broken wands, and maybe a dead body, all bunched together into a small mound. Running through it will knock it over and get your boots really gross.")
 
 ;; --------------------------------------------------------------
-;; * Magical energy shields
+;; * Plasma
 ;; --------------------------------------------------------------
+
+(defclass MagicalBarrier [Scenery]
+  ; Without barrier generators having (yet?) been implemented, these
+  ; have essentially no interesting properties.
+
+  (setv
+    color 'dark-green
+    blocks-move T)
+
+  (setv directions None)
+
+  ; IQ's effect of damaging the player when he walks into it isn't
+  ; implemented, because so far as I can tell, there's never a reason
+  ; to walk into a barrier—you can't even construct a puzzle to
+  ; require it.
+
+  (setv flavor "It's some kind of forcefield."))
+
+(deftile "||" "a magical barrier (meridional)" MagicalBarrier
+  :iq-ix 180
+  :directions #(Direction.N Direction.S))
+
+(deftile "==" "a magical barrier (zonal)" MagicalBarrier
+  :iq-ix 179
+  :directions #(Direction.W Direction.E))
+
 
 (deftile "()" "a magical energy shield" [Scenery EachTurner]
   :color 'dark-orange
