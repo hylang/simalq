@@ -376,6 +376,27 @@
   (assert-at 'E "wall"))
 
 
+(defn test-wall-generator []
+  (init [
+    :map "
+      . →|. . o . . .
+      @ →|. . . . . ."])
+  (setv G.rules.reality-bubble-size 2)
+
+  ; Wall generators aren't limited by the reality bubble.
+  (wk 'E)
+  (assert-textmap "
+    . →|. . o . . .
+    @ ██████████████")
+  ; They can be triggered with an arrow. And they're stopped by any
+  ; nonempty tile; monsters are unhurt.
+  (cant (wk 'NE) "That diagonal is blocked by a neighbor.")
+  (shoot 'NE)
+  (assert-textmap "
+    . ██████o . . .
+    @ ██████████████"))
+
+
 (defn test-fountains []
   (init [
     :poison-intensity (f/ 1 5)

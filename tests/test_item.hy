@@ -663,8 +663,10 @@
   (init [
     :width 30 :height 1
     :tiles [
-      "pile of gold" "treasure chest" "key"
-      "phase trigger" "phasing wall (in phase)" "cracked wall" "orc"]])
+      "pile of gold" "wall generator (west)"
+      "treasure chest" "key"
+      "phase trigger" "phasing wall (in phase)"
+      "cracked wall" "orc"]])
   (defn remote [x]
     (use-item "wand of remote action" [x 0]))
   (setv G.rules.reality-bubble-size 20)
@@ -674,27 +676,31 @@
   ; Pick up gold.
   (remote 1)
   (assert (= G.score 100))
+  ; Trigger a wall generator.
+  (remote 2)
+  (assert-at [1 0] "wall")
+  (assert-at [2 0] "wall")
   ; Try to unlock a chest.
-  (set-square [2 0] "treasure chest" "pile of gold")
-  (cant (remote 2) "It's locked, and you're keyless at the moment.")
+  (set-square [3 0] "treasure chest" "pile of gold")
+  (cant (remote 3) "It's locked, and you're keyless at the moment.")
   ; Get a key, unlock it, and get the gold.
-  (remote 3)
+  (remote 4)
   (assert (= G.player.keys 1))
   (assert (= G.score 150))
-  (remote 2)
+  (remote 3)
   (assert (= G.player.keys 0))
   (assert (= G.score 150))
-  (remote 2)
+  (remote 3)
   (assert (= G.score 250))
   ; Hit a phase trigger.
-  (remote 4)
-  (assert-at [5 0] "phasing wall (out of phase)")
+  (remote 5)
+  (assert-at [6 0] "phasing wall (out of phase)")
 
   ; Things that wands of remote action can't do include:
   ; - Break a cracked wall
-  (cant (remote 6) nothing)
-  ; - Attack a monster
   (cant (remote 7) nothing)
+  ; - Attack a monster
+  (cant (remote 8) nothing)
   ; - Affect an empty square
   (cant (remote 15) nothing)
   ; - Pick up a key when you're already full.

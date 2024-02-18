@@ -566,6 +566,45 @@
   :flavor "Where do video games get all their crates from? There must be entire warehouses full of 'em, am I right?")
 
 ;; --------------------------------------------------------------
+;; * Wall generators
+;; --------------------------------------------------------------
+
+(defclass WallGenerator [Scenery]
+  (setv
+    blocks-move T
+    ; Surprisingly, but per IQ, wall generators aren't diagonal
+    ; blockers.
+    direction None)
+
+  (defmeth hook-player-bump [origin]
+    (doc f"Creates a line of walls to the {@direction.name}, stopping at the first nonempty square. The wall generator itself then reverts to a normal wall.")
+    (@generate)
+    True)
+  (defmeth hook-player-shot []
+    "As when bumped."
+    (@generate))
+
+  (defmeth generate []
+    (for [p (ray @pos @direction Inf)]
+      (when (at p)
+        (break))
+      (Tile.make p "wall"))
+    (@replace "wall"))
+
+  (setv flavor "Ever wondered where all those walls come from?"))
+
+(do-mac
+  (import simalq.geometry [Direction])
+  `(do ~@(lfor
+    [direction iq-ix] [
+      [Direction.N 190] [Direction.E 193]
+      [Direction.S 191] [Direction.W 192]]
+    :setv c (get Direction.arrows direction)
+    `(deftile ~f"{c}|" ~f"a wall generator ({direction.name})" WallGenerator
+      :iq-ix ~iq-ix
+      :direction (. Direction ~(hy.models.Symbol direction.abbr))))))
+
+;; --------------------------------------------------------------
 ;; * Fountains
 ;; --------------------------------------------------------------
 
