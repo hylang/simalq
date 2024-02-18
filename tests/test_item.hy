@@ -618,6 +618,10 @@
   ; Everything except the Void is destroyed by annihilation.
   (use-item "wand of annihilation" 'E)
   (assert-at 'E "Void")
+  ; There's an error message for trying to use a wand of annihliation
+  ; where it would do nothing.
+  (cant (use-item "wand of annihilation" 'E) "There isn't anything you can annihilate there.")
+  (cant (use-item "wand of annihilation" 'N) "There isn't anything you can annihilate there.")
   ; Contra IQ, we allow the player to kill herself with a wand of
   ; annihilation, because it's funny.
   (use-item "wand of annihilation" 'here)

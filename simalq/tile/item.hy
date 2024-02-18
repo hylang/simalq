@@ -509,7 +509,11 @@
 
   :use (meth [target]
     "Utterly destroys everything at the target."
-    (annihilate target))
+    (for [t (at target)  :if (not t.superblock)]
+      (annihilate target)
+      (return))
+    (print "gonna raise")
+    (raise (CommandError "There isn't anything you can annihilate there.")))
 
   :flavor "Now this is a real wand of nothing. A wand of nothingness. A wand of nothing left.")
 
