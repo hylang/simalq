@@ -37,16 +37,25 @@
   "Strip out the colors in a colorstr and return a plain string."
   (.join "" (gfor  c x  c.char)))
 
+(setv color-cache {})
+  ; We cache color functions because they can be slow to compute in
+  ; 256-color mode, in which case `blessed` needs to find an
+  ; approximation for each color.
 (defn bless-colorstr [B x]
   "Render a colorstr `x` into terminal sequences via the
   `blessed.Terminal` object `B`."
   (.join "" (gfor
     c x
-    :setv fg (B.color-rgb #* (get color.by-name
-      (or c.fg color.default-fg)))
-    :setv bg (B.on-color-rgb #* (get color.by-name
-      (or c.bg color.default-bg)))
-    (fg (bg c.char)))))
+    :setv k #(c.fg c.bg)
+    :do (unless (in k color-cache)
+      (setv
+        fg (B.color-rgb #* (get color.by-name
+          (or c.fg color.default-fg)))
+        bg (B.on-color-rgb #* (get color.by-name
+          (or c.bg color.default-bg)))
+        (get color-cache k) (fn [x [fg fg] [bg bg]] (fg (bg x)))))
+    ((get color-cache k) c.char))))
+
 
 (defn colorstr-to-width [x width]
   (cut (+ x (colorstr (* " " (max 0 (- width (len x)))))) width))
