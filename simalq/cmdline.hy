@@ -14,6 +14,7 @@
 (setv advertised-iq-quests #(
   "New First Quest"
   "New DeathQuest"
+  "BoneQuest"
   "New Nightmare"))
   ; The other IQ quests have at least one unimplemented tile type.
 
@@ -95,7 +96,13 @@
 
 (defn quest-list []
   (.join "\n\n" (gfor
-    [name qf] (.items (available-quests))
+    [name qf] (sorted (.items (available-quests)) :key (fn [it]
+      ; List built-in quests first, then `advertised-iq-quests` in
+      ; the order it specifies.
+      (setv k (get it 0))
+      (if (in k advertised-iq-quests)
+        (.index advertised-iq-quests k)
+        -1)))
     :if (or (in name advertised-iq-quests) (in name builtin-quests))
     (.join "\n" (gfor
       :setv q (qf)
