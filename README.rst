@@ -1,5 +1,7 @@
 Infinitesimal Quest 2 + ε
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+`Source code (GitHub) <https://github.com/hylang/simalq>`_
+------------------------------------------------------------
 
 Infinitesimal Quest 2 + ε (or "SQ" for short; Python package name ``simalq``) is a Gauntlet-like turn-based puzzling dungeon crawler written to serve as an official example program for `Hy <http://hylang.org>`_. It's a reimplementation / remake / demake of `Yves Meynard <http://yvesmeynard.com>`_'s 1996 Macintosh game Infinity Quest II, abbreviated "IQ".
 
