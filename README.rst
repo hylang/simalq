@@ -55,6 +55,8 @@ Development status
 
 SQ is reasonably polished and allows playing through several complete quests. Not quite all of IQ's tile types are implemented, and so a few of its original quests (Nightmare 2, Delirium, and the original tutorial Boot Camp 2) aren't completely playable. You can try them if you want, but they aren't listed by ``--quests``.
 
+Overall, the code is in good shape and provides examples of solving many different kinds of problems in Hy. Some files use `Outli <https://github.com/jdtsmith/outli>`__ headers in comments for organization.
+
 Version history
 ============================================================
 
