@@ -12,9 +12,9 @@
 (setv url "http://hylang.org/simalq")
 
 (setv advertised-iq-quests #(
-   "New First Quest"
-   "New DeathQuest"
-   "New Nightmare"))
+  "New First Quest"
+  "New DeathQuest"
+  "New Nightmare"))
   ; The other IQ quests have at least one unimplemented tile type.
 
 (setv difficulty-presets (dict
