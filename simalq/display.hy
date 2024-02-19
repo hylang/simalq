@@ -42,12 +42,10 @@
   `blessed.Terminal` object `B`."
   (.join "" (gfor
     c x
-    :setv fg (if c.fg
-      (B.color-rgb #* (get color.by-name c.fg))
-      (fn [x] x))
-    :setv bg (if c.bg
-      (B.on-color-rgb #* (get color.by-name c.bg))
-      (fn [x] x))
+    :setv fg (B.color-rgb #* (get color.by-name
+      (or c.fg color.default-fg)))
+    :setv bg (B.on-color-rgb #* (get color.by-name
+      (or c.bg color.default-bg)))
     (fg (bg c.char)))))
 
 (defn colorstr-to-width [x width]
