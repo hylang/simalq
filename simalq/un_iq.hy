@@ -13,7 +13,7 @@
   functools [cache]
   construct
   toolz [partition]
-  simalq.util [cache-dir]
+  simalq.util [cache-dir seq]
   simalq.geometry [Map Pos]
   simalq.quest [Quest Level]
   simalq.tile [Tile])
@@ -304,7 +304,48 @@
           "<>" "fixed damaging trap"
           "k " "key"
           "G " ["ghost" :hp 3]
-          "K " ["Dark Knight" :hp 12]})))
+          "K " ["Dark Knight" :hp 12]}))
+
+    ["BoneQuest" 3]
+      ; Replace the two trapped-wall swastikas.
+      (replace-map-rect level 13 24
+        :text "
+          . ████. i ██████. . ██
+          . ████. ████████. ████
+          i . <>. . . . . <>. ██
+          . ██████. ████████. .
+          . . . ██i . . ██████i "
+        :map-marks {
+          "██" ["trapped wall" :wallnum 1]
+          "i " ["imp" :hp 3]
+          "<>" "one-shot damaging trap"})
+
+    ["BoneQuest" 8]
+      ; Replace the large central swastika.
+      (replace-map-rect level 6 6
+        :text "
+          ██, ███4███████1██████
+          ██. ██. ██. ██. ██. ,
+          ██d ██☉G██d ██☉G██d ██
+          ██. ██> ██. ██> ██. ██
+          ██o ██████, ██████o ██
+          ██. d . , . , . d . ██
+          ██████████, ██████████
+          █3. ☉G> ██. ██> ☉G. █2
+          ██████████d ██████████
+          , . d . o . o . d . ██
+          ██████████████████, ██"
+        :map-marks {
+          #** (dfor
+            i (seq 1 4)
+            f"█{i}" ["trapped wall" :wallnum i])
+          ", " "broken trap"
+          "o " ["orc" :hp 3]
+          "☉G" ["generator"
+            :hp 3
+            :summon-class "ghost"
+            :summon-frequency (f/ 1)
+            :summon-hp 3]}))
 
   level)
 
