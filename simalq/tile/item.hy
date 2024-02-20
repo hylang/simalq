@@ -313,7 +313,7 @@
 
   :help (meth []
     f"Surrounds you in a cloud of poison for {@duration} more turns. You are immune to the effect, but all monsters within 1 square take {G.rules.player-poison-damage} damage at the end of each turn.")
-  :flavor "Finally, somebody concoted a poison that hurts monsters but not you. This handy wearable fumigator lets you apply it hands-free.")
+  :flavor "Finally, somebody concocted a poison that hurts monsters but not you. This handy wearable fumigator lets you apply it hands-free.")
 
 (deftile "! " "a passwall amulet" StatusEffectItem
   :color 'purple
@@ -527,7 +527,7 @@
 
   :!mon-damage #(2 1 1)
   :use (meth [target]
-    (doc f"Does {(get @mon-damage 1)} fire damage to all monsters in {(burst-size (len @mon-damage))}, except at the center square, where they take {(get @mon-damage 0)} fire damage. Futhermore, all webs in the burst are destroyed. You take no damage.")
+    (doc f"Does {(get @mon-damage 1)} fire damage to all monsters in {(burst-size (len @mon-damage))}, except at the center square, where they take {(get @mon-damage 0)} fire damage. Furthermore, all webs in the burst are destroyed. You take no damage.")
     (for [
         pos (burst-damage target :damage-type DamageType.Fire
           :amount @mon-damage

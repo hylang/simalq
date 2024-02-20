@@ -254,7 +254,7 @@
       #* extra))
 
   (defmeth wander [[implicit-attack T] [ethereal-to #()]]
-    "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic psuedorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
+    "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic pseudorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
 
     (when (and implicit-attack (@try-to-attack-player))
       (return))
@@ -671,7 +671,7 @@
       (@make @pos "gunk")
       (@rm-from-map)))
 
-  :flavor "A seed of discord the size of a basketball that can flood a room insde of a minute. Think fast.")
+  :flavor "A seed of discord the size of a basketball that can flood a room inside of a minute. Think fast.")
 
 (deftile "O " "a gunk" Summoner
   :color 'dark-orange

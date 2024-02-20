@@ -301,7 +301,7 @@
         (Tile.make @target "metal door")))
     T)
 
-  :flavor "A switch (sadly too awkwardly designed to be flipped with an arrow from Tris's bow) that can open a metal door somewhere in the dungeon. It can also close the door, in case you want to bring half a ton of steel hurtling down on somebody's head.")
+  :flavor "A switch (too awkwardly designed to be flipped with an arrow from Tris's bow) that can open a metal door somewhere in the dungeon. It can also close the door, in case you want to bring half a ton of steel hurtling down on somebody's head.")
 
 ;; --------------------------------------------------------------
 ;; ** One-way doors
