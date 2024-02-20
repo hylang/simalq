@@ -343,4 +343,4 @@
           (.get color.tile-bg-by-hp
             t.hp
             (get color.tile-bg-by-hp "other")))
-      :bold F)))
+      :bold t.bold)))

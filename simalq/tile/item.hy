@@ -25,6 +25,9 @@
   "An object the player can pick up."
 
   (setv
+    bold T
+      ; A lot of items have small, spindly mapsyms, and we generally
+      ; want them to stand out from scenery, so we boldface all of them.
     acquirement-points 0)
 
   (defmeth hook-player-walked-into []

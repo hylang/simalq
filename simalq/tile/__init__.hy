@@ -141,6 +141,8 @@
       ; Similar, for the background color. `None` means allowing
       ; other background-color effects, like the reality fringe, to
       ; determine it.
+    bold False
+      ; Whether the mapsym should be boldfaced.
     flavor None
       ; Flavor text to show in a help screen.
     iq-ix None

@@ -34,7 +34,8 @@
               color [
                 (or cc.fg simalq.color.default-fg)
                 (or cc.bg simalq.color.default-bg)]
-              (get simalq.color.by-name color))))
+              (get simalq.color.by-name color))
+            :bold cc.bold))
         :bullets (lfor
           bullet (.info-bullets tile)
           :if bullet
@@ -58,9 +59,11 @@
     (E.code :class "mapsym" #* (gfor
       cc tile.mapsym
       (E.span cc.char :style
-        (.format "color: {}; background-color: {}" #* (gfor
-          rgb cc.colors
-          (.format "#{:02x}{:02x}{:02x}" #* rgb)))))))
+        (.format "color: {}; background-color: {};{}"
+          #* (gfor
+            rgb cc.colors
+            (.format "#{:02x}{:02x}{:02x}" #* rgb))
+          (if cc.bold " font-weight: bold" ""))))))
 
   (setv info (get-info))
 
