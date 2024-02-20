@@ -23,15 +23,16 @@
 
 
 (defdataclass ColorChar []
-  "A character with a foreground and background color. Colors can
-  be `None` or a symbol (a key of `color.by-name`)."
-  :fields [char fg bg])
+  "A character with a foreground and background color, plus a boldface
+  state. Colors can be `None` or a symbol (a key of `color.by-name`).
+  `bold` is a `bool`."
+  :fields [char fg bg bold])
 
-(defn colorstr [s [fg None] [bg None]]
+(defn colorstr [s [fg None] [bg None] [bold F]]
   "Convert a string to a colorstr, i.e., a list of `ColorChar`s."
   (lfor
     c s
-    (ColorChar c fg bg)))
+    (ColorChar c fg bg bold)))
 
 (defn uncolor [x]
   "Strip out the colors in a colorstr and return a plain string."
@@ -54,7 +55,7 @@
         bg (B.on-color-rgb #* (get color.by-name
           (or c.bg color.default-bg)))
         (get color-cache k) (fn [x [fg fg] [bg bg]] (fg (bg x)))))
-    ((get color-cache k) c.char))))
+    ((get color-cache k) (if c.bold (B.bold c.char) c.char)))))
 
 
 (defn colorstr-to-width [x width]
@@ -147,15 +148,15 @@
           (for [[i c] (enumerate cs)] (cond
             (or
                 (overwrapped G.map.wrap-x mx focus.x G.map.width)
-                (overwrapped G.map.wrap-y my focus.y G.map.height)) (do
-              (setv c.fg color.overwrapped)
-              (setv c.bg color.default-bg))
+                (overwrapped G.map.wrap-y my focus.y G.map.height))
+              (setv c (ColorChar color.overwrapped color.default-bg None))
             (in p overmarks) (do
               (setv o (get overmarks p i))
               (setv c.bg o.bg)
               (when o.char
+                (setv c.char o.char)
                 (setv c.fg o.fg)
-                (setv c.char o.char)))
+                (setv c.bold o.bold)))
             (= [mx my] [focus.x focus.y])
               (setv c.bg
                 ; Use a different color for the focus if the player
@@ -312,7 +313,7 @@
     (setv out (lfor
       [below above] (zip out (color-tile tile))
       (if (= above.char " ")
-        (ColorChar below.char below.fg above.bg)
+        (ColorChar below.char below.fg above.bg below.bold)
         above))))
   (when (=
       (dist p G.player.pos)
@@ -329,9 +330,9 @@
   (lfor
     i [0 1]
     (ColorChar
-      (get t.mapsym i)
-      (if (isinstance t.color tuple) (get t.color i) t.color)
-      (cond
+      :char (get t.mapsym i)
+      :fg (if (isinstance t.color tuple) (get t.color i) t.color)
+      :bg (cond
         (isinstance t.color-bg tuple)
           (get t.color-bg i)
         t.color-bg
@@ -341,4 +342,5 @@
           ; how many HP they have.
           (.get color.tile-bg-by-hp
             t.hp
-            (get color.tile-bg-by-hp "other"))))))
+            (get color.tile-bg-by-hp "other")))
+      :bold F)))

@@ -80,7 +80,8 @@
       (ColorChar
         :char (when (in p labels) (get labels p i))
         :fg colors.flash-label
-        :bg color))))
+        :bg color
+        :bold F))))
   (sleep flash-time-s))
 
 
