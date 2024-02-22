@@ -77,12 +77,12 @@
 
 
 (defn get-command [key]
-  (import simalq.keyboard [read-dir-key cmd-keys])
+  (import simalq.keyboard [read-dir-key command-keys])
   (when (setx v (read-dir-key key))
     (return (if (= v 'center)
       (Wait)
       (Walk v))))
-  (when (setx v (.get cmd-keys (str key)))
+  (when (setx v (.get command-keys (str key)))
     (return (if (isinstance v list)
       ((get v 0) #* (cut v 1 None))
       (v))))
@@ -336,7 +336,7 @@
 
 (defn help-text []
   (setv controls (.join "\n" (lfor
-    [k cmd] (.items hy.I.simalq/keyboard.cmd-keys)
+    [k cmd] (.items hy.I.simalq/keyboard.command-keys)
     :setv [cmd arg] (if (isinstance cmd list) cmd [cmd None])
     (+ k " - " (.format
       (re.sub r"\s+" " " cmd.__doc__)
