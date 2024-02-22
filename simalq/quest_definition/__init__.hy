@@ -30,6 +30,8 @@ quest definitions from other files in this directory."
 
 (defn locate [locator]
   (cond
+    (is locator None)
+      None
     (= locator 'here)
       G.player.pos
     (isinstance locator hy.models.Symbol)
@@ -37,7 +39,9 @@ quest definitions from other files in this directory."
     (isinstance locator list)
       (Pos G.map #* locator)
     (isinstance locator Pos)
-      locator))
+      locator
+    True
+      (raise (TypeError locator))))
 
 ;; --------------------------------------------------
 ;; * `mk-quest`, `mk-level`, `mk-tile`
