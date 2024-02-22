@@ -1,3 +1,6 @@
+"Convert the README to HTML for use on hylang.org"
+
+
 (import
   pathlib [Path]
   lxml.html)
