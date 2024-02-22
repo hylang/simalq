@@ -18,6 +18,7 @@ setuptools.setup(
     long_description = Path('README.rst').read_text(),
     long_description_content_type = 'text/x-rst',
     project_urls = {
+        'Homepage': 'http://hylang.org/simalq',
         'Source Code': 'https://github.com/hylang/simalq'},
     python_requires = '>= 3.10',
     install_requires = dependencies,
@@ -28,4 +29,5 @@ setuptools.setup(
     classifiers = [
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3'])
+        'Programming Language :: Hy',
+        'Topic :: Games/Entertainment :: Puzzle Games'])
