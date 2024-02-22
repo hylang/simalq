@@ -238,14 +238,14 @@
         d action.direction
         target G.player.pos
         targets []
-        magic F)
+        magic? F)
       (when G.player.magic-arrows
-       (setv magic T)
+       (setv magic? T)
        (-= G.player.magic-arrows 1))
       (defn animate []
         (flash-map :flash-time-s .1
           G.player.pos
-          (if magic
+          (if magic?
             color.flash-player-shot-magic
             color.flash-player-shot-mundane)
           targets
@@ -269,15 +269,15 @@
               ; The arrow may stop after the hook is called.
               (animate)
               (.hook-player-shot tile)
-              (unless (and magic (!= tile.pos target))
+              (unless (and magic? (!= tile.pos target))
                 (return)))
             (isinstance tile Damageable) (do
               ; The arrow damages the tile and may stop.
               (animate)
-              (.damage tile (player-shot-damage magic) (if magic
+              (.damage tile (player-shot-damage magic?) (if magic?
                 DamageType.MagicArrow
                 DamageType.MundaneArrow))
-              (unless (and magic (!= tile.pos target))
+              (unless (and magic? (!= tile.pos target))
                 (return)))
             tile.blocks-player-shots
               ; The arrow won't be able to leave this square, although

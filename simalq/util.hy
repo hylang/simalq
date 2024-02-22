@@ -102,10 +102,10 @@
       G.rules.player-melee-damage-weakness-reduction
       0)))
 
-(defn player-shot-damage [magic]
+(defn player-shot-damage [magic?]
   "Return how much damage the player does with her bow."
   (cond
-    magic
+    magic?
       G.rules.player-shot-damage-magic
     (get G.player.artifacts "Elven Bow")
       G.rules.player-shot-damage-artifact
