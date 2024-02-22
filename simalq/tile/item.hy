@@ -231,9 +231,10 @@
   :iq-ix 27
   :acquirement-points 100
 
+  :!n-arrows 10
   :pick-up (meth []
-    (doc f"Gives you {G.rules.magic-arrows-pickup-size} magic arrows. Magic arrows are fired in place of regular arrows. They do {G.rules.player-shot-damage-magic} damage, and hurt some monsters that are immune to mundane arrows. If a magic arrow destroys a monster or object, it continues on its path and can keep doing damage.")
-    (+= G.player.magic-arrows G.rules.magic-arrows-pickup-size))
+    (doc f"Gives you {@n-arrows} magic arrows. Magic arrows are fired in place of regular arrows. They do {G.rules.player-shot-damage-magic} damage, and hurt some monsters that are immune to mundane arrows. If a magic arrow destroys a monster or object, it continues on its path and can keep doing damage.")
+    (+= G.player.magic-arrows @n-arrows))
 
   :flavor "Now we're talkin'! These missiles engraved with mystical runes hit hard and keep on going. Sadly, Tris is so excited to use them that she can't shoot mundane arrows until she's used them all up.")
 
@@ -243,9 +244,10 @@
     ; to get a non-emoji hourglass.
   :acquirement-points 0
 
+  :!time-bonus 25
   :pick-up (meth []
-    (doc f"Adds {G.rules.time-bonus} turns to the current time limit.")
-    (+= G.time-left G.rules.time-bonus))
+    (doc f"Adds {@time-bonus} turns to the current time limit.")
+    (+= G.time-left @time-bonus))
 
   :flavor "Oh dear! Oh dear! I shall be late!")
 

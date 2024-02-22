@@ -171,10 +171,6 @@
       ; How much damage the player does with magic arrows.
     player-poison-damage 3
       ; How much damage the player does with a poisonous aura.
-    magic-arrows-pickup-size 10
-      ; How many magic arrows come in a pickup.
-    time-bonus 25
-      ; How many turns a clock pickup extends the time limit by.
     artifact-shield-factor (f/ 3 4)
       ; How much the artifact shield multiplies incoming damage by.
     paralysis-duration 3
