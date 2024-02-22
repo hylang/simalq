@@ -1,3 +1,6 @@
+"Test types and functions for map geometry."
+
+
 (require
   hyrule [ebranch])
 (import

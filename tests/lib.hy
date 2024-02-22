@@ -1,3 +1,7 @@
+;; --------------------------------------------------------------
+;; * Imports
+;; --------------------------------------------------------------
+
 (require
   hyrule [do-n unless])
 (import
@@ -10,8 +14,12 @@
   simalq.quest-definition [mk-quest mk-tile locate parse-text-map]
   simalq.main [take-turn])
 
+;; --------------------------------------------------------------
+;; * Initialization functions
+;; --------------------------------------------------------------
 
 (defn init [#* levels [starting-hp 100] #** rules]
+  "(Re)initialize the global state."
   (start-quest
     :quest (mk-quest #* levels :starting-hp starting-hp)
     :rules rules)
@@ -21,8 +29,12 @@
   (start-quest (iq-quest "Boot Camp 2"))
   (start-level level-n))
 
+;; --------------------------------------------------------------
+;; * Tiles
+;; --------------------------------------------------------------
 
 (defn top [locator [attribute None]]
+  "Get the top tile at this location, and optionally an attribute thereof."
   (setv x (get (at (locate locator)) 0))
   (if attribute
     (getattr x (hy.mangle attribute))
@@ -50,6 +62,8 @@
     (mk-tile p tile-spec)))
 
 (defn assert-at [locator #* things]
+  "Check every tile at this square against a list of stems. Order
+  matters."
   (setv stack (at (locate locator)))
   (if (= things #('floor))
     (assert (= (len stack) 0))
@@ -79,8 +93,12 @@
 (defn assert-player-at [x y]
   (assert (= G.player.pos (Pos G.map x y))))
 
+;; --------------------------------------------------------------
+;; * Player actions
+;; --------------------------------------------------------------
 
 (defmacro cant [form [msg-check None]]
+  "Assert that the given action raises a `CommandError`."
   (setv e (hy.gensym))
   `(do
     (with [~e (hy.I.pytest.raises hy.I.simalq/util.CommandError)]
@@ -91,8 +109,8 @@
         (hy.repr (str ~msg-check))
         (hy.repr (. ~e value args [0]))))])))
 
-
 (defn wk [direction-abbr [n-times 1]]
+  "Walk."
   (do-n n-times
     (take-turn (Walk (getattr Direction (str direction-abbr))))))
 
@@ -105,6 +123,9 @@
     (take-turn (Shoot (getattr Direction (str direction-abbr))))))
 
 (defn use-item [thing [locator None]]
+  "`thing` can be an integer (meaning to use the inventory item with
+  that index) or a string (meaning to the item with that stem in the
+  inventory and then immediately use it)."
   (setv target (if locator
     (locate locator)
     (MetaDict :x None :y None)))

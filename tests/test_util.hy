@@ -1,3 +1,6 @@
+"Test some of the game's internal utility bits."
+
+
 (require
   simalq.macros [pop-integer-part defmacro-kwargs])
 (import
