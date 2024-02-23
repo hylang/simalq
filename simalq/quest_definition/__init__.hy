@@ -70,8 +70,8 @@ quest definitions from other files in this directory."
       ; The requested tiles are placed in a line east of the player
       ; start.
     [map None]
-      ; Overrides `width`, `height`, `tiles`, and possibly
-      ; `player-start` if provided.
+      ; A string passed to `parse-text-map`. It overrides `width`,
+      ; `height`, `tiles`, and possibly `player-start` if provided.
     [map-marks #()]
     [title None]
     [next-level None]
@@ -119,6 +119,7 @@ quest definitions from other files in this directory."
         (setv player-start #(x y))
       (= mapsym ". ")
         None
+      ; A few mapsyms have a default associated tile for convenience.
       (= mapsym "██")
         (mk-tile p "wall")
       (= mapsym "> ")

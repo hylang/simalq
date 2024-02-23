@@ -1,3 +1,6 @@
+"The command-line interface."
+
+
 (require
   hyrule [unless])
 (import

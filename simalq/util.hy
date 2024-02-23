@@ -25,6 +25,7 @@
   (range a (+ b step) step))
 
 (defn sign [x]
+  "N.B. This function returns 0 for -0.0, and raises `TypeError` for NaN."
   (cond
     (< x 0) -1
     (> x 0)  1
@@ -114,16 +115,16 @@
 
 
 (defclass DamageType [Enum] (setv
-  ; These only apply to damage against monsters
+  ; These only apply to damage against monsters.
   PlayerMelee   "sword attacks"
   MundaneArrow  "mundane arrows"
   MagicArrow    "magic arrows"
   Fire          "fire"
-  ; These only apply to damage against the player
+  ; These only apply to damage against the player.
   MonsterMelee  "monsters' melee attacks"
   MonsterShot   "monsters' shots"
   Trap          "traps"
-  ; These are equal-opportunity
+  ; These are equal-opportunity.
   Poison        "poison"
   DeathMagic    "death magic"))
 
@@ -145,6 +146,7 @@
     (bool (get G.player.status-effects @)))
 
   (defmeth add [duration]
+    "Give the player this status effect for the given duration."
     (when (and (@bad?) (.player-has? StatusEffect.Prot))
       ; Protection prevents harmful effects.
       (return))

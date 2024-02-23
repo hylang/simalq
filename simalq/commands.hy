@@ -1,3 +1,6 @@
+"Interface and logic for player commands and actions."
+
+
 (require
   hyrule [case ecase ebranch do-n unless]
   simalq.macros [defdataclass])
@@ -20,7 +23,7 @@
   "Something the player wants to do, translated from user input.")
 
 (defdataclass Action [Command]
-  "A discrete effect that the player can have on the gamestate.")
+  "A discrete effect that the player can have on the game state.")
 (defdataclass Wait [Action]
   "Do nothing, passing your turn (or, more precisely, passing
   one opportunity for an action).")
@@ -60,7 +63,6 @@
   wait key) to get info on a tile under the cursor, and any other key
   to exit look mode. If there's more than one tile on the selected
   square, you'll be prompted to choose one when you try to get info.")
-
 (defdataclass ShiftHistory [Command]
   "{details}"
   ; Undo or redo.
@@ -87,7 +89,6 @@
       ((get v 0) #* (cut v 1 None))
       (v))))
   None)
-
 
 
 (defn do-command [cmd]
@@ -187,16 +188,19 @@
       (ecase G.player.game-over-state
         'dead "You're dead"
         'won "You won the game")))))
-  (when (and (.player-has? StatusEffect.Para) (is-not (type action) Wait))
+  (when (and
+      (.player-has? StatusEffect.Para)
+      (is-not (type action) Wait))
     (raise (CommandError "You're paralyzed. You can only wait for it to pass.")))
 
   (ebranch (in (type action) it)
 
     [Wait]
-      ; Nothing to do. This action should always succeed.
+      ; Nothing to do. This action should always be allowed.
       None
 
     [Walk UseControllableTeleporter] (do
+
       (defn pat [pos]
         "`at`, but excluding tiles we should ignore due to passwall."
         (gfor
@@ -206,21 +210,25 @@
             tile.passwallable
             (.player-has? StatusEffect.Pass)))
           tile))
+
       (setv d action.direction)
       (setv [target wly] (walkability G.player.pos d :monster? F))
       (when (= wly 'out-of-bounds)
         (raise (CommandError "The border of the dungeon blocks your movement.")))
       (when (= wly 'blocked-diag)
         (raise (CommandError "That diagonal is blocked by a neighbor.")))
+
       (for [tile (pat target)]
         (when (.hook-player-bump tile G.player.pos)
           (return)))
       (when (= wly 'bump)
         (raise (CommandError "Your way is blocked.")))
+
       (for [tile (pat G.player.pos)]
         (.hook-player-walk-from tile target))
       (for [tile (pat target)]
         (.hook-player-walk-to tile G.player.pos))
+
       ; No exceptions have stopped us, so go.
       (setv pos-was G.player.pos)
       (.move G.player target)
@@ -231,6 +239,7 @@
           (return))))
 
     [Shoot] (do
+
       (setv
         d action.direction
         target G.player.pos
@@ -239,6 +248,7 @@
       (when G.player.magic-arrows
        (setv magic? T)
        (-= G.player.magic-arrows 1))
+
       (defn animate []
         (flash-map :flash-time-s .1
           G.player.pos
@@ -247,6 +257,7 @@
             color.flash-player-shot-mundane)
           targets
           {}))
+
       (do-n G.rules.reality-bubble-size
         (setv target (+ target d))
         (unless target
@@ -277,8 +288,8 @@
               (unless (and magic? (!= tile.pos target))
                 (return)))
             tile.blocks-player-shots
-              ; The arrow won't be able to leave this square, although
-              ; it can affect other tiles in the square.
+              ; The arrow can't leave this square, although it can
+              ; affect other tiles in the square.
               (setv blocked T)))
         (when blocked
           (animate)
@@ -302,6 +313,7 @@
           (when target
             (raise (CommandError "That item can't use a target.")))
           (.use item)))
+      ; All usable items are destroyed after one use.
       (setv (get G.player.inventory action.item-ix) None))))
 
 
@@ -312,10 +324,12 @@
   should then end.
 
   Return a selected `Pos` or `None`."
+
   (setv focus G.player.pos)
   (hy.I.simalq/main.io-mode
     :draw (fn []
-      (hy.I.simalq/main.print-main-screen focus :status-bar F :tile-list 'nonpickable))
+      (hy.I.simalq/main.print-main-screen
+        focus :status-bar F :tile-list 'nonpickable))
     :on-input (fn [key]
       (nonlocal focus)
       (setv dir-v (hy.I.simalq/keyboard.read-dir-key key))

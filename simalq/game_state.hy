@@ -121,7 +121,8 @@
       ; changing, such as monsters moving around.
     level-n None
       ; An integer indicating the level we're currently playing.
-      ; Numbered starting from 1.
+      ; Numbered starting from 1, so `(get G.quest.levels n)` is
+      ; counted as level `(- n 1)`.
     score 0
       ; How many points the player has accumulated.
     turn-n 0
@@ -146,7 +147,7 @@
     reality-bubble-size 6
       ; The reality bubble is the (Chebyshev) radius around the
       ; player in which monsters etc. get to act. It's a square
-      ; spanning `2 * reality-bubble-size + 1` map squares on each
+      ; spanning `(+ (* 2 reality-bubble-size) 1)` map squares on each
       ; side, with the player in the center.
     player-hp-factor (f/ 1)
       ; Multiplies the player's starting HP and healing.
@@ -179,9 +180,8 @@
       ; Damage per turn (to the player) from poisonous fountains.
     dainty-monsters T])
       ; Whether monsters will only step on empty floor (with some
-      ; exceptions, like spiders walking on webs). Otherwise,
-      ; monsters obey similar rules as the player does regarding
-      ; blocking tiles.
+      ; exceptions, like spiders walking on webs). Otherwise, monsters
+      ; can move through items and some kinds of scenery.
 
 
 (setv G (Global))

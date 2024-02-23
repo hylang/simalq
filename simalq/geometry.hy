@@ -1,3 +1,6 @@
+"Types for level geometry and functions to operate on them."
+
+
 (require
   hyrule [unless do-n]
   simalq.macros [defdataclass defmeth])
@@ -17,8 +20,8 @@
       ; Booleans.
     data
       ; A tuple of tuples representing the squares of the map. Each
-      ; tile is itself a list representing a stack of tiles on that
-      ; square. An empty stack means that the tile has only floor.
+      ; square is itself a list representing a stack of tiles. An
+      ; empty stack means that the square has only plain floor.
     width height
       ; Cached map dimensions for speed.
     each-turn
@@ -51,8 +54,8 @@
   :fields [name x y]
   :frozen T)
 ((fn []
-  ; Define the direction constants (`Direction.N`, `.NE`, etc.)
-  ; and collections thereof (`Direction.orths`, `.diags`, `.all`).
+  ; Define the direction constants (`Direction.N`, `.NE`, etc.) and
+  ; related conveniences (e.g., `Direction.orths`).
   (setv Direction.orths (tuple (map Direction
     ["north" "east" "south" "west"]
     [0       1       0      -1]
@@ -211,7 +214,7 @@
     p)))
 
 (defn burst-size [size [article? True]]
-  "Describes the size of a `burst`."
+  "Describe the size of a `burst` in prose."
   (setv n (- (* 2 size) 1))
   (.format "{}{}-by-{} burst"
     (if article?

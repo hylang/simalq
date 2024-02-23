@@ -3,6 +3,8 @@
 
 
 (defmacro defdataclass [class-name superclasses #* rest]
+  "Syntactic sugar for common uses of data classes."
+
   (setv   rest (list rest)  docstring [])
   (when (and rest (isinstance (get rest 0) hy.models.String))
     (.append docstring (.pop rest 0)))
@@ -172,9 +174,11 @@
     #** (if p-kwargs {p-kwargs collected-kwargs} {})))
 
 (defn parse-params [params]
+  "A subroutine for `defmacro-kwargs` and `match-params`."
   (import
     funcparserlib.parser [maybe many]
     hy.model-patterns [SYM FORM sym brackets pexpr])
+
   (setv msym (>> SYM hy.mangle))
   (defn pvalue [root wanted]
     (>> (pexpr (+ (sym root) wanted)) (fn [x] (get x 0))))

@@ -1,3 +1,6 @@
+"Lists of strings to pick from pseudorandomly."
+
+
 (setv meal-messages #(
   "Finally, some good pizza."
   "Macaroni with the chicken shtrips. Ugh!"

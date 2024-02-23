@@ -1,3 +1,12 @@
+"Code for saving games and loading saved games. Each saved game is a
+ZIP archive with two members:
+- `state.pkl`, a pickled `Global` object
+- `meta.json`, a JSON file of metadata."
+
+;; --------------------------------------------------------------
+;; * Imports
+;; --------------------------------------------------------------
+
 (require
   hyrule [unless])
 (import

@@ -1,3 +1,6 @@
+"Color definitions."
+
+
 (setv
 
   by-name (dfor
