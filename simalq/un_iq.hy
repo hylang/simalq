@@ -108,7 +108,7 @@
   (Bytes 897)
   :levels (Array this.n-levels (kw-struct
     :title (iq-str 128)
-    :floor-tile Byte
+    :floor-image Byte
     :width Byte
     :height Byte
     :player-start iq-pos
@@ -121,7 +121,7 @@
     :time-limit Int16ub
     :exit-speed Int16ub
     (Const (bytes [0]))
-    :wall-tile Byte
+    :wall-image Byte
     :moving-exit-start iq-pos
     :map (Bytes (* this.width this.height))
     :tile-extras (Array this.n-tile-extras (kw-struct
