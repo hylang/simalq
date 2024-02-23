@@ -46,15 +46,16 @@
       `(. construct ~x)
       x)))))
 
-(defn sym-struct [#* args]
-  "Create a `construct.Struct`, naming the fields with Hy symbols."
-  (setv  args (list args)  new [])
-  (while args
-    (setv k (when (isinstance (get args 0) hy.models.Symbol)
-      (hy.mangle (.pop args 0))))
-    (setv v (.pop args 0))
-    (.append new (if k (/ k v) v)))
-  (construct.Struct #* new))
+(defmacro kw-struct [#* args]
+  "Create a `construct.Struct`, naming the fields with Hy keyword
+  objects."
+  `(construct.Struct ~@((fn []
+    (setv xs (list args))
+    (while xs
+      (setv x (.pop xs 0))
+      (yield (if (isinstance x hy.models.Keyword)
+        `(/ ~(hy.mangle x.name) ~(.pop xs 0))
+        x)))))))
 
 (defmacro adapt [old-cls #* body]
   "Syntactic sugar for `construct.Adapter`."
@@ -99,33 +100,33 @@
 ;; * The Construct format for quest files
 ;; --------------------------------------------------------------
 
-(setv quest-fmt (with-construct (sym-struct
-  'n-levels Byte
+(setv quest-fmt (with-construct (kw-struct
+  :n-levels Byte
   (Bytes 261)
-  'starting-hp Int16ub
-  'title (iq-str 256)
+  :starting-hp Int16ub
+  :title (iq-str 256)
   (Bytes 897)
-  'levels (Array this.n-levels (sym-struct
-    'title (iq-str 128)
-    'floor-tile Byte
-    'width Byte
-    'height Byte
-    'player-start iq-pos
-    'n-tile-extras Int16ub
-    'wrap-x big-bool
-    'wrap-y big-bool
-    'next-level Int16ub
-    'light Int16ub
-    'poison-interval Int16ub
-    'time-limit Int16ub
-    'exit-speed Int16ub
+  :levels (Array this.n-levels (kw-struct
+    :title (iq-str 128)
+    :floor-tile Byte
+    :width Byte
+    :height Byte
+    :player-start iq-pos
+    :n-tile-extras Int16ub
+    :wrap-x big-bool
+    :wrap-y big-bool
+    :next-level Int16ub
+    :light Int16ub
+    :poison-interval Int16ub
+    :time-limit Int16ub
+    :exit-speed Int16ub
     (Const (bytes [0]))
-    'wall-tile Byte
-    'moving-exit-start iq-pos
-    'map (Bytes (* this.width this.height))
-    'tile-extras (Array this.n-tile-extras (sym-struct
-      'pos iq-pos
-      'data (Bytes 2)))))
+    :wall-tile Byte
+    :moving-exit-start iq-pos
+    :map (Bytes (* this.width this.height))
+    :tile-extras (Array this.n-tile-extras (kw-struct
+      :pos iq-pos
+      :data (Bytes 2)))))
   Terminated)))
 
 ;; --------------------------------------------------------------
