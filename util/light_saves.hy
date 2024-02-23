@@ -22,18 +22,29 @@ thousands of turns.]]
       :setv a state.action
       (ecase (type a)
         Wait ["Wait"]
-        Walk ["Walk" a.direction.x a.direction.y]
-        Shoot ["Shoot" a.direction.x a.direction.y]
-        UseItem ["UseItem" a.item-ix a.target-x a.target-y])))))))
+        Walk ["Walk"
+          a.direction.x a.direction.y]
+        Shoot ["Shoot"
+          a.direction.x a.direction.y]
+        UseItem ["UseItem"
+          a.item-ix a.target-x a.target-y]
+        UseControllableTeleporter ["UseControllableTeleporter"
+          a.direction a.target-x a.target-y])))))))
 
 (defn load [path]
+  (defn d [xs]
+    (get Direction.from-coords (tuple xs)))
+
   (for [[atype #* args] (tqdm
       (hy.I.json.loads (hy.I.gzip.decompress (.read-bytes (Path path)))))]
     (take-turn (ecase atype
       "Wait" (Wait)
-      "Walk" (Walk (get Direction.from-coords (tuple args)))
-      "Shoot" (Shoot (get Direction.from-coords (tuple args)))
-      "UseItem" (UseItem #* args)))))
+      "Walk" (Walk (d args))
+      "Shoot" (Shoot (d args))
+      "UseItem" (UseItem #* args)
+      "UseControllableTeleporter" (UseControllableTeleporter
+        (d (get args 0))
+        #* (cut args 1 None))))))
 
 
 (defmain [_ action path]
