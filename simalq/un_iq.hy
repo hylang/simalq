@@ -59,12 +59,11 @@
 
 (defmacro adapt [old-cls #* body]
   "Syntactic sugar for `construct.Adapter`."
-  (setv C (hy.gensym))
-  `(do
-    (defclass ~C [construct.Adapter]
-      (defn _decode [self obj context path]
-        ~@body))
-    (~C ~old-cls)))
+  `(
+    (type "adapter" #(construct.Adapter) (dict
+      :_decode (fn [self obj context path]
+        ~@body)))
+    ~old-cls))
 
 (defn mac-roman-str [n]
   "A Mac Roman-encoded string of length `n` with Mac-style newlines."
@@ -169,10 +168,10 @@
     :if (not (.endswith member "/"))
     (.removeprefix member "infinity_quests_2/") (.read z member))))
 
-(defn read-quest [name inp]
+(defn read-quest [name data]
   "Parse `bytes` into a `Quest`."
 
-  (setv data (.parse quest-fmt inp))
+  (setv data (.parse quest-fmt data))
   (Quest
     :name name
     :title data.title
@@ -193,41 +192,42 @@
           (Pos m (- (get xy 0) 1) (- m.height (get xy 1)))
           None))
       :setv tile-extras (dfor
-        c l.tile-extras
-        (mk-pos c.pos) (tuple c.data))
+        pair l.tile-extras
+        (mk-pos pair.pos) (tuple pair.data))
 
       :do (for [x (range l.width)  y (range l.height)]
         ; Fill in `m`.
         (setv iq-ix (get l.map (+ (* x l.height) (- l.height y 1))))
           ; We have to reverse y-coordinates to get y = 0 as the
           ; bottom row.
-        (unless (= iq-ix FLOOR)
-          (setv p (Pos m x y))
-          (setv result (get Tile.types-by-iq-ix iq-ix))
-          (defn te [cls]
-            (if (in p tile-extras)
-              (.read-tile-extras cls mk-pos
-                #* (get tile-extras p))
-              {}))
-          (.extend (get m.data x y) (cond
-            (is (type result) type)
-              ; The usual case: the `iq-ix` specifies the type, and no
-              ; more.
-              [(result :pos p #** (te result))]
-            (is (type result) dict)
-              ; This `iq-ix` specifies the type and a certain value of
-              ; a field.
-              [((get result "cls") :pos p
-                #** {(get result "field") (get result "value")}
-                #** (te (get result "cls")))]
-            (callable (type result))
-              ; A special case where a callback makes the tiles
-              ; itself. It can return any number of them.
-              (result p #* (get tile-extras p))
-            T
-              (raise (ValueError (+ "Bad `Tile.types-by-iq-ix` entry: " (repr result))))))))
+        (when (= iq-ix FLOOR)
+          (continue))
+        (setv p (Pos m x y))
+        (setv result (get Tile.types-by-iq-ix iq-ix))
+        (defn te [cls]
+          (if (in p tile-extras)
+            (.read-tile-extras cls mk-pos
+              #* (get tile-extras p))
+            {}))
+        (.extend (get m.data x y) (cond
+          (is (type result) type)
+            ; The usual case: the `iq-ix` specifies the type, and no
+            ; more.
+            [(result :pos p #** (te result))]
+          (is (type result) dict)
+            ; This `iq-ix` specifies the type and a certain value of
+            ; a field.
+            [((get result "cls") :pos p
+              #** {(get result "field") (get result "value")}
+              #** (te (get result "cls")))]
+          (callable (type result))
+            ; A special case where a callback makes the tiles
+            ; itself. It can return any number of them.
+            (result p #* (get tile-extras p))
+          T
+            (raise (ValueError (+ "Bad `Tile.types-by-iq-ix` entry: " (repr result)))))))
 
-      (denazify name (+ i 1) (Level
+      (denazify name (Level
         :n (+ i 1)
         :title l.title
         :player-start (mk-pos l.player-start)
@@ -244,10 +244,10 @@
 ;; * Denazification
 ;; --------------------------------------------------------------
 
-(defn denazify [quest-name level-n level]
+(defn denazify [quest-name level]
   "Remove swastika-based designs in the given IQ level. The level is
   modified in place and then returned."
-  (case [quest-name level-n]
+  (case [quest-name level.n]
 
     ["New Nightmare" 1] (do
       ; Replace the large central swastika.
