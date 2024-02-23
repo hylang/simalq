@@ -149,21 +149,25 @@
   (.mkdir cache-dir :parents T :exist-ok T)
   (setv path (/ cache-dir "infinity_quests_2.zip"))
   (unless (.exists path)
-    (import http.client contextlib)
-    (with [con (contextlib.closing (http.client.HTTPConnection "arfer.net"))]
+    (import http.client contextlib hashlib)
+    (setv data (with [con
+        (contextlib.closing (http.client.HTTPConnection "arfer.net"))]
       (.request con "GET" "/downloads/infinity_quests_2.zip"
         :headers {"User-Agent" "Infinitesimal Quest 2 + epsilon"})
       (setv r (.getresponse con))
-      (assert (= r.status 200))
-      (.write-bytes path (.read r))))
+      (when (!= r.status 200)
+        (raise (ValueError f"The HTTP request to get IQ quests returned status code {r.status}")))
+      (.read r)))
+    (setv value (.hexdigest (hashlib.sha512 data)))
+    (unless (= value "044b0c16fcc3bda2869d5b97ecaf32b39177988e510230e44456a33485c2df4e929443b9765463654961b7190ecf431a6871417a52c81e81c61f089d2793ab5d")
+      (raise (ValueError f"Bad SHA-512 hash for IQ quests: {value}")))
+    (.write-bytes path data))
 
   ; Read the files from the archive.
-  (setv prefix "infinity_quests_2/")
   (with [z (ZipFile path "r")] (dfor
-    q (.namelist z)
-    :setv v (.read z q)
-    :if v
-    (.removeprefix q prefix) v)))
+    member (.namelist z)
+    :if (not (.endswith member "/"))
+    (.removeprefix member "infinity_quests_2/") (.read z member))))
 
 (defn read-quest [name inp]
   "Parse `bytes` into a `Quest`."
