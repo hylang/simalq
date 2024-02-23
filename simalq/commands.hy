@@ -128,20 +128,18 @@
         (take-turn (Shoot v))))
 
     Inventory
-      (when (is-not None (setx item-ix (get-inventory-ix)))
+      (when (is-not (setx item-ix (get-inventory-ix)) None)
         (if (setx item (get G.player.inventory item-ix))
           (info-screen item)
           (raise (CommandError "That inventory slot is empty."))))
 
     GonnaUseItem
-      (when (is-not None (setx item-ix (get-inventory-ix)))
+      (when (is-not (setx item-ix (get-inventory-ix)) None)
         (if (and
             (setx item (get G.player.inventory item-ix))
             item.targeted)
-          (do
-            (setv target (targeting-mode (fn [target] T)))
-            (when target
-              (take-turn (UseItem item-ix target.x target.y))))
+          (when (setx target (targeting-mode (fn [target] T)))
+            (take-turn (UseItem item-ix target.x target.y)))
           (take-turn (UseItem item-ix None None))))
 
     Look
@@ -152,8 +150,7 @@
               0
               (menu (len stack) :draw (fn []
                 (print-main-screen target :status-bar F :tile-list 'pickable)))))))
-          (info-screen (get stack tile-ix)))
-        F))
+          (info-screen (get stack tile-ix)))))
 
     ShiftHistory (do
       (when (and (< cmd.steps 0) (= G.state-i 0))
@@ -163,20 +160,20 @@
       (.set-state-i G (max 0 (min (- (len G.states) 1)
         (+ G.state-i cmd.steps)))))
 
-    SaveGame
+    SaveGame (do
       (try
         (save-game-to-slot (= cmd.kind 'checkpoint))
-        (msg f"Game saved ({cmd.kind !s}).")
         (except [e IOError]
-          (raise (CommandError (+ "Save failed: " (str e))))))
+          (raise (CommandError f"Save failed: {e}"))))
+      (msg f"Game saved ({cmd.kind !s})."))
 
-    LoadGame
+    LoadGame (do
       (try
         (when (setx path (load-saved-game-screen (get-saves-list)))
-          (load-game path)
-          (msg "Game loaded."))
+          (load-game path))
         (except [e IOError]
-          (raise (CommandError (+ "Load failed: " (str e))))))
+          (raise (CommandError f"Load failed: {e}"))))
+      (msg "Game loaded."))
 
     Quit
       (sys.exit)))
