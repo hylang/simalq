@@ -1,3 +1,6 @@
+"The quest and level types."
+
+
 (require
   hyrule [unless]
   simalq.macros [defdataclass])
@@ -11,10 +14,14 @@
 
 (defdataclass Quest []
   "A scenario or campaign; a sequence of levels to play."
-  :fields [name title authors starting-hp levels]
+  :fields [
+    name title authors ; Textual metadata
+    starting-hp        ; An integer
+    levels]            ; A tuple of `Level` objects
   :frozen T)
 
 (defn start-quest [quest [rules None]]
+  "Initialize the global state for playing the given quest."
   (setv
     G.rules (Rules)
     G.quest quest)
@@ -23,21 +30,38 @@
       (setattr G.rules k v)))
   (.initialize-states G)
   (setv G.player (Player :pos None))
-  (when quest
-    (setv G.player.hp (refactor-hp quest.starting-hp))))
+  (setv G.player.hp (refactor-hp quest.starting-hp)))
 
 
 (defdataclass Level []
   "A map and associated data for playing it."
   :fields [
-    n title player-start next-level
-    poison-intensity time-limit exit-speed moving-exit-start
+    n
+      ; The level number. The first item (i.e., index 0) in
+      ; `Quest.levels` must have level number 1, the next (index 1)
+      ; must have level number 2, and so on.
+    title
+      ; Free text. It can be up to several sentences describing the
+      ; level, rather than just a name.
+    player-start
+      ; A `Pos`.
+    next-level
+      ; The level number of the level to go to if the player uses a
+      ; regular exit, or the time limit expires.
+    poison-intensity
+      ; A `fraction.Fraction`, the dose of ambient poison per turn.
+    time-limit
+      ; An integer (counting in turns), or `None`.
+    exit-speed moving-exit-start
+      ; These fields would be used to implement moving exits, but
+      ; moving exits are not yet implemented, so they're ignored.
     map])
-  ; Poison intensity is a fraction.Fraction, the amount of poison to
-  ; dose the player with per turn, which converts to poison damage
-  ; once it gets ≥ 1.
+      ; A `Map`.
 
 (defn start-level [level-n [show-title T]]
+  "Begin playing the level of the given number. If `level-n` is
+  greater than the number of levels in this quest, the player wins the
+  game."
   (when (> level-n (len G.quest.levels))
     (raise (GameOverException 'won)))
   (setv level (get G.quest.levels (- level-n 1)))
@@ -52,6 +76,6 @@
     G.time-left G.level.time-limit)
   (.move G.player G.level.player-start)
   (unless G.states
-    ; If we haven't saved any states yet (because the game just
+    ; If we haven't saved any states yet (because the quest just
     ; started), save this as the first state in the history.
     (.advance-states G)))

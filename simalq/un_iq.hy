@@ -1,4 +1,4 @@
-"Parse IQ quest files."
+"Import IQ quest files."
 
 ;; --------------------------------------------------------------
 ;; * Imports
@@ -24,6 +24,7 @@
 ;; --------------------------------------------------------------
 
 (setv FLOOR 1)
+  ; The IQ index number for plain floor.
 
 (eval-when-compile (defn replace-atoms [x f]
   (import hyrule [coll?])
@@ -77,8 +78,9 @@
     (/ "len" Byte)
     (/ "string" (adapt (mac-roman-str this.len) (.replace obj "•" "☠")))
       ; IQ uses a font that displays bullets as skulls. We imitate it
-      ; thus. The skull emoji (U+1F480) is arguably a closer match in
-      ; design, but emoji in terminals sometimes cause funky spacing.
+      ; thus. The skull emoji (U+1F480, "💀") is arguably a closer
+      ; match in design, but emoji in terminals sometimes cause funky
+      ; spacing.
     (Bytes (- n 2 this.len)))))
 
 (setv big-bool
@@ -131,8 +133,8 @@
 ;; --------------------------------------------------------------
 
 (defn iq-quest [quest-name]
-  "Get the given original quest IQ, as a `Quest`. Or use the symbol
-  `all` to get all quests as a dictionary."
+  "Get the given original IQ quest, as a `Quest`. Or pass in the
+  symbol `all` to get all quests as a dictionary."
   (if (= quest-name 'all)
     (dfor
       [k v] (.items (iq-quests-raw))
@@ -170,6 +172,7 @@
     :name name
     :title data.title
     :authors (if (= name "New DeathQuest")
+      ; We're assuming this is a standard IQ quest, not user-made.
       "Yves and Serge Meynard"
       "Yves Meynard")
     :starting-hp data.starting-hp
