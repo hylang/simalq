@@ -107,11 +107,12 @@ interface elements as lists of `ColorChar`s."
     (+= out (lfor
       line (draw-status-bar)
       (colorstr-to-width line width))))
+  (setv status-bar-lines (len out))
   ; Then the map per se, including overmarks.
   (+= out (draw-map
     focus
     width
-    (- height (if status-bar status-bar-lines 0))
+    (- height status-bar-lines)
     (or overmarks {})))
 
   ; Write other parts on top of the map, just under the status bar.
@@ -119,8 +120,7 @@ interface elements as lists of `ColorChar`s."
   ; simultaneously.
   (defn scribble-on-map [lines]
     (for [[i line] (enumerate lines)]
-      (when status-bar
-        (+= i status-bar-lines))
+      (+= i status-bar-lines)
       (setv (cut (get out i) (len line)) line)))
   ; First, the tile list.
   (when tile-list
@@ -284,8 +284,6 @@ interface elements as lists of `ColorChar`s."
 ;; --------------------------------------------------------------
 ;; ** The status bar
 ;; --------------------------------------------------------------
-
-(setv status-bar-lines 2)
 
 (defn draw-status-bar []
   "Return each line of status bar, as a colorstr."
