@@ -8,7 +8,8 @@
   simalq.util [GameOverException StatusEffect]
   simalq.geometry [at Pos]
   simalq.game-state [G]
-  simalq.quest-definition [mk-tile])
+  simalq.quest-definition [mk-tile]
+  simalq.commands [move-blocked-msgs])
 (setv  T True  F False)
 
 
@@ -141,7 +142,7 @@
   ; Use the control to create a door.
   (wk 'W)
   (assert-at 'E "metal door")
-  (cant (wk 'E) "Your way is blocked.")
+  (cant (wk 'E) move-blocked-msgs.simple)
   ; Use the control to destroy the door.
   (wk 'W)
   (assert-at 'E 'floor)
@@ -330,7 +331,7 @@
     X X X | X X o
     o X o @ X o o ")
   ; You can walk through out-of-phase walls, but not in-phase walls.
-  (cant (wk 'E) "Your way is blocked.")
+  (cant (wk 'E) move-blocked-msgs.simple)
   (wk 'W)
   (assert-at 'here 'player "phasing wall (out of phase)"))
 
@@ -390,7 +391,7 @@
     @ ██████████████")
   ; They can be triggered with an arrow. And they're stopped by any
   ; nonempty tile; monsters are unhurt.
-  (cant (wk 'NE) "That diagonal is blocked by a neighbor.")
+  (cant (wk 'NE) move-blocked-msgs.diag)
   (shoot 'NE)
   (assert-textmap "
     . ██████o . . .
@@ -478,7 +479,7 @@
   (assert-at 'here 'player "teleporter")
   ; Teleporters can't be walked past diagonally.
   (wk 'E)
-  (cant (wk 'NW) "That diagonal is blocked by a neighbor.")
+  (cant (wk 'NW) move-blocked-msgs.diag)
 
   ; With multiple porters in range, you get sent to one of the
   ; nearest. Re-entering the original sends you to different nearest

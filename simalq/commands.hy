@@ -9,6 +9,7 @@
   re
   copy [deepcopy]
   toolz [partition]
+  metadict [MetaDict]
   simalq.color :as color
   simalq.util [CommandError DamageType StatusEffect msg player-shot-damage flash-map menu-letters]
   simalq.geometry [Direction Pos at dist]
@@ -17,6 +18,12 @@
   simalq.tile.scenery [Scenery walkability]
   simalq.save-load [save-game-to-slot get-saves-list load-game])
 (setv  T True  F False)
+
+
+(setv move-blocked-msgs (MetaDict
+  :simple "Your way is blocked."
+  :diag "That diagonal is blocked by a neighbor."
+  :map-border "The border of the dungeon blocks your movement."))
 
 
 (defdataclass Command []
@@ -214,15 +221,15 @@
       (setv d action.direction)
       (setv [target wly] (walkability G.player.pos d :monster? F))
       (when (= wly 'out-of-bounds)
-        (raise (CommandError "The border of the dungeon blocks your movement.")))
+        (raise (CommandError move-blocked-msgs.map-border)))
       (when (= wly 'blocked-diag)
-        (raise (CommandError "That diagonal is blocked by a neighbor.")))
+        (raise (CommandError move-blocked-msgs.diag)))
 
       (for [tile (pat target)]
         (when (.hook-player-bump tile G.player.pos)
           (return)))
       (when (= wly 'bump)
-        (raise (CommandError "Your way is blocked.")))
+        (raise (CommandError move-blocked-msgs.simple)))
 
       (for [tile (pat G.player.pos)]
         (.hook-player-walk-from tile target))

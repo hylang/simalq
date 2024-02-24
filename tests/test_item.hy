@@ -8,7 +8,8 @@
   simalq.game-state [G]
   simalq.util [StatusEffect]
   simalq.tile [Monster]
-  simalq.quest-definition [mk-tile])
+  simalq.quest-definition [mk-tile]
+  simalq.commands [move-blocked-msgs])
 (setv  T True  F False)
 
 
@@ -345,7 +346,7 @@
   (assert-player-at 2 1)
   (mv-player 1 0)
   (set-square 'N "Void")
-  (cant (wk 'NE) "That diagonal is blocked by a neighbor."))
+  (cant (wk 'NE) move-blocked-msgs.diag))
 
 
 (defn test-ring-of-protection []
@@ -403,7 +404,7 @@
     'floor "wall"]])
 
   (wk 'E 19)
-  (cant (wk 'E) "Your way is blocked.")
+  (cant (wk 'E) move-blocked-msgs.simple)
   (for [[i result] (enumerate (.values becomes))]
     (assert-at [(+ i 3) 0] result)))
 

@@ -10,7 +10,8 @@
   simalq.game-state [G]
   simalq.util [mixed-number menu-letters StatusEffect]
   simalq.geometry [Pos at dist]
-  simalq.tile [Tile Damageable])
+  simalq.tile [Tile Damageable]
+  simalq.commands [move-blocked-msgs])
 (setv  T True  F False)
 
 
@@ -18,8 +19,8 @@
   ; These messages are probably too naggy to actually show. They're
   ; still implemented for the sake of testing the corresponding
   ; `CommandError`s.
-  "Your way is blocked."
-  "The border of the dungeon blocks your movement."))
+  move-blocked-msgs.simple
+  move-blocked-msgs.map-border))
 
 
 (defdataclass ColorChar []

@@ -9,7 +9,8 @@
   tests.lib [init init-boot-camp assert-at wait mv-player wk shoot assert-player-at assert-hp]
   simalq.game-state [G]
   simalq.save-load [save-game load-game]
-  simalq.quest-definition [mk-tile])
+  simalq.quest-definition [mk-tile]
+  simalq.commands [move-blocked-msgs])
 (setv  T True  F False)
 
 
@@ -34,7 +35,7 @@
   (assert (= G.state-i 2))
   (assert (= G.turn-n 2))
   ; Try going west, bumping into the level border.
-  (cant (wk 'W) "The border of the dungeon blocks your movement.")
+  (cant (wk 'W) move-blocked-msgs.map-border)
   (assert (= G.state-i 2))
     ; Failed attempts at actions don't advance the game-state index.
   (assert (= G.turn-n 2))
@@ -42,13 +43,13 @@
   ; Try walking into a wall tile.
   (wk 'S)
   (assert (= G.turn-n 3))
-  (cant (wk 'S) "Your way is blocked.")
+  (cant (wk 'S) move-blocked-msgs.simple)
   ; Walk into the (plain) door to the east.
   (wk 'NE)
   (wk 'E 3)
   (assert-at 'here 'player "door")
   ; Try walking diagonally past the wall to the north.
-  (cant (wk 'NE) "That diagonal is blocked by a neighbor.")
+  (cant (wk 'NE) move-blocked-msgs.diag)
 
   ; Walk diagonally between some pillars.
   (mv-player 3 1)
@@ -103,7 +104,7 @@
   (assert-player-at 0 19)
   (wk 'S 19)
   (assert-player-at 0 0)
-  (cant (wk 'W) "The border of the dungeon blocks your movement.")
+  (cant (wk 'W) move-blocked-msgs.map-border)
   (wk 'E)
 
   (assert (= G.level-n 2))
