@@ -188,7 +188,8 @@ interface elements as lists of `ColorChar`s."
             (or
                 (overwrapped G.map.wrap-x mx focus.x G.map.width)
                 (overwrapped G.map.wrap-y my focus.y G.map.height))
-              (setv c (ColorChar color.overwrapped color.default-bg None))
+              (setv c (ColorChar c.char
+                color.overwrapped color.default-bg None))
             (in p overmarks) (do
               (setv o (get overmarks p i))
               (setv c.bg o.bg)
