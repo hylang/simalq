@@ -1,3 +1,10 @@
+"The `ColorChar` type, and functions to render various game or
+interface elements as lists of `ColorChar`s."
+
+;; --------------------------------------------------------------
+;; * Imports
+;; --------------------------------------------------------------
+
 (require
   hyrule [unless ecase]
   simalq.macros [defdataclass])
@@ -14,14 +21,9 @@
   simalq.commands [move-blocked-msgs])
 (setv  T True  F False)
 
-
-(setv hide-messages #(
-  ; These messages are probably too naggy to actually show. They're
-  ; still implemented for the sake of testing the corresponding
-  ; `CommandError`s.
-  move-blocked-msgs.simple
-  move-blocked-msgs.map-border))
-
+;; --------------------------------------------------------------
+;; * `ColorChar`
+;; --------------------------------------------------------------
 
 (defdataclass ColorChar []
   "A character with a foreground and background color, plus a boldface
@@ -58,10 +60,36 @@
         (get color-cache k) (fn [x [fg fg] [bg bg]] (fg (bg x)))))
     ((get color-cache k) (if c.bold (B.bold c.char) c.char)))))
 
-
 (defn colorstr-to-width [x width]
   (cut (+ x (colorstr (* " " (max 0 (- width (len x)))))) width))
 
+(defn color-tile [t]
+  "Return a two-item colorstr."
+  (lfor
+    i [0 1]
+    (ColorChar
+      :char (get t.mapsym i)
+      :fg (if (isinstance t.color tuple) (get t.color i) t.color)
+      :bg (cond
+        (isinstance t.color-bg tuple)
+          (get t.color-bg i)
+        t.color-bg
+          t.color-bg
+        (and (isinstance t Damageable) (is-not t G.player))
+          ; Monsters etc. get an automatic background color to show
+          ; how many HP they have.
+          (.get color.tile-bg-by-hp
+            t.hp
+            (get color.tile-bg-by-hp "other")))
+      :bold t.bold)))
+
+;; --------------------------------------------------------------
+;; * Drawing functions
+;; --------------------------------------------------------------
+
+;; --------------------------------------------------------------
+;; ** The top level
+;; --------------------------------------------------------------
 
 (defn draw-screen [
     width height
@@ -120,6 +148,16 @@
 
   out)
 
+(setv hide-messages #(
+  ; These messages are probably too naggy to actually show. They're
+  ; still implemented for the sake of testing the corresponding
+  ; `CommandError`s.
+  move-blocked-msgs.simple
+  move-blocked-msgs.map-border))
+
+;; --------------------------------------------------------------
+;; ** The map
+;; --------------------------------------------------------------
 
 (defn draw-map [focus width height overmarks]
   "Return a list of colorstrs, one per line. The map will include
@@ -220,6 +258,31 @@
       ; coordinate case to be overwapped. Thus, each `Pos` has exactly
       ; one (x, y) pair that is considered not to be overwrapped.
 
+(defn mapsym-at-pos [p]
+  "Get a length-2 colorstr to represent the given `Pos`."
+
+  (setv floor-mapsym ". ")
+
+  (setv stack (at p))
+  (setv out (colorstr floor-mapsym))
+  (for [tile (reversed stack)]
+    (setv out (lfor
+      [below above] (zip out (color-tile tile))
+      (if (= above.char " ")
+        (ColorChar below.char below.fg above.bg below.bold)
+        above))))
+  (when (=
+      (dist p G.player.pos)
+      (+ G.rules.reality-bubble-size 1))
+    (for [c out]
+      (if (= (uncolor out) "██")
+        (setv c.fg color.reality-fringe-block)
+        (setv c.bg (or c.bg color.reality-fringe)))))
+  out)
+
+;; --------------------------------------------------------------
+;; ** The status bar
+;; --------------------------------------------------------------
 
 (setv status-bar-lines 2)
 
@@ -286,6 +349,10 @@
           (colorstr "  "))))
       #* (status-effects :bad F))))
 
+;; --------------------------------------------------------------
+;; ** Tile menus
+;; --------------------------------------------------------------
+
 (defn tile-menu [tiles pickable?]
   "Return a list of colorstrs, one for each tile."
   ; Create the text for each line.
@@ -301,47 +368,3 @@
     :setv (cut cs (.index line "�") (+ (.index line "�") 1))
       (if item (color-tile item) (colorstr "  "))
     cs))
-
-
-(defn mapsym-at-pos [p]
-  "Get a length-2 colorstr to represent the given `Pos`."
-
-  (setv floor-mapsym ". ")
-
-  (setv stack (at p))
-  (setv out (colorstr floor-mapsym))
-  (for [tile (reversed stack)]
-    (setv out (lfor
-      [below above] (zip out (color-tile tile))
-      (if (= above.char " ")
-        (ColorChar below.char below.fg above.bg below.bold)
-        above))))
-  (when (=
-      (dist p G.player.pos)
-      (+ G.rules.reality-bubble-size 1))
-    (for [c out]
-      (if (= (uncolor out) "██")
-        (setv c.fg color.reality-fringe-block)
-        (setv c.bg (or c.bg color.reality-fringe)))))
-  out)
-
-
-(defn color-tile [t]
-  "Return a two-item colorstr."
-  (lfor
-    i [0 1]
-    (ColorChar
-      :char (get t.mapsym i)
-      :fg (if (isinstance t.color tuple) (get t.color i) t.color)
-      :bg (cond
-        (isinstance t.color-bg tuple)
-          (get t.color-bg i)
-        t.color-bg
-          t.color-bg
-        (and (isinstance t Damageable) (is-not t G.player))
-          ; Monsters etc. get an automatic background color to show
-          ; how many HP they have.
-          (.get color.tile-bg-by-hp
-            t.hp
-            (get color.tile-bg-by-hp "other")))
-      :bold t.bold)))
