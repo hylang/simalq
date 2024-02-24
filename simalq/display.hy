@@ -93,9 +93,13 @@ interface elements as lists of `ColorChar`s."
 
 (defn draw-screen [
     width height
+      ; Integers
     focus
+      ; A `Pos`
     [status-bar T]
-    [tile-list None] [inventory F]
+    [tile-list None]
+      ; `None`, or the symbols `pickable` or `nonpickable`
+    [inventory F]
     [messages #()]
     [overmarks None]]
   "Return a colorstr for the main screen."
@@ -108,7 +112,7 @@ interface elements as lists of `ColorChar`s."
       line (draw-status-bar)
       (colorstr-to-width line width))))
   (setv status-bar-lines (len out))
-  ; Then the map per se, including overmarks.
+  ; Then the map, including overmarks.
   (+= out (draw-map
     focus
     width
@@ -166,14 +170,17 @@ interface elements as lists of `ColorChar`s."
   over them. The `char` attribute of these `ColorChar`s can be `None`
   to indicate that the map character should be preserved."
 
-  (setv xlim (map-limits (ceil (/ width 2)) G.map.width focus.x G.map.wrap-x))
-  (setv ylim (map-limits height G.map.height focus.y G.map.wrap-y))
+  (setv xlim (map-limits
+    :sdim (ceil (/ width 2)) :mdim G.map.width
+    :fc focus.x :wrap G.map.wrap-x))
+  (setv ylim (map-limits
+    :sdim height :mdim G.map.height
+    :fc focus.y :wrap G.map.wrap-y))
 
   (lfor
     my (reversed (range (get ylim 0) (+ (get ylim 1) 1)))
     (lfor mx (range (get xlim 0) (+ (get xlim 1) 1))
-    ; Get the two characters and their colors for the corresponding
-    ; mapsym.
+    ; For this square, get the two characters and their colors.
     [i c] (enumerate
       (if (and
           (or G.map.wrap-x (<= 0 mx (- G.map.width 1)))
@@ -186,11 +193,12 @@ interface elements as lists of `ColorChar`s."
           (setv cs (mapsym-at-pos p))
           (for [[i c] (enumerate cs)] (cond
             (or
-                (overwrapped G.map.wrap-x mx focus.x G.map.width)
-                (overwrapped G.map.wrap-y my focus.y G.map.height))
+                (overwrapped? G.map.wrap-x mx focus.x G.map.width)
+                (overwrapped? G.map.wrap-y my focus.y G.map.height))
               (setv c (ColorChar c.char
                 color.overwrapped color.default-bg None))
             (in p overmarks) (do
+              ; Overmarks can override what would normally appear.
               (setv o (get overmarks p i))
               (setv c.bg o.bg)
               (when o.char
@@ -198,13 +206,14 @@ interface elements as lists of `ColorChar`s."
                 (setv c.fg o.fg)
                 (setv c.bold o.bold)))
             (= [mx my] [focus.x focus.y])
+              ; Mark the focus with a special background color.
               (setv c.bg
-                ; Use a different color for the focus if the player
-                ; is dead and it's on the player's square. This is
-                ; the most prominent visual indication of death.
                 (if (and
                     (= p G.player.pos)
                     (= G.player.game-over-state 'dead))
+                  ; Use a different color if the player is dead and
+                  ; it's on the player's square. This is the most
+                  ; prominent visual indication of death.
                   color.focus-on-dead-player
                   color.focus))))
            cs)
@@ -235,12 +244,16 @@ interface elements as lists of `ColorChar`s."
 
   (setv adj (if (% sdim 2) 0 -1))
   (when (and (not wrap) (>= sdim (+ mdim (* 2 border))))
-    (return #((- (// mdim 2) (// sdim 2)) (+ (// mdim 2) (// sdim 2) adj))))
+    ; We can easily fit this whole map dimension on screen. Ignore the
+    ; focus and center the map instead.
+    (return #(
+      (- (// mdim 2) (// sdim 2))
+      (+ (// mdim 2) (// sdim 2) adj))))
   (setv lo (- fc (// sdim 2)))
   (setv hi (+ fc (// sdim 2) adj))
-  (when wrap
-    (return #(lo hi)))
   (cond
+    wrap
+      #(lo hi)
     (< lo (- border))
       #((- border) (- sdim border 1))
     (>= hi (+ mdim border))
@@ -248,7 +261,8 @@ interface elements as lists of `ColorChar`s."
     T
       #(lo hi)))
 
-(defn overwrapped [wraps? mc fc mdim]
+(defn overwrapped? [wraps? mc fc mdim]
+  "Are we re-displaying the same square due to wrapping?"
   (unless wraps?
     (return F))
   (setv d (abs (- mc fc)))
@@ -270,11 +284,13 @@ interface elements as lists of `ColorChar`s."
     (setv out (lfor
       [below above] (zip out (color-tile tile))
       (if (= above.char " ")
+        ; A space character is transparent to the tile below.
         (ColorChar below.char below.fg above.bg below.bold)
         above))))
   (when (=
       (dist p G.player.pos)
       (+ G.rules.reality-bubble-size 1))
+    ; Mark the boundary of the reality bubble.
     (for [c out]
       (if (= (uncolor out) "██")
         (setv c.fg color.reality-fringe-block)
@@ -286,9 +302,10 @@ interface elements as lists of `ColorChar`s."
 ;; --------------------------------------------------------------
 
 (defn draw-status-bar []
-  "Return each line of status bar, as a colorstr."
+  "Return a tuple of colorstrs, one per line of status bar."
 
   (defn j [#* xs]
+    "Join strings and colorstrs with spaces, ignoring `None`s."
     (reduce
       (fn [a b] (+ a (colorstr "  ") b))
       (gfor
@@ -297,6 +314,7 @@ interface elements as lists of `ColorChar`s."
         (if (is (type x) str) (colorstr x) x))))
 
   (defn status-effects [bad]
+    "Names and remaining durations of status effects."
     (gfor
       se StatusEffect
       :if (= (.bad? se) bad)
@@ -354,12 +372,14 @@ interface elements as lists of `ColorChar`s."
 
 (defn tile-menu [tiles pickable?]
   "Return a list of colorstrs, one for each tile."
+
   ; Create the text for each line.
   (setv lines (lfor
     [i item] (enumerate tiles)
     (.format " {}� {}  "
       (if pickable? (+ "(" (get menu-letters i) ") ") "")
       (if item item.full-name "---"))))
+
   ; Pad out short lines and replace the "�"s with colored mapsyms.
   (lfor
     [line item] (zip lines tiles)
