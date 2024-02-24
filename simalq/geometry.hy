@@ -12,6 +12,9 @@
 (setv  T True  F False)
 
 
+(defclass GeometryError [Exception])
+
+
 (defdataclass Map []
   "A level layout."
 
@@ -242,6 +245,3 @@
     (* G.turn-n 1,000,000,007)))
       ; The multiplier is chosen to be (a) prime and (b) bigger
       ; than typical reasonable `pos-seed` values.
-
-
-(defclass GeometryError [Exception])
