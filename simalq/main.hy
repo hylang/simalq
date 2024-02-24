@@ -183,7 +183,6 @@
 
     :draw (fn []
       (print-main-screen
-        :focus G.player.pos
         :messages (tuple message-queue)))
 
     :on-input (fn [key]
@@ -198,12 +197,12 @@
         (except [e CommandError]
           (msg (get e.args 0)))))))
 
-(defn print-main-screen [focus #** kwargs]
+(defn print-main-screen [#** kwargs]
   (print
     :flush T :sep "" :end ""
     B.home
     (.join "\n" (map (fn [x] (bless-colorstr B x)) (draw-screen
-      B.width B.height focus #** kwargs)))))
+      B.width B.height #** kwargs)))))
 
 
 (setv max-wrap-cols 75)

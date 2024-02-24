@@ -94,8 +94,9 @@ interface elements as lists of `ColorChar`s."
 (defn draw-screen [
     width height
       ; Integers
-    focus
-      ; A `Pos`
+    [target None]
+      ; An optional `Pos` to focus the map. Otherwise, we use the
+      ; player's current position.
     [status-bar T]
     [tile-list None]
       ; `None`, or the symbols `pickable` or `nonpickable`
@@ -113,8 +114,10 @@ interface elements as lists of `ColorChar`s."
       (colorstr-to-width line width))))
   (setv status-bar-lines (len out))
   ; Then the map, including overmarks.
+  (setv focus (or target G.player.pos))
   (+= out (draw-map
     focus
+    (bool target)
     width
     (- height status-bar-lines)
     (or overmarks {})))
@@ -163,7 +166,7 @@ interface elements as lists of `ColorChar`s."
 ;; ** The map
 ;; --------------------------------------------------------------
 
-(defn draw-map [focus width height overmarks]
+(defn draw-map [focus targeting? width height overmarks]
   "Return a list of colorstrs, one per line. The map will include
   (typically, is centered on) `focus`, a `Pos`. `overmarks` should be
   a dictionary mapping `Pos`es to pairs of `ColorChar`s to display
@@ -207,15 +210,15 @@ interface elements as lists of `ColorChar`s."
                 (setv c.bold o.bold)))
             (= [mx my] [focus.x focus.y])
               ; Mark the focus with a special background color.
-              (setv c.bg
-                (if (and
-                    (= p G.player.pos)
-                    (= G.player.game-over-state 'dead))
-                  ; Use a different color if the player is dead and
-                  ; it's on the player's square. This is the most
-                  ; prominent visual indication of death.
-                  color.focus-on-dead-player
-                  color.focus))))
+              (setv c.bg (cond
+                targeting?
+                  color.highlight-target
+                (= G.player.game-over-state 'dead)
+                  ; Use a different color if the player is dead. This
+                  ; is the most prominent visual indication of death.
+                  color.highlight-player-dead
+                T
+                  color.highlight-player-living))))
            cs)
         ; Otherwise, we're off the map. Draw border.
         (colorstr "██" color.void)))

@@ -60,12 +60,11 @@
     (.append message-queue (.join " " (map str args)))))
 
 
-(defn flash-map [focus color ps labels flash-time-s]
+(defn flash-map [color ps labels flash-time-s]
   "Animate the map by briefly flashing some positions a certain color,
-  optionally with a text label replacing the map character. `focus`
-  should be a `Pos`, `ps` an iterable of `Pos` to flash, and
-  `labels` a dictionary mapping a subset of positions in `ps` to
-  2-character `str`s."
+  optionally with a text label replacing the map character. `ps`
+  should be an iterable of `Pos` to flash, and `labels` a dictionary
+  mapping a subset of positions in `ps` to 2-character `str`s."
 
   (import
     simalq.main [print-main-screen displaying]
@@ -74,7 +73,7 @@
   (unless (and ps (displaying))
     (return))
 
-  (print-main-screen focus
+  (print-main-screen
     :status-bar T
     :messages message-queue
     :overmarks (dfor  p ps  p (lfor  i (range 2)
@@ -198,7 +197,6 @@
 
   (setv b (tuple (burst center (- (len amount) 1))))
   (flash-map
-    G.player.pos
     color
     :ps b
     :labels {}

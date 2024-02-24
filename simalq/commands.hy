@@ -121,7 +121,7 @@
 
   (defn get-inventory-ix []
     (menu G.rules.max-usables :draw (fn []
-      (print-main-screen G.player.pos :inventory T))))
+      (print-main-screen :inventory T))))
 
   (ecase (type cmd)
 
@@ -157,7 +157,8 @@
             (is-not None (setx tile-ix (if (= (len stack) 1)
               0
               (menu (len stack) :draw (fn []
-                (print-main-screen target :status-bar F :tile-list 'pickable)))))))
+                (print-main-screen :target target
+                  :status-bar F :tile-list 'pickable)))))))
           (info-screen (get stack tile-ix)))))
 
     ShiftHistory (do
@@ -258,7 +259,6 @@
 
       (defn animate []
         (flash-map :flash-time-s .1
-          G.player.pos
           (if magic?
             color.flash-player-shot-magic
             color.flash-player-shot-mundane)
@@ -336,7 +336,7 @@
   (hy.I.simalq/main.io-mode
     :draw (fn []
       (hy.I.simalq/main.print-main-screen
-        focus :status-bar F :tile-list 'nonpickable))
+        :target focus :status-bar F :tile-list 'nonpickable))
     :on-input (fn [key]
       (nonlocal focus)
       (setv dir-v (hy.I.simalq/keyboard.read-dir-key key))

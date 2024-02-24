@@ -81,7 +81,6 @@
   :!animate-hit (meth [attacker label [special-color? F] [show-ivln? T]]
     "Use `flash-map` to indicate that the player's been hit."
     (flash-map
-      @pos
       (if special-color?
          colors.flash-player-hit-by-special-attack
          colors.flash-player-damaged)
