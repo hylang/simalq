@@ -1,5 +1,8 @@
 "Types for level geometry and functions to operate on them."
 
+;; --------------------------------------------------------------
+;; * Imports
+;; --------------------------------------------------------------
 
 (require
   hyrule [unless do-n]
@@ -11,9 +14,15 @@
   simalq.game-state [G])
 (setv  T True  F False)
 
+;; --------------------------------------------------------------
+;; * Helpers
+;; --------------------------------------------------------------
 
 (defclass GeometryError [Exception])
 
+;; --------------------------------------------------------------
+;; * `Map`
+;; --------------------------------------------------------------
 
 (defdataclass Map []
   "A level layout."
@@ -52,10 +61,14 @@
         _ (range width)
         (tuple (gfor  _ (range height)  [])))))))
 
+;; --------------------------------------------------------------
+;; * `Direction`
+;; --------------------------------------------------------------
 
 (defdataclass Direction []
   :fields [name x y]
   :frozen T)
+
 ((fn []
   ; Define the direction constants (`Direction.N`, `.NE`, etc.) and
   ; related conveniences (e.g., `Direction.orths`).
@@ -95,6 +108,9 @@
   (setv Direction.opposite (property (fn [self]
     (get opposites self))))))
 
+;; --------------------------------------------------------------
+;; * `Pos`
+;; --------------------------------------------------------------
 
 (defdataclass Pos []
   "A position; a point on a map."
@@ -133,6 +149,10 @@
       (except [GeometryError]))))
 
 (hy.repr-register Pos str)
+
+;; --------------------------------------------------------------
+;; ** `Pos` functions
+;; --------------------------------------------------------------
 
 (defn at [pos]
   (get pos.map.data pos.x pos.y))
