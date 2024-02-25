@@ -14,7 +14,9 @@
   (. (iq-quest quest-name) levels [(- level-n 1)] map data))
 
 (defn assert-stem [m x y stem]
-  (assert (= (. m [x] [y] [0] stem) stem)))
+  (if (= stem 'floor)
+    (assert (= (len (get m x y)) 0))
+    (assert (= (. m [x] [y] [0] stem) stem))))
 
 
 (defn test-get-all []
@@ -32,29 +34,29 @@
 
 
 (defn test-bootcamp-level1 []
-  (setv level (. (iq-quest "Boot Camp 2") levels [0]))
-
   ; Check the level attributes.
+  (setv l (. (iq-quest "Boot Camp 2") levels [0]))
   (for [[got expected] (partition 2 [
-      level.title (.join "\n" [
+      l.title (.join "\n" [
         "Welcome to Boot Camp!"
         "Let's start with some basic scenery."
         "Shift-click to identify objects."])
-      level.player-start (Pos level.map 0 15)
-      level.next-level 2
-      level.poison-intensity (f/ 1 5)
-      level.time-limit None
-      level.exit-speed 10
-      level.moving-exit-start None
-      level.map.wrap-x False
-      level.map.wrap-y False])]
+      l.player-start (Pos l.map 0 15)
+      l.next-level 2
+      l.poison-intensity (f/ 1 5)
+      l.time-limit None
+      l.exit-speed 10
+      l.moving-exit-start None
+      l.map.wrap-x False
+      l.map.wrap-y False])]
     (assert (= got expected)))
 
   ; Count the number of tiles of each type that occur in the map.
+  (setv m (get-level-map "Boot Camp 2" 1))
   (assert (=
 
     (dict (Counter (gfor
-      row level.map.data
+      row m
       stack row
       tile stack
       tile.stem)))
@@ -78,13 +80,13 @@
 
   ; Check a few corner tiles, so we know we haven't rotated or
   ; reflected the map.
-  (assert (= (. level map data [0] [0]) [])) ; I.e., floor
-  (assert (= (. level map data [15] [0] [0] stem) "key"))
-  (assert (= (. level map data [15] [15] [0] stem) "cracked wall"))
+  (assert-stem m 0 0 'floor)
+  (assert-stem m 15 0 "key")
+  (assert-stem m 15 15 "cracked wall")
 
   ; Check the hit points of the two cracked walls.
-  (assert (= (. level map data [7] [8] [0] hp) 4))
-  (assert (= (. level map data [15] [15] [0] hp) 2)))
+  (assert (= (. m [7] [8] [0] hp) 4))
+  (assert (= (. m [15] [15] [0] hp) 2)))
 
 
 (defn test-unpad []
@@ -236,11 +238,11 @@
   (setv m (get-level-map "Boot Camp 2" 14))
 
   ; A normal exit
-  (setv [tile] (get m 10 8))
-  (assert (= tile.stem "exit"))
-  (assert (is tile.level-n None))
+  (setv [t] (get m 10 8))
+  (assert (= t.stem "exit"))
+  (assert (is t.level-n None))
 
   ; A special exit
-  (setv [tile] (get m 7 15))
-  (assert (= tile.stem "exit"))
-  (assert (= tile.level-n 15)))
+  (setv [t] (get m 7 15))
+  (assert (= t.stem "exit"))
+  (assert (= t.level-n 15)))
