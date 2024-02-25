@@ -137,9 +137,9 @@
   symbol `all` to get all quests as a dictionary."
   (if (= quest-name 'all)
     (dfor
-      [k v] (.items (iq-quests-raw))
-      k (read-quest k v))
-    (read-quest quest-name (get (iq-quests-raw) quest-name))))
+      k (.keys (iq-quests-raw))
+      k (read-quest k))
+    (read-quest quest-name)))
 
 (defn [cache] iq-quests-raw []
   "Get a dictionary of raw IQ quests as `bytes` objects."
@@ -168,10 +168,11 @@
     :if (not (.endswith member "/"))
     (.removeprefix member "infinity_quests_2/") (.read z member))))
 
-(defn read-quest [name data]
-  "Parse `bytes` into a `Quest`."
+(defn [cache] read-quest [name]
+  "Parse `bytes` from the named element of `iq-quests-raw` into a
+  `Quest`."
 
-  (setv data (.parse quest-fmt data))
+  (setv data (.parse quest-fmt (get (iq-quests-raw) name)))
   (Quest
     :name name
     :title data.title
