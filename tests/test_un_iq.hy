@@ -87,6 +87,21 @@
   (assert (= (. level map data [15] [15] [0] hp) 2)))
 
 
+(defn test-unpad []
+
+  (setv m (get-level-map "BoneQuest" 11))
+  (assert (= (len m) (len (get m 0)) 13))
+    ; Both dimensions are 16 with the original Void-padding.
+  (assert-stem m 0 0 "exit")
+    ; It would be at (0, 3) with padding.
+
+  (setv m (get-level-map "Delirium" 4))
+  (assert (= (len (get m 0)) 15))
+    ; The height is 15 with padding.
+  (assert (= (. (get m 8 0 0) summon-frequency) (f/ 1 2))))
+    ; It would be at (8, 1) with padding.
+
+
 (defn test-denazify []
   (setv m (get-level-map "New Nightmare" 24))
   ; The original 5-by-5 trap swastikas on this level each comprise

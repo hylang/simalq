@@ -182,9 +182,22 @@
       "Yves Meynard")
     :starting-hp data.starting-hp
     :levels (tuple (gfor
-      [i l] (enumerate data.levels)
+      [level-n l] (enumerate data.levels)
+      :do (+= level-n 1)
 
-      :setv m (Map.make l.wrap-x l.wrap-y l.width l.height)
+      :setv m (Map.make
+        l.wrap-x l.wrap-y
+        ; Trim border rows of Void that merely pad out the map to IQ's
+        ; minimal dimensions. We don't bother to do this for Boot Camp 2
+        ; because we only use that quest for testing and don't offer it
+        ; for play.
+        :width (- l.width (if (and (= name "BoneQuest") (= level-n 11))
+          3
+          0))
+        :height (- l.height (cond
+          (and (= name "BoneQuest") (= level-n 11))  3
+          (and (= name "Delirium")  (= level-n  4))  1
+          True                                       0)))
       :setv mk-pos (fn [xy]
         "Convert from IQ coordinates (1-based indices, y = 1 on top, 0
         means missing) to SQ coordinates (0-based indices with y = 0 on
@@ -231,7 +244,7 @@
             (raise (ValueError (+ "Bad `Tile.types-by-iq-ix` entry: " (repr result)))))))
 
       (denazify name (Level
-        :n (+ i 1)
+        :n level-n
         :title l.title
         :player-start (mk-pos l.player-start)
         :next-level l.next-level
