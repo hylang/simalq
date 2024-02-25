@@ -192,18 +192,20 @@
         (if (and #* xy)
           (Pos m (- (get xy 0) 1) (- m.height (get xy 1)))
           None))
+      :setv iq-ixes (dfor
+        ix (seq 1 m.width)
+        iy (seq 1 m.height)
+        (mk-pos #(ix iy)) (get l.map (+ (* (- ix 1) l.height) (- iy 1))))
       :setv tile-extras (dfor
         pair l.tile-extras
         (mk-pos pair.pos) (tuple pair.data))
 
-      :do (for [x (range l.width)  y (range l.height)]
+      :do (for [x (range m.width)  y (range m.height)]
         ; Fill in `m`.
-        (setv iq-ix (get l.map (+ (* x l.height) (- l.height y 1))))
-          ; We have to reverse y-coordinates to get y = 0 as the
-          ; bottom row.
+        (setv p (Pos m x y))
+        (setv iq-ix (get iq-ixes p))
         (when (= iq-ix FLOOR)
           (continue))
-        (setv p (Pos m x y))
         (setv result (get Tile.types-by-iq-ix iq-ix))
         (defn te [cls]
           (if (in p tile-extras)
