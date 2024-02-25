@@ -252,6 +252,20 @@
 
   (_scrolling-text-screen lines))
 
+(defn victory-screen []
+  (import zlib base64)
+  (text-screen :center F (+
+    (.decode :encoding "UTF-8" (zlib.decompress (base64.b64decode
+      b"eNqVUkEOwCAIu+8VfSoHD7zAB/qSxaECwsxmSNRSpCUCaLWswJ8lJZfs3CqZ4E/1rES5XGNfUixnnmc/dtwU9Qjra7MdRK0vmw60YXen0kwYQpp5cTkulDzgDpqhLU6Z0LTDY7QlqKRUCbnRuJJTJszCfhQkSqF2NiijeQzR9uP0BhF5bBI=")))
+        ; Modified from `toilet -f mono12`.
+    "\n"
+    "You've escaped the dungeon and returned home to your kingdom, safe and sound. Congratulations!\n"
+    "\n"
+    f"Score: {G.score :10,}\n"
+    f"Turn:  {G.turn-n :10,}\n"
+    "\n"
+    version-string)))
+
 (defn _scrolling-text-screen [lines]
 
   (setv top-line-ix 0)
@@ -317,18 +331,3 @@
 
   (when (is-not save-ix None)
     (get saves save-ix "path")))
-
-
-(defn victory-screen []
-  (import zlib base64)
-  (text-screen :center F (+
-    (.decode :encoding "UTF-8" (zlib.decompress (base64.b64decode
-      b"eNqVUkEOwCAIu+8VfSoHD7zAB/qSxaECwsxmSNRSpCUCaLWswJ8lJZfs3CqZ4E/1rES5XGNfUixnnmc/dtwU9Qjra7MdRK0vmw60YXen0kwYQpp5cTkulDzgDpqhLU6Z0LTDY7QlqKRUCbnRuJJTJszCfhQkSqF2NiijeQzR9uP0BhF5bBI=")))
-        ; Modified from `toilet -f mono12`.
-    "\n"
-    "You've escaped the dungeon and returned home to your kingdom, safe and sound. Congratulations!\n"
-    "\n"
-    f"Score: {G.score :10,}\n"
-    f"Turn:  {G.turn-n :10,}\n"
-    "\n"
-    version-string)))
