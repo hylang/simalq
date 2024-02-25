@@ -178,7 +178,7 @@
 
     LoadGame (do
       (try
-        (when (setx path (load-saved-game-screen (get-saves-list)))
+        (when (setx path (load-saved-game-screen #* (get-saves-list)))
           (load-game path))
         (except [e IOError]
           (raise (CommandError f"Load failed: {e}"))))

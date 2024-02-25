@@ -2,6 +2,7 @@
   hyrule [unless ecase]
   simalq.macros [pop-integer-part])
 (import
+  re
   time [sleep]
   contextlib [contextmanager]
   simalq [version-string]
@@ -13,7 +14,7 @@
   simalq.tile [Tile Scenery]
   simalq.quest [start-quest start-level]
   simalq.commands [Action get-command do-command do-action]
-  simalq.display [draw-screen bless-colorstr]
+  simalq.display [draw-screen bless-colorstr color-tile]
   simalq.save-load [get-saves-list load-game])
 (setv  T True  F False)
 
@@ -224,11 +225,7 @@
 (defn info-screen [t]
   "Enter an `io-mode` for showing information about the tile `t`."
 
-  (import
-    re
-    simalq.display [color-tile])
-
-  (setv lines [
+  (_scrolling-text-screen [
     #* (* [""] y-margin)
     (+ x-margin (bless-colorstr B (color-tile t)) "  " t.full-name)
     ""
@@ -241,15 +238,13 @@
       bullet (.info-bullets t)
       :if bullet
       line (wrapped (re.sub r"\s+" " " (if (isinstance bullet tuple)
-        (+
+        (.format "{} {}"
           (B.bold f"• {(get bullet 0)}:")
-          " " (str (get bullet 1)))
+          (get bullet 1))
         (B.bold f"• {bullet}"))))
       line)
     ""
-    #* (wrapped t.flavor)])
-
-  (_scrolling-text-screen lines))
+    #* (wrapped t.flavor)]))
 
 (defn victory-screen []
   (import zlib base64)
@@ -303,11 +298,9 @@
     (+ x-margin line)))
 
 
-(defn load-saved-game-screen [saves-meta]
+(defn load-saved-game-screen [saves display-lines]
   "Display a menu of saved games, and return the path of a saved game
   to load (or `None` for no selection)."
-
-  (setv [saves display-lines] saves-meta)
 
   (setv save-ix None)
   (io-mode
