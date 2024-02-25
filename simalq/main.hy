@@ -19,27 +19,26 @@
 
 
 (defn main [quest [rules None] [skip-to-level None] [load-main-save F]]
-  (setv save (and
-    load-main-save
-    (setx save (next
-      (gfor  item (get (get-saves-list quest.name) 0)  :if (get item "main")  item)
-      None))))
-  (start-quest quest (and (not save) rules))
+  "Begin interactive play with the named quest. `load-main-save` is ignored if
+  `skip-to-level` is true."
+  (setv save (when (and load-main-save (not skip-to-level))
+    (next
+      (gfor
+        item (get (get-saves-list quest.name) 0)
+        :if (get item "main")
+        item)
+      None)))
+  (start-quest quest (when (not save) rules))
   (with [(player-io)]
     (if save
-      (do
-        (load-game (get save "path"))
-        (when skip-to-level
-          (start-level
-            :level-n skip-to-level
-            :show-title F)))
+      (load-game (get save "path"))
       (do
         ; `skip-to-level` is used for debugging, so for convenience,
         ; don't show titles when it's provided.
         (unless skip-to-level
           (text-screen G.quest.title :center T))
         (start-level
-          :level-n (if skip-to-level (int skip-to-level) 1)
+          :level-n (or skip-to-level 1)
           :show-title (not skip-to-level))))
     (main-io-loop)))
 

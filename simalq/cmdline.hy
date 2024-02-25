@@ -56,7 +56,7 @@
         :help "multiply ambient poison rates by the fraction X (affects new games only)"]
       ["--skip-to-level"
         :type int :metavar "N"
-        :help "skip to the requested level (for debugging)"]]))
+        :help "skip to the requested level (for debugging; forces `--new`)"]]))
 
   (setv p.QUEST (.replace p.QUEST "_" " "))
     ; We allow the quest name to be specified with underscores in
