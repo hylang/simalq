@@ -1,3 +1,9 @@
+"The most central functions for the game logic and interface."
+
+;; --------------------------------------------------------------
+;; * Imports
+;; --------------------------------------------------------------
+
 (require
   hyrule [unless ecase]
   simalq.macros [pop-integer-part])
@@ -18,6 +24,9 @@
   simalq.save-load [get-saves-list load-game])
 (setv  T True  F False)
 
+;; --------------------------------------------------------------
+;; * `main`
+;; --------------------------------------------------------------
 
 (defn main [quest [rules None] [skip-to-level None] [load-main-save F]]
   "Begin interactive play with the named quest. `load-main-save` is ignored if
@@ -43,6 +52,9 @@
           :show-title (not skip-to-level))))
     (main-io-loop)))
 
+;; --------------------------------------------------------------
+;; * Running turns
+;; --------------------------------------------------------------
 
 (defn take-turn [action]
   (try
@@ -55,7 +67,7 @@
           (get simalq.strings.death-messages (%
              (turn-and-pos-seed G.player.pos)
              (len simalq.strings.death-messages))))
-        'won  (victory-screen))))
+        'won (victory-screen))))
   (.advance-states G))
 
 (defn _take-turn [action]
@@ -115,7 +127,8 @@
       :amount (* [G.rules.player-poison-damage] 2)
       :color 'moss-green
       :quick-flash T))
-        ; This is happening every turn, so it should be fast.
+        ; This animation happens every turn the player has a poisonous
+        ; aura, so make it especially fast.
 
   ; Tick down status effects.
   (for [se StatusEffect]
@@ -134,6 +147,13 @@
   (+= G.turn-n 1)
   (setv G.player.taking-extra-action F))
 
+;; --------------------------------------------------------------
+;; * IO
+;; --------------------------------------------------------------
+
+;; --------------------------------------------------------------
+;; ** Basics
+;; --------------------------------------------------------------
 
 (setv B None)
 (setv _displaying F)
@@ -177,6 +197,9 @@
   (while (B.inkey :timeout 0))
   (B.inkey :esc-delay .01))
 
+;; --------------------------------------------------------------
+;; ** The main loop for IO
+;; --------------------------------------------------------------
 
 (defn main-io-loop []
   (io-mode
@@ -204,12 +227,16 @@
     (.join "\n" (map (fn [x] (bless-colorstr B x)) (draw-screen
       B.width B.height #** kwargs)))))
 
+;; --------------------------------------------------------------
+;; ** Text screens
+;; --------------------------------------------------------------
 
 (setv max-wrap-cols 75)
 (setv x-margin (* 2 " "))
 (setv y-margin 1)
 
 (defn text-screen [text center]
+  "Wrap text into lines and display it interactively."
   (unless (displaying)
     (return))
   (_scrolling-text-screen (+
@@ -227,13 +254,16 @@
 
   (_scrolling-text-screen [
     #* (* [""] y-margin)
+    ; The mapsym and name of the tile
     (+ x-margin (bless-colorstr B (color-tile t)) "  " t.full-name)
     ""
+    ; The name of the tile's superclass
     (+ x-margin (B.bold (next (gfor
       [name superclass] (.items Tile.superclasses)
       :if (isinstance t superclass)
       name))))
     ""
+    ; Info bullets
     #* (gfor
       bullet (.info-bullets t)
       :if bullet
@@ -244,6 +274,7 @@
         (B.bold f"• {bullet}"))))
       line)
     ""
+    ; The flavor text
     #* (wrapped t.flavor)]))
 
 (defn victory-screen []
@@ -261,6 +292,9 @@
     version-string)))
 
 (defn _scrolling-text-screen [lines]
+  "A simplistic interactive mode for reading text that may be taller
+  than the screen. Any key will advance the text, or end the mode once
+  you've reached the end of the text."
 
   (setv top-line-ix 0)
   (setv pause-seconds 0.25)
@@ -280,8 +314,8 @@
         (sleep pause-seconds)))
 
     :on-input (fn [key]
-      ; Advance `top-line-ix` (i.e., scroll the screen), or exit if
-      ; we've shown it all.
+      ; Advance `top-line-ix` (and hence scroll the screen), or exit
+      ; if we've shown it all.
       (nonlocal top-line-ix)
       (setv new-ix (min
         (+ top-line-ix B.height)
@@ -297,6 +331,9 @@
       (min max-wrap-cols (- B.width (len x-margin))))
     (+ x-margin line)))
 
+;; --------------------------------------------------------------
+;; ** The menu for loading a saved game
+;; --------------------------------------------------------------
 
 (defn load-saved-game-screen [saves display-lines]
   "Display a menu of saved games, and return the path of a saved game
