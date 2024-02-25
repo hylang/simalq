@@ -179,10 +179,10 @@
     LoadGame (do
       (try
         (when (setx path (load-saved-game-screen #* (get-saves-list)))
-          (load-game path))
+          (load-game path)
+          (msg "Game loaded."))
         (except [e IOError]
-          (raise (CommandError f"Load failed: {e}"))))
-      (msg "Game loaded."))
+          (raise (CommandError f"Load failed: {e}")))))
 
     Quit
       (sys.exit)))
