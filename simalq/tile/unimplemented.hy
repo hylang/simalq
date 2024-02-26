@@ -1,8 +1,6 @@
 (require
-  simalq.macros [defmeth]
   simalq.tile [deftile])
 (import
-  dataclasses [dataclass]
   simalq.tile [Tile])
 (setv  T True  F False)
 
@@ -12,10 +10,7 @@
   substitute, but we can put in `Tile.types-by-iq-ix` as a stub."
 
   (setv fields ["tile_extras"])
-
-  (defmeth __init__ [[pos None] [tile-extras None]]
-    (object.__setattr__ @ "pos" pos)
-    (object.__setattr__ @ "tile_extras" tile-extras))
+  (setv field-defaults {"tile_extras" None})
 
   (defn [classmethod] read-tile-extras [cls mk-pos a b]
     (dict :tile-extras #(a b))))
