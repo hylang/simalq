@@ -49,15 +49,6 @@
 (defn html []
   "Use `get-info` to construct an HTML document."
 
-  (import
-    ; The depenency on `lxml` isn't declared in `setup.py` because it
-    ; isn't needed to play the game.
-    lxml.html
-    lxml.builder)
-
-  (setv E (lxml.builder.ElementMaker
-    :makeelement lxml.html.html-parser.makeelement))
-
   (defn mapsym [tile]
     (E.code :class "mapsym" #* (gfor
       cc tile.mapsym
@@ -70,11 +61,11 @@
 
   (setv info (get-info))
 
-  (setv doc (E.html :lang "en"
+  (+ "<!DOCTYPE html>\n" (render-elem (E.html :lang "en"
 
     ; The `<head>`
     (E.head
-      (E.meta :charset "UTF-8")
+      (E.meta :charset "UTF-8" :_self-closing T)
       (E.title "Tilepedia — Infinitesimal Quest 2 + ε")
       (E.style "
         h2, h3
@@ -117,10 +108,27 @@
             (E.li #* (if (isinstance bullet tuple)
               [(E.strong (get bullet 0) ": ") (str (get bullet 1))]
               [(E.strong bullet)]))))
-          (E.div :class "flavor" tile.flavor)]))]))))
+          (E.div :class "flavor" tile.flavor)]))]))))))
 
-  (lxml.html.tostring doc
-    :pretty-print T :encoding "unicode" :doctype "<!DOCTYPE html>"))
+; In combination with `render-elem`, `E` works roughly like
+; `lxml.builder.ElementMaker`.
+(setv E ((type "ElementMaker" #() (dict
+  :__getattr__ (fn [self tag]
+    (fn [#* kids [_self-closing F] #** attrs]
+      #(tag attrs kids _self-closing)))))))
+
+(defn render-elem [x]
+  (import html [escape :as hesc])
+  (when (isinstance x str)
+    (return (hesc x :quote F)))
+  (setv [tag attrs kids self-closing] x)
+  (.format "<{} {}>{}{}"
+    (hesc tag)
+    (.join " " (gfor
+      [k v] (.items attrs)
+      f"{(hesc k)}='{(hesc v)}'"))
+    (.join "" (map render-elem kids))
+    (if self-closing "" f"</{(hesc tag)}>")))
 
 
 (defn cat [l]

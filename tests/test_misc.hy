@@ -34,7 +34,7 @@
 
 (defn test-tilepedia []
   "Just check that calling all these info methods doesn't crash."
-  (assert (isinstance (hy.I.simalq/tile/tilepedia.get-info) dict)))
+  (assert (isinstance (hy.I.simalq/tile/tilepedia.html) str)))
 
 
 (defn test-builtin-quests []
