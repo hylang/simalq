@@ -39,7 +39,7 @@
       (@hook-pos-set None @pos)))
 
   (defmeth __setattr__ [name value]
-    (if (in name (@all-mutable-fields))
+    (if (in name (@all-fields :mutable-only T))
       (object.__setattr__ @ name value)
       (raise (AttributeError f"Tried to set attribute {name !r} on an instance of {(type @) !r}. Use `object.__setattr__` if you really mean it."))))
 
@@ -56,16 +56,12 @@
     (for [[k v] (.items state)]
       (object.__setattr__ @ k v)))
 
-  (defn [classmethod] all-fields [cls]
+  (defn [classmethod] all-fields [cls [mutable-only F]]
     (sfor
       c cls.__mro__
-      field (.get c.__dict__ "fields" #())
-      field))
-
-  (defn [classmethod] all-mutable-fields [cls]
-    (sfor
-      c cls.__mro__
-      field (.get c.__dict__ "mutable_fields" #())
+      field (.get c.__dict__
+        (if mutable-only "mutable_fields" "fields")
+        #())
       field))
 
   (defn [classmethod property] name-with-article [cls]
