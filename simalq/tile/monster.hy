@@ -170,7 +170,8 @@
   (setv mutable-fields #("approach_dir"))
   (defmeth info-bullets [#* extra]
     (.info-bullets (super)
-      #("Approach direction" @approach-dir)))
+      #("Approach direction" @approach-dir)
+      #* extra))
 
   (defmeth approach [
       [implicit-attack T]
