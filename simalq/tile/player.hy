@@ -12,7 +12,7 @@
 
 
 (deftile "@ " "Princess Triskaidecagonn XIII" Damageable
-  ; A type representing the player-character.
+  ; A tile representing the player-character.
 
   :field-defaults (dict
     :game-over-state None
@@ -44,8 +44,8 @@
     :floater-disturbance (Fraction 0))
       ; A measure of how much time you've spent adjacent to floaters.
   :mutable-fields (tuple (map hy.mangle '(game-over-state hp poison-dose just-exited taking-extra-action keys magic-arrows floater-disturbance)))
-    ; `inventory` and `artifacts` should be mutated directly rather
-    ; reassigned.
+    ; `status-effects, `inventory`, and `artifacts` should be mutated
+    ; directly rather reassigned.
 
   :__init__ (meth [pos]
     (.__init__ (super) :pos pos)
