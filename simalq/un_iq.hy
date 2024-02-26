@@ -175,11 +175,11 @@
   (setv data (.parse quest-fmt (get (iq-quests-raw) name)))
   (Quest
     :name name
-    :title data.title
     :authors (if (= name "New DeathQuest")
       ; We're assuming this is a standard IQ quest, not user-made.
       "Yves and Serge Meynard"
       "Yves Meynard")
+    :title data.title
     :starting-hp data.starting-hp
     :levels (tuple (gfor
       [level-n l] (enumerate data.levels)
