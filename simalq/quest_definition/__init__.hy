@@ -48,30 +48,32 @@ quest definitions from other files in this directory."
 ;; --------------------------------------------------
 
 (defn mk-quest [
+  ; Make a quest.
     #* levels
     [starting-hp 100]
     [name "Test Quest"]
-    [title "Test Quest title"]
-    [authors "Mitt Lowporch and Cire Whyhall"]]
+    [authors "Mitt Lowporch and Cire Whyhall"]
+    [title "Test Quest title"]]
   (Quest
     :name name
-    :title title
     :authors authors
+    :title title
     :starting-hp starting-hp
     :levels (tuple (gfor
       [i level-args] (enumerate levels)
       (mk-level :n (+ i 1) #** (kwdict level-args))))))
 
 (defn mk-level [
+  ; Make a level.
     [n 1]
     [player-start #(0 0)]
     [width 16] [height 16] [wrap-x False] [wrap-y False]
     [tiles #()]
-      ; The requested tiles are placed in a line east of the player
-      ; start.
+      ; An iterable of stems. The requested tiles are placed in a line
+      ; east of the player start.
     [map None]
       ; A string passed to `parse-text-map`. It overrides `width`,
-      ; `height`, `tiles`, and possibly `player-start` if provided.
+      ; `height`, `tiles`, and `player-start` if provided.
     [map-marks #()]
     [title None]
     [next-level None]
@@ -80,7 +82,7 @@ quest definitions from other files in this directory."
   (if map
     (setv [m player-start] (parse-text-map map map-marks wrap-x wrap-y))
     (do
-      (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
+      (setv m (Map.make wrap-x wrap-y width height))
       (for [[i tile-spec] (enumerate tiles)]
         (mk-tile
           (Pos m (+ (get player-start 0) i 1) (get player-start 1))
@@ -103,10 +105,12 @@ quest definitions from other files in this directory."
   (setv width (ceil (/
     (try (.index text "\n") (except [ValueError] (len text)))
     2)))
-  (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width width :height height))
+  (setv m (Map.make wrap-x wrap-y width height))
   (setv mapsyms (dfor
     [y row] (enumerate (reversed (.split text "\n")))
     :do (when (% (len row) 2) (setv row (+ row " ")))
+      ; Odd-length rows are treated as ending with a space. Thus, you
+      ; don't need trailing spaces in the text.
     [x mapsym] (enumerate (partition 2 row))
     #(x y) (.join "" mapsym)))
   (setv player-start #(0 0))
@@ -137,7 +141,9 @@ quest definitions from other files in this directory."
   #(m player-start))
 
 (defn mk-tile [locator tile-spec [map-object None] [mapsyms None]]
+  "Make a tile."
   (when (= tile-spec 'floor)
+    ; Do nothing, since floor is actually the absence of tiles.
     (return))
   (if (isinstance tile-spec str)
     (setv  d {}  stem tile-spec)
