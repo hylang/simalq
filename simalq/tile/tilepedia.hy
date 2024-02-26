@@ -1,3 +1,6 @@
+"Render all tile info screens into a single HTML page."
+
+
 (import
   metadict [MetaDict]
   simalq.color
