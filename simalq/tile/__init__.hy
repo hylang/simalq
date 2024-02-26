@@ -1,3 +1,7 @@
+;; --------------------------------------------------------------
+;; * Imports
+;; --------------------------------------------------------------
+
 (require
   hyrule [unless]
   simalq.macros [field-defaults defmeth defmacro-kwargs])
@@ -10,14 +14,23 @@
   simalq.geometry [at])
 (setv  T True  F False)
 
+;; --------------------------------------------------------------
+;; * `Tile`
+;; --------------------------------------------------------------
 
 (defclass Tile []
+  "A thing associated with a square of a level, such as a wall or a
+  monster."
+
   (field-defaults
     pos None)
       ; Generally this will actually be a `Pos`, but it could be
       ; `None` for e.g. an item in the player's inventory.
   (setv types {})
+    ; All concrete tile types, keyed by their stems.
   (setv types-by-iq-ix {})
+    ; Tile types (or more complex entities, as used by `simalq.un-iq`)
+    ; keyed by IQ index number.
 
   (defmeth __init__ [#** kwargs]
     ; Each keyword argument must match a field.
@@ -91,6 +104,7 @@
       (object.__setattr__ @ "pos" None)))
 
   (defmeth move [pos]
+    "Set the tile's position."
     (@hook-pos-set @pos pos)
     (when (is-not @pos None)
       (.remove (at @pos) @))
@@ -98,13 +112,14 @@
     (object.__setattr__ @ "pos" pos))
 
   (defmeth replace [new-stem #** kwargs]
+    "Create a new tile to spec and put it in this tile's place."
     (setv t ((get Tile.types new-stem) :pos @pos #** kwargs))
     (setv (get (at @pos) (.index (at @pos) @)) t)
     (object.__setattr__ @ "pos" None)
     (@hook-pos-set t.pos None))
 
   (defmeth dod [prefix attr [superc None]]
-    "Invoke a dynadoc or get a regular docstring for an info bullet."
+    "Invoke a dynadoc, or get a regular docstring, for an info bullet."
     (setv attr (hy.mangle attr))
     (when (and
         (setx method (getattr (type @) attr None))
@@ -115,6 +130,7 @@
       #(prefix string)))
 
   ; The below variables and methods may be overridden by subclasses.
+  ; The above, other than `__init__`, aren't expected to be overridden.
 
   (setv
     mutable-fields #()
@@ -209,10 +225,13 @@
     ; after the hook is called. (A magic arrow might still keep going
     ; to other tiles.)
 
+;; --------------------------------------------------------------
+;; ** `deftile`
+;; --------------------------------------------------------------
 
 (defmacro-kwargs deftile [mapsym name superc #** kwargs]
-  "Declare and return a new concrete and final tile type. Superclasses
-  of tiles not meant to themselves be instantiated should be declared
+  "Declare a new concrete and final tile type. Superclasses of other
+  tiles not meant to themselves be instantiated should be declared
   with `defclass`."
 
   (setv superc (if (isinstance superc hy.models.List)
@@ -231,7 +250,7 @@
     [hy.I.simalq/tile.tiletype]
     ~(hy.models.Symbol (+ "TileType_" (.join "" (gfor
       c (get kwargs "stem")
-      (if (or (= c " ") (in c hy.reader.HyReader.NON_IDENT)) "_" c)))))
+      (if (or (= c " ") (in c hy.reader.HyReader.NON-IDENT)) "_" c)))))
     ~superc
     ; Attributes whose names begin with a exclamation point, as in
     ; `:!length 5`, are considered to be newly declared and so
@@ -258,8 +277,10 @@
 (defn tiletype [cls]
   "A decorator used by `deftile`."
 
+  ; Check `mapsym`.
   (assert (or (isinstance cls.mapsym property) (= (len cls.mapsym) 2)))
 
+  ; Check for unknown attributes.
   (setv unknown-attrs (lfor
     k (dir cls)
     :if (not-in k cls.declare)
@@ -270,15 +291,19 @@
     k))
   (when unknown-attrs
     (raise (TypeError f"Unknown attributes: {unknown-attrs}")))
-      ; New attributes should be introduced in a superclass or declared with
-      ; an exclamation point.
+      ; New attributes should be introduced in a superclass or
+      ; declared with an exclamation point. Otherwise, it's too easy
+      ; to typo an attribute name.
 
+  ; Allow `fields` to be set implicitly by `field-defaults`.
   (when (and (in "field_defaults" cls.__dict__) (not-in "fields" cls.__dict__))
     (setv cls.fields (tuple (.keys cls.field-defaults))))
 
+  ; Update `Tile.types`.
   (assert (not-in cls.stem Tile.types))
   (setv (get Tile.types cls.stem) cls)
 
+  ; Update `Tile.types-by-iq-ix`.
   (when (setx iq-ix cls.iq-ix)
     (for [i (if (isinstance iq-ix int) [iq-ix] iq-ix)]
       (assert (not-in i Tile.types-by-iq-ix))
@@ -291,6 +316,7 @@
       (setv (get Tile.types-by-iq-ix iq-ix)
         (dict :cls cls :field field :value field-value))))
 
+  ; Update `hy.repr`.
   (hy.repr-register cls (fn [x]
     (.format "(<{}> {})" stem (.join " " (gfor
       s (.all-fields x)
@@ -298,6 +324,9 @@
 
   cls)
 
+;; --------------------------------------------------------------
+;; * Basic tile mixins
+;; --------------------------------------------------------------
 
 (defclass Actor [Tile]
   "A kind of tile (typically a monster) that gets to do something each
@@ -322,8 +351,11 @@
   (defmeth act []
     (raise NotImplementedError)))
 
-
 (defclass PosHooked [Tile]
+  "A kind of tile which is kept in a list attached to its map. Subclasses
+  should define a method `poshooked-callback`, which can be called on each
+  instance on the current map with `run-all`."
+
   (setv map-attr None)
 
   (defmeth hook-pos-set [old new]
@@ -347,7 +379,6 @@
   bubble, and it goes after all actors."
 
   (setv map-attr "each_turn"))
-
 
 (defclass Damageable [Tile]
   "Tiles that can take damage, like from being attacked by the player
@@ -374,10 +405,9 @@
     destruction-points 0
       ; Points awarded for destroying the tile.
     score-for-damaging F)
-      ; If true, you get the tile's point value per HP of damage you
-      ; do to it (with no points for overkill). Otherwise, you get
-      ; its point value for destroying it (or picking it up, if it's
-      ; an item).
+      ; If true, the player gets `destruction-points` per HP of damage
+      ; done to the tile (with no points for overkill). Otherwise, she
+      ; gets `destruction-points` only for actually destroying it.
 
   (defmeth hook-player-bump [origin]
     "You attack the tile with your sword."
@@ -420,20 +450,21 @@
     (dict :HP @hp))
 
   (defmeth info-bullets [#* extra]
+    (defn dtypes [dts]
+      (.join ", " (gfor  x dts  x.value)))
     (.info-bullets (super)
       #("Hit points" @hp)
       (if @immune
-        #("Immune to" (.join ", " (gfor  x @immune  x.value)))
+        #("Immune to" (dtypes @immune))
         "No immunities")
       (when @resists
-        #("Takes no more than 1 damage from" (.join ", " (gfor  x @resists  x.value))))
+        #("Takes no more than 1 damage from" (dtypes @resists)))
       (when @weaknesses
-        #("Instantly destroyed by" (.join ", " (gfor  x @weaknesses  x.value))))
+        #("Instantly destroyed by" (dtypes @weaknesses)))
       #* extra
       #("Point value" (.format "{:,}{}"
         @destruction-points
         (if @score-for-damaging " (scored per HP lost)" ""))))))
-
 
 (defn annihilate [pos]
   "Destroy or remove everything at `pos`, except for superblockers."
@@ -444,8 +475,11 @@
       (isinstance t Damageable)
         (.damage t Inf None)
       T
-       (.rm-from-map t))))
+        (.rm-from-map t))))
 
+;; --------------------------------------------------------------
+;; * `Tile.superclasses`
+;; --------------------------------------------------------------
 
 (import
   ; Chiefly for side-effects: namely, filling out `Tile.types` and
