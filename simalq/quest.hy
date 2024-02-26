@@ -20,11 +20,14 @@
     levels]            ; A tuple of `Level` objects
   :frozen T)
 
-(defn start-quest [quest [rules None]]
+(defn start-quest [quest [rules None] [show-title T]]
   "Initialize the global state for playing the given quest."
   (setv
     G.rules (Rules)
     G.quest quest)
+  (when show-title
+    (hy.I.simalq/main.text-screen :center T
+      quest.title))
   (when rules
     (for [[k v] (.items rules)]
       (setattr G.rules k v)))

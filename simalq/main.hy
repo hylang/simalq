@@ -38,18 +38,17 @@
         :if (get item "main")
         item)
       None)))
-  (start-quest quest (when (not save) rules))
   (with [(player-io)]
+    ; `skip-to-level` is used for debugging, so for convenience,
+    ; don't show titles when it's provided.
+    (start-quest quest
+      :rules (when (not save) rules)
+      :show-title (not (or save skip-to-level)))
     (if save
       (load-game (get save "path"))
-      (do
-        ; `skip-to-level` is used for debugging, so for convenience,
-        ; don't show titles when it's provided.
-        (unless skip-to-level
-          (text-screen G.quest.title :center T))
-        (start-level
-          :level-n (or skip-to-level 1)
-          :show-title (not skip-to-level))))
+      (start-level
+        :level-n (or skip-to-level 1)
+        :show-title (not skip-to-level)))
     (main-io-loop)))
 
 ;; --------------------------------------------------------------
