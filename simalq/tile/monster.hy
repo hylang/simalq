@@ -138,12 +138,10 @@
         damage))
 
     (.info-bullets (super)
-      (if @damage-melee
-        #("Melee damage" (damage-array @damage-melee))
-        "No melee attack")
-      (if @damage-shot
-        #("Shot damage" (damage-array @damage-shot))
-        "No ranged attack")
+      (when @damage-melee
+        #("Melee damage" (damage-array @damage-melee)))
+      (when @damage-shot
+        #("Shot damage" (damage-array @damage-shot)))
       (when @shot-range
         #("Shot range" @shot-range))
       (when @kamikaze

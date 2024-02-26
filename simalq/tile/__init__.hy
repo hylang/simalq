@@ -454,9 +454,8 @@
       (.join ", " (gfor  x dts  x.value)))
     (.info-bullets (super)
       #("Hit points" @hp)
-      (if @immune
-        #("Immune to" (dtypes @immune))
-        "No immunities")
+      (when @immune
+        #("Immune to" (dtypes @immune)))
       (when @resists
         #("Takes no more than 1 damage from" (dtypes @resists)))
       (when @weaknesses
