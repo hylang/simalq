@@ -35,3 +35,11 @@
 (defn test-tilepedia []
   "Just check that calling all these info methods doesn't crash."
   (assert (isinstance (hy.I.simalq/tile/tilepedia.get-info) dict)))
+
+
+(defn test-builtin-quests []
+  (setv d hy.I.simalq/quest-definition.builtin-quests)
+  (assert (is (type d) dict))
+  (assert (is
+    (type ((. d ["Tutorial Quest"] quest-fn))
+    hy.I.simalq/quest.Quest))))

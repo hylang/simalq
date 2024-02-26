@@ -365,5 +365,3 @@
 })))
 
 quest)
-
-(setv (get hy.I.simalq/quest-definition.builtin-quests name) quest-fn)

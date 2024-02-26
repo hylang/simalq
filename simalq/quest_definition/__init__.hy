@@ -161,5 +161,9 @@ quest definitions from other files in this directory."
 ;; * Load built-in quests
 ;; --------------------------------------------------
 
-(setv builtin-quests {})
-(import simalq.quest_definition.tutorial)
+(setv builtin-quests (dfor
+  ; Every module in this directory should have the members `name` and
+  ; `quest-fn`.
+  [loader mod _] (hy.I.pkgutil.walk-packages __path__)
+  :setv m (. loader (find-module mod) (load-module mod))
+  m.name m.quest-fn))
