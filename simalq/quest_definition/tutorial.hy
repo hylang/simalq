@@ -15,7 +15,7 @@
 
 (setv quest (mk-quest
   :starting-hp 500
-  :name "Tutorial Quest"
+  :name name
   :authors "Kodi B. Arfer"
   :title #[[An instructive introduction to Infinitesimal Quest 2 + ε, inspired by Yves Meynard's "Boot Camp 2".]]
 
