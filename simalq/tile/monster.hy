@@ -517,7 +517,7 @@
   :field-defaults (dict
     :shot-power (f/ 0))
   :mutable-fields #("shot_power")
-  :info-bullets (meth [#* extra]
+  :info-bullets (meth []
     (.info-bullets (super)
       #("Shot power" @shot-power)))
 
@@ -659,7 +659,7 @@
     (dict
       #** (.suffix-dict (super))
      :gt @growth-timer))
-  :info-bullets (meth [#* extra]
+  :info-bullets (meth []
     (.info-bullets (super)
       #("Growth timer" @growth-timer)))
 
@@ -764,7 +764,7 @@
   :field-defaults (dict
     :shot-power (f/ 0))
   :mutable-fields #("shot_power")
-  :info-bullets (meth [#* extra]
+  :info-bullets (meth []
     (.info-bullets (super)
       #("Shot power" @shot-power)))
 

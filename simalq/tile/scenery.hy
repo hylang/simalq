@@ -733,7 +733,7 @@
 
     T)
 
-  :info-bullets (meth [#* extra]
+  :info-bullets (meth []
     (.info-bullets (super)
       #("Times entered" @times-entered)
       #("Output direction" @output-dir)))
@@ -820,7 +820,7 @@
     (+ "█" (if (< @wallnum 10) (str @wallnum) "^")))
   :suffix-dict (meth []
     (dict :type @wallnum))
-  :info-bullets (meth [#* extra]
+  :info-bullets (meth []
     (.info-bullets (super)
       #("Wallfall type" @wallnum)))
 
@@ -1023,7 +1023,7 @@
     (unless @time-remaining
       (@rm-from-map)))
 
-  :info-bullets (meth [#* extra]
+  :info-bullets (meth []
     (.info-bullets (super)
       #("Turns remaining" @time-remaining)))
 
