@@ -15,7 +15,7 @@
 (defdataclass Quest []
   "A scenario or campaign; a sequence of levels to play."
   :fields [
-    name title authors ; Textual metadata
+    name authors title ; Textual metadata
     starting-hp        ; An integer
     levels]            ; A tuple of `Level` objects
   :frozen T)
@@ -27,7 +27,7 @@
     G.quest quest)
   (when show-title
     (hy.I.simalq/main.text-screen :center T
-      quest.title))
+      f"{quest.name}\nby {quest.authors}\n\n{quest.title}"))
   (when rules
     (for [[k v] (.items rules)]
       (setattr G.rules k v)))
