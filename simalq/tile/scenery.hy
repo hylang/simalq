@@ -100,6 +100,7 @@
   (unless target
     (return #(None 'out-of-bounds)))
   #(target (cond
+    ; First, check for diagonal blockers.
     (and
         direction.x direction.y
         (any (gfor
@@ -113,8 +114,11 @@
             (not-in tile.stem ethereal-to)
             (not (and tile.passwallable (.player-has? StatusEffect.Pass)))))))
       'blocked-diag
+    ; If there are no diagonal blockers, but the actor can't actually
+    ; occupy the square, it can still bump things on the square.
     (not (can-occupy? target monster? ethereal-to))
       'bump
+    ; Otherwise, the actor can walk there.
     True
       'walk)))
 
@@ -164,7 +168,7 @@
     146) ; fire fountain
       ; Replacing fire fountains with pillars is not entirely
       ; cosmetic. For example, IQ's fire fountains aren't affected by
-      ; wall-destroying wands.
+      ; passwall wands (i.e., wall-destroying wands).
   :blocks-move T
   :passwallable T
   :wand-destructible T
@@ -183,15 +187,15 @@
   :blocks-move T :blocks-player-shots F :blocks-monster-shots F
   :flavor "Watch your step.")
 
+;; --------------------------------------------------------------
+;; * Doors
+;; --------------------------------------------------------------
+
 (deftile "++" "a door" Scenery
   :color 'brown
   :iq-ix 5
   :blocks-monster T
-  :flavor "Unlocked, but it just won't stay open. Maybe that's for the best, since monsters are too dumb to operate it.")
-
-;; --------------------------------------------------------------
-;; * Doors
-;; --------------------------------------------------------------
+  :flavor "It's unlocked, but it just won't stay open. Maybe that's for the best, since monsters are too dumb to operate it.")
 
 ;; --------------------------------------------------------------
 ;; ** Locked doors
@@ -366,7 +370,7 @@
       (= n -1) "< "
       (= n 0)  "><"
       (= n 1)  "> "
-      (> n 1)  ">>"))
+      True     ">>"))
 
   :suffix-dict (meth []
     {
@@ -676,9 +680,9 @@
 (deftile "┣┫" "a teleporter" Scenery
   :color 'purple
   :field-defaults (dict
-    :times-entered 0
+    :times-used 0
     :output-dir None)
-  :mutable-fields #("times_entered" "output_dir")
+  :mutable-fields #("times_used" "output_dir")
   :iq-ix 23
   :blocks-diag T :blocks-monster T
 
@@ -715,8 +719,8 @@
       (return F))
     (setv [other-porter neighbors] (get
       candidates
-      (% @times-entered (len candidates))))
-    (+= @times-entered 1)
+      (% @times-used (len candidates))))
+    (+= @times-used 1)
     ; Choose the specific target square.
     (while True
       (setv other-porter.output-dir
@@ -737,7 +741,7 @@
 
   :info-bullets (meth []
     (.info-bullets (super)
-      #("Times entered" @times-entered)
+      #("Times used" @times-used)
       #("Output direction" @output-dir)))
 
   :flavor "A bulky cubic device representing an early attempt at teleportation technology. Its operation is a bit convoluted. The fun part is, you can tele-frag with it.")
@@ -799,7 +803,7 @@
     (doc (if (= @wallnum 0)
       "Destroys all trapped walls and other wallfall traps on the level, regardless of type."
       f"Destroys all trapped walls on the level of type {@wallnum} or 0, along with all other wallfall traps of type {@wallnum}."))
-    (for [col G.map.data  stack col  tile stack]
+    (for [col G.map.data  stack col  tile (list stack)]
       (when (or
           (and (= tile.stem "trapped wall")
             (or (= @wallnum 0) (in tile.wallnum [0 @wallnum])))
@@ -826,7 +830,7 @@
     (.info-bullets (super)
       #("Wallfall type" @wallnum)))
 
-  :flavor "The special thing about this wall is that it can be destroyed by wallfall traps of the corresponding type.\n\nWhat's the deal with monster closets? Monsters are proud of who they are, am I right? I'll be here all week.")
+  :flavor "The special thing about this wall is that it can be destroyed by wallfall traps.\n\nWhat's the deal with monster closets? Monsters are proud of who they are, am I right? I'll be here all week.")
 
 ;; --------------------------------------------------------------
 ;; ** Damaging traps
@@ -879,8 +883,8 @@
   :blocks-move F :blocks-monster T
   :hook-player-walked-into (meth []
     (doc f"The tile is destroyed, but you're paralyzed for {G.rules.paralysis-duration} turns.")
-    (.add StatusEffect.Para G.rules.paralysis-duration)
-    (@rm-from-map))
+    (@rm-from-map)
+    (.add StatusEffect.Para G.rules.paralysis-duration))
 
   :flavor "This spiderweb is the size of a really big spiderweb. Until Idok cleans up the dungeon properly, you'll have to tediously carve your way through the webs with your sword. Got any recommendations for a good smitemaster?")
 
