@@ -37,10 +37,10 @@
   (setv
     damage-melee None
       ; How much damage the monster does with its basic melee attack.
-      ; This can be `None`, one number, or a tuple of numbers, with
-      ; element 0 giving damage when the monster is at 1 HP, element 1
-      ; at 2 HP, etc. (the last element being implicitly repeated as
-      ; required).
+      ; This can be `None` (for no melee attack), one number, or a
+      ; tuple of numbers, with element 0 giving damage when the
+      ; monster is at 1 HP, element 1 at 2 HP, etc. (the last element
+      ; being implicitly repeated as required).
     damage-shot None
       ; Likewise for shots.
     shot-range None
@@ -72,6 +72,8 @@
     (and
       (.player-has? StatusEffect.Ivis)
       (not (adjacent? (or mon-pos @pos) G.player.pos))
+        ; Invisibility has no effect on adjacent monsters. They can
+        ; smell your fear.
       (not @sees-invisible)))
 
   (defmeth try-to-attack-player [[dry-run F] [shots-ignore-obstacles F] [pos None]]
@@ -376,14 +378,15 @@
   :score-for-damaging (property-meth []
     (self-sc score-for-damaging))
   :immune (property-meth []
+    ; Generators inherit all the immunities of the monsters they
+    ; generate, and they're always immune to poison.
     (setv x (self-sc immune))
     (+ x (if (in Poison x) #() #(Poison))))
 
   :full-name (property-meth []
-    (setv sc (self-sc))
     (.format "{}{} {}"
-      (if sc.article (+ sc.article " ") "")
-      (.replace sc.stem " " "-")
+      (if (self-sc article) (+ (self-sc article) " ") "")
+      (.replace (self-sc stem) " " "-")
       (Tile.full-name.fget @)))
 
   :act (meth []
@@ -579,7 +582,7 @@
   :iq-ix 49
   :destruction-points 200
 
-  :immune  #(MundaneArrow Fire #* undead-immunities)
+  :immune #(MundaneArrow Fire #* undead-immunities)
   :resists #(MagicArrow)
   :damage-melee 20
 
@@ -590,7 +593,9 @@
   :destruction-points 50
 
   :immune #(PlayerMelee MundaneArrow Fire Poison DeathMagic)
-     ; The immunity to death magic is an addition to IQ.
+    ; The immunity to death magic is an addition compared to IQ. I
+    ; added it because they're clearly not living things. "Killing"
+    ; them with a wand of death makes no sense.
   :damage-melee 25
   :kamikaze T
 
@@ -614,7 +619,7 @@
     (@wander :implicit-attack F))
 
   :hook-normal-destruction (meth []
-    "The monster can attempt a free attack, unless it killed itself by kamikaze."
+    "The monster can immediately attempt to attack, unless it killed itself by kamikaze."
     (@try-to-attack-player))
 
   :flavor "A giant aerial jellyfish, kept aloft by a foul-smelling and highly reactive gas. It doesn't fly so much as float about in the dungeon drafts. If disturbed, it readily explodes, and its explosions have the remarkable property of harming you and nobody else.")
