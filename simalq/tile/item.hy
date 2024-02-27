@@ -223,8 +223,7 @@
   :pick-up (meth []
     (doc f"Adds to your count of keys. If you're at the maximum number
       of keys ({G.rules.max-keys}), you can't step on its square.")
-    (+= G.player.keys 1)
-    (assert (<= G.player.keys G.rules.max-keys)))
+    (+= G.player.keys 1))
 
   :flavor "Idok uses only the worst locks and keys that money can buy. The keys are bulky and heavy, yet immediately snap into pieces on being used once, and every lock can be opened by any old key.")
 
