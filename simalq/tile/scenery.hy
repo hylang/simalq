@@ -362,7 +362,7 @@
   :mapsym (property-meth []
     (setv n (- (@effective-level-n) G.level-n))
     (cond
-      (< n -1) "< "
+      (< n -1) "<<"
       (= n -1) "< "
       (= n 0)  "><"
       (= n 1)  "> "
