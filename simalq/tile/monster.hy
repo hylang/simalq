@@ -15,7 +15,7 @@
   simalq.geometry [Direction at dist adjacent? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
   simalq.tile [Tile Actor Damageable]
-  simalq.tile.scenery [Scenery walkability nogo?])
+  simalq.tile.scenery [Scenery walkability can-occupy?])
 (setv  T True  F False)
 
 ;; --------------------------------------------------------------
@@ -205,7 +205,7 @@
             tile (at intermediate)
             (and (isinstance tile Scenery) tile.superblock))))
           (setx target (+ intermediate d))
-          (not (nogo? target :monster? T :ethereal-to ethereal-to)))
+          (can-occupy? target :monster? T :ethereal-to ethereal-to))
         (do
           (setv [target wly] (walkability @pos d :monster? T :ethereal-to ethereal-to))
           (= wly 'walk))))
@@ -790,7 +790,7 @@
       (when (and
           (or
             (= target @pos)
-            (not (nogo? target :monster? T :ethereal-to #())))
+            (can-occupy? target :monster? T :ethereal-to #()))
           (@try-to-attack-player :dry-run T :pos target))
         (@move target)
         (return))))

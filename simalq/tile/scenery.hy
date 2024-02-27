@@ -113,21 +113,24 @@
             (not-in tile.stem ethereal-to)
             (not (and tile.passwallable (.player-has? StatusEffect.Pass)))))))
       'blocked-diag
-    (nogo? target monster? ethereal-to)
+    (not (can-occupy? target monster? ethereal-to))
       'bump
     True
       'walk)))
 
-(defn nogo? [pos monster? ethereal-to]
-  (any (gfor
+(defn can-occupy? [pos monster? ethereal-to]
+  "Similar to `walkability`, but all that is considered is whether the
+  player or monster could occupy `pos`, and the return value is just a
+  `bool`."
+  (all (gfor
     t (at pos)
-    (and (not-in t.stem ethereal-to) (or
+    (or (in t.stem ethereal-to) (not (or
       (and monster? G.rules.dainty-monsters)
       (isinstance t hy.I.simalq/tile.Monster)
       (and (isinstance t Scenery) (or
         (and monster? t.blocks-monster)
         (and t.blocks-move (or monster?
-          (not (and t.passwallable (.player-has? StatusEffect.Pass))))))))))))
+          (not (and t.passwallable (.player-has? StatusEffect.Pass)))))))))))))
 
 (defclass Wallish [Scenery]
   (setv
