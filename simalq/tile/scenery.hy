@@ -557,9 +557,8 @@
         (= @n-pushes 1)
           " The block then transforms into a normal wall."
         True
-          f" After {(- @n-pushes 1)} more push{(if (> @n-pushes 2) "es" "")}, the block will transform into a normal wall.")))
-    (setv target (+ @pos G.action.direction))
-    (@move target)
+          f" After a total of {@n-pushes} pushes, the block will transform into a normal wall.")))
+    (@move (+ @pos G.action.direction))
     (unless (is @n-pushes None)
       (-= @n-pushes 1)
       (unless @n-pushes
