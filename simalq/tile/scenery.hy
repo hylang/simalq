@@ -120,14 +120,14 @@
 
 (defn nogo? [pos monster? ethereal-to]
   (any (gfor
-    tile (at pos)
-    (and (not-in tile.stem ethereal-to) (or
+    t (at pos)
+    (and (not-in t.stem ethereal-to) (or
       (and monster? G.rules.dainty-monsters)
-      (isinstance tile hy.I.simalq/tile.Monster)
-      (and (isinstance tile Scenery) (or
-        (and monster? tile.blocks-monster)
-        (and tile.blocks-move (or monster?
-          (not (and tile.passwallable (.player-has? StatusEffect.Pass))))))))))))
+      (isinstance t hy.I.simalq/tile.Monster)
+      (and (isinstance t Scenery) (or
+        (and monster? t.blocks-monster)
+        (and t.blocks-move (or monster?
+          (not (and t.passwallable (.player-has? StatusEffect.Pass))))))))))))
 
 (defclass Wallish [Scenery]
   (setv
