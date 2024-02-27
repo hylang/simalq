@@ -37,7 +37,9 @@
   (defmeth pick-up [])
 
   (defmeth hook-remote-action []
+    ; Check if we can take the item.
     (@hook-player-walk-to None)
+    ; Then actually take it.
     (@hook-player-walked-into)
     T)
 
@@ -175,7 +177,7 @@
   :hp-effect 0
   :eat-messages #("There's nothing to eat here. Rats.")
 
-  :flavor #[[It looks like one of the monsters got to this food first.]])
+  :flavor "It looks like one of the monsters got to this food first.")
 
 (deftile "% " "some dessert" Food
   :color 'rose
@@ -447,7 +449,7 @@
         (return)))
     (raise (CommandError "There isn't a destructible tile there.")))
 
-  :flavor #[[I always thought the phrase "open sesame" was a humorous deliberate corruption of "open says-a-me", but since it comes to us from French, if not from Arabic and then French, this is unlikely.]])
+  :flavor #[[I always thought the phrase "open sesame" was a humorous deliberate corruption of "open says-a-me", but since it comes to us from French, if not from Arabic and then French, this is unlikely.\n\n    I've got a hole in me pocket.]])
 
 (deftile "/ " "a wand of exit" Usable
   :color-bg 'lime
@@ -490,7 +492,7 @@
         :if (not (at pos))]
       (Tile.make pos "web")))
 
-  :flavor "Of all the wands you can find in the dungeon, this can truly be said to be one of them. It looks and feels awfully like a body part from an oversized arachnid, and it makes a huge mess, but it has its uses.")
+  :flavor "Of all the wands you can find in the dungeon, this is definitely one of them. It looks and feels awfully like a body part from an oversized arachnid, and it makes a huge mess, but it has its uses.")
 
 (deftile "/ " "a wand of death" Usable
   :color 'blue
@@ -564,7 +566,7 @@
         (return)))
     (raise (CommandError "There isn't anything you can affect there.")))
 
-  :flavor "This wand bears an uncanny resemblance to a grabber arm, and is nearly as useful. Many a wizard has used one to eat tortilla chips from across the room. Now this power is yours.")
+  :flavor "This wand bears an uncanny resemblance to a grabber arm, and is nearly as useful. Many a wizard has used one to eat tortilla chips from across the room. Now this marvelous power is yours.")
 
 ;; --------------------------------------------------------------
 ;; ** Bombs
