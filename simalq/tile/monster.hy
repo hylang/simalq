@@ -35,7 +35,6 @@
   "A non-player character, typically out to kill the player."
 
   (setv
-    mutable-fields #("hp" "movement_state")
     damage-melee None
       ; How much damage the monster does with its basic melee attack.
       ; This can be `None`, one number, or a tuple of numbers, with
