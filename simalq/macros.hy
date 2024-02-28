@@ -149,7 +149,30 @@
 
 
 (defmacro-kwargs defdataclass [class-name superclasses #* args #** kwargs]
-  "Syntactic sugar for common uses of data classes."
+  #[[Syntactic sugar for common uses of data classes. Code like
+
+    (defdataclass C []
+      "A docstring."
+
+      :fields [foo1 foo2]
+      :eq True
+
+      (defn method [self]
+        (+ self.foo1 self.foo2)))
+
+  becomes
+
+    (defclass [(dataclass :slots True :eq True)] C []
+      "A docstring."
+
+      (annotate foo1 ...)
+      (annotate foo2 ...)
+
+      (defn method [self]
+        (+ self.foo1 self.foo2)))
+
+  `slots` is always set to `True`. `:fields` is optional, and you may
+  supply a dictionary `:field-defaults` instead.]]
 
   (setv   args (list args)  docstring [])
   (when (and args (isinstance (get args 0) hy.models.String))
