@@ -11,7 +11,7 @@
   "All state information for the game being played, including an undo
   history of individual `GameState`s."
 
-  :field-defaults [
+  :field-defaults {
     rules None
       ; A `Rules` object. It shouldn't be mutated mid-game, or the
       ; game-state history can get desynchronized.
@@ -22,7 +22,7 @@
       ; The current `GameState`.
     states []
       ; A history of `GameState`s.
-    state-i None]
+    state-i None}
       ; An index of `states`, pointing to the predecessor of `state`.
       ; Typically its value is just the last index of `states`, but it's
       ; decremented when states are undone.
@@ -107,7 +107,7 @@
   from the player. Instances of this class but not `HydratedGameState`
   are "dehydrated" game states.]]
 
-  :field-defaults [action None])
+  :field-defaults {action None})
     ; The player's `Action` that produced this game state from the
     ; previous one. It's `None` only for the initial state.
 
@@ -115,7 +115,7 @@
 (defdataclass HydratedGameState [GameState]
   "A fully elaborated game state."
 
-  :field-defaults [
+  :field-defaults {
     level None
       ; A `Level` object. This is mutated to represent the level
       ; changing, such as monsters moving around.
@@ -132,13 +132,13 @@
     time-left None
       ; The number of turns remaining on the current level's time limit
       ; (if it has one).
-    player None])
+    player None})
       ; A `Player` object.
 
 
 (defdataclass Rules []
 
-  :field-defaults [
+  :field-defaults {
     ; All defaults are per IQ when applicable.
     state-dehydration-factor 100
       ; State 0, and every `state-dehydration-factor` states
@@ -178,7 +178,7 @@
       ; How many rounds paralysis lasts for.
     poison-emitter-damage 2
       ; Damage per turn (to the player) from poisonous fountains.
-    dainty-monsters T])
+    dainty-monsters T})
       ; Whether monsters will only step on empty floor (with some
       ; exceptions, like spiders walking on webs). Otherwise, monsters
       ; can move through items and some kinds of scenery.
