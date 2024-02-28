@@ -170,6 +170,8 @@ quest definitions from other files in this directory."
 (setv builtin-quests (dfor
   ; Every module in this directory should have the members `name` and
   ; `quest-fn`.
-  [loader mod _] (hy.I.pkgutil.walk-packages __path__)
-  :setv m (. loader (find-module mod) (load-module mod))
+  [finder m _] (hy.I.pkgutil.walk-packages __path__)
+  :setv spec (.find-spec finder m)
+  :setv m (hy.I.importlib/util.module-from-spec spec)
+  :do (.loader.exec-module spec m)
   m.name m.quest-fn))
