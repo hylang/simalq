@@ -50,12 +50,20 @@ The original IQ map layouts have a number of swastika-like designs. Yves Meynard
 
 While Yves kindly provided me with IQ's source code for reference, SQ is an original work that doesn't substantively copy IQ at the code level, and has many fine differences (deliberate, and probably also accidental) in behavior.
 
-Development status
+Implementation
 ============================================================
 
 SQ is reasonably polished and allows playing through several complete quests. Not quite all of IQ's tile types are implemented, and so a few of its original quests (Nightmare 2, Delirium, and the original tutorial Boot Camp 2) aren't completely playable. You can try them if you want, but they aren't listed by ``--quests``.
 
-Overall, the code is in good shape and provides examples of solving many different kinds of problems in Hy. Some files use `Outli <https://github.com/jdtsmith/outli>`__ headers in comments for organization.
+Overall, the code is in good shape and provides examples of solving many different kinds of problems in Hy. Some files use `Outli <https://github.com/jdtsmith/outli>`__ headers in comments for organization. Among the things you can see demonstrated in SQ are:
+
+- Using macros to streamline the definition of many similar classes: see ``defdataclass`` and ``deftile`` (try looking at uses of them first before getting into the hairy details of their implementation)
+- Managing global variables and several notions of global state: see ``Global``
+- Writing a terminal-based game with `blessed <https://pypi.org/project/blessed>`__
+- Parsing a novel binary format with `construct <https://pypi.org/project/construct>`__
+- Generating HTML with a minimal ``ElementTree``-like interface: see ``simalq.tile.tilepedia``
+- Testing a Hy program with `pytest <https://pytest.org>`__ (and with tests that are themselves written in Hy)
+- Creating a new quest for SQ: duplicate the file ``tutorial.hy``, edit it to taste, and put it in the same directory (``quest_definition``)
 
 Version history
 ============================================================
