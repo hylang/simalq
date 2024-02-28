@@ -126,7 +126,7 @@
     #** (if p-rest {p-rest (tuple collected-rest)} {})
     #** (if p-kwargs {p-kwargs collected-kwargs} {})))
 
-(defn parse-params [params]
+(eval-and-compile (defn parse-params [params]
   "A subroutine for `defmacro-kwargs` and `match-params`."
   (import
     funcparserlib.parser [maybe many]
@@ -145,31 +145,23 @@
     p ps
     :setv [k dv] (if (isinstance p hy.models.List) p [p None])
     k (dict :value None :default dv)))
-  [ps p-rest p-kwargs])
+  [ps p-rest p-kwargs]))
 
 
-(defmacro defdataclass [class-name superclasses #* rest]
+(defmacro-kwargs defdataclass [class-name superclasses #* args #** kwargs]
   "Syntactic sugar for common uses of data classes."
 
-  (setv   rest (list rest)  docstring [])
-  (when (and rest (isinstance (get rest 0) hy.models.String))
-    (.append docstring (.pop rest 0)))
-  (setv  kwargs []  fields []  field-defaults [])
-  (while (and rest (isinstance (get rest 0) hy.models.Keyword))
-    (setv [k v #* rest] rest)
-    (cond
-      (= k ':fields)
-        (setv fields v)
-      (= k ':field-defaults)
-        (setv field-defaults v)
-      True
-        (.extend kwargs [k v])))
+  (setv   args (list args)  docstring [])
+  (when (and args (isinstance (get args 0) hy.models.String))
+    (.append docstring (.pop args 0)))
+  (setv fields (.pop kwargs "fields" []))
+  (setv field-defaults (.pop kwargs "field_defaults" {}))
   (assert (not (and fields field-defaults)))
     ; `field-defaults` defines `fields` implicitly.
   (unless (or fields field-defaults)
-    (.extend kwargs '[:frozen True]))
+    (setv (get kwargs "frozen") 'True))
   `(defclass
-    [(hy.I.dataclasses.dataclass :slots True ~@kwargs)]
+    [(hy.I.dataclasses.dataclass :slots True #** ~kwargs)]
     ~class-name ~superclasses
     ~@docstring
     ~@(if field-defaults
@@ -181,7 +173,7 @@
       (gfor
         field fields
         `(annotate ~field ...)))
-    ~@rest))
+    ~@args))
 
 
 (defmacro field-defaults [#* items]
