@@ -158,7 +158,7 @@
               0
               (menu (len stack) :draw (fn []
                 (print-main-screen :target target
-                  :status-bar F :tile-list 'pickable)))))))
+                  :tile-list 'pickable)))))))
           (info-screen (get stack tile-ix)))))
 
     ShiftHistory (do
@@ -336,7 +336,7 @@
   (hy.I.simalq/main.io-mode
     :draw (fn []
       (hy.I.simalq/main.print-main-screen
-        :target focus :status-bar F :tile-list 'nonpickable))
+        :target focus :tile-list 'nonpickable))
     :on-input (fn [key]
       (nonlocal focus)
       (setv dir-v (hy.I.simalq/keyboard.read-dir-key key))

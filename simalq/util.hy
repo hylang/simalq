@@ -74,7 +74,6 @@
     (return))
 
   (print-main-screen
-    :status-bar T
     :messages message-queue
     :overmarks (dfor  p ps  p (lfor  i (range 2)
       (ColorChar

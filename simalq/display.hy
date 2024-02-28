@@ -97,7 +97,6 @@ interface elements as lists of `ColorChar`s."
     [target None]
       ; An optional `Pos` to focus the map. Otherwise, we use the
       ; player's current position.
-    [status-bar T]
     [tile-list None]
       ; `None`, or the symbols `pickable` or `nonpickable`
     [inventory F]
@@ -108,10 +107,9 @@ interface elements as lists of `ColorChar`s."
   (setv out [])
 
   ; The status bar is drawn first.
-  (when status-bar
-    (+= out (lfor
-      line (draw-status-bar)
-      (colorstr-to-width line width))))
+  (+= out (lfor
+    line (draw-status-bar)
+    (colorstr-to-width line width)))
   (setv status-bar-lines (len out))
   ; Then the map, including overmarks.
   (setv focus (or target G.player.pos))
