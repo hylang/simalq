@@ -333,9 +333,9 @@ interface elements as lists of `ColorChar`s."
       (when G.time-left
         (.format "⏲ {:,} (→ {})"
           G.time-left
-          (if (< G.level.next-level (len G.quest.levels))
-            (.format "DL {:,}" G.level.next-level)
-            "victory")))
+          (if (> G.level.next-level (len G.quest.levels))
+            "victory"
+            (.format "DL {:,}" G.level.next-level))))
       (when G.player.keys
         (.format "⚷ {}" G.player.keys))
       (when G.player.magic-arrows (+
