@@ -76,6 +76,7 @@ Version history
 
 This section lists the most important user-visible changes in each release. Typically, saved games for each version *aren't* compatible with other versions, but release numbers marked with an asterisk (*) should be compatible with saved games from the previous release. Unless making a backward-compatible upgrade of this kind, you should delete all your saved games before upgrading the game.
 
+- 1.0.0 (2024-03-01): Various improvements to the display.
 - 0.6.0 (2024-02-19): The IQ quest BoneQuest is now fully playable.
 - 0.5.0 (2024-01-10): Largely internal changes. The new script ``util/gate_map.hy`` may be useful for mapping mazes of teleportation gates, such as New Nightmare level 10.
 - 0.4.0* (2023-09-08): SQ now uses `platformdirs <https://pypi.org/project/platformdirs>`__ to set data directories.
