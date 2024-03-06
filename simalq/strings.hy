@@ -90,6 +90,7 @@
   "You suddenly yearn for your distant homeland."
   "You summon a butterfly. It flies away."
   "You've got mail."
+  "Your dad turns into a chickenrat."
   "Your skin turns orange."
   "python3: segmentation fault (core dumped)"
   #[[The wand asks "For what do you wish?" After you reply, it says "Yeah, me too."]]
