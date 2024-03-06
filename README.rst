@@ -71,6 +71,8 @@ Overall, the code is in good shape and provides examples of solving many differe
 - Testing a Hy program with `pytest <https://pytest.org>`__ (and with tests that are themselves written in Hy)
 - Creating a new quest for SQ: duplicate the file ``tutorial.hy``, edit it to taste, and put it in the same directory (``quest_definition``)
 
+Some of SQ's approach and a little of its code descends from my earlier unfinished game `Rogue TV <https://github.com/Kodiologist/Rogue-TV>`__.
+
 Version history
 ============================================================
 
