@@ -4,8 +4,8 @@
 (import
   collections [Counter]
   fractions [Fraction :as f/]
+  hyrule [thru]
   toolz [partition]
-  simalq.util [seq]
   simalq.geometry [Pos]
   simalq.un-iq [iq-quest])
 
@@ -111,8 +111,8 @@
   ; Our replacements have 13 traps and 12 floor squares.
   (assert (=
     (dict (Counter (gfor
-      x (seq 12 16)
-      y (seq 29 33)
+      x (thru 12 16)
+      y (thru 29 33)
       :setv stack (get m x y)
       (if (len stack)
         (.join "-" (gfor  t stack  t.stem))

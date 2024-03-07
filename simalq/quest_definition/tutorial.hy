@@ -2,7 +2,6 @@
 
 (import
   fractions [Fraction :as f/]
-  simalq.util [seq]
   simalq.quest-definition [mk-quest])
 (setv  T True  F False)
 
@@ -145,7 +144,7 @@
       :summon-frequency (f/ 1 2)
       :summon-hp 1]
     #** (dfor
-      i (seq 1 8)
+      i (range 10)
       mon ["orc" "wizard"]
       f"{(get mon 0)}{i}" [mon :hp i])}]
 

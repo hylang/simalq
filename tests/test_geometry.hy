@@ -5,8 +5,8 @@
   hyrule [ebranch])
 (import
   copy [deepcopy]
+  hyrule [thru]
   pytest
-  simalq.util [seq]
   simalq.geometry [
     Map Pos Direction ray adjacent? dir-to dist burst
     GeometryError])
@@ -274,7 +274,7 @@
   (setv iq-spiral-size 6)
   (setv iq-spiral (list (zip
     ; Translated directly from `SetSpiralX` and `SetSpiralY` in IQ.
-    (gfor  i (seq 0 168)  (ebranch (in i it)
+    (gfor  i (thru 168)  (ebranch (in i it)
       #(121 157 158 159 160 161 162 163 164 165 166 167 168)  -6
       #(81 122 156 111 112 113 114 115 116 117 118 119 120)  -5
       #(49 73 74 75 76 77 78 79 80 82 110 123 155)  -4
@@ -288,7 +288,7 @@
       #(57 58 59 60 61 62 63 64 65 90 102 131 147)  4
       #(91 92 93 94 95 96 97 98 99 100 101 132 146)  5
       #(133 134 135 136 137 138 139 140 141 142 143 144 145)  6))
-    (gfor  i (seq 0 168) (ebranch (in i it)
+    (gfor  i (thru 168) (ebranch (in i it)
       #(145 146 147 148 149 150 151 152 153 154 155 156 157)  6
       #(101 102 103 104 105 106 107 108 109 110 111 144 158)  5
       #(65 66 67 68 69 70 71 72 73 100 112 143 159)  4

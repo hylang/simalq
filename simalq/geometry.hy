@@ -9,8 +9,9 @@
   simalq.macros [defdataclass defmeth])
 (import
   itertools [chain]
+  hyrule [thru]
   toolz [unique]
-  simalq.util [seq sign]
+  simalq.util [sign]
   simalq.game-state [G])
 (setv  T True  F False)
 
@@ -224,12 +225,12 @@
   If `exclude-center` is true, the center position isn't returned."
 
   (unique (gfor
-    c (seq 0 (min size (max center.map.width center.map.height)))
+    c (thru 0 (min size (max center.map.width center.map.height)))
     [x y] (py "chain(
-      (( x, -c) for x in seq(    -c,      c,  1)),
-      (( c,  y) for y in seq(-c + 1,      c,  1)),
-      (( x,  c) for x in seq( c - 1,     -c, -1)),
-      ((-c,  y) for y in seq( c - 1, -c + 1, -1)))")
+      (( x, -c) for x in thru(    -c,      c,  1)),
+      (( c,  y) for y in thru(-c + 1,      c,  1)),
+      (( x,  c) for x in thru( c - 1,     -c, -1)),
+      ((-c,  y) for y in thru( c - 1, -c + 1, -1)))")
     :setv p (try
       (Pos center.map (+ center.x x) (+ center.y y))
       (except [GeometryError]))

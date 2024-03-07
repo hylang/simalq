@@ -19,11 +19,6 @@
 (setv saved-games-dir (/ (Path platform-dirs.user-data-dir) "save"))
 
 
-(defn seq [a b [step 1]]
-  "A version of `range` that includes both ends (given a compatible
-  step size)."
-  (range a (+ b step) step))
-
 (defn sign [x]
   "N.B. This function returns 0 for -0.0, and raises `TypeError` for NaN."
   (cond

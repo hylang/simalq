@@ -10,8 +10,9 @@
   re
   fractions [Fraction :as f/]
   enum [Enum]
+  hyrule [thru]
   toolz [unique]
-  simalq.util [DamageType StatusEffect next-in-cycle mixed-number seq]
+  simalq.util [DamageType StatusEffect next-in-cycle mixed-number]
   simalq.geometry [Direction at dist adjacent? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
   simalq.tile [Tile Actor Damageable]
@@ -788,7 +789,7 @@
         (@try-to-attack-player)
         (return)))
     (for [
-        dist-from-player [#* (seq 2 G.rules.reality-bubble-size) 1]
+        dist-from-player [#* (thru 2 G.rules.reality-bubble-size) 1]
         direction Direction.all
         :if (setx target (.+n G.player.pos dist-from-player direction))]
       (when (and

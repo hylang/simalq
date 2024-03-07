@@ -11,9 +11,10 @@
   fractions [Fraction :as f/]
   zipfile [ZipFile]
   functools [cache]
+  hyrule [thru]
   construct
   toolz [partition]
-  simalq.util [cache-dir seq]
+  simalq.util [cache-dir]
   simalq.geometry [Map Pos]
   simalq.quest [Quest Level]
   simalq.tile [Tile])
@@ -206,8 +207,8 @@
           (Pos m (- (get xy 0) 1) (- m.height (get xy 1)))
           None))
       :setv iq-ixes (dfor
-        ix (seq 1 m.width)
-        iy (seq 1 m.height)
+        ix (thru 1 m.width)
+        iy (thru 1 m.height)
         (mk-pos #(ix iy)) (get l.map (+ (* (- ix 1) l.height) (- iy 1))))
       :setv tile-extras (dfor
         pair l.tile-extras
@@ -361,7 +362,7 @@
           ██████████████████, ██"
         :map-marks {
           #** (dfor
-            i (seq 1 4)
+            i (thru 1 4)
             f"█{i}" ["trapped wall" :wallnum i])
           ", " "broken trap"
           "o " ["orc" :hp 3]
