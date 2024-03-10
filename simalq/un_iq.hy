@@ -27,25 +27,18 @@
 (setv FLOOR 1)
   ; The IQ index number for plain floor.
 
-(eval-when-compile (defn replace-atoms [x f]
-  (import hyrule [coll?])
-  (if (coll? x)
-    ((type x) (gfor  elem x  (replace-atoms elem f)))
-    (f x))))
-
 (defmacro with-construct [#* body]
   "Replace all symbols starting with an uppercase letter, like
   `Foo`, with `construct.Foo`, plus `this`, minus booleans and
   `None`."
-  `(do ~@(replace-atoms body (fn [x]
-    (if (or
+  `(do ~@(hy.I.hyrule.map-model body (fn [x]
+    (when (or
           (= x 'this)
           (and
             (isinstance x hy.models.Symbol)
             (.isupper (get x 0))
             (not-in x '[True False T F None])))
-      `(. construct ~x)
-      x)))))
+      `(. construct ~x))))))
 
 (defmacro kw-struct [#* args]
   "Create a `construct.Struct`, naming the fields with Hy keyword
