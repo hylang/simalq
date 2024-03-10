@@ -3,8 +3,8 @@
 ;; --------------------------------------------------------------
 
 (require
-  hyrule [unless do-n list-n]
-  simalq.macros [field-defaults pop-integer-part defmeth defmacro-kwargs]
+  hyrule [unless do-n list-n defmacro-kwargs]
+  simalq.macros [field-defaults pop-integer-part defmeth]
   simalq.tile [deftile])
 (import
   re

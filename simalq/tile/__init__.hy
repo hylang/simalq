@@ -3,8 +3,8 @@
 ;; --------------------------------------------------------------
 
 (require
-  hyrule [unless]
-  simalq.macros [field-defaults defmeth defmacro-kwargs])
+  hyrule [unless defmacro-kwargs]
+  simalq.macros [field-defaults defmeth])
 (import
   copy [deepcopy]
   re

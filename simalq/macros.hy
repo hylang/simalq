@@ -1,5 +1,5 @@
 (require
-  hyrule [unless])
+  hyrule [unless defmacro-kwargs])
 
 
 (defmacro defmeth [#* args]
@@ -44,108 +44,6 @@
     (defn ~decorators ~fname [self ~@params]
       ~@body)
     ~@dynadoc))
-
-
-(defmacro defmacro-kwargs [mname params #* body]
-  (setv [ps p-rest p-kwargs] (parse-params params))
-  (setv g (hy.gensym))
-  `(defmacro ~mname [#* ~g]
-    (setv ~g (hy.I.simalq/macros.match-params ~g '~params))
-    ~@(gfor
-      name [#* (.keys ps) #* (if p-rest [p-rest] []) #* (if p-kwargs [p-kwargs] [])]
-      `(setv ~(hy.models.Symbol name) (get ~g ~name)))
-    ~@body))
-
-(defn match-params [args params]
-  "Match a interable of arguments against a parameter list in the
-  style of a `defn` lambda list. The parameter-list syntax here is
-  somewhat restricted: annotations are forbiddden, `/` and `*` aren't
-  recognized, and nothing is allowed after `#* args` other than `#**
-  kwargs`.
-
-  Return a dictionary of parameters and their values."
-
-  (setv [ps p-rest p-kwargs] (parse-params params))
-
-  ; Loop over `args`.
-  (setv  args (list args)  collected-rest []  collected-kwargs {}  i-pos 0)
-  (while args
-    (setv x (.pop args 0))
-    (cond
-
-      (and
-          (isinstance x hy.models.Expression)
-          x
-          (isinstance (get x 0) hy.models.Symbol)
-          (in (hy.mangle (get x 0)) ["unpack_iterable" "unpack_mapping"]))
-        ; Unpacking would require evaluating the elements of `args`, which we
-        ; want to avoid.
-        (raise (TypeError "unpacking is not allowed in `args`"))
-
-      (isinstance x hy.models.Keyword) (do
-        ; A keyword argument
-        (setv x (hy.mangle x.name))
-        (when (or
-            (in x collected-kwargs)
-            (and (in x ps) (is-not (get ps x "value") None)))
-          (raise (TypeError (+ "keyword argument repeated: " x))))
-        (setv v (.pop args 0))
-        (cond
-          (in x ps)
-            (setv (get ps x "value") v)
-          p-kwargs
-            (setv (get collected-kwargs x) v)
-          True
-            (raise (TypeError f"unexpected keyword argument '{x}'"))))
-
-      True (do
-        ; A positional argument
-        (cond
-          (< i-pos (len ps)) (do
-            (setv [k d] (get (list (.items ps)) i-pos))
-            (if (is (get d "value") None)
-              (setv (get d "value") x)
-              (raise (TypeError f"got multiple values for argument '{k}'"))))
-          p-rest
-            (.append collected-rest x)
-          True
-            (raise (TypeError f"takes {(len ps)} positional arguments but more were given")))
-        (+= i-pos 1))))
-
-  ; Return the result.
-  (dict
-    #** (dfor
-      [p d] (.items ps)
-      p (cond
-        (is-not (get d "value") None)
-          (get d "value")
-        (is-not (get d "default") None)
-          (get d "default")
-        True
-          (raise (TypeError f"missing a required positional argument: '{p}'"))))
-    #** (if p-rest {p-rest (tuple collected-rest)} {})
-    #** (if p-kwargs {p-kwargs collected-kwargs} {})))
-
-(eval-and-compile (defn parse-params [params]
-  "A subroutine for `defmacro-kwargs` and `match-params`."
-  (import
-    funcparserlib.parser [maybe many]
-    hy.model-patterns [SYM FORM sym brackets pexpr])
-
-  (setv msym (>> SYM hy.mangle))
-  (defn pvalue [root wanted]
-    (>> (pexpr (+ (sym root) wanted)) (fn [x] (get x 0))))
-  (setv [ps p-rest p-kwargs] (.parse
-    (+
-      (many (| msym (brackets msym FORM)))
-      (maybe (pvalue "unpack-iterable" msym))
-      (maybe (pvalue "unpack-mapping" msym)))
-    params))
-  (setv ps (dfor
-    p ps
-    :setv [k dv] (if (isinstance p hy.models.List) p [p None])
-    k (dict :value None :default dv)))
-  [ps p-rest p-kwargs]))
 
 
 (defmacro-kwargs defdataclass [class-name superclasses #* args #** kwargs]
