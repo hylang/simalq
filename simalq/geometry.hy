@@ -9,9 +9,8 @@
   simalq.macros [defdataclass defmeth])
 (import
   itertools [chain]
-  hyrule [thru]
+  hyrule [sign thru]
   toolz [unique]
-  simalq.util [sign]
   simalq.game-state [G])
 (setv  T True  F False)
 

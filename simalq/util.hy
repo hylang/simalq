@@ -19,14 +19,6 @@
 (setv saved-games-dir (/ (Path platform-dirs.user-data-dir) "save"))
 
 
-(defn sign [x]
-  "N.B. This function returns 0 for -0.0, and raises `TypeError` for NaN."
-  (cond
-    (< x 0) -1
-    (> x 0)  1
-    (= x 0)  0
-    True     (raise TypeError)))
-
 (defn mixed-number [fraction]
   (setv n (pop-integer-part fraction))
   (or
