@@ -5,6 +5,7 @@
 (require
   hyrule [do-n unless])
 (import
+  toolz [concat]
   metadict [MetaDict]
   simalq.geometry [Pos at Direction]
   simalq.un-iq [iq-quest]
@@ -82,7 +83,8 @@
     (hy.I.simalq/tile.Player :pos (Pos model player-x player-y)))
   (assert (= G.map.width model.width))
   (assert (= G.map.height model.height))
-  (for [[stack-actual stack-expected] (zip (sum :start #() G.map.data) (sum :start #() model.data))]
+  (for [[stack-actual stack-expected]
+      (zip (concat G.map.data) (concat model.data))]
     (assert (= (len stack-actual) (len stack-expected)))
     (for [[t-actual t-expected] (zip stack-actual stack-expected)]
       (assert (= t-actual.stem t-expected.stem)))))

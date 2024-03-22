@@ -418,7 +418,7 @@
       :points-for-generator (classmethod (fn [cls] ~points-gen))
       :flavor ~flavor-mon
       :flavor-for-generator ~flavor-gen
-      ~@(sum :start [] (gfor
+      ~@(hy.I.toolz.concat (gfor
         [k v] (.items kwargs)
         [(hy.models.Keyword k) v])))
 

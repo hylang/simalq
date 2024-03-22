@@ -2,6 +2,7 @@
 
 
 (import
+  toolz [concat]
   metadict [MetaDict]
   simalq.color
   simalq.game-state [G]
@@ -97,9 +98,9 @@
             :href (+ "#" tile.id)))))))))
 
     ; One section of info screens per superclass
-    #* (cat (gfor
+    #* (concat (gfor
       [superclass-name tiles] (.items info)
-      [(E.h2 superclass-name) #* (cat (gfor
+      [(E.h2 superclass-name) #* (concat (gfor
         ; One info screen per tile type
         tile tiles
         [(E.h3 (mapsym tile) tile.long-name :id tile.id)
@@ -129,10 +130,6 @@
       f"{(hesc k)}='{(hesc v)}'"))
     (.join "" (map render-elem kids))
     (if self-closing "" f"</{(hesc tag)}>")))
-
-
-(defn cat [l]
-  (sum :start [] l))
 
 
 (when (= __name__ "__main__")
