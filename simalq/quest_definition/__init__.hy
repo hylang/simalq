@@ -170,8 +170,7 @@ quest definitions from other files in this directory."
 (setv builtin-quests (dfor
   ; Every module in this directory should have the members `name` and
   ; `quest-fn`.
-  [finder m _] (hy.I.pkgutil.walk-packages __path__)
-  :setv spec (.find-spec finder m)
-  :setv m (hy.I.importlib/util.module-from-spec spec)
-  :do (.loader.exec-module spec m)
+  p (.iterdir (hy.I.pathlib.Path (get __path__ 0)))
+  :if (not-in p.name ["__init__.hy" "__pycache__"])
+  :setv m (hy.I.hyrule.import-path p)
   m.name m.quest-fn))
