@@ -1,10 +1,10 @@
 dependencies = [
-    'hy @ git+https://github.com/hylang/hy@83d71b62438d5bd349bf2e1c307b87d1a045ffa0',
-    'hyrule @ git+https://github.com/hylang/hyrule@9b14a0944a0e8aa667486effb6421ebf23ef2744',
-    'toolz >= 0.12.0',
+    'hy == 0.29.0',
+    'hyrule == 0.6.0',
+    'toolz >= 0.12.1',
     'construct >= 2.10.70',
     'blessed >= 1.20.0',
-    'platformdirs >= 4.1.0',
+    'platformdirs >= 4.2.2',
     'metadict >= 0.1.3']
 
 import setuptools
