@@ -448,7 +448,7 @@
         (return)))
     (raise (CommandError "There isn't a destructible tile there.")))
 
-  :flavor #[[I always thought the phrase "open sesame" was a humorous deliberate corruption of "open says-a-me", but since it comes to us from French, if not from Arabic and then French, this is unlikely.\n\n    I've got a hole in me pocket.]])
+  :flavor (+ #[[I always thought the phrase "open sesame" was a humorous deliberate corruption of "open says-a-me", but since it comes to us from French, if not from Arabic and then French, this is unlikely.]] "\n\n    I've got a hole in me pocket."))
 
 (deftile "/ " "a wand of exit" Usable
   :color-bg 'lime
