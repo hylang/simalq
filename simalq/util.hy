@@ -39,7 +39,6 @@
   "Represents a game ending, whether by losing or winning.")
 
 
-
 (setv message-queue [])
 
 (defn msg [#* args]
