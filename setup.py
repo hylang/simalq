@@ -4,7 +4,7 @@ dependencies = [
     'toolz >= 0.12.1',
     'construct >= 2.10.70',
     'blessed >= 1.20.0',
-    'platformdirs >= 4.2.2',
+    'platformdirs >= 4.3.3',
     'metadict >= 0.1.3']
 
 import setuptools
