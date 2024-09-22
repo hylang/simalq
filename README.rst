@@ -78,6 +78,7 @@ Version history
 
 This section lists the most important user-visible changes in each release. Typically, saved games for each version *aren't* compatible with other versions, but release numbers marked with an asterisk (*) should be compatible with saved games from the previous release. Unless making a backward-compatible upgrade of this kind, you should delete all your saved games before upgrading the game.
 
+- 1.0.2* (2024-09-22): Largely internal changes.
 - 1.0.1* (2024-05-20): Largely internal changes.
 - 1.0.0 (2024-03-01): Various improvements to the display.
 - 0.6.0 (2024-02-19): The IQ quest BoneQuest is now fully playable.
