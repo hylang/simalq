@@ -1,6 +1,6 @@
 dependencies = [
-    'hy == 0.29.0',
-    'hyrule == 0.6.0',
+    'hy >= 1',
+    'hyrule >= 0.7.0',
     'toolz >= 0.12.1',
     'construct >= 2.10.70',
     'blessed >= 1.20.0',
