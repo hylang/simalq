@@ -824,12 +824,12 @@
 
 
 (defn test-archmage []
+
   (init [:tiles [
     "archmage"
     'floor
     "cloak of invisibility"
     "cloak of invisibility"]])
-
   (mv-player 2 0)
   (assert (= G.player.hp 100))
   ; The shot of an archmage can disenchant, in which case it does no
@@ -847,4 +847,21 @@
   (set-square 'E "archmage")
   (wait)
   (assert (.player-has? StatusEffect.Ivis))
-  (assert (= G.player.hp 86)))
+  (assert (= G.player.hp 86))
+
+  ; Test for a bug where a diagonally blocked but adjacent archmage
+  ; didn't disenchant.
+  (init [
+    :map "
+       ██W
+       . ██
+       ! ██
+       @ ██"
+    :map-marks {
+      "W " "archmage"
+      "! " "cloak of invisibility"}])
+  (wk 'N)
+  (assert (.player-has? StatusEffect.Ivis))
+  (wk 'N)
+  (assert (not (.player-has? StatusEffect.Ivis)))
+  (assert (= G.player.hp 100)))

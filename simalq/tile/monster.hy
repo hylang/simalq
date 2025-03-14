@@ -3,7 +3,7 @@
 ;; --------------------------------------------------------------
 
 (require
-  hyrule [unless do-n list-n defmacro-kwargs]
+  hyrule [unless do-n list-n defmacro-kwargs case]
   simalq.macros [field-defaults pop-integer-part defmeth]
   simalq.tile [deftile])
 (import
@@ -77,6 +77,11 @@
         ; smell your fear.
       (not @sees-invisible)))
 
+  (setv special-melee None)
+    ; A method to do a special effect instead of damage for a melee attack.
+  (setv special-shot None)
+    ; Likewise for shots.
+
   (defmeth try-to-attack-player [[dry-run F] [shots-ignore-obstacles F] [pos None]]
     "Try to melee or shoot the player, if the monster can. Return true
     if it succeeded. If `dry-run` is true, the attack isn't actually
@@ -95,14 +100,14 @@
 
     ; Try a melee attack first.
     (when (and
-        @damage-melee
+        (or @damage-melee @special-melee)
         (adjacent? pos G.player.pos)
         (in (get (walkability pos d :monster? T) 1)
           ['bump 'walk]))
       (setv attack 'melee))
 
     ; Otherwise, try a ranged attack.
-    (when (and (not attack) @damage-shot)
+    (when (and (not attack) (or @damage-shot @special-shot))
       (for [target (ray :pos pos :direction d :length
           (min (or @shot-range Inf) G.rules.reality-bubble-size))]
         (when (= target G.player.pos)
@@ -115,16 +120,28 @@
               (not shots-ignore-obstacles)))))
           (break))))
 
-    ; If we can't attack, bail out.
-    (unless attack
-      (return F))
-
-    ; Execute the attack.
+    ; Execute the attack (if we have one).
     (when dry-run
-      (return T))
-    (.damage G.player :attacker @
-      (@damage-by-hp (if (= attack 'shot) @damage-shot @damage-melee))
-      (if (= attack 'shot) MonsterShot MonsterMelee))
+      (return (bool attack)))
+    (setv special (case attack
+      'melee @special-melee
+      'shot @special-shot))
+    (setv damage (case attack
+      'melee @damage-melee
+      'shot @damage-shot))
+    (cond
+      (and special (special))
+        ; Make a special attack. (The effect has already happened, so
+        ; just play an animation.)
+        (.animate-hit G.player @ "  " :special-color? T)
+      damage
+        ; Make a regular attack.
+        (.damage G.player :attacker @
+          (@damage-by-hp damage)
+          (if (= attack 'shot) MonsterShot MonsterMelee))
+      True
+        ; We don't actually have a usable attack. Bail out.
+        (return F))
     (when @kamikaze
       (@rm-from-map))
     T)
@@ -142,10 +159,12 @@
     (.info-bullets (super)
       (when @damage-melee
         #("Melee damage" (damage-array @damage-melee)))
+      (@dod "Melee special attack" 'special-melee Monster)
       (when @damage-shot
         #("Shot damage" (damage-array @damage-shot)))
       (when @shot-range
         #("Shot range" @shot-range))
+      (@dod "Shot special attack" 'special-shot Monster)
       (when @kamikaze
         #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
       (when @sees-invisible
@@ -811,14 +830,9 @@
   :damage-shot 12
   :sees-invisible T
 
-  :act (meth []
-    (doc (.format "Disenchant — If it's not adjacent but has line of effect to you, the monster disenchants you, removing the first beneficial status effect that you have from the following list: {}. Otherwise, it behaves per `Approach`."
-      (.join ", " (gfor  e (StatusEffect.disenchantable)  e.name))))
-    (if (and
-        (not (adjacent? @pos G.player.pos))
-        (@try-to-attack-player :dry-run T)
-        (StatusEffect.disenchant-player))
-      (.animate-hit G.player @ "  " :special-color? T)
-      (@approach)))
+  :special-shot (meth []
+     (doc (.format "If possible, removes the first beneficial status effect that you have from the following list, instead of doing damage: {}."
+       (.join ", " (gfor  e (StatusEffect.disenchantable)  e.name))))
+     (StatusEffect.disenchant-player))
 
   :flavor "A professor emeritus whose killer instincts have been honed by decades of publishing and not perishing. His canny eye can detect the least visible academic politics, and his mastery of grant-review panels has bought him the reagents for powerful spells. But even with the best health insurance in the land, he's found that aging has taken its toll: he can no longer cane the young folk with the vigor of his early years.")
