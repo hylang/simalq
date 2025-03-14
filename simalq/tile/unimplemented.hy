@@ -21,7 +21,6 @@
     [129 "archdevil"]
     [130 "exit_mobile"]
     [132 "golem"]
-    [134 "siren"]
     [152 "random_gate"]
     [164 "cyclops"]
     [165 "dark_prince"]

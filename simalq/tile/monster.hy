@@ -836,3 +836,28 @@
      (StatusEffect.disenchant-player))
 
   :flavor "A professor emeritus whose killer instincts have been honed by decades of publishing and not perishing. His canny eye can detect the least visible academic politics, and his mastery of grant-review panels has bought him the reagents for powerful spells. But even with the best health insurance in the land, he's found that aging has taken its toll: he can no longer cane the young folk with the vigor of his early years.")
+
+
+(deftile "m " "a siren" Approacher
+  :iq-ix 134
+  :destruction-points 75
+
+  :field-defaults (dict
+    :shot-power (f/ 0))
+  :mutable-fields #("shot_power")
+  :info-bullets (meth []
+    (.info-bullets (super)
+      #("Shot power" @shot-power)))
+
+  :damage-melee 5
+  :!shot-frequency (f/ 1 4)
+
+  :special-shot (meth []
+     (doc f"If the monster can shoot at you and you're not already paralyzed, it gains {@shot-frequency} shot power. If this is ≥1, it can subtract 1 to paralyze you for {G.rules.paralysis-duration} turns.")
+     (unless (.player-has? StatusEffect.Para)
+       (+= @shot-power @shot-frequency)
+       (when (pop-integer-part @shot-power)
+         (.add StatusEffect.Para G.rules.paralysis-duration)
+         T)))
+
+  :flavor "This mermaid is all giggles and smiles, but she's obviously trying to kill you. She sings an enchanted song that can briefly enrapture you, holding you in place in a momentary crisis of conscience. The words go like this: \"Oh please, kind sir, spare me. Oh please, sir, get me back to the water. Let me live, oh let me live.\" Pretty rude of her to misgender you like that.\n\n    Hey guys, did you know that…")

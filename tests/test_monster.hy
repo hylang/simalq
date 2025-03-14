@@ -865,3 +865,35 @@
   (wk 'N)
   (assert (not (.player-has? StatusEffect.Ivis)))
   (assert (= G.player.hp 100)))
+
+
+(defn test-siren []
+  (init [:tiles
+    (+ (* ['floor] 10) ["siren"])])
+  (setv G.rules.reality-bubble-size 20)
+
+  ; The siren needs to build up shot power before it can paralyze.
+  (assert-at [11 0] "siren")
+  (wait 3)
+  (assert (not (.player-has? StatusEffect.Para)))
+  (assert-at [8 0] "siren")
+  (wait)
+  (assert (.player-has? StatusEffect.Para))
+  (assert-at [8 0] "siren")
+  (wait 2)
+  (assert-at [6 0] "siren")
+  (wait 3)
+  (assert (not (.player-has? StatusEffect.Para)))
+  (assert-at [3 0] "siren")
+  (wait)
+  (assert (.player-has? StatusEffect.Para))
+  (assert-at [3 0] "siren")
+  (wait 2)
+  (assert-at [1 0] "siren")
+  (assert (not (.player-has? StatusEffect.Para)))
+  (assert (= G.player.hp 100))
+  ; Up close, sirens use an ordinary melee attack.
+  (wait)
+  (assert-at [1 0] "siren")
+  (assert (not (.player-has? StatusEffect.Para)))
+  (assert (= G.player.hp 95)))
