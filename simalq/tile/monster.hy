@@ -13,7 +13,7 @@
   hyrule [thru]
   toolz [unique]
   simalq.util [DamageType StatusEffect next-in-cycle mixed-number]
-  simalq.geometry [Direction at dist adjacent? dir-to turn-and-pos-seed ray]
+  simalq.geometry [Direction at dist adjacent? adj-or-eq? dir-to turn-and-pos-seed ray]
   simalq.game-state [G]
   simalq.tile [Tile Actor Damageable]
   simalq.tile.scenery [Scenery walkability can-occupy?])
@@ -72,7 +72,7 @@
   (defmeth player-invisible-to? [[mon-pos None]]
     (and
       (.player-has? StatusEffect.Ivis)
-      (not (adjacent? (or mon-pos @pos) G.player.pos))
+      (not (adj-or-eq? (or mon-pos @pos) G.player.pos))
         ; Invisibility has no effect on adjacent monsters. They can
         ; smell your fear.
       (not @sees-invisible)))

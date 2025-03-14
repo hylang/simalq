@@ -160,6 +160,9 @@
 (defn adjacent? [p1 p2]
   (= (dist p1 p2) 1))
 
+(defn adj-or-eq? [p1 p2]
+  (<= (dist p1 p2) 1))
+
 (defn dist [p1 p2]
   "Chebyshev distance as the crow flies between the given positions,
   accounting for the possibilty of wrapping."
