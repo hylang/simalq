@@ -216,6 +216,7 @@
 
 
 (defn test-cloak-of-invisibility []
+
   (init [
     :map "
       . d . . .
@@ -225,7 +226,6 @@
       . o . . ."
     :map-marks {
       "! " "cloak of invisibility"}])
-
   (assert (= G.player.hp 100))
   ; Get the cloak. Now that we're invisible, the orc can't approach
   ; and the devil can't shoot. (Nor can the imp flee, and it's too
@@ -242,7 +242,20 @@
   ; immobile.
   (wk 'SW)
   (assert (= G.player.hp 97))
-  (assert-at [1 4] "devil"))
+  (assert-at [1 4] "devil")
+
+  ; Contra IQ, monsters can still shoot an invisible Tris so long as
+  ; they're adjacent.
+  (init [
+    :map "
+       ██d
+       . ██
+       ! ██
+       @ ██"
+    :map-marks {
+      "! " "cloak of invisibility"}])
+  (wk 'N 2)
+  (assert (= G.player.hp 90)))
 
 
 (defn test-potion-of-speed []
