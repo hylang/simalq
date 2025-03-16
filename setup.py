@@ -14,11 +14,11 @@ setuptools.setup(
     python_requires = '>= 3.10',
     install_requires = [
         'hy >= 1',
-        'hyrule >= 0.7.0',
-        'toolz >= 0.12.1',
+        'hyrule >= 1',
+        'toolz >= 1',
         'construct >= 2.10.70',
         'blessed >= 1.20.0',
-        'platformdirs >= 4.3.3',
+        'platformdirs >= 4.3.6',
         'metadict >= 0.1.3'],
     packages = setuptools.find_packages(),
     package_data = dict(simalq = [
