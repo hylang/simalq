@@ -443,7 +443,7 @@
     (defn t [] (Pos G.map 5 6))
 
     (mk-tile [1 0] [stem :target (t)])
-    (assert-full-name [1 0] f"a {stem} (dest <Pos 5,6>)")
+    (assert-full-name [1 0] f"a {stem} (target <Pos 5,6>)")
     (set-square (t) "orc" "pile of gold" "exit")
     (assert (and (= G.turn-n 0) (= G.player.pos (Pos G.map 0 0))))
     ; Walking into the gate warps us to the target square, but

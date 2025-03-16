@@ -142,6 +142,19 @@
     passwallable T
     wand-destructible T))
 
+(defclass TargetedScenery [Scenery]
+
+  (setv
+    field-defaults (dict
+      :target None)
+    fields #("target"))
+
+  (defmeth [classmethod] read-tile-extras [mk-pos v1 v2]
+    (dict :target (mk-pos #(v1 v2))))
+
+  (defmeth suffix-dict []
+    (dict :target @target)))
+
 ;; --------------------------------------------------------------
 ;; * Basic scenery
 ;; --------------------------------------------------------------
@@ -285,18 +298,10 @@
 
   :flavor "This massive slab of steel will certainly not be opened with a sad little bargain-basement skeleton key. Your best bet is looking for a remote switch of some kind.")
 
-(deftile "+|" "a metal-door control" Scenery
+(deftile "+|" "a metal-door control" TargetedScenery
   :iq-ix 168
-  :field-defaults (dict
-    :target None)
-  :fields #("target")
 
   :blocks-move T
-
-  :read-tile-extras (classmethod (fn [cls mk-pos v1 v2]
-    (dict :target (mk-pos #(v1 v2)))))
-  :suffix-dict (meth []
-    (dict :target @target))
 
   :hook-player-bump (meth [origin]
     (doc f"If there's a metal door at {@target}, it's destroyed. Otherwise, everything on the square is destroyed and a metal door is created there.")
@@ -640,19 +645,10 @@
 ;; ** Gates
 ;; --------------------------------------------------------------
 
-(defclass Gate [Scenery]
-  (setv field-defaults (dict
-    :target None))
-  (setv fields #("target"))
-
+(defclass Gate [TargetedScenery]
   (setv blocks-monster T)
   (setv one-shot? F)
 
-  (defn [classmethod] read-tile-extras [cls mk-pos v1 v2]
-    (dict :target (mk-pos #(v1 v2))))
-
-  (defmeth suffix-dict []
-    (dict :dest @target))
   (defmeth hook-player-walked-into []
     (doc (+
       f"Teleports you to {@target}. Anything already there is unaffected."
