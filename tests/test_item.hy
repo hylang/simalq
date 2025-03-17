@@ -3,7 +3,7 @@
   tests.lib [cant])
 (import
   fractions [Fraction :as f/]
-  tests.lib [init init-boot-camp assert-at assert-player-at assert-hp assert-textmap set-square mv-player wk shoot wait use-item top]
+  tests.lib [init init-boot-camp assert-at assert-player-at assert-hp assert-textmap assert-full-name set-square mv-player wk shoot wait use-item top]
   simalq.geometry [Pos Direction at]
   simalq.game-state [G]
   simalq.util [StatusEffect]
@@ -485,6 +485,7 @@
     (assert-at 'NE #* new)
     (assert-at 'E #* old #* new))
   (use-item "wand of shielding")
+  (assert-full-name 'N "a magical energy shield (time left 11)")
   (check 3 T T)
   ; Shields protect for 12 turns, so the first set (created on turn 0,
   ; and therefore providing its first turn of protection on turn 0)

@@ -1024,6 +1024,9 @@
   :blocks-move F :blocks-monster T
   :blocks-player-shots F :blocks-monster-shots T
 
+  :suffix-dict (meth []
+    {"time left" @time-remaining})
+
   :poshooked-callback (meth []
     (-= @time-remaining 1)
     (unless @time-remaining
