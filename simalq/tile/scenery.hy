@@ -360,15 +360,10 @@
 ;; * Exits
 ;; --------------------------------------------------------------
 
-(deftile :name "an exit" :superc Scenery
-  :field-defaults (dict
-    :level-n None)
-  :color-bg 'lime
-  :iq-ix [
-    7   ; normal exit
-    94] ; special exit
+(defclass Exit [Scenery]
+  (setv color-bg 'lime)
 
-  :mapsym (property-meth []
+  (defmeth [property] mapsym []
     (setv n (- (@effective-level-n) G.level-n))
     (cond
       (< n -1) "<<"
@@ -377,7 +372,10 @@
       (= n 1)  "> "
       True     ">>"))
 
-  :suffix-dict (meth []
+  (defmeth effective-level-n []
+    G.level.next-level)
+
+  (defmeth suffix-dict []
     {
       (.format "{}to" (if (<= (@effective-level-n) G.level-n)
         "back "
@@ -386,23 +384,34 @@
         "victory"
         f"level {(@effective-level-n)}")})
 
-  :blocks-monster T
-  :blocks-player-shots F :blocks-monster-shots F
+  (setv
+    blocks-monster T
+    blocks-player-shots F  blocks-monster-shots F)
 
-  :read-tile-extras (classmethod (fn [cls mk-pos v1 v2]
-    (dict :level-n v2)))
-
-  :!effective-level-n (meth []
-    (if (is @level-n None) G.level.next-level @level-n))
-
-  :hook-player-walked-into (meth []
+  (defmeth hook-player-walked-into []
     (doc f"Takes you to dungeon level {(@effective-level-n)}. If you're already on that level, it's refreshed. If there is no such level, you win the quest.")
 
     (hy.I.simalq/quest.start-level (@effective-level-n))
     (setv G.player.just-exited T)
-    True)
+    True))
+
+(deftile :name "an exit" :superc Exit
+  :iq-ix 7
 
   :flavor "Get me outta here.")
+
+(deftile :name "a special exit" :superc Exit
+  :iq-ix 94
+  :field-defaults (dict
+    :level-n 0)
+
+  :read-tile-extras (classmethod (fn [cls mk-pos v1 v2]
+    (dict :level-n v2)))
+
+  :effective-level-n (meth []
+    @level-n)
+
+  :flavor "What's so special about it? Well, it might take you to a different level from a normal exit. Of course, all exits are special; some are just more special than others.")
 
 ;; --------------------------------------------------------------
 ;; * Disappearing walls

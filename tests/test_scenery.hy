@@ -204,10 +204,10 @@
     (init
       [
         :map "> @ >1"
-        :map-marks {">1" ["exit" :level-n 1]}]
+        :map-marks {">1" ["special exit" :level-n 1]}]
       [])
     (assert-full-name 'W "an exit (to level 2)")
-    (assert-full-name 'E "an exit (back to level 1)")
+    (assert-full-name 'E "a special exit (back to level 1)")
     (wk (if use-special-exit? 'E 'W))
     (assert (= G.level-n (if use-special-exit? 1 2)))))
 

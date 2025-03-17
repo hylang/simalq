@@ -229,10 +229,15 @@
 ;; ** `deftile`
 ;; --------------------------------------------------------------
 
-(defmacro-kwargs deftile [mapsym name superc #** kwargs]
+(defmacro-kwargs deftile [[mapsym None] [name None] [superc None] #** kwargs]
   "Declare a new concrete and final tile type. Superclasses of other
   tiles not meant to themselves be instantiated should be declared
   with `defclass`."
+
+  ; Although `mapsym` is first of the three named arguments, it's the
+  ; one that's actually optional.
+  (assert (is-not name None))
+  (assert (is-not superc None))
 
   (setv superc (if (isinstance superc hy.models.List)
     superc
@@ -242,6 +247,8 @@
   (setv (get kwargs "stem") (re.sub r"\A(a|an|the|some) "
     (fn [m] (setv (get kwargs "article") (.group m 1)) "")
     name))
+  (when mapsym
+    (setv (get kwargs "mapsym") mapsym))
 
   (defn un! [x]
     (.removeprefix x "hyx_Xexclamation_markX"))
@@ -260,7 +267,7 @@
       :if (!= k (un! k))
       (un! k))))
     ~@(gfor
-      [k v] (.items (dict :mapsym mapsym #** kwargs))
+      [k v] (.items kwargs)
       :setv k (un! k)
       ; Treat `(meth …)` and `(property-meth …)` forms specially.
       (cond

@@ -240,9 +240,8 @@
   ; A normal exit
   (setv [t] (get m 10 8))
   (assert (= t.stem "exit"))
-  (assert (is t.level-n None))
 
   ; A special exit
   (setv [t] (get m 7 15))
-  (assert (= t.stem "exit"))
+  (assert (= t.stem "special exit"))
   (assert (= t.level-n 15)))
