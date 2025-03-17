@@ -78,7 +78,7 @@ quest definitions from other files in this directory."
     [title None]
     [next-level None]
     [poison-intensity (Fraction 0)]
-    [time-limit None] [exit-speed None] [moving-exit-start None]]
+    [time-limit None] [exit-delay None] [timed-exit-start None]]
   (if map
     (setv [m player-start] (parse-text-map map map-marks wrap-x wrap-y))
     (do
@@ -95,8 +95,8 @@ quest definitions from other files in this directory."
     :player-start (Pos m #* player-start)
     :poison-intensity poison-intensity
     :time-limit time-limit
-    :exit-speed exit-speed
-    :moving-exit-start moving-exit-start))
+    :exit-delay exit-delay
+    :timed-exit-start timed-exit-start))
 
 (defn parse-text-map [text [map-marks #()] [wrap-x False] [wrap-y False]]
   (setv text (dedent

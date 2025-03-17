@@ -45,8 +45,8 @@
       l.next-level 2
       l.poison-intensity (f/ 1 5)
       l.time-limit None
-      l.exit-speed 10
-      l.moving-exit-start None
+      l.exit-delay 10
+      l.timed-exit-start None
       l.map.wrap-x False
       l.map.wrap-y False])]
     (assert (= got expected)))

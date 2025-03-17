@@ -112,10 +112,10 @@
     :light Int16ub
     :poison-interval Int16ub
     :time-limit Int16ub
-    :exit-speed Int16ub
+    :exit-delay Int16ub
     (Const (bytes [0]))
     :wall-image Byte
-    :moving-exit-start iq-pos
+    :timed-exit-start iq-pos
     :map (Bytes (* this.width this.height))
     :tile-extras (Array this.n-tile-extras (kw-struct
       :pos iq-pos
@@ -246,8 +246,8 @@
           (f/ 0)
           (f/ 1 l.poison-interval))
         :time-limit (or l.time-limit None)
-        :exit-speed l.exit-speed
-        :moving-exit-start (mk-pos l.moving-exit-start)
+        :exit-delay l.exit-delay
+        :timed-exit-start (mk-pos l.timed-exit-start)
         :map m))))))
 
 ;; --------------------------------------------------------------

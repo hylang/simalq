@@ -55,7 +55,7 @@
       ; A `fraction.Fraction`, the dose of ambient poison per turn.
     time-limit
       ; An integer (counting in turns), or `None`.
-    exit-speed moving-exit-start
+    exit-delay timed-exit-start
       ; These fields would be used to implement moving exits, but
       ; moving exits are not yet implemented, so they're ignored.
     map])
