@@ -78,7 +78,7 @@
   :destroy (meth [was-instakill?]
     (raise (GameOverException 'dead)))
 
-  :!animate-hit (meth [attacker label [special-color? F] [show-ivln? T]]
+  :$animate-hit (meth [attacker label [special-color? F] [show-ivln? T]]
     "Use `flash-map` to indicate that the player's been hit."
     (flash-map
       (if special-color?

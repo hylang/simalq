@@ -528,7 +528,7 @@
   :color-bg #('black None)
   :iq-ix 188
 
-  :!radius 3
+  :$radius 3
 
   :act (meth []
     (doc f"Fade — If you're within {@radius} squares, the tile is destroyed.")
@@ -943,7 +943,7 @@
   :color 'magenta
   :iq-ix 201
 
-  :!duration 12
+  :$duration 12
   :hook-player-walked-into (meth []
     (doc f"Makes you weak for {@duration} more turns, reducing the damage of your sword strikes by {G.rules.player-melee-damage-weakness-reduction}.")
     (.add StatusEffect.Weak @duration))

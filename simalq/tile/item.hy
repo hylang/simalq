@@ -199,7 +199,7 @@
   :eat-messages #("You drink a jar of poison. It tastes pretty bad.")
 
   ; Define the shot effect in terms of poison-gas bombs.
-  :!pb (meth []
+  :$pb (meth []
     (get Tile.types "poison-gas bomb"))
   :hook-player-shot (meth []
     (doc (.dynadoc (. (@pb) use) (@pb)))
@@ -232,7 +232,7 @@
   :iq-ix 27
   :acquirement-points 100
 
-  :!n-arrows 10
+  :$n-arrows 10
   :pick-up (meth []
     (doc f"Gives you {@n-arrows} magic arrows. Magic arrows are fired in place of regular arrows. They do {G.rules.player-shot-damage-magic} damage, and hurt some monsters that are immune to mundane arrows. If a magic arrow destroys a monster or object, it continues on its path and can keep doing damage.")
     (+= G.player.magic-arrows @n-arrows))
@@ -245,7 +245,7 @@
     ; to get a non-emoji hourglass.
   :acquirement-points 0
 
-  :!time-bonus 25
+  :$time-bonus 25
   :pick-up (meth []
     (doc f"Adds {@time-bonus} turns to the current time limit.")
     (+= G.time-left @time-bonus))
@@ -498,8 +498,8 @@
   :iq-ix 156
   :acquirement-points 250
 
-  :!mon-damage #(Inf Inf Inf)
-  :!player-damage 25
+  :$mon-damage #(Inf Inf Inf)
+  :$player-damage 25
   :use (meth [target]
     (doc f"Kills all monsters in {(burst-size (len @mon-damage))}, except those immune to death magic. If you're in the burst, you take {@player-damage} damage.")
     (burst-damage target :damage-type DamageType.DeathMagic
@@ -527,7 +527,7 @@
   :iq-ix 154
   :acquirement-points 100
 
-  :!mon-damage #(2 1 1)
+  :$mon-damage #(2 1 1)
   :use (meth [target]
     (doc f"Does {(get @mon-damage 1)} fire damage to all monsters in {(burst-size (len @mon-damage))}, except at the center square, where they take {(get @mon-damage 0)} fire damage. Furthermore, all webs in the burst are destroyed. You take no damage.")
     (for [
@@ -626,12 +626,12 @@
   :iq-ix 121
   :acquirement-points 150
 
-  :!player-damage 20
-  :!mon-damage 3
-  :!use-burst-size 3
-  :!shot-burst-size 2
+  :$player-damage 20
+  :$mon-damage 3
+  :$use-burst-size 3
+  :$shot-burst-size 2
 
-  :!bomb-burst (meth [pos size]
+  :$bomb-burst (meth [pos size]
     (burst-damage pos :damage-type DamageType.Poison
       :amount (* [@mon-damage] size)
       :color 'moss-green
@@ -654,13 +654,13 @@
   :iq-ix 157
   :acquirement-points 200
 
-  :!quake-damage-monster 3
-  :!quake-damage-wall 2
-  :!new-cracked-wall-starting-hp 4
-  :!use-burst-size 2
-  :!shot-burst-size 1
+  :$quake-damage-monster 3
+  :$quake-damage-wall 2
+  :$new-cracked-wall-starting-hp 4
+  :$use-burst-size 2
+  :$shot-burst-size 1
 
-  :!bomb-burst (meth [target size]
+  :$bomb-burst (meth [target size]
     (for [
         p (burst-damage target :damage-type DamageType.Fire
           :amount (* [@quake-damage-monster] (+ size 1))

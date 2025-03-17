@@ -544,8 +544,8 @@
       #("Shot power" @shot-power)))
 
   :damage-shot #(1 2 3)
-  :!flee-range 2
-  :!shot-frequency (f/ 4 5)
+  :$flee-range 2
+  :$shot-frequency (f/ 4 5)
 
   :act (meth []
     (doc f"Coward — If the monster is within {@flee-range} squares of you, it flees (per `Approach` in reverse). Otherwise, if it has line of sight to you (ignoring all obstacles), it adds {@shot-frequency} to its shot power. If this is ≥1, it subtracts 1 to shoot you. Otherwise, it wanders (per `Wander`).")
@@ -628,7 +628,7 @@
   :damage-shot 10
   :shot-range 1
   :kamikaze T
-  :!disturbance-increment (f/ 1 5)
+  :$disturbance-increment (f/ 1 5)
 
   :act (meth []
     (doc f"Float — If you're adjacent, increases your floater disturbance by {@disturbance-increment}. If your floater disturbance reaches 1, it's cleared and the monster attacks. Otherwise, the monster wanders per `Wander`.")
@@ -655,7 +655,7 @@
 
   :immune #(MundaneArrow MagicArrow)
   :damage-melee 6
-  :!summon-frequency (f/ 1 10)
+  :$summon-frequency (f/ 1 10)
 
   :act (meth []
     (doc f"Blob – If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {@summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
@@ -704,7 +704,7 @@
   :immune #(PlayerMelee MundaneArrow MagicArrow)
   :damage-melee 2
 
-  :!summon-frequency (f/ 1 5)
+  :$summon-frequency (f/ 1 5)
 
   :act (meth []
     (doc f"Gunky — If the monster can attack, it does. Otherwise, it builds up {@summon-frequency} summoning power per turn, which it can use to summon gunk seeds per `Generate`.")
@@ -741,7 +741,7 @@
   :destruction-points 50
 
   :damage-melee 10
-  :!approach-range 2
+  :$approach-range 2
 
   :act (meth []
     (doc f"Webcrawl — If the monster is within {@approach-range} squares of you, it approaches (per `Approach`). Otherwise, it wanders (per `Wander`). In both cases, it can move through webs, and it creates a web on its square afterwards if no web is there already.")
@@ -793,7 +793,7 @@
       #("Shot power" @shot-power)))
 
   :damage-shot 10
-  :!shot-frequency (f/ 3 4)
+  :$shot-frequency (f/ 3 4)
 
   :act (meth []
     (doc f"Teleport Attack — If the monster has line of sight to you, it adds {@shot-frequency} to its shot power. If this is ≥1, it subtracts 1 to shoot you. If it doesn't shoot you, it tries to teleport into line of sight, preferring to be as close as possible to you without being adjacent. Its destination must lie in the reality bubble.")
@@ -850,7 +850,7 @@
       #("Shot power" @shot-power)))
 
   :damage-melee 5
-  :!shot-frequency (f/ 1 4)
+  :$shot-frequency (f/ 1 4)
 
   :special-shot (meth []
      (doc f"If the monster can shoot at you and you're not already paralyzed, it gains {@shot-frequency} shot power. If this is ≥1, it can subtract 1 to paralyze you for {G.rules.paralysis-duration} turns.")

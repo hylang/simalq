@@ -250,8 +250,8 @@
   (when mapsym
     (setv (get kwargs "mapsym") mapsym))
 
-  (defn un! [x]
-    (.removeprefix x "hyx_Xexclamation_markX"))
+  (defn un$ [x]
+    (.removeprefix x "hyx_Xdollar_signX"))
 
   `(defclass
     [hy.I.simalq/tile.tiletype]
@@ -259,16 +259,16 @@
       c (get kwargs "stem")
       (if (or (= c " ") (in c hy.reader.HyReader.NON-IDENT)) "_" c)))))
     ~superc
-    ; Attributes whose names begin with a exclamation point, as in
-    ; `:!length 5`, are considered to be newly declared and so
+    ; Attributes whose names begin with a dollar sign, as in
+    ; `:$length 5`, are considered to be newly declared and so
     ; exempted from the unknown-attributes check.
     (setv declare ~(tuple (gfor
       k (.keys kwargs)
-      :if (!= k (un! k))
-      (un! k))))
+      :if (!= k (un$ k))
+      (un$ k))))
     ~@(gfor
       [k v] (.items kwargs)
-      :setv k (un! k)
+      :setv k (un$ k)
       ; Treat `(meth …)` and `(property-meth …)` forms specially.
       (cond
         (and (isinstance v hy.models.Expression) (= (get v 0) 'meth))
