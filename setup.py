@@ -1,12 +1,3 @@
-dependencies = [
-    'hy >= 1',
-    'hyrule >= 0.7.0',
-    'toolz >= 0.12.1',
-    'construct >= 2.10.70',
-    'blessed >= 1.20.0',
-    'platformdirs >= 4.3.3',
-    'metadict >= 0.1.3']
-
 import setuptools
 from pathlib import Path
 
@@ -21,7 +12,14 @@ setuptools.setup(
         'Homepage': 'http://hylang.org/simalq',
         'Source Code': 'https://github.com/hylang/simalq'},
     python_requires = '>= 3.10',
-    install_requires = dependencies,
+    install_requires = [
+        'hy >= 1',
+        'hyrule >= 0.7.0',
+        'toolz >= 0.12.1',
+        'construct >= 2.10.70',
+        'blessed >= 1.20.0',
+        'platformdirs >= 4.3.3',
+        'metadict >= 0.1.3'],
     packages = setuptools.find_packages(),
     package_data = dict(simalq = [
         str(p.relative_to('simalq'))
