@@ -193,9 +193,9 @@
           (and (= name "Delirium")  (= level-n  4))  1
           True                                       0)))
       :setv mk-pos (fn [xy]
-        "Convert from IQ coordinates (1-based indices, y = 1 on top, 0
-        means missing) to SQ coordinates (0-based indices with y = 0 on
-        bottom, None means missing)."
+        "Convert from IQ coordinates (1-based, y = 1 on top, 0 means
+        missing) to SQ coordinates (0-based, y = 0 on bottom, None
+        means missing)."
         (if (and #* xy)
           (Pos m (- (get xy 0) 1) (- m.height (get xy 1)))
           None))
