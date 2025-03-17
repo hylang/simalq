@@ -4,7 +4,7 @@
 (import
   fractions [Fraction :as f/]
   pytest
-  tests.lib [init init-boot-camp locate assert-at assert-hp assert-full-name assert-textmap set-square mv-player assert-player-at wk wait shoot use-item use-cport]
+  tests.lib [init init-boot-camp locate assert-at assert-hp assert-full-name assert-textmap set-square mv-player assert-player-at top wk wait shoot use-item use-cport]
   simalq.util [GameOverException StatusEffect]
   simalq.geometry [at Pos]
   simalq.game-state [G]
@@ -210,6 +210,44 @@
     (assert-full-name 'E "a special exit (back to level 1)")
     (wk (if use-special-exit? 'E 'W))
     (assert (= G.level-n (if use-special-exit? 1 2)))))
+
+
+(defn test-timed-exit []
+
+  (setv e1 [7 9])
+  (setv e2 [8 8])
+  (setv center [7 8])
+
+  (init-boot-camp 10)
+  (assert-full-name e1 "a timed exit (to level 11, time left 5, next at <Pos 8,8>)")
+  (assert-full-name e2 "a timed exit (to level 11, inactive, next at <Pos 7,7>)")
+  ; An inactive exit doesn't take you anywhere.
+  (mv-player #* center)
+  (wk 'E)
+  (assert (= G.level-n 10))
+  (mv-player #* center)
+  (assert (=  (top e1 'deactivates-on-turn) 4))
+  (assert (is (top e2 'deactivates-on-turn) None))
+  ; Eventually, the next exit becomes active.
+  (wait 3)
+  (assert (= G.level-n 10))
+  (assert (=  (top e1 'deactivates-on-turn) 4))
+  (assert (is (top e2 'deactivates-on-turn) None))
+  (wait 1)
+  (assert (= G.level-n 10))
+  (assert (=  (top e1 'deactivates-on-turn) None))
+  (assert (is (top e2 'deactivates-on-turn) 9))
+  (wk 'E)
+  (assert (= G.level-n 11))
+
+  ; If an exit activates while you're standing on it, you
+  ; automatically go through it.
+  (init-boot-camp 10)
+  (mv-player #* e2)
+  (wait 4)
+  (assert (= G.level-n 10))
+  (wait 1)
+  (assert (= G.level-n 11)))
 
 
 (defn test-cracked-wall []

@@ -7,6 +7,7 @@
 (import
   simalq.game-state [G Rules]
   simalq.util [StatusEffect refactor-hp GameOverException]
+  simalq.geometry [at]
   simalq.tile.player [Player]
   copy [deepcopy])
 (setv  T True  F False)
@@ -55,9 +56,10 @@
       ; A `fraction.Fraction`, the dose of ambient poison per turn.
     time-limit
       ; An integer (counting in turns), or `None`.
-    exit-delay timed-exit-start
-      ; These fields would be used to implement moving exits, but
-      ; moving exits are not yet implemented, so they're ignored.
+    exit-delay
+      ; The number of turns each timed exit stays active, or `None`.
+    timed-exit-start
+      ; The `Pos` of the first timed exit to activate, or `None`.
     map])
       ; A `Map`.
 
@@ -78,6 +80,11 @@
       ; the references to `G.level.map` in tiles point to the new map.
     G.time-left G.level.time-limit)
   (.move G.player G.level.player-start)
+  (when G.level.timed-exit-start
+    (for [tile (at G.level.timed-exit-start)
+        :if (= tile.stem "timed exit")]
+      (setv tile.deactivates-on-turn (+ G.turn-n G.level.exit-delay -1))
+      (break)))
   (unless G.states
     ; If we haven't saved any states yet (because the quest just
     ; started), save this as the first state in the history.

@@ -19,7 +19,6 @@
 (do-mac `(do ~@(gfor [iq-ix stem] [
 
     [129 "archdevil"]
-    [130 "exit_mobile"]
     [132 "golem"]
     [152 "random_gate"]
     [164 "cyclops"]

@@ -6,7 +6,7 @@
   fractions [Fraction :as f/]
   hyrule [thru]
   toolz [partition]
-  simalq.geometry [Pos]
+  simalq.geometry [Pos at]
   simalq.un-iq [iq-quest])
 
 
@@ -245,3 +245,32 @@
   (setv [t] (get m 7 15))
   (assert (= t.stem "special exit"))
   (assert (= t.level-n 15)))
+
+
+(defn test-timed-exit []
+  (setv l (. (iq-quest "Boot Camp 2") levels [(- 10 1)]))
+  (assert (= l.timed-exit-start.xy #(7 9)))
+  (assert (= l.exit-delay 5))
+  (setv m l.map.data)
+  (setv [t] (get m 7 9))
+  (assert (= t.deactivates-on-turn None))
+    ; This hasn't been initialized yet, since the level hasn't
+    ; started.
+  (assert (= t.target.xy #(8 8)))
+  (setv [t] (get m 8 8))
+  (assert (= t.deactivates-on-turn None))
+  (assert (= t.target.xy #(7 7))))
+
+
+(defn test-timed-exit-loops []
+  ; Every timed exit in the IQ quests should point to another timed
+  ; exit.
+  (for [
+      q (.values (iq-quest 'all))
+      l q.levels
+      column l.map.data
+      stack column
+      tile stack
+      :if (= tile.stem "timed exit")]
+    (setv [targeted-tile] (at tile.target))
+    (assert (= targeted-tile.stem "timed exit"))))

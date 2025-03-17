@@ -413,6 +413,52 @@
 
   :flavor "What's so special about it? Well, it might take you to a different level from a normal exit. Of course, all exits are special; some are just more special than others.")
 
+(deftile :name "a timed exit" :superc [Exit TargetedScenery EachTurner]
+  :iq-ix 130
+    ; In IQ, this is variously called a "moveable exit", "moving exit",
+    ; "mobile exit", "dormant exit", or "inaccessible exit".
+
+  :field-defaults (dict
+    :deactivates-on-turn None)
+  :mutable-fields #("deactivates_on_turn")
+
+  :color-bg (property-meth []
+    (if (is @deactivates-on-turn None)
+      'pale-green
+      'lime))
+
+  :suffix-dict (meth []
+    {
+      #** (Exit.suffix-dict @)
+      #** (if (is @deactivates-on-turn None)
+        {"inactive" None}
+        {"time left" (- @deactivates-on-turn G.turn-n -1)})
+      "next at" @target})
+
+  :info-bullets (meth []
+    (.info-bullets (super)
+      #("Special effect" f"While active, its timer ticks down. When the timer hits 0, it deactivates, and another timed exit (at {@target}) is activated. If you happen to be standing on the newly activated exit, you'll immediately go through it.")))
+
+  :poshooked-callback (meth []
+    (when (and (= @deactivates-on-turn G.turn-n) @target)
+      (for [tile (at @target) :if (= tile.stem "timed exit")]
+        ; Deactivate this exit.
+        (setv @deactivates-on-turn None)
+        ; Activate the next one.
+        (setv tile.deactivates-on-turn (+ G.turn-n G.level.exit-delay))
+        (when (= tile.pos G.player.pos)
+          ; The player is sitting on the exit while it activated, so it's used
+          ; immediately.
+          (.hook-player-walked-into tile))
+        (break))))
+
+  :hook-player-walked-into (meth []
+    (doc f"Acts as an exit to dungeon level {(@effective-level-n)}, but only if it's currently active. Otherwise, nothing happens.")
+    (when (is-not @deactivates-on-turn None)
+      (.hook-player-walked-into (super))))
+
+  :flavor "A hatch that opens and closes on a schedule, like the big metal shutter of a bodega.")
+
 ;; --------------------------------------------------------------
 ;; * Disappearing walls
 ;; --------------------------------------------------------------

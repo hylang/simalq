@@ -85,7 +85,7 @@
     (+ @name-with-article (if suffix-items
       (.format " ({})" (.join ", " (gfor
         [k v] suffix-items
-        f"{k} {v}")))
+        (if (is v None) k f"{k} {v}"))))
       "")))
 
   (defmeth [classmethod] make [pos stem [stack-ix 0] #** kwargs]
