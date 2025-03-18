@@ -897,3 +897,17 @@
   (assert-at [1 0] "siren")
   (assert (not (.player-has? StatusEffect.Para)))
   (assert (= G.player.hp 95)))
+
+
+(defn test-golem []
+  (init
+    [:tiles ['floor 'floor 'floor "golem"]])
+
+  ; Golems do nothing unless they're within 3 squares of Tris.
+  (assert-at [4 0] "golem")
+  (wk 'N)
+  (wk 'S)
+  (wait 10)
+  (assert-at [4 0] "golem")
+  (wk 'E)
+  (assert-at [3 0] "golem"))

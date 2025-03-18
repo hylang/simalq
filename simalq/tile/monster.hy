@@ -878,4 +878,23 @@
 
   :flavor "This mermaid is all giggles and smiles, but she's obviously trying to kill you. She sings an enchanted song that can briefly enrapture you, holding you in place in a momentary crisis of conscience. The words go like this: \"Oh please, kind sir, spare me. Oh please, sir, get me back to the water. Let me live, oh let me live.\" Pretty rude of her to misgender you like that.\n\n    Hey guys, did you know that…")
 
+
+(deftile "M " "a golem" Approacher
+  :iq-ix 132
+  :destruction-points 75
+
+  :immune #(MundaneArrow Poison)
+  :damage-melee 18
+  :$approach-range 3
+
+  :act (meth []
+    (doc f"Guard — If the monster is within {@approach-range} squares of you, it approaches (per `Approach`). Otherwise, it does nothing.")
+    (when (and
+        (<= (dist G.player.pos @pos) @approach-range)
+        (not (@player-invisible-to?)))
+      (@approach)))
+
+  :flavor "An animated statue with dull senses and unbelievable strength.\n\n    I have a big ol' golem.\n    I made it out of clay.\n    And when it's dry and ready,\n    Oh people I shall slay.")
+
+
 )
