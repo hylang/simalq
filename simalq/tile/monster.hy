@@ -782,6 +782,20 @@
   :flavor "A wretched organic structure, fashioned from fiendish flesh. It twists about to aim its toothy maw, from which it belches flame. It's immobile, but dark magics make it almost invulnerable… almost.")
 
 
+(deftile "W " "a blind mage" Monster
+  :color 'brown
+  :iq-ix 166
+  :destruction-points 75
+
+  :damage-melee 4
+  :damage-shot 8
+    ; Since blind mages don't have their darkness attack from IQ,
+    ; their shots always do damage.
+  :sees-invisible T
+
+  :flavor "An early-career researcher who has lost her powers of vision after countless hours of poring over manuscripts, memoranda, and prospective graduate students' letters of recommendation. She's had to develop acute hearing in order to detect the slightest whisper of new funding opportunities.")
+
+
 (deftile "W " "a teleporting mage" Monster
   :color 'purple
   :iq-ix 186  ; invisible mage

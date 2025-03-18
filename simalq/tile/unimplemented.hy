@@ -23,7 +23,6 @@
     [152 "random_gate"]
     [164 "cyclops"]
     [165 "dark_prince"]
-    [166 "blind_mage"]
     [177 "doppelganger"]
     [178 "magical_barrier_generator"]
     [184 "giant_ant"]
