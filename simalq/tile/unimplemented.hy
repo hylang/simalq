@@ -18,10 +18,8 @@
 
 (do-mac `(do ~@(gfor [iq-ix stem] [
 
-    [129 "archdevil"]
     [152 "random_gate"]
     [164 "cyclops"]
-    [165 "dark_prince"]
     [177 "doppelganger"]
     [178 "magical_barrier_generator"]
     [184 "giant_ant"]
@@ -38,8 +36,7 @@
     [207 "exploding_wall"]
     [208 "wall_making_trap"]
     [209 "snitch"]
-    [210 "dark_king"]
-    [211 "lord_of_the_undead"]]
+    [210 "dark_king"]]
 
   `(deftile "� " ~stem UnimplementedTile
     :iq-ix ~iq-ix))))

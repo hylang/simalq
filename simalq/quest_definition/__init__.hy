@@ -128,6 +128,10 @@ quest definitions from other files in this directory."
         (mk-tile p "wall")
       (= mapsym "> ")
         (mk-tile p "exit")
+      (= mapsym "d ")
+        (mk-tile p "devil")
+      (= mapsym "K ")
+        (mk-tile p "Dark Knight")
       True (do
         (setv types (lfor
           t (.values Tile.types)

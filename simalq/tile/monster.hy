@@ -897,4 +897,85 @@
   :flavor "An animated statue with dull senses and unbelievable strength.\n\n    I have a big ol' golem.\n    I made it out of clay.\n    And when it's dry and ready,\n    Oh people I shall slay.")
 
 
+(defclass Lord [Approacher Summoner]
+
+  (setv
+    summon-frequency NotImplementedError
+    summons NotImplementedError)
+      ; (stem, HP) pairs of monsters that can be summoned.
+
+  (field-defaults
+    summon-i 0)
+  (setv mutable-fields #("summon_i"))
+  (defmeth suffix-dict []
+    (dict
+      #** (.suffix-dict (super))
+     :next (repr (get @summons @summon-i))))
+  (defmeth info-bullets []
+    (.info-bullets (super)
+      #("Summoning frequency" @summon-frequency)
+      #("Summons list" (repr (list @summons)))
+      #("Next summon" (repr (get @summons @summon-i)))))
+
+  (defmeth act []
+    (doc f"Attack or Summon — If the monster can attack, it does. Otherwise, it builds up summoning power, which it can use to summon a monster per `Generate`, drawing the next kind of summoned monster (and its HP) in order from its summons list. If it doesn't summon, it approaches (per `Approach`).")
+    (or
+      (@try-to-attack-player)
+      (and
+        (do
+          (setv [stem hp] (get @summons @summon-i))
+          (@summon :!stem :!hp :frequency @summon-frequency))
+        (do
+          (setv @summon-i (% (+ @summon-i 1) (len @summons)))
+          T))
+      (@approach))))
+
+(deftile "d " "an archdevil" Lord
+  :color 'red
+  :bold T
+  :iq-ix 129
+  :destruction-points 90
+
+  :damage-melee 12
+  :damage-shot 15
+
+  :summon-frequency (f/ 1 4)
+  :summons #(#("devil" 1) #("devil" 2) #("devil" 3))
+
+  :flavor "A bigger, badder devil with a long, pointy pitchfork. His authority puts innumerable rank-and-file devils at his disposal, but he's still not fireproof.\n\n    Please allow me to introduce myself.\n    I'm a man of wealth and taste.\n\n    PROTIP: To defeat the Cyberdemon, shoot at it until it dies.")
+
+(deftile "L " "a Lord of the Undead" Lord
+  :iq-ix 211
+  :destruction-points 225
+
+  :damage-melee 15
+  :damage-shot 5
+    ; As with blind mages, shots always do damage.
+
+  :summon-frequency (f/ 1 2)
+    ; In IQ, Lords of the Undead have a summoning chance of only 1/4,
+    ; but they can summon more than one monster at a time, randomly
+    ; varying from 1 to 3.
+  :summons (tuple (gfor
+    hp [1 2 3]
+    stem ["ghost" "shade"]
+    #(stem hp)))
+
+  :flavor "A rare leathery-winged monster from some dark corner of the world. It can fire magic missiles at you, or call the spirits of the departed to attack you. It is not itself undead, which comes to show that the masses are all too often at the mercy of leaders who have nothing in common with them… something to think about, perhaps, Your Royal Highness?")
+
+(deftile "K " "a Dark Princess" Lord
+  :color 'red
+  :bold T
+  :iq-ix 165
+    ; "Dark Prince" in IQ
+  :destruction-points 125
+
+  :damage-melee 15
+
+  :summon-frequency (f/ 1 5)
+  :summons #(#("Dark Knight" 6))
+
+  :flavor #[[A feudal lord of Dark Knights. Her armor is covered with long spikes, and her massive halberd means business. When she sees you, she cries out "Fight me!". But first, she'd like to soften you up with some of her subordinates.]])
+
+
 )

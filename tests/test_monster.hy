@@ -911,3 +911,43 @@
   (assert-at [4 0] "golem")
   (wk 'E)
   (assert-at [3 0] "golem"))
+
+
+(defn test-lord []
+  "This test effectively covers archdevils and Dark Princes, which are
+  special cases of Lords of the Undead."
+
+  (init [
+    :map "
+       . . .
+       . L .
+       . . .
+       ██████
+       @ ! ."
+    :map-marks {
+      "! " "cloak of invisibility"}])
+        ; We use invisbility so monsters stay immobile.
+  ; A Lord of the Undead can summon every other turn.
+  (wk 'E)
+  (assert-at [1 4] 'floor)
+  (wait 1)
+  (assert-at [1 4] "ghost")
+  ; It summons a 1-HP ghost, then a 1-HP shade, then a 2-HP ghost, and
+  ; so on up to a 3-HP shade, which then cycles back to a 1-HP ghost.
+  ; The summons are placed in the same clockwise order as a generator.
+  (wait (* 2 7))
+  (setv p (Pos G.map 1 3))
+  (for [[direction [stem hp]] (zip
+      Direction.all
+      (hy.I.itertools.cycle [
+        ["ghost" 1] ["shade" 1]
+        ["ghost" 2] ["shade" 2]
+        ["ghost" 3] ["shade" 3]]))]
+    (assert-at (+ p direction) stem)
+    (assert-hp (+ p direction) hp))
+
+  ; Lords don't get to summon while attacking the player.
+  (init [:map "@ L ."])
+  (wait 5)
+  (assert (= G.player.hp (- 100 (* 5 15))))
+  (assert-at [2 0] 'floor))
