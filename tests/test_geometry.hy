@@ -2,7 +2,7 @@
 
 
 (require
-  hyrule [ebranch])
+  hyrule [ebranch pun])
 (import
   copy [deepcopy]
   hyrule [thru]
@@ -11,6 +11,9 @@
     Map Pos Direction ray adjacent? dir-to dist burst
     GeometryError])
 (setv  T True  F False)
+
+
+(pun
 
 
 (defn test-map []
@@ -130,7 +133,7 @@
 (defn test-adjacent? []
   (defn all-adjacencies [[wrap-x F] [wrap-y F]]
     "Get all adjacencies from (0, 0)."
-    (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width 4 :height 5))
+    (setv m (Map.make :!wrap-x :!wrap-y :width 4 :height 5))
     (lfor
       y (reversed (range m.height))
       x (range m.width)
@@ -165,7 +168,7 @@
 (defn test-dir-to []
   (defn all-dirs [[wrap-x F] [wrap-y F]]
     "Get all directions from (1, 1)."
-    (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width 5 :height 6))
+    (setv m (Map.make :!wrap-x :!wrap-y :width 5 :height 6))
     (lfor
       y (reversed (range m.height))
       x (range m.width)
@@ -210,7 +213,7 @@
   (setv d 7)
   (defn all-dists [[wrap-x F] [wrap-y F]]
     "Get all distances from (1, 1)."
-    (setv m (Map.make :wrap-x wrap-x :wrap-y wrap-y :width d :height d))
+    (setv m (Map.make :!wrap-x :!wrap-y :width d :height d))
     (lfor
       y (reversed (range m.height))
       x (range m.width)
@@ -252,8 +255,7 @@
 
 (defn test-burst []
   (for [size [2 6]  exclude-center [F T]  wrap-x [F T]  wrap-y [F T]]
-    (setv m (Map.make :width 5 :height 7
-      :wrap-x wrap-x :wrap-y wrap-y))
+    (setv m (Map.make :!wrap-x :!wrap-y :width 5 :height 7))
     (setv p0 (Pos m 1 1))
     (setv b (tuple (burst p0 size exclude-center)))
     ; A burst shouldn't duplicate positions.
@@ -316,3 +318,6 @@
   (setv m (Map.make :width 20 :height 20 :wrap-x T :wrap-y T))
   (setv b (list (burst (Pos m 4 7) Inf)))
   (assert (= (len b) (* 20 20))))
+
+
+)

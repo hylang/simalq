@@ -3,7 +3,7 @@
 ;; --------------------------------------------------------------
 
 (require
-  hyrule [unless defmacro-kwargs]
+  hyrule [unless defmacro-kwargs pun]
   simalq.macros [field-defaults defmeth])
 (import
   copy [deepcopy]
@@ -321,7 +321,7 @@
     (for [[iq-ix field-value] (.items d)]
       (assert (not-in iq-ix Tile.types-by-iq-ix))
       (setv (get Tile.types-by-iq-ix iq-ix)
-        (dict :cls cls :field field :value field-value))))
+        (pun (dict :!cls :!field :value field-value)))))
 
   ; Update `hy.repr`.
   (hy.repr-register cls (fn [x]
@@ -496,6 +496,5 @@
   simalq.tile.monster [Monster]
   simalq.tile.unimplemented [UnimplementedTile])
 
-(setv Tile.superclasses (do-mac (dfor
-  c '[Scenery Item Monster Player]
-  (str c) c)))
+(setv Tile.superclasses (pun (dict
+  :!Scenery :!Item :!Monster :!Player)))

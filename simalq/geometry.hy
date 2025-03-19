@@ -5,7 +5,7 @@
 ;; --------------------------------------------------------------
 
 (require
-  hyrule [unless do-n]
+  hyrule [unless do-n pun]
   simalq.macros [defdataclass defmeth])
 (import
   itertools [chain]
@@ -125,7 +125,7 @@
       (%= y map.height))
     (unless (and (<= 0 x (- map.width 1)) (<= 0 y (- map.height 1)))
       (raise (GeometryError f"Illegal position: {x}, {y}")))
-    (for [[k v] (.items (dict  :map map  :x x  :y y))]
+    (for [[k v] (.items (pun (dict :!map :!x :!y)))]
       ; Call `object.__setattr__` to bypass `dataclass`'s frozen
       ; checks.
       (object.__setattr__ @ k v)))

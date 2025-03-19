@@ -7,7 +7,7 @@ quest definitions from other files in this directory."
 ;; --------------------------------------------------
 
 (require
-  hyrule [unless])
+  hyrule [unless pun])
 (import
   math [ceil]
   re
@@ -54,14 +54,14 @@ quest definitions from other files in this directory."
     [name "Test Quest"]
     [authors "Mitt Lowporch and Cire Whyhall"]
     [title "Test Quest title"]]
-  (Quest
-    :name name
-    :authors authors
-    :title title
-    :starting-hp starting-hp
+  (pun (Quest
+    :!name
+    :!authors
+    :!title
+    :!starting-hp
     :levels (tuple (gfor
       [i level-args] (enumerate levels)
-      (mk-level :n (+ i 1) #** (kwdict level-args))))))
+      (mk-level :n (+ i 1) #** (kwdict level-args)))))))
 
 (defn mk-level [
   ; Make a level.
@@ -87,16 +87,16 @@ quest definitions from other files in this directory."
         (mk-tile
           (Pos m (+ (get player-start 0) i 1) (get player-start 1))
           tile-spec))))
-  (Level
-    :title title
-    :n n
+  (pun (Level
+    :!title
+    :!n
     :next-level (or next-level (+ n 1))
     :map m
     :player-start (Pos m #* player-start)
-    :poison-intensity poison-intensity
-    :time-limit time-limit
-    :exit-delay exit-delay
-    :timed-exit-start timed-exit-start))
+    :!poison-intensity
+    :!time-limit
+    :!exit-delay
+    :!timed-exit-start)))
 
 (defn parse-text-map [text [map-marks #()] [wrap-x False] [wrap-y False]]
   (setv text (dedent

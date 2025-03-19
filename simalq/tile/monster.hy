@@ -3,7 +3,7 @@
 ;; --------------------------------------------------------------
 
 (require
-  hyrule [unless do-n list-n defmacro-kwargs case]
+  hyrule [unless do-n list-n defmacro-kwargs case pun]
   simalq.macros [field-defaults pop-integer-part defmeth]
   simalq.tile [deftile])
 (import
@@ -18,6 +18,8 @@
   simalq.tile [Tile Actor Damageable]
   simalq.tile.scenery [Scenery walkability can-occupy?])
 (setv  T True  F False)
+
+(pun
 
 ;; --------------------------------------------------------------
 ;; * Declarations
@@ -108,7 +110,7 @@
 
     ; Otherwise, try a ranged attack.
     (when (and (not attack) (or @damage-shot @special-shot))
-      (for [target (ray :pos pos :direction d :length
+      (for [target (ray :!pos :direction d :length
           (min (or @shot-range Inf) G.rules.reality-bubble-size))]
         (when (= target G.player.pos)
           (setv attack 'shot)
@@ -226,9 +228,9 @@
             tile (at intermediate)
             (and (isinstance tile Scenery) tile.superblock))))
           (setx target (+ intermediate d))
-          (can-occupy? target :monster? T :ethereal-to ethereal-to))
+          (can-occupy? target :monster? T :!ethereal-to))
         (do
-          (setv [target wly] (walkability @pos d :monster? T :ethereal-to ethereal-to))
+          (setv [target wly] (walkability @pos d :monster? T :!ethereal-to))
           (= wly 'walk))))
 
     (unless (ok-target)
@@ -282,7 +284,7 @@
     (setv [d @wander-state] (@pseudorandom-dir @wander-state))
     (unless d
       (return))
-    (setv [target wly] (walkability @pos d :monster? T :ethereal-to ethereal-to))
+    (setv [target wly] (walkability @pos d :monster? T :!ethereal-to))
     (unless (= wly 'walk)
       (return))
     (when (> (dist G.player.pos target) G.rules.reality-bubble-size)
@@ -354,7 +356,7 @@
           ; end summoning, wasting the consumed summon power.
           (return)))
       ; We have a target. Place the monster.
-      (@make target stem :hp hp))
+      (@make target stem :!hp))
     T))
 
 ;; --------------------------------------------------------------
@@ -446,8 +448,8 @@
         ; We need `[hp hp]` above to be sure we get a separate variable
         ; for each closure.
         [((get Tile.types "generator")
-          :pos pos
-          :hp hp
+          :!pos
+          :!hp
           :summon-class ~(get (.partition name " ") 2)
           :summon-hp (>> te-v2 5)
           :summon-frequency (get
@@ -760,8 +762,8 @@
 (setv (get Tile.types-by-iq-ix 135) (fn [pos _ te-v2]
   ; Unlike IQ, we represent the spider and its web separately.
   [
-    ((get Tile.types "giant spider") :pos pos :hp te-v2)
-    ((get Tile.types "web") :pos pos)]))
+    ((get Tile.types "giant spider") :!pos :hp te-v2)
+    ((get Tile.types "web") :!pos)]))
 
 
 (deftile "Z " "a turret" Stationary
@@ -861,3 +863,5 @@
          T)))
 
   :flavor "This mermaid is all giggles and smiles, but she's obviously trying to kill you. She sings an enchanted song that can briefly enrapture you, holding you in place in a momentary crisis of conscience. The words go like this: \"Oh please, kind sir, spare me. Oh please, sir, get me back to the water. Let me live, oh let me live.\" Pretty rude of her to misgender you like that.\n\n    Hey guys, did you know that…")
+
+)
