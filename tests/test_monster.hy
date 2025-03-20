@@ -951,3 +951,27 @@
   (wait 5)
   (assert (= G.player.hp (- 100 (* 5 15))))
   (assert-at [2 0] 'floor))
+
+
+(defn test-doppelganger []
+
+  ; Tris takes 5 damage for each point of damage received by a
+  ; doppelganger (ignoring overkill).
+  (init [:tiles ["doppelganger"]])
+  (shoot 'E)
+  (assert (= G.player.hp 95))
+  (init [:tiles ["doppelganger"]])
+  (wk 'E)
+  (assert (= G.player.hp 95))
+  (init [:tiles [["doppelganger" :hp 2]]])
+  (wk 'E)
+  (assert (= G.player.hp 90))
+  (init [:tiles ['floor 'floor "jar of poison" "doppelganger"]])
+  (shoot 'E)
+  (assert (= G.player.hp 95))
+
+  ; Instakills avoid this empathy damage.
+  (init [:tiles ["doppelganger"]])
+  (use-item "wand of death" [3 0])
+  (assert-at 'E 'floor)
+  (assert (= G.player.hp 100)))

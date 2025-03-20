@@ -435,11 +435,14 @@
     (when (or (= amount Inf) (in damage-type @weaknesses))
       (setv instakill? T)
       (setv amount @hp))
+    (setv amount (min amount @hp amount))
+      ; Overkill damage is removed.
     (-= @hp amount)
     (when @score-for-damaging
-      (+= G.score (* @destruction-points (min amount (+ @hp amount)))))
-        ; No extra points are awarded for overkill damage.
-    (when (<= @hp 0)
+      (+= G.score (* @destruction-points amount)))
+    (when (not instakill?)
+      (@hook-damaged amount))
+    (when (= @hp 0)
       (@destroy instakill?)))
 
   (defmeth destroy [was-instakill?]
@@ -448,6 +451,11 @@
     (unless @score-for-damaging
       (+= G.score @destruction-points))
     (@rm-from-map))
+
+  (defmeth hook-damaged [amount]
+    "Called when the title has received finite damage (but before it's
+    been destroyed, if applicable)."
+    None)
 
   (defmeth hook-normal-destruction []
     "Called when the tile is about to be destroyed by finite damage."

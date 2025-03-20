@@ -171,6 +171,7 @@
         #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
       (when @sees-invisible
         #("Invisibility detection" "The monster is unaffected by you being invisible."))
+      (@dod "Effect when damaged" 'hook-damaged Damageable)
       (@dod "Effect on death" 'hook-normal-destruction Damageable)
       #* extra
       (@dod "Behavior" 'act))))
@@ -976,6 +977,24 @@
   :summons #(#("Dark Knight" 6))
 
   :flavor #[[A feudal lord of Dark Knights. Her armor is covered with long spikes, and her massive halberd means business. When she sees you, she cries out "Fight me!". But first, she'd like to soften you up with some of her subordinates.]])
+
+
+(deftile "@ " "a doppelganger" Approacher
+  :iq-ix 177
+  :destruction-points 100
+
+  :damage-melee 5
+
+  :$empathy-factor 5
+
+  :hook-damaged (meth [amount]
+    (doc f"For each point of damage the monster endures, you take {@empathy-factor} untyped damage.")
+    ; In IQ, a ring of protection prevents this damage, but this is
+    ; undocumented, and it feels unmotivated compared to the
+    ; status-effect-themed effects of the ring.
+    (.damage G.player (* amount @empathy-factor) :damage-type None))
+
+  :flavor "Who is this amazingly good-looking woman? Her stiff, robotic movements make her too clumsy to use a bow, but you hate to see that beautiful face scratched. It feels personal. Maybe there's some way you can just take her out without having to give her a lot of unsightly wounds.")
 
 
 )
