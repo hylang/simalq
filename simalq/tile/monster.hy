@@ -10,7 +10,7 @@
   re
   fractions [Fraction :as f/]
   enum [Enum]
-  hyrule [thru]
+  hyrule [thru xor]
   toolz [unique]
   simalq.util [DamageType StatusEffect next-in-cycle mixed-number]
   simalq.geometry [Direction at dist adjacent? adj-or-eq? dir-to turn-and-pos-seed ray]
@@ -241,12 +241,9 @@
         (next-in-cycle Direction.orths @approach-dir))
       (when advance-approach-dir
         (setv @approach-dir approach-dir))
-      (setv d (tuple (gfor c ["x" "y"]
-        (if (getattr approach-dir c)
-          (if (getattr d c)
-            0
-            (getattr approach-dir c))
-          (getattr d c)))))
+      (setv d (tuple (gfor
+        c ["x" "y"]
+        (int (xor (getattr approach-dir c) (getattr d c))))))
       ; Per IQ, we make only one attempt to find a new direction.
       ; So if this fails, give up.
       (when (= d #(0 0))
