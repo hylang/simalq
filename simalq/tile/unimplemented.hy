@@ -19,7 +19,6 @@
 (do-mac `(do ~@(gfor [iq-ix stem] [
 
     [152 "random_gate"]
-    [164 "cyclops"]
     [178 "magical_barrier_generator"]
     [184 "giant_ant"]
     [185 "dark_brain"]

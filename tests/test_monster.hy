@@ -913,6 +913,29 @@
   (assert-at [3 0] "golem"))
 
 
+(defn test-cyclops []
+
+  ; Cyclopes approach, but don't attack.
+  (init [:tiles ['floor "cyclops"]])
+  (wait 1)
+  (assert-at 'E "cyclops")
+  (wait 5)
+  (assert (= G.player.hp 100))
+  ; They're immune to swords and arrows.
+  (wk 'E)
+  (shoot 'E)
+  (assert-at 'E "cyclops")
+
+  ; Contra IQ, cyclopes will try to get orthogonal to you even if
+  ; they're diagonally adjacent and there are no diagonal blockers.
+  (init [
+    :map "
+       @ .
+       . C"])
+  (wait)
+  (assert-at 'S "cyclops"))
+
+
 (defn test-lord []
   "This test effectively covers archdevils and Dark Princes, which are
   special cases of Lords of the Undead."

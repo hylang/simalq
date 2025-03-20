@@ -214,8 +214,12 @@
     (when (is d None)
       ; The player is in our square. Just give up.
       (return F))
-    (when reverse
-      (setv d d.opposite))
+    (if reverse
+      (setv d d.opposite)
+      (when (and (adjacent? @pos G.player.pos) (in d Direction.orths))
+        ; We're already as close as we can get, without entering the
+        ; player's square.
+        (return F)))
 
     (setv target None)
     (defn ok-target []
@@ -893,6 +897,15 @@
       (@approach)))
 
   :flavor "An animated statue with dull senses and unbelievable strength.\n\n    I have a big ol' golem.\n    I made it out of clay.\n    And when it's dry and ready,\n    Oh people I shall slay.")
+
+
+(deftile "C " "a cyclops" Approacher
+  :iq-ix 164
+  :destruction-points 100
+
+  :immune #(PlayerMelee MundaneArrow MagicArrow)
+
+  :flavor "A one-eyed gentle giant carrying a shield the size of a refrigerator, against which even magic arrows are useless. Abiding by a philosophy of nonviolent resistance against kyriarchy, he will do his best to obstruct you without hurting a hair on your head.")
 
 
 (defclass Lord [Approacher Summoner]
