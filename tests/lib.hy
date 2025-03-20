@@ -126,8 +126,8 @@
 
 (defn use-item [thing [locator None]]
   "`thing` can be an integer (meaning to use the inventory item with
-  that index) or a string (meaning to the item with that stem in the
-  inventory and then immediately use it)."
+  that index) or a string (meaning to add the item with that stem to
+  the inventory and then immediately use it)."
   (setv target (if locator
     (locate locator)
     (MetaDict :x None :y None)))
