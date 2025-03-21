@@ -135,7 +135,7 @@
       (and special (special))
         ; Make a special attack. (The effect has already happened, so
         ; just play an animation.)
-        (.animate-hit G.player @ "  " :special-color? T)
+        (.animate-hit G.player @ "  " :special? T)
       damage
         ; Make a regular attack.
         (.damage G.player :attacker @

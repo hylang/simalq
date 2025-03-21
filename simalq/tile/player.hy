@@ -63,7 +63,7 @@
         (* G.rules.artifact-shield-factor amount)))))
 
     (when animate
-      (@animate-hit attacker :show-ivln? F
+      (@animate-hit attacker
         :label (if (> amount 99) "OW" (format amount "2"))))
 
     (setv hp-was @hp)
@@ -78,10 +78,12 @@
   :destroy (meth [was-instakill?]
     (raise (GameOverException 'dead)))
 
-  :$animate-hit (meth [attacker label [special-color? F] [show-ivln? T]]
-    "Use `flash-map` to indicate that the player's been hit."
+  :$animate-hit (meth [attacker label [special? F]]
+    "Use `flash-map` to indicate that the player's been hit. If
+    `special` is true, a different color from normal is used, and the
+    player's square is flashed even if she's invulnerable."
     (flash-map
-      (if special-color?
+      (if special?
          colors.flash-player-hit-by-special-attack
          colors.flash-player-damaged)
       (+
@@ -90,7 +92,7 @@
             (dir-to @pos attacker.pos)
             (dist @pos attacker.pos))
           #())
-        (if (and (not show-ivln?) (.player-has? StatusEffect.Ivln))
+        (if (and (not special?) (.player-has? StatusEffect.Ivln))
           #()
           #(@pos)))
       {@pos label}
