@@ -83,10 +83,10 @@
     `special` is true, a different color from normal is used, and the
     player's square is flashed even if she's invulnerable."
     (flash-map
-      (if special?
+      :color (if special?
          colors.flash-player-hit-by-special-attack
          colors.flash-player-damaged)
-      (+
+      :ps (+
         (if (and attacker attacker.pos)
           (ray @pos
             (dir-to @pos attacker.pos)
@@ -95,7 +95,7 @@
         (if (and (not special?) (.player-has? StatusEffect.Ivln))
           #()
           #(@pos)))
-      {@pos label}
+      :labels {@pos label}
       :flash-time-s .2))
 
   :flavor "People who've met Tris and Argonn separately are sometimes surprised to learn that they're siblings. They don't look much alike.")

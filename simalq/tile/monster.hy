@@ -135,12 +135,16 @@
       (and special (special))
         ; Make a special attack. (The effect has already happened, so
         ; just play an animation.)
-        (.animate-hit G.player @ "  " :special? T)
+        (.animate-hit G.player
+          :attacker @
+          :label "  "
+          :special? T)
       damage
         ; Make a regular attack.
-        (.damage G.player :attacker @
-          (@damage-by-hp damage)
-          (if (= attack 'shot) MonsterShot MonsterMelee))
+        (.damage G.player
+          :attacker @
+          :amount (@damage-by-hp damage)
+          :damage-type (if (= attack 'shot) MonsterShot MonsterMelee))
       True
         ; We don't actually have a usable attack. Bail out.
         (return F))
