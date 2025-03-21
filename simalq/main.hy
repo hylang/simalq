@@ -288,6 +288,8 @@
     f"Score: {G.score :10,}\n"
     f"Turn:  {G.turn-n :10,}\n"
     "\n"
+    G.quest.name
+    "\n"
     version-string)))
 
 (defn _scrolling-text-screen [lines]
