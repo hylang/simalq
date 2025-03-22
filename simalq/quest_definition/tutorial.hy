@@ -24,7 +24,7 @@
 
 1 [:title (t #[[You are Princess Triskaidecagonn XIII, represented by the symbol "@". Your goal in each quest is to escape the dungeon alive, with as many points as possible. Points are awarded for killing monsters and collecting items.\n\nHit "?" (Shift-/) for the controls. Use look mode to learn what each thing on the screen is and what it does.]])
   :map "
-    . . . . . ██. $1$1. ██. . | ██. . .
+    . . . . . ██. $ $ . ██. . | ██. . .
     . . . . . ██. . . . ██. | . ██. ██.
     . . @ . . . . . . . ██. ██. ██. ██.
     . . . . . ██. . . . ██. ██. ██. ██.
@@ -36,7 +36,6 @@
     . . . . . . | . | . | . . . . . . .
     . . . . . | . | . | . | . . . . . ."
   :map-marks {
-    "$1" "pile of gold"
     "$2" "handful of gems"}]
 
 2 [:title (t #[[Tris's mastery of diviniation magic allows her to predict the future. In game terms, this means that the game is fully deterministic, and you can undo as many actions as you like. You can even undo back to a previous level. In the status bar, next to the turn counter, a negative number shows how many actions you've undone, and hence how many you can redo.\n\nYou can also freely save the game and load your saves. One command overwrites your main save slot. Another one makes a "checkpoint" save that's never overwritten. Each saved game maintains an independent undo history.]])
@@ -70,9 +69,7 @@
      . ██. ██. ██. ████. ██. ██. ██.
      $ ██. ██. ██. ████. ██. ██. ██.
      ██████████████████████████+↓████
-     . . . . . . . . > . . . . . . ."
-  :map-marks {
-    "$ " "pile of gold"}]
+     . . . . . . . . > . . . . . . ."]
 
 3 [:title "Many dungeon levels are filled with poisonous air. Sadly, the monsters have gotten used to it, so it only hurts you. The status bar shows how much poison you're breathing in each turn. Once you have 1 or more units of this poison in your system, it's converted to damage, which is deducted from your hit points (HP).\n\nYou can probably guess what happens when you run out of HP (but this, too, can be undone). Pick up food to regain HP.\n\nLevels can wrap around."
   :poison-intensity (f/ 1 5)
@@ -115,7 +112,6 @@
   :map-marks {
     "##" ["cracked wall" :hp 1]
     "++" "door"
-    "$ " "pile of gold"
     "K3" ["Dark Knight" :hp 3]
     "K2" ["Dark Knight" :hp 2]}]
 
@@ -207,7 +203,6 @@
       :summon-class "devil"
       :summon-frequency (f/ 1 3)
       :summon-hp 1]
-    "$ " "pile of gold"
     "k " "key"
     "! " "amulet of invulnerability"
     "01" "standard bomb"

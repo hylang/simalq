@@ -288,8 +288,7 @@
         (if gen-west "a " "b ") ["generator"
           :summon-class "orc"
           :summon-frequency (f/ 1 4)]
-        (if gen-west "b " "a ") 'floor
-        "$ " "pile of gold"}])
+        (if gen-west "b " "a ") 'floor}])
     (setv G.rules.dainty-monsters F)
 
     (defn check [orc-at-p1 orc-at-p2]

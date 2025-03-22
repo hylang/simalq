@@ -128,6 +128,8 @@ quest definitions from other files in this directory."
         (mk-tile p "wall")
       (= mapsym "> ")
         (mk-tile p "exit")
+      (= mapsym "$ ")
+        (mk-tile p "pile of gold")
       (= mapsym "d ")
         (mk-tile p "devil")
       (= mapsym "K ")

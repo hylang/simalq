@@ -570,7 +570,6 @@
       @ ┣┫$ ┣┫++"
     :map-marks {
       "┣┫" "teleporter"
-      "$ " "pile of gold"
       "d " ["devil" :hp 3]
       "0 " "standard bomb"
       "++" "door"}])

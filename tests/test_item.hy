@@ -456,9 +456,7 @@
     :map "
       . o .
       ██. .
-      $ @ ."
-    :map-marks {
-      "$ " "pile of gold"}])
+      $ @ ."])
 
   ; A wand of shielding creates a shield on each adjacent square (even
   ; if something else is there, unlike IQ). Monsters can't move onto
