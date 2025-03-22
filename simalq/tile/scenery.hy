@@ -278,9 +278,9 @@
   ; on top of the item contained within.
   [
     ((get Tile.types "treasure chest") :pos pos)
-    #* (if (= te-v1 21) ; An unknown potion
-         ((get Tile.types-by-iq-ix te-v1) pos None te-v2)
-         [((get Tile.types-by-iq-ix te-v1) :pos pos)])]))
+    (if (= te-v1 21) ; An unknown potion
+      (hy.I.simalq/tile/item.unknown-potion pos te-v2)
+      ((get Tile.types-by-iq-ix te-v1) :pos pos))]))
 
 ;; --------------------------------------------------------------
 ;; ** Metal doors
