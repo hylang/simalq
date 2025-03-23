@@ -606,7 +606,7 @@
 
   :flavor "Named not for a hat, but for the three horns projecting from their equine heads, Tricorns spend decades mediating while cocooned in woolen blankets. Their richly cultivated spirituality allows them to unleash a spark of static electricity from a fair distance, albeit still not as far as your arrows can fly. Up close, they can poke you with their horns for slightly less damage.")
 
-(deftile "D " "Death" Approacher
+(deftile "A " "Death" Approacher
   :iq-ix 49
   :destruction-points 200
 

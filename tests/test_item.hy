@@ -596,7 +596,7 @@
     "##" "cracked wall"})
   (init [
     :map "
-      ██d ██☉G██D
+      ██d ██☉G██A
       t ██o ##i ██
       ██G ██☉o██K
       @ ██N ██s ██"
@@ -614,7 +614,7 @@
   ; are immune to wands of death. The rightmost column is outside the
   ; burst radius.
   (assert-textmap :map-marks map-marks :text "
-    ██. ██☉G██D
+    ██. ██☉G██A
     . ██. ##. ██
     ██G ██. ██K
     @ ██N ██s ██")
