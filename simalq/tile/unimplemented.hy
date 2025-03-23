@@ -19,7 +19,6 @@
 (do-mac `(do ~@(gfor [iq-ix stem] [
 
     [152 "random_gate"]
-    [184 "giant_ant"]
     [187 "magical_mirror"]
     [195 "dragon_egg"]
     [196 "wyrm"]

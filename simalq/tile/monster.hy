@@ -871,6 +871,21 @@
   :flavor "A professor emeritus whose killer instincts have been honed by decades of publishing and not perishing. His canny eye can detect the least visible academic politics, and his mastery of grant-review panels has bought him the reagents for powerful spells. But even with the best health insurance in the land, he's found that aging has taken its toll: he can no longer cane the young folk with the vigor of his early years.")
 
 
+(deftile "a " "a giant ant" Approacher
+  :iq-ix 184
+  :destruction-points 50
+
+  :damage-melee 7
+
+  :special-melee (meth []
+     (doc f"If you're not already paralyzed, you're paralyzed for {G.rules.paralysis-duration} turns.")
+     (unless (.player-has? StatusEffect.Para)
+       (.add StatusEffect.Para G.rules.paralysis-duration)
+       T))
+
+  :flavor "A belligerent reddish-brown bug the size of a cougar with a paralyzing venom and a strong work ethic. Oddly, giant spiders have no appetite for it.\n\n    I, for one, welcome our new insect overlords.")
+
+
 (deftile "m " "a siren" Approacher
   :iq-ix 134
   :destruction-points 75

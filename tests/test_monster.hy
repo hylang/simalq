@@ -866,6 +866,23 @@
   (assert (= G.player.hp 100)))
 
 
+(defn test-ant []
+  (init [
+    :tiles ["giant ant"]])
+
+  ; Ants paralyze if you're not already paralyzed, and otherwise do
+  ; damage.
+  (wait 1)
+  (assert (= G.player.hp 100))
+  (assert (.player-has? StatusEffect.Para))
+  (wait 1)
+  (assert (= G.player.hp 93))
+  (assert (.player-has? StatusEffect.Para))
+  (wait 1)
+  (assert (= G.player.hp 86))
+  (assert (not (.player-has? StatusEffect.Para))))
+
+
 (defn test-siren []
   (init [:tiles
     (+ (* ['floor] 10) ["siren"])])
