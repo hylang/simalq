@@ -943,8 +943,8 @@
 (defclass Lord [Approacher Summoner]
 
   (setv
-    summon-frequency NotImplementedError
-    summons NotImplementedError)
+    summon-frequency NotImplemented
+    summons NotImplemented)
       ; (stem, HP) pairs of monsters that can be summoned.
 
   (field-defaults
