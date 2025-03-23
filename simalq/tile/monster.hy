@@ -788,6 +788,18 @@
   :flavor "A wretched organic structure, fashioned from fiendish flesh. It twists about to aim its toothy maw, from which it belches flame. It's immobile, but dark magics make it almost invulnerable… almost.")
 
 
+(deftile "h " "a Dark Brain" Approacher
+  :iq-ix 185
+  :destruction-points 80
+
+  :damage-melee 8
+  :damage-shot 8
+    ; Since Dark Brains don't have their confusion attack from IQ,
+    ; their shots always do damage.
+
+  :flavor "A psychic monster from deep underground that can give you a wicked headache with telepathy, or tear off your scalp to reach your delicious brain with its tentacles.")
+
+
 (deftile "W " "a blind mage" Approacher
   :color 'brown
   :iq-ix 166
@@ -795,8 +807,7 @@
 
   :damage-melee 4
   :damage-shot 8
-    ; Since blind mages don't have their darkness attack from IQ,
-    ; their shots always do damage.
+    ; Again, without the special attack, shots always do damage.
   :sees-invisible T
 
   :flavor "An early-career researcher who has lost her powers of vision after countless hours of poring over manuscripts, memoranda, and prospective graduate students' letters of recommendation. She's had to develop acute hearing in order to detect the slightest whisper of new funding opportunities.")

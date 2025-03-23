@@ -20,7 +20,6 @@
 
     [152 "random_gate"]
     [184 "giant_ant"]
-    [185 "dark_brain"]
     [187 "magical_mirror"]
     [195 "dragon_egg"]
     [196 "wyrm"]
