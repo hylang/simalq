@@ -83,7 +83,8 @@
     (hy.I.simalq/tile.Player :pos (Pos model player-x player-y)))
   (assert (= G.map.width model.width))
   (assert (= G.map.height model.height))
-  (for [[stack-actual stack-expected]
+  (for [
+      [stack-actual stack-expected]
       (zip (concat G.map.data) (concat model.data))]
     (assert (= (len stack-actual) (len stack-expected)))
     (for [[t-actual t-expected] (zip stack-actual stack-expected)]
