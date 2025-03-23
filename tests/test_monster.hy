@@ -1014,3 +1014,31 @@
   (use-item "wand of death" [3 0])
   (assert-at 'E 'floor)
   (assert (= G.player.hp 100)))
+
+
+(defn test-dragon []
+ (init
+   :starting-hp 10,000
+   [:tiles ['floor "dragon egg"]])
+
+ ; It takes a 1-HP dragon egg 4 turns to hatch. The newly created
+ ; wyrmling doesn't get to move or attack on the same turn.
+ (wait 3)
+ (assert-at [2 0] "dragon egg")
+ (wait)
+ (assert-at [2 0] "wyrmling")
+ (assert-hp [2 0] 4)
+ ; The wyrmling can now move and attack.
+ (wait)
+ (assert (= G.player.hp 10,000))
+ (assert-at 'E "wyrmling")
+ (wait)
+ (assert (= G.player.hp 9,992))
+ ; After a total of 7 turns after hatching, the wyrmling becomes a
+ ; dragon.
+ (wait 5)
+ (assert-at 'E "dragon")
+ (assert-hp 'E 8)
+ ; The dragon can continue gaining HP, up to 16.
+ (wait 50)
+ (assert-hp 'E 16))

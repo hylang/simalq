@@ -1039,4 +1039,79 @@
   :flavor "Who is this amazingly good-looking woman? Her stiff, robotic movements make her too clumsy to use a bow, but you hate to see that beautiful face scratched. It feels personal. Maybe there's some way you can just take her out without having to give her a lot of unsightly wounds.")
 
 
+(defclass Dragon [Approacher]
+
+  (field-defaults
+    regen-power 0)
+  (setv mutable-fields #("regen_power"))
+
+  (setv
+    regen-frequency NotImplemented
+    grow-threshold None
+    grow-stem None
+    regen-limit 16)
+
+  (defmeth suffix-dict []
+    (dict
+      #** (.suffix-dict (super))
+      :pw @regen-power))
+  (defmeth info-bullets []
+    (.info-bullets (super)
+      #("Regeneration power" @regen-power)
+      #("Regeneration frequency" @regen-frequency)
+      #("Growth threshold" @grow-threshold)
+      #("Next life stage" @grow-stem)))
+
+  (setv grow-help "adds its regeneration frequency to its regeneration power. If the sum is ≥1, the integer part is removed to add to the monster's HP. Then, if the monster has a growth threshold and its HP is greater or equal, it advances to its next life stage (and loses all regeneration power).")
+
+  (defmeth act []
+    (doc f"Approach and Grow — The monster approaches per `Approach`. Then, it {@grow-help}")
+    (@approach)
+    (@regen))
+
+  (defmeth regen []
+    (+= @regen-power @regen-frequency)
+    (setv @hp (max
+      @hp
+      (min @regen-limit (+ @hp (pop-integer-part @regen-power)))))
+    (when (and (is-not @grow-threshold None) (>= @hp @grow-threshold))
+      (@make @pos @grow-stem :hp @hp)
+      (@rm-from-map)))
+
+  (setv flavor "Dragons are very, very large reptiles that hatch from eggs and grow stronger at an alarming rate. Their claws are razor-sharp from birth. As an adult, they can spew gouts of super-hot flame.\n\n    Do not meddle in the affairs of dragons, for you are crunchy and taste good with ketchup."))
+
+(deftile "e " "a dragon egg" Dragon
+  :iq-ix 195
+  :destruction-points 20
+
+  :regen-frequency (f/ 4 5)
+  :grow-threshold 4
+  :grow-stem "wyrmling"
+
+  :act (meth []
+    (doc f"Grow — The monster {@grow-help}")
+    (@regen)))
+
+(deftile "D " "a wyrmling" Dragon
+  :color 'brown
+  :iq-ix 196
+    ; Renamed from IQ's "wyrm" to make its youth more obvious.
+  :destruction-points 50
+
+  :damage-melee 8
+
+  :regen-frequency (f/ 3 5)
+  :grow-threshold 8
+  :grow-stem "dragon")
+
+(deftile "D " "a dragon" Dragon
+  :iq-ix 197
+
+  :damage-melee 20
+  :damage-shot 20
+
+  :regen-frequency (f/ 2 5)
+  :destruction-points 250)
+
+
 )

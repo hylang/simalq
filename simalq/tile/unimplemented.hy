@@ -20,9 +20,6 @@
 
     [152 "random_gate"]
     [187 "magical_mirror"]
-    [195 "dragon_egg"]
-    [196 "wyrm"]
-    [197 "dragon"]
     [202 "rotation_trap"]
     [203 "krogg"]
     [204 "vampire"]
