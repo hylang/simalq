@@ -915,7 +915,9 @@
   :iq-ix 132
   :destruction-points 75
 
-  :immune #(MundaneArrow Poison)
+  :immune #(MundaneArrow Poison DeathMagic)
+    ; Not immune to death magic in IQ, but seeing as they're
+    ; nonliving, I think they ought to be.
   :damage-melee 18
   :$approach-range 3
 
