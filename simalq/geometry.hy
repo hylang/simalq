@@ -194,17 +194,20 @@
     (*= dy -1))
   (get Direction.from-coords #((sign dx) (sign dy))))
 
-(defn ray [pos direction length]
+(defn ray [pos direction length [origin-twice-ok? F]]
   "Return a line of `length` points in `direction` from `pos`, not
   including `pos`. If it wraps far enough that it would get to `pos`,
-  it stops just before it."
+  it stops just before it, unless `origin-twice-ok?` is true, in which
+  case `pos` is included once more and the ray ends."
 
   (setv out [pos])
   (do-n length
     (setv new (+ (get out -1) direction))
-    (when (or (is new None) (= new pos))
+    (when (or (is new None) (and (= new pos) (not origin-twice-ok?)))
       (break))
-    (.append out new))
+    (.append out new)
+    (when (= new pos)
+      (break)))
   (tuple (cut out 1 None)))
 
 (defn burst [center size [exclude-center False]]

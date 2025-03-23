@@ -3,11 +3,12 @@
 ;; --------------------------------------------------------------
 
 (require
-  hyrule [unless]
+  hyrule [unless block]
   simalq.macros [defmeth]
   simalq.tile [deftile])
 (import
   fractions [Fraction :as f/]
+  hyrule [distinct]
   simalq.color :as color
   simalq.util [CommandError DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction at burst dist dir-to ray]
@@ -1039,9 +1040,6 @@
 ;; --------------------------------------------------------------
 
 (defclass MagicalBarrier [Scenery]
-  ; Without barrier generators having (yet?) been implemented, these
-  ; have essentially no interesting properties.
-
   (setv
     color 'dark-green
     blocks-move T)
@@ -1063,6 +1061,113 @@
   :iq-ix 179
   :directions #(Direction.W Direction.E))
 
+(setv MagicalBarrier.dir->stem (dfor
+  stem ["magical barrier (meridional)" "magical barrier (zonal)"]
+  d (. Tile.types [stem] directions)
+  d stem))
+
+(deftile "[]" "a barrier projector" [Scenery EachTurner]
+  :color MagicalBarrier.color
+  :iq-ix 178 ; magical barrier generator
+
+  :field-defaults (dict
+    :awakens-on-turn None)
+  :mutable-fields #("awakens_on_turn")
+
+  :blocks-move T
+  :$sleep-turns 7
+  :$damage-to-player 5
+
+  :suffix-dict (meth []
+    (if (is @awakens-on-turn None)
+       {"active" None}
+       {"time left" (- @awakens-on-turn G.turn-n -1)}))
+
+  :hook-player-bump (meth [origin]
+    (doc f"The projector deactivates, destroying all magical barriers in an unbroken straight line from its square. After {@sleep-turns} turns, the projector reactivates, creating new barriers to any projectors that lie in an unobstructed straight line. Monsters caught in a new barrier are annihilated. If you're caught, you take {@damage-to-player} damage.")
+    (when (is @awakens-on-turn None) (for [d Direction.orths]
+      (setv barrier-stem (get MagicalBarrier.dir->stem d))
+      (block (for [p (ray @pos d Inf)]
+        (for [t (at p)]
+          (when (= t.stem barrier-stem)
+            ; Remove the topmost magical barrier at `p`.
+            (.rm-from-map t)
+            ; Move on to the next square.
+            (break))
+          (else
+            ; `p` has no magical barriers, so cease looking in
+            ; this direction.
+            (block-ret)))))))
+    (setv @awakens-on-turn (+ G.turn-n @sleep-turns))
+    T)
+  :hook-player-shot (meth []
+    "As when bumped."
+    (@hook-player-bump None))
+
+  :poshooked-callback (meth []
+    (when (= @awakens-on-turn G.turn-n)
+      (setv @awakens-on-turn None)
+      (setv skip #{})
+      (for [d Direction.orths]
+        (when (and (not-in d skip) (@project d))
+          ; This barrier wrapped around, so avoid redundantly
+          ; projecting in the opposite direction.
+          (.add skip d.opposite)))))
+
+  :$project (meth [d]
+    "Try to project a barrier in the given direction. Return true if a
+    barrier was projected *and* it wrapped around back to this
+    projector."
+
+    (setv
+      barrier-stem (get MagicalBarrier.dir->stem d)
+      make-barriers-at []
+      monsters-to-kill []
+      hurt-player? F
+      wrapped? F)
+
+    ; Check each square in this direction.
+    (block (for [p (ray @pos d Inf :origin-twice-ok? T)]
+      (.append make-barriers-at p)
+      (for [tile (at p)] (cond
+        (isinstance tile hy.I.simalq/tile.Monster)
+          (.append monsters-to-kill tile)
+        (is tile G.player)
+          (setv hurt-player? T)
+        (and (= tile.stem barrier-stem) (in p make-barriers-at))
+          ; Avoid creating a barrier in a square that already has
+          ; one of the appropriate orientation.
+          (.remove make-barriers-at p)
+        (= tile.stem "barrier projector") (do
+          ; Make barriers up to (but not including) this square.
+          (when (in p make-barriers-at)
+            (.remove make-barriers-at p))
+          (setv wrapped? (= p @pos))
+          (block-ret))
+        (and
+            (isinstance tile Scenery)
+            (not (isinstance tile MagicalBarrier))
+            (or tile.blocks-move tile.blocks-monster)
+            tile.blocks-monster-shots)
+          ; Our path to the next projector is blocked, so we can't
+          ; create any barriers in this direction. Bail out.
+          (return)))
+      (else
+        ; The loop has terminated without finding an end projector, so
+        ; bail out.
+        (return))))
+
+    ; We're now ready to make barriers.
+    (for [p make-barriers-at]
+      (Tile.make p barrier-stem))
+    (for [mon (distinct monsters-to-kill)]
+      (.damage mon Inf None))
+    (when hurt-player?
+      (.damage G.player @damage-to-player DamageType.Trap))
+
+    wrapped?)
+
+  :flavor "This large magitek gizmo can maintain fields of brilliant, crackling plasma to partition rooms. To reboot it, give it a little percussive maintenance.")
 
 (deftile "()" "a magical energy shield" [Scenery EachTurner]
   :color 'dark-orange

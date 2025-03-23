@@ -810,3 +810,69 @@
   (assert-at [3 0] "phasing wall (out of phase)")
   ; It's destroyed after use.
   (assert-at 'here 'player))
+
+
+(defn test-barrier-projector []
+  "The behavior of magical barrier generators in IQ is pretty finicky, so
+  a lot of the details are different in SQ."
+
+  (init [:map "
+      ████████████████@ ||██████
+      []◀▶o $ ||==. ====[]==| []"])
+  (assert-full-name 'SE "a barrier projector (active)")
+  ; Hitting the projector turns off barriers in an unbroken straight
+  ; line from it.
+  (wk 'SE)
+  (assert-textmap "
+      ████████████████@ . ██████
+      []◀▶o $ ||==. . . []. | []")
+  (assert-full-name 'SE "a barrier projector (time left 7)")
+  ; Hitting it again resets the timer.
+  (wait 1)
+  (assert-full-name 'SE "a barrier projector (time left 6)")
+  (wk 'SE)
+  (assert-full-name 'SE "a barrier projector (time left 7)")
+  ; After 7 turns, the projector reactivates, creating a new barrier
+  ; to eligible projectors. Contra IQ, there's no distance limiit.
+  ; - No barrier is projected north because there's no projector.
+  ; - No barriers are projected east because the column blocks the
+  ;   other projector.
+  ; - The hole, gold, and barrier of the wrong orientation are still there.
+  ; - The orc is slain.
+  ; - No extra barrier was created on the square that already had one
+  ;   (of the correct orientation).
+  (wait 6)
+  (assert-textmap "
+      ████████████████@ . ██████
+      []◀▶o $ ||==. . . []. | []")
+  (wait)
+  (assert-textmap
+    :text "
+      ████████████████@ . ██████
+      []01==0203========[]. | []"
+    :map-marks {
+      "01" #("magical barrier (zonal)" "hole")
+      "02" #("magical barrier (zonal)" "pile of gold")
+      "03" #("magical barrier (zonal)" "magical barrier (meridional)")})
+  ; You get points for monsters killed by barriers.
+  (assert (= G.score 3))
+
+  ; A projector can connect with itself on a wrapped level.
+  (init [:wrap-x T :wrap-y T :map "
+    . . . .
+    . @ [].
+    . . . .
+    . . . ."])
+  ; Projectors can be deactivated by shooting them.
+  (shoot 'E)
+  (wait 10)
+  (wk 'N)
+  (assert-textmap "
+     . @ ||.
+     ====[]==
+     . . ||.
+     . . ||.")
+  ; Tris took 5 damage for being caught in a newly projected barrier
+  ; (but no additional damage for just waiting on it, after it was
+  ; created).
+  (assert (= G.player.hp 95)))

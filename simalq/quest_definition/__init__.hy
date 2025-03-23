@@ -74,7 +74,7 @@ quest definitions from other files in this directory."
     [map None]
       ; A string passed to `parse-text-map`. It overrides `width`,
       ; `height`, `tiles`, and `player-start` if provided.
-    [map-marks #()]
+    [map-marks {}]
     [title None]
     [next-level None]
     [poison-intensity (Fraction 0)]
@@ -98,7 +98,7 @@ quest definitions from other files in this directory."
     :!exit-delay
     :!timed-exit-start)))
 
-(defn parse-text-map [text [map-marks #()] [wrap-x False] [wrap-y False]]
+(defn parse-text-map [text [map-marks {}] [wrap-x False] [wrap-y False]]
   (setv text (dedent
     (re.sub r"\A( *\n)*" "" (re.sub r"( *\n)*\Z" "" text))))
   (setv height (+ 1 (.count text "\n")))
@@ -117,8 +117,9 @@ quest definitions from other files in this directory."
   (for [[[x y] mapsym] (.items mapsyms)]
     (setv p (Pos m x y))
     (cond
-      (in mapsym map-marks)
-        (mk-tile p (get map-marks mapsym) m mapsyms)
+      (setx v (.get map-marks mapsym))
+        (for [spec (reversed (if (isinstance v tuple) v #(v)))]
+          (mk-tile p spec m mapsyms))
       (= mapsym "@ ")
         (setv player-start #(x y))
       (= mapsym ". ")
