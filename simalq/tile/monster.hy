@@ -788,7 +788,7 @@
   :flavor "A wretched organic structure, fashioned from fiendish flesh. It twists about to aim its toothy maw, from which it belches flame. It's immobile, but dark magics make it almost invulnerable… almost.")
 
 
-(deftile "W " "a blind mage" Monster
+(deftile "W " "a blind mage" Approacher
   :color 'brown
   :iq-ix 166
   :destruction-points 75
