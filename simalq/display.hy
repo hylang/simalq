@@ -286,7 +286,11 @@ interface elements as lists of `ColorChar`s."
       [below above] (zip out (color-tile tile))
       (if (= above.char " ")
         ; A space character is transparent to the tile below.
-        (ColorChar below.char below.fg above.bg below.bold)
+        (ColorChar
+          below.char
+          below.fg
+          (or below.bg above.bg)
+          below.bold)
         above))))
   (when (=
       (dist p G.player.pos)
