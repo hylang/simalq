@@ -212,6 +212,7 @@
   :color 'brown
   :iq-ix 5
   :blocks-monster T
+  :passwallable T
   :flavor "It's unlocked, but it just won't stay open. Maybe that's for the best, since monsters are too dumb to operate it.")
 
 ;; --------------------------------------------------------------

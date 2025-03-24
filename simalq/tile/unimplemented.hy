@@ -21,7 +21,6 @@
     [152 "random_gate"]
     [187 "magical_mirror"]
     [202 "rotation_trap"]
-    [203 "krogg"]
     [204 "vampire"]
     [205 "moving_wall"]
     [206 "illusory_wall"]

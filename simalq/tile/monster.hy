@@ -281,7 +281,7 @@
         (if @wander-state "" " (this monster is not yet seeded, so values will change if it first acts on a later turn)")))
       #* extra))
 
-  (defmeth wander [[implicit-attack T] [ethereal-to #()]]
+  (defmeth wander [[implicit-attack T] [ethereal-to #()] [bump-hook None]]
     "Wander — If the monster can attack, it does. Otherwise, it chooses a direction (or, with equal odds as any given direction, nothing) with a simplistic pseudorandom number generator. It walks in the chosen direction if it can and the target square is inside the reality bubble."
 
     (when (and implicit-attack (@try-to-attack-player))
@@ -291,9 +291,12 @@
     (unless d
       (return))
     (setv [target wly] (walkability @pos d :monster? T :!ethereal-to))
-    (unless (= wly 'walk)
+    (when (and target (> (dist G.player.pos target) G.rules.reality-bubble-size))
       (return))
-    (when (> (dist G.player.pos target) G.rules.reality-bubble-size)
+    (when (and (= wly 'bump) bump-hook)
+      (bump-hook target)
+      (setv [target wly] (walkability @pos d :monster? T :!ethereal-to)))
+    (unless (= wly 'walk)
       (return))
     (@move target))
 
@@ -937,6 +940,33 @@
   :immune #(PlayerMelee MundaneArrow MagicArrow)
 
   :flavor "A one-eyed gentle giant carrying a shield the size of a refrigerator, against which even magic arrows are useless. Abiding by a philosophy of nonviolent resistance against kyriarchy, he will do his best to obstruct you without hurting a hair on your head.")
+
+
+(deftile "U " "an umber hulk" Wanderer
+  :iq-ix 203 ; krogg
+  :destruction-points 125
+    ; That's 100 points from IQ, plus 25 points (10% of the value of a
+    ; handful of gems) to make up for not actually dropping gems.
+
+  :immune #(Fire)
+
+  :damage-melee 10
+
+  :act (meth []
+    "Tunnel — As `Wander`, but if the selected square is impassable, the monster tries to destroy one tile on that square. A tile can be destroyed if it's permeable with a passwall amulet. If successful, the monster can try once more to move onto that square."
+    (@wander :bump-hook @destroy-walls))
+
+  :$destroy-walls (meth [target]
+    (unless target
+      (return))
+    (for [tile (at target)]
+      (when (and (isinstance tile Scenery) tile.passwallable)
+        ; We can destroy this tile. So we do, and then return, since
+        ; we can only destroy one tile per turn.
+        (.rm-from-map tile)
+        (return))))
+
+  :flavor "An umber hulk is something like a beetle with the frame of a particularly large gorilla. It can rapidly dig through solid rock, and its serrated mandibles can give you a nasty bite. This subspecies of umber hulk has gained an immunity to heat to adapt to the depths of planetary mantle it inhabits, but lost a (poorly thematically motivated) ancestral ability to magically confuse enemies with its gaze.")
 
 
 (defclass Lord [Approacher Summoner]

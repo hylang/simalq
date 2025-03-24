@@ -2,6 +2,7 @@
   hyrule [do-n])
 (import
   fractions [Fraction :as f/]
+  hyrule [thru]
   tests.lib [init assert-at assert-full-name assert-hp assert-textmap wait set-square wk shoot mv-player use-item top]
   simalq.util [StatusEffect]
   simalq.geometry [Direction Pos ray at burst]
@@ -950,6 +951,32 @@
        . C"])
   (wait)
   (assert-at 'S "cyclops"))
+
+
+(defn test-umber-hulk []
+
+  (init [
+    :map "
+      @ ▒▒| ##U █1^█++██◀▶██"
+    :map-marks {
+      "▒▒" "Void"
+      "##" "cracked wall"
+      "█1" "trapped wall"
+      "++" "door"}])
+  (setv G.rules.reality-bubble-size 20)
+
+  ; Umber hulks can destroy somewhat more tiles than IQ's kroggs. Not
+  ; everything, though.
+  (wait 100)
+  (assert-at 'E "Void")
+  (assert-at [9 0] "hole")
+  (assert-at [10 0] "wall")
+  (for [x (thru 2 7)]
+    (setv stack (at (Pos G.map x 0)))
+    (print x stack)
+    (assert (or
+      (not stack)
+      (and (= (len stack) 1) (= (. stack [0] stem) "umber hulk"))))))
 
 
 (defn test-lord []
