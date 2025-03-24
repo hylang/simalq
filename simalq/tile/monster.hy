@@ -699,8 +699,7 @@
     "Gunk Up — The monster's growth timer decreases by 1. If the timer has hit 0, it then transforms into an adult gunk."
     (-= @growth-timer 1)
     (when (= @growth-timer 0)
-      (@make @pos "gunk")
-      (@rm-from-map)))
+      (@replace "gunk")))
 
   :flavor "A seed of discord the size of a basketball that can flood a room inside of a minute. Think fast.")
 
@@ -722,7 +721,7 @@
 
   :hook-normal-destruction (meth []
     "A gunk seed is created in its square."
-    (@make @pos "gunk seed"))
+    (@replace "gunk seed"))
 
   :flavor "A peevish and very prolific pile of puke that pokes with pseudopods. It resists most weapons, and even if you do manage to kill it, it leaves a seed behind.")
 
@@ -1075,8 +1074,7 @@
       @hp
       (min @regen-limit (+ @hp (pop-integer-part @regen-power)))))
     (when (and (is-not @grow-threshold None) (>= @hp @grow-threshold))
-      (@make @pos @grow-stem :hp @hp)
-      (@rm-from-map)))
+      (@replace @grow-stem :hp @hp)))
 
   (setv flavor "Dragons are very, very large reptiles that hatch from eggs and grow stronger at an alarming rate. Their claws are razor-sharp from birth. As an adult, they can spew gouts of super-hot flame.\n\n    Do not meddle in the affairs of dragons, for you are crunchy and taste good with ketchup."))
 
