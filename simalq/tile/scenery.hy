@@ -8,7 +8,7 @@
   simalq.tile [deftile])
 (import
   fractions [Fraction :as f/]
-  hyrule [distinct]
+  toolz [unique]
   simalq.color :as color
   simalq.util [CommandError DamageType next-in-cycle StatusEffect]
   simalq.geometry [Pos Direction at burst dist dir-to ray]
@@ -1173,7 +1173,7 @@
     ; We're now ready to make barriers.
     (for [p make-barriers-at]
       (Tile.make p barrier-stem))
-    (for [mon (distinct monsters-to-kill)]
+    (for [mon (unique monsters-to-kill)]
       (.damage mon Inf None))
     (when hurt-player?
       (.damage G.player @damage-to-player DamageType.Trap))
