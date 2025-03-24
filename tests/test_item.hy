@@ -689,6 +689,7 @@
       "pile of gold" "wall generator (west)"
       "treasure chest" "key"
       "phase trigger" "phasing wall (in phase)"
+      "barrier projector" "magical barrier (zonal)"
       "cracked wall" "orc"]])
   (defn remote [x]
     (use-item "wand of remote action" [x 0]))
@@ -718,12 +719,15 @@
   ; Hit a phase trigger.
   (remote 5)
   (assert-at [6 0] "phasing wall (out of phase)")
+  ; Hit a barrier projector.
+  (remote 7)
+  (assert-at [8 0] 'floor)
 
   ; Things that wands of remote action can't do include:
   ; - Break a cracked wall
-  (cant (remote 7) nothing)
+  (cant (remote 9) nothing)
   ; - Attack a monster
-  (cant (remote 8) nothing)
+  (cant (remote 10) nothing)
   ; - Affect an empty square
   (cant (remote 15) nothing)
   ; - Pick up a key when you're already full.
