@@ -349,11 +349,10 @@
 
   (init [
     :map "
-       . ██.
-       @ ! ██"
-    :map-marks
-      {"! " "passwall amulet"}])
-
+      . ██.
+      @ ! ██"
+    :map-marks {
+      "! " "passwall amulet"}])
   (wk 'E)
   (wk 'NE)
   (assert-player-at 2 1)
