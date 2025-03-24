@@ -98,25 +98,21 @@
   (defmeth rm-from-map []
     "If this tile is on a map, remove it from the map. Otherwise, do
     nothing."
-    (@hook-pos-set @pos None)
-    (when (is-not @pos None)
-      (.remove (at @pos) @)
-      (object.__setattr__ @ "pos" None)))
+    (@move None))
 
   (defmeth move [pos]
     "Set the tile's position."
     (@hook-pos-set @pos pos)
     (when (is-not @pos None)
       (.remove (at @pos) @))
-    (.insert (at pos) 0 @)
+    (when (is-not pos None)
+      (.insert (at pos) 0 @))
     (object.__setattr__ @ "pos" pos))
 
   (defmeth replace [new-stem #** kwargs]
     "Create a new tile to spec and put it in this tile's place."
-    (setv t ((get Tile.types new-stem) :pos @pos #** kwargs))
-    (setv (get (at @pos) (.index (at @pos) @)) t)
-    (object.__setattr__ @ "pos" None)
-    (@hook-pos-set t.pos None))
+    (@make @pos new-stem (.index (at @pos) @) #** kwargs)
+    (@rm-from-map))
 
   (defmeth dod [prefix attr [superc None]]
     "Invoke a dynadoc, or get a regular docstring, for an info bullet."
