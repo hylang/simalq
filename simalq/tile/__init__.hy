@@ -187,7 +187,7 @@
 
   (defmeth hook-pos-set [old new]
     "Called whenever `@pos` changes, or is set to a non-`None` value
-    for the first time."
+    on object creation."
     None)
 
   (defmeth hook-player-bump [origin]

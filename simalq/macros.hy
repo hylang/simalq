@@ -3,9 +3,11 @@
 
 
 (defmacro defmeth [#* args]
-  #[[Define a method. `self` can be elided from the parameter list,
-  `self` itself can be written `@` in the body, and `self.foo`
-  can be written `@foo`.
+  #[[Define a method. This macro is similar to but distinct from
+  Hyrule's `meth`.
+
+  `self` can be elided from the parameter list, `self` itself can be
+  written `@` in the body, and `self.foo` can be written `@foo`.
 
   Furthermore, the method can have a "dynamic docstring": another
   function stored in an attribute `dynadoc` of the host function. If
