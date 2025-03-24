@@ -387,6 +387,37 @@
   (assert-at [11 3] "phasing wall (out of phase)"))
 
 
+(defn test-explosive-wall []
+  (init [
+    :map "
+      @ X█o X█K X███X█
+      X█X█X███X█X███X█
+      T T T T T T T T"
+    :map-marks {
+      "T " ["thorn tree" :hp 100]
+      "K " ["Dark Knight" :hp 100]}])
+  (setv G.rules.reality-bubble-size 1)
+
+  ; Hit one of the explosive walls, setting off a chain reaction
+  ; (which can extend past the reality bubble).
+  (wk 'E)
+  (assert-textmap
+    :text "
+      @ . . . K . ██X█
+      . . . ██. . ██X█
+      . . . . . . . T"
+    :map-marks {
+      "T " ["thorn tree" :hp 100]
+      "K " ["Dark Knight" :hp (- 100 (* 4 3))]})
+  ; The player is unhurt.
+  (assert (= G.player.hp 100))
+  ; And she gets points for harmed monsters, as normal.
+  (assert (= G.score (+ 3 (* 10 7))))
+  ; Hitting an explosive wall takes a turn. In IQ, it doesn't, which
+  ; is presumably a bug.
+  (assert (= G.turn-n 1)))
+
+
 (defn test-pushblock []
   (init
     [:tiles ["pushblock" "pile of gold"]])

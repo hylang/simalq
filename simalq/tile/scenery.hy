@@ -10,7 +10,7 @@
   fractions [Fraction :as f/]
   toolz [unique]
   simalq.color :as color
-  simalq.util [CommandError DamageType next-in-cycle StatusEffect]
+  simalq.util [CommandError DamageType next-in-cycle StatusEffect burst-damage]
   simalq.geometry [Pos Direction at burst dist dir-to ray]
   simalq.tile [Tile Actor PosHooked EachTurner Damageable annihilate]
   simalq.game-state [G])
@@ -588,6 +588,29 @@
     (PhasingWall.run-all))
 
   :flavor "An immobile switch that toggles phasing walls. Tris's expertise in target shooting allows her to trigger one of these with a single arrow.")
+
+
+(deftile "X█" "an explosive wall" Wallish
+  :color #('pale-orange None)
+  :color-bg #('black None)
+  :iq-ix 207 ; exploding wall
+
+  :$damage 3
+
+  :hook-player-bump (meth [origin]
+    (doc f"Explodes in a 3-by-3 burst of fire, doing {@damage} damage to monsters (but not harming you) and setting off any other explosive walls in the area.")
+    (setv target @pos)
+    (@rm-from-map)
+    (for [
+        pos (burst-damage target :damage-type DamageType.Fire
+          :amount [@damage @damage]
+          :color 'orange)
+        tile (list (at pos))
+        :if (= tile.stem "explosive wall")]
+      (.hook-player-bump tile None))
+    T)
+
+  :flavor "This section of stonework is packed with bombs. Just one good smack could set them all off.")
 
 ;; --------------------------------------------------------------
 ;; * Pushblocks
