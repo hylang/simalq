@@ -812,6 +812,15 @@
   (assert-at 'here 'player))
 
 
+(defn test-wall-making-trap []
+  (init
+    [:tiles ["wall-making trap"]])
+  (wk 'E)
+  (assert-at 'here 'player "wall-making trap")
+  (wk 'E)
+  (assert-at 'W "wall"))
+
+
 (defn test-barrier-projector []
   "The behavior of magical barrier generators in IQ is pretty finicky, so
   a lot of the details are different in SQ."

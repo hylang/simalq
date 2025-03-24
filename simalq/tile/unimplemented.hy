@@ -26,7 +26,6 @@
     [205 "moving_wall"]
     [206 "illusory_wall"]
     [207 "exploding_wall"]
-    [208 "wall_making_trap"]
     [209 "snitch"]
     [210 "dark_king"]]
 

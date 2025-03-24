@@ -1014,6 +1014,15 @@
 
   :flavor "A pressure plate faintly inscribed with a ying-yang symbol.")
 
+(deftile "<>" "a wall-making trap" Trap
+  :iq-ix 208
+
+  :hook-player-walked-from (meth []
+    "The tile is replaced with an ordinary wall."
+    (@replace "wall"))
+
+  :flavor "Don't let the wall hit you on the way out.")
+
 (deftile ", " "a broken trap" Trap
   :iq-ix #(
     ; Removed trap-like tiles that stick around after stepping on them.
