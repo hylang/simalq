@@ -1,5 +1,7 @@
 (require
   hyrule [unless defmacro-kwargs])
+(import
+  hyrule [map-model])
 
 
 (defmacro defmeth [#* args]
@@ -20,17 +22,12 @@
   (_defmeth decorators fname params body))
 
 (defn _defmeth [decorators fname params body]
-  (defn f [x]
-    (cond
-      (isinstance x hy.models.Sequence)
-        ((type x) (map f x))
-      (and (isinstance x hy.models.Symbol) (.startswith x "@"))
-        (if (= x '@)
-          'self
-          `(. self ~(hy.models.Symbol (cut x 1 None))))
-      True
-        x))
-  (setv body (f (hy.as-model body)))
+
+  (setv body (map-model body (fn [x]
+    (when (and (isinstance x hy.models.Symbol) (.startswith x "@"))
+      (if (= x '@)
+        'self
+        `(. self ~(hy.models.Symbol (cut x 1 None))))))))
 
   (setv dynadoc #(None))
   (when (and
