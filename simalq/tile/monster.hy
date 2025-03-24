@@ -787,13 +787,13 @@
   :flavor "A wretched organic structure, fashioned from fiendish flesh. It twists about to aim its toothy maw, from which it belches flame. It's immobile, but dark magics make it almost invulnerable… almost.")
 
 
-(deftile "h " "a Dark Brain" Approacher
-  :iq-ix 185
+(deftile "h " "a mind flayer" Approacher
+  :iq-ix 185 ; Dark Brain
   :destruction-points 80
 
   :damage-melee 8
   :damage-shot 8
-    ; Since Dark Brains don't have their confusion attack from IQ,
+    ; Since mind flayers don't have Dark Brains' confusion attack,
     ; their shots always do damage.
 
   :flavor "A psychic monster from deep underground that can give you a wicked headache with telepathy, or tear off your scalp to reach your delicious brain with its tentacles.")
