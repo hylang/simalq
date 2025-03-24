@@ -1031,7 +1031,8 @@
   :iq-ix #(
     ; Removed trap-like tiles that stick around after stepping on them.
      93   ; false exit
-    189)  ; confusion trap
+    189   ; confusion trap
+    206)  ; illusory wall
 
   :flavor "This once-vicious trap has decayed from neglect and is now pointlessly collecting dust. It was probably implemented in Flash or something.")
 

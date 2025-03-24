@@ -23,7 +23,6 @@
     [202 "rotation_trap"]
     [204 "vampire"]
     [205 "moving_wall"]
-    [206 "illusory_wall"]
     [207 "exploding_wall"]
     [209 "snitch"]
     [210 "dark_king"]]
