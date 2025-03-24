@@ -113,7 +113,10 @@
             (isinstance tile Scenery)
             tile.blocks-diag
             (not-in tile.stem ethereal-to)
-            (not (and tile.passwallable (.player-has? StatusEffect.Pass)))))))
+            (not (and
+              (not monster?)
+              tile.passwallable
+              (.player-has? StatusEffect.Pass)))))))
       'blocked-diag
     ; If there are no diagonal blockers, but the actor can't actually
     ; occupy the square, it can still bump things on the square.

@@ -344,9 +344,9 @@
 
 
 (defn test-passwall-diag []
-  "Passwall allows you to ignore diagonal blockers that you would be
-  able to walk through, but not other diagonal blockers (contra IQ)."
 
+  ; Passwall allows you to ignore diagonal blockers that you would be
+  ; able to walk through, but not other diagonal blockers (contra IQ).
   (init [
     :map "
       . ██.
@@ -358,7 +358,18 @@
   (assert-player-at 2 1)
   (mv-player 1 0)
   (set-square 'N "Void")
-  (cant (wk 'NE) move-blocked-msgs.diag))
+  (cant (wk 'NE) move-blocked-msgs.diag)
+
+  ; Test for a bug where monsters could ignore diagonal blockers if
+  ; the player had a passwall amulet.
+  (init [
+    :map "
+      . ██o
+      @ ! ██"
+    :map-marks {
+      "! " "passwall amulet"}])
+  (wk 'E)
+  (assert (= G.player.hp 100)))
 
 
 (defn test-ring-of-protection []
