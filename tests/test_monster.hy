@@ -1,6 +1,7 @@
 (require
   hyrule [do-n])
 (import
+  collections [Counter]
   fractions [Fraction :as f/]
   hyrule [thru]
   tests.lib [init assert-at assert-full-name assert-hp assert-textmap wait set-square wk shoot mv-player use-item top]
@@ -1022,6 +1023,41 @@
   (wait 10)
   (assert (= G.player.hp (- 500 (* 10 15))))
   (assert-at [2 0] 'floor))
+
+
+(defn test-vampire []
+
+  (init [
+    :map "
+       d o w
+       . V g
+       . . .
+       ██████
+       @ . ."
+    :map-marks {
+      "w " ["wizard" :hp 10]}])
+  (assert-full-name [1 3] #[[a vampire (HP 1, wd ....., act "wander")]])
+  ; Given enough time, all the non-vampires (except the devil, which
+  ; isn't vampirizable) are vampirized, and the remaining empty space
+  ; is filled with 3-HP bats.
+  (wait 20)
+  (assert (=
+    (Counter (lfor
+      p (burst (Pos G.map 1 3) 1)
+      tile (at p)
+      #(tile.stem tile.hp)))
+    (Counter {
+      #("vampire" 1) 3
+      #("vampire" 10) 1
+      #("bat" 3) 4
+      #("devil" 1) 1})))
+
+  ; A slain vampire becomes a 3-HP bat.
+  (init
+    [:tiles ["vampire"]])
+  (wk 'E)
+  (assert-at 'E "bat")
+  (assert-hp 'E 3))
 
 
 (defn test-doppelganger []

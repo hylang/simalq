@@ -21,7 +21,6 @@
     [152 "random_gate"]
     [187 "magical_mirror"]
     [202 "rotation_trap"]
-    [204 "vampire"]
     [205 "moving_wall"]
     [209 "snitch"]
     [210 "dark_king"]]

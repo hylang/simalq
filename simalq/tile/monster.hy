@@ -3,7 +3,7 @@
 ;; --------------------------------------------------------------
 
 (require
-  hyrule [unless do-n list-n defmacro-kwargs case pun]
+  hyrule [unless do-n list-n defmacro-kwargs case ecase pun block]
   simalq.macros [field-defaults pop-integer-part defmeth]
   simalq.tile [deftile])
 (import
@@ -13,7 +13,7 @@
   hyrule [thru xor]
   toolz [unique]
   simalq.util [DamageType StatusEffect next-in-cycle mixed-number]
-  simalq.geometry [Direction at dist adjacent? adj-or-eq? dir-to turn-and-pos-seed ray]
+  simalq.geometry [Direction at dist adjacent? adj-or-eq? dir-to turn-and-pos-seed ray burst]
   simalq.game-state [G]
   simalq.tile [Tile Actor Damageable]
   simalq.tile.scenery [Scenery walkability can-occupy?])
@@ -53,6 +53,8 @@
       ; If true, the monster kills itself upon attacking.
     sees-invisible F
       ; If true, the monster is unaffected by the player being invisible.
+    vampirizable F
+      ; If true, a vampire can turn this monster into another vampire.
     flavor-for-generator "In defiance of thermodynamics, this device pumps out monsters endlessly.")
       ; Flavor text for generators of this monster type.
 
@@ -175,6 +177,8 @@
         #("Kamikaze" "When the monster attacks, it dies. You get no points for this."))
       (when @sees-invisible
         #("Invisibility detection" "The monster is unaffected by you being invisible."))
+      (when @vampirizable
+        #("Vampirizable" "This monster can be turned by a vampire."))
       (@dod "Effect when damaged" 'hook-damaged Damageable)
       (@dod "Effect on death" 'hook-normal-destruction Damageable)
       #* extra
@@ -471,6 +475,7 @@
   :points-mon 3 :points-gen 12
 
   :damage-melee #(3 6 9)
+  :vampirizable T
 
   :flavor-mon "A green-skinned, muscle-bound, porcine humanoid with a pointy spear and a bad attitude."
   :flavor-gen "A sort of orcish clown car, facetiously called a village.")
@@ -480,6 +485,7 @@
   :points-mon 2 :points-gen 8
 
   :damage-melee #(2 4 6)
+  :vampirizable T
 
   :flavor-mon "Goblins are a smaller, uglier, smellier, and worse-equipped cousin of orcs that try to make up for it with even more sadistic malice. It almost works."
   :flavor-gen "Oops, somebody gave the goblins a bath. Now there's a lot more of them, and they still stink.")
@@ -529,6 +535,7 @@
 
   :damage-melee 4
   :damage-shot #(4 8 12)
+  :vampirizable T
 
   :flavor-mon "This fresh-faced would-be scholar has finished sewing the stars onto his robe and is starting to grow a beard. Idok has told the whole class that whoever kills you gets tenure. Considering what the rest of the academic job market is like, the offer has proven irresistible to many."
   :flavor-gen "The Pigpimples Institute of Thaumaturgy and Dweomercraft: a shameless diploma mill that happily takes students' money to teach them one spell, then sends them on a suicide mission against a much smarter and tougher opponent.")
@@ -1055,6 +1062,75 @@
   :summons #(#("Dark Knight" 6))
 
   :flavor #[[A feudal lord of Dark Knights. Her armor is covered with long spikes, and her massive halberd means business. When she sees you, she cries out "Fight me!". But first, she'd like to soften you up with some of her subordinates.]])
+
+
+(deftile "V " "a vampire" [Wanderer Summoner]
+  :iq-ix 204
+  :destruction-points 100
+
+  :field-defaults (dict
+    :action-i 0)
+  :mutable-fields #("action_i")
+
+  :immune undead-immunities
+  :damage-melee 10
+
+  :$summon-frequency 2
+  :$summon-hp 3
+  :$action-list #(
+    ; For simplicity, vampires don't also sometimes apporach as in IQ.
+    'wander
+    'wander
+    'vampirize
+    'wander
+    'bats
+    'vampirize
+    'wander
+    'wander
+    'vampirize
+    'bats)
+
+  :info-bullets (meth []
+    (.info-bullets (super)
+      #("Action list" (.join ", " (map str @action-list)))
+      #("Action index" @action-i)))
+
+  :suffix-dict (meth []
+    {
+      #** (Monster.suffix-dict @)
+      "wd" (:wd (Wanderer.suffix-dict @))
+      ; Summoner.suffix-dict is skipped on purpose, because the
+      ; displayed summon power will always be 0, because the summon
+      ; frequency is an integer.
+      "act" (hy.repr (str (get @action-list @action-i)))})
+
+  :act (meth []
+    (doc f"Idiosyncratic — If the monster can attack, it does. Otherwise, it rotates among its list of actions. `wander` works per `Wander`. `bats` summons {@summon-frequency} bats, each with {@summon-hp} HP. `vampirize` attempts to turn an adjacent monster into a vampire, and works per `Wander` if no eligible monster is present.")
+    (when (@try-to-attack-player)
+      (return))
+    (ecase (get @action-list @action-i)
+      'wander
+        (@wander)
+      'bats
+        (@summon "bat" @summon-frequency @summon-hp)
+      'vampirize
+        (block (for [p (burst @pos 1 :exclude-center T)  tile (at p)]
+          (when (and
+              (isinstance tile Monster)
+              tile.vampirizable
+              (in (get (walkability @pos (dir-to @pos p) :monster? T) 1)
+                ['bump 'walk]))
+            (.replace tile "vampire" :hp tile.hp)
+            (block-ret))
+          (else
+            (@wander)))))
+    (setv @action-i (% (+ 1 @action-i) (len @action-list))))
+
+  :hook-normal-destruction (meth []
+    (doc f"A bat with {@summon-hp} HP is created in its square.")
+    (@replace "bat" :hp @summon-hp))
+
+  :flavor "An aristocratic gentleman in a long black cloak with an infectious personality. A steady diet of the blood of the living makes him appear much more vivacious than other undead. Though he looks young, he is in fact somewhat long in the tooth.")
 
 
 (deftile "@ " "a doppelganger" Approacher
