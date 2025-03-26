@@ -1036,6 +1036,10 @@
   :iq-ix 211
   :destruction-points 225
 
+  ; In IQ, Lords of the Undead are immune to wands of death, but lack
+  ; the usual undead immunity to poison, probably reflecting
+  ; indecisiveness as to whether they're actually undead. We treat
+  ; them as not undead.
   :damage-melee 15
   :damage-shot 5
     ; As with blind mages, shots always do damage.
