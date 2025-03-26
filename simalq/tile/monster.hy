@@ -973,6 +973,8 @@
 
   (setv
     summon-frequency NotImplemented
+    summon-count 1
+      ; Number of monsters generated per summon.
     summons NotImplemented)
       ; (stem, HP) pairs of monsters that can be summoned.
 
@@ -986,21 +988,28 @@
   (defmeth info-bullets []
     (.info-bullets (super)
       #("Summoning frequency" @summon-frequency)
+      #("Summoning count" @summon-count)
       #("Summons list" (repr (list @summons)))
       #("Next summon" (repr (get @summons @summon-i)))))
 
   (defmeth act []
-    (doc f"Attack or Summon — If the monster can attack, it does. Otherwise, it builds up summoning power, which it can use to summon a monster per `Generate`, drawing the next kind of summoned monster (and its HP) in order from its summons list. If it doesn't summon, it approaches (per `Approach`).")
+    (doc f"Attack or Summon — If the monster can attack, it does. Otherwise, it builds up summoning power, which it can use to summon one or more monsters per `Generate`, drawing the next kind of summoned monster (and its HP) in order from its summons list. If it doesn't summon, it approaches (per `Approach`).")
     (or
       (@try-to-attack-player)
-      (and
-        (do
-          (setv [stem hp] (get @summons @summon-i))
-          (@summon :!stem :!hp :frequency @summon-frequency))
-        (do
-          (setv @summon-i (% (+ @summon-i 1) (len @summons)))
-          T))
-      (@approach))))
+      (when (@try-summon @summon-frequency)
+        ; When we have enough summoning power to summon at least one
+        ; monster, then also summon any extras allowed by
+        ; `@summon-count`. These new summons don't change summoning
+        ; power on net.
+        (do-n (- @summon-count 1)
+          (@try-summon 1)))
+      (@approach)))
+
+   (defmeth try-summon [frequency]
+     (setv [stem hp] (get @summons @summon-i))
+     (when (@summon :!stem :!hp :!frequency)
+       (setv @summon-i (% (+ @summon-i 1) (len @summons)))
+       T)))
 
 (deftile "d " "an archdevil" Lord
   :color 'red
@@ -1024,10 +1033,8 @@
   :damage-shot 5
     ; As with blind mages, shots always do damage.
 
-  :summon-frequency (f/ 1 2)
-    ; In IQ, Lords of the Undead have a summoning chance of only 1/4,
-    ; but they can summon more than one monster at a time, randomly
-    ; varying from 1 to 3.
+  :summon-frequency (f/ 1 4)
+  :summon-count 2
   :summons (tuple (gfor
     hp [1 2 3]
     stem ["ghost" "shade"]

@@ -993,15 +993,20 @@
     :map-marks {
       "! " "cloak of invisibility"}])
         ; We use invisbility so monsters stay immobile.
-  ; A Lord of the Undead can summon every other turn.
+  ; A Lord of the Undead can summon 2 monsters every 4 turns.
   (wk 'E)
   (assert-at [1 4] 'floor)
-  (wait 1)
+  (assert-at [2 4] 'floor)
+  (wait 2)
+  (assert-at [1 4] 'floor)
+  (assert-at [2 4] 'floor)
+  (wait)
   (assert-at [1 4] "ghost")
-  ; It summons a 1-HP ghost, then a 1-HP shade, then a 2-HP ghost, and
-  ; so on up to a 3-HP shade, which then cycles back to a 1-HP ghost.
-  ; The summons are placed in the same clockwise order as a generator.
-  (wait (* 2 7))
+  (assert-at [2 4] "shade")
+  ; It summons a 1-HP ghost and a 2-HP shade, then a 2-HP ghost and
+  ; shade, and eventually cycles back to a 1-HP ghost and shade. The
+  ; summons are placed in the same clockwise order as a generator.
+  (wait (* 3 4))
   (setv p (Pos G.map 1 3))
   (for [[direction [stem hp]] (zip
       Direction.all
@@ -1013,9 +1018,9 @@
     (assert-hp (+ p direction) hp))
 
   ; Lords don't get to summon while attacking the player.
-  (init [:map "@ L ."])
-  (wait 5)
-  (assert (= G.player.hp (- 100 (* 5 15))))
+  (init :starting-hp 500 [:map "@ L ."])
+  (wait 10)
+  (assert (= G.player.hp (- 500 (* 10 15))))
   (assert-at [2 0] 'floor))
 
 
