@@ -22,7 +22,6 @@
     [187 "magical_mirror"]
     [202 "rotation_trap"]
     [205 "moving_wall"]
-    [209 "snitch"]
     [210 "dark_king"]]
 
   `(deftile "� " ~stem UnimplementedTile

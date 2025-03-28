@@ -1158,6 +1158,86 @@
   :flavor "Who is this amazingly good-looking woman? Her stiff, robotic movements make her too clumsy to use a bow, but you hate to see that beautiful face scratched. It feels personal. Maybe there's some way you can just take her out without having to give her a lot of unsightly wounds.")
 
 
+(deftile "n " "a snitch" [Approacher Wanderer]
+  :iq-ix 209
+  :destruction-points 75
+    ; Inexplicably worth no points in IQ, perhaps left over from a
+    ; plan to make them drop extra treasure like Gauntlet's thief.
+
+  :field-defaults (dict
+    :item None
+    :interest 0)
+  :mutable-fields #("item" "interest")
+  :suffix-dict (meth []
+    (dict
+      #** (.suffix-dict (super))
+      :item (if @item @item.stem "---")
+      :interest @interest))
+  :info-bullets (meth [#* extra]
+    (.info-bullets (super)
+      #("Item" (and @item @item.full-name))
+      #("Remaining interest in current item" @interest)))
+
+  :immune #(MundaneArrow MagicArrow)
+  :damage-melee 2
+  :$sight-range 4
+  :$initial-interest 5
+
+  :$obtain (meth [item]
+    (.move item None)
+    (setv @item item)
+    (setv @interest @initial-interest))
+
+  :special-melee (meth []
+    "The monster steals the last item in your inventory, or a key. You lose points for anything that's stolen."
+    (for [[i item] (reversed (tuple (enumerate G.player.inventory)))]
+      (when item
+        (@obtain item)
+        (setv (get G.player.inventory i) None)
+        (break)))
+    (when (and (not @item) G.player.keys)
+      (@obtain ((get Tile.types "key")))
+      (-= G.player.keys 1))
+    (unless @item
+      (return))
+    (-= G.score @item.acquirement-points)
+    T)
+
+  :act (meth []
+    (doc f"Idiosyncratic — If the monster is within {@sight-range} squares, it approaches (per `Approach`) if empty-handed, and flees (per `Approach` in reverse) if it's carrying an item. Otherwise, it wanders (per `Wander`), taking any item it happens to step onto. It drops what it's holding if it gets a new item, or after {@initial-interest} steps of wandering.")
+    (when (and
+        (<= (dist G.player.pos @pos) @sight-range)
+        (not (@player-invisible-to?)))
+      (return (@approach #** (if @item
+        (dict :reverse T :implicit-attack F)
+        {}))))
+    (setv p-was @pos)
+    (setv item-was @item)
+    (@wander :bump-hook @pick-up-item)
+    (when (and @item (!= @pos p-was)) (cond
+      (is @item item-was) (do
+        (-= @interest 1)
+        (when (= @interest 0)
+          (.move @item p-was)
+          (setv @item None)
+          (setv @interest None)))
+      item-was
+        (.move item-was p-was))))
+
+  :$pick-up-item (meth [target]
+    (for [tile (at target)]
+      (when (isinstance tile hy.I.simalq/tile.Item)
+        (@obtain tile)
+        (return))))
+
+  :hook-destruction (meth [was-instakill?]
+    (doc "The monster drops what it's holding, even if it was instakilled.")
+    (when @item
+      (.move @item @pos)))
+
+  :flavor #[[Described aptly by the sages as "greedy little pests", snitches are small green men that like to acquire things, particularly things in other people's pockets. Their quick hands can seize arrows midflight and relieve sharp-eyed princesses of their belongings. They're just as quick to grow bored of their loot and search for new treasures.]])
+
+
 (defclass Dragon [Approacher]
 
   (field-defaults

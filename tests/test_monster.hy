@@ -4,7 +4,7 @@
   collections [Counter]
   fractions [Fraction :as f/]
   hyrule [thru]
-  tests.lib [init assert-at assert-full-name assert-hp assert-textmap wait set-square wk shoot mv-player use-item top]
+  tests.lib [init assert-at assert-full-name assert-hp assert-textmap wait set-square wk shoot mv-player use-item top mk-tile]
   simalq.util [StatusEffect]
   simalq.geometry [Direction Pos ray at burst]
   simalq.game-state [G])
@@ -1082,6 +1082,77 @@
   (use-item "wand of death" [3 0])
   (assert-at 'E 'floor)
   (assert (= G.player.hp 100)))
+
+
+(defn test-snitch [monkeypatch]
+
+  ; For ease of testing, force snitches to wander east exclusively.
+  (monkeypatch.setattr
+    (get hy.I.simalq/tile.Tile.types "snitch")
+    "pseudorandom_dir"
+    (fn [self state] #(Direction.E state)))
+
+  ; Upon wandering onto an item, a snitch will pick it up.
+  (init [:map "
+     @ . . . . n $ . . . . . . ."])
+  (setv G.rules.reality-bubble-size 20)
+  (wait 1)
+  (assert-at [6 0] "snitch")
+  ; The snitch holds the item for 5 turns before losing interest.
+  (wait 4)
+  (assert-at [9 0] 'floor)
+  (assert-at [10 0] "snitch")
+  (wait 1)
+  (assert-at [10 0] "pile of gold")
+  (assert-at [11 0] "snitch")
+
+  ; When a snitch holding an item picks up a new one, it drops the old
+  ; one on its previous square.
+  (init [
+    :map "
+      @ . . . . n / . $ . . ."
+    :map-marks {
+      "/ " "wand of nothing"}])
+  (setv G.rules.reality-bubble-size 20)
+  (wait 3)
+  (assert-at [7 0] "wand of nothing")
+  (assert-at [8 0] "snitch")
+
+  ; An empty-handed snitch within 4 squares of you will approach and
+  ; attack.
+  (init [])
+  (set-square [0 2] "snitch")
+  (wait 2)
+  (defn snitch [] (top 'N))
+  (assert (= G.player.hp 98))
+  (setv G.player.keys 5)
+  ; If you're carrying an item, it gets stolen, and you take no
+  ; damage.
+  (setv (get G.player.inventory 0) (mk-tile None "wand of shielding"))
+  (wait 1)
+  (assert (= G.player.hp 98))
+  (assert (= (. (snitch) item stem) "wand of shielding"))
+  (assert (is (get G.player.inventory 0) None))
+  (assert (= G.player.keys 5))
+  ; Snitches can also steal a key, if your inventory is empty.
+  (setv (. (snitch) item) None)
+  (wait 1)
+  (assert (= G.player.hp 98))
+  (assert (= (. (snitch) item stem) "key"))
+  (assert (= G.player.keys 4))
+  ; A snitch that's still in range with something in hand will flee.
+  ; Also, snitches are immune to all arrows.
+  (shoot 'N)
+  (assert-at [0 2] "snitch")
+  (wait 3)
+  (assert-at [0 5] "snitch")
+  ; Once out of range, it wanders, and can drop or pick up items as
+  ; before.
+  (wait 1)
+  (assert-at [1 5] "snitch")
+  (wait 4)
+  (assert-at [5 5] "snitch")
+  (assert-at [4 5] "key"))
 
 
 (defn test-dragon []
