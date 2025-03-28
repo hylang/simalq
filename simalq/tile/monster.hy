@@ -295,9 +295,11 @@
     (unless d
       (return))
     (setv [target wly] (walkability @pos d :monster? T :!ethereal-to))
-    (when (and target (> (dist G.player.pos target) G.rules.reality-bubble-size))
+    (unless target
       (return))
-    (when (and (= wly 'bump) bump-hook)
+    (when (> (dist G.player.pos target) G.rules.reality-bubble-size)
+      (return))
+    (when (and (in wly ['bump 'walk]) bump-hook)
       (bump-hook target)
       (setv [target wly] (walkability @pos d :monster? T :!ethereal-to)))
     (unless (= wly 'walk)
@@ -966,8 +968,6 @@
     (@wander :bump-hook @destroy-walls))
 
   :$destroy-walls (meth [target]
-    (unless target
-      (return))
     (for [tile (at target)]
       (when (and (isinstance tile Scenery) tile.passwallable)
         ; We can destroy this tile. So we do, and then return, since
