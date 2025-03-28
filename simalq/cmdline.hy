@@ -16,10 +16,12 @@
 
 (setv advertised-iq-quests #(
   "New First Quest"
+  "Nightmare 2"
   "New DeathQuest"
   "BoneQuest"
   "New Nightmare"))
-  ; The other IQ quests have at least one unimplemented tile type.
+  ; Delirium has a few unimplemented tile types.
+  ; Boot Camp 2 should be made obsolete by Tutorial Quest.
 
 (setv difficulty-presets (dict
   :easy (dict :hp (f/ 2) :poison (f/ 0))
