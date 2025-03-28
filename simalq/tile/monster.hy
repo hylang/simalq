@@ -180,7 +180,7 @@
       (when @vampirizable
         #("Vampirizable" "This monster can be turned by a vampire."))
       (@dod "Effect when damaged" 'hook-damaged Damageable)
-      (@dod "Effect on death" 'hook-normal-destruction Damageable)
+      (@dod "Effect on death" 'hook-destruction Damageable)
       #* extra
       (@dod "Behavior" 'act))))
 
@@ -656,9 +656,10 @@
         (return (@try-to-attack-player))))
     (@wander :implicit-attack F))
 
-  :hook-normal-destruction (meth []
+  :hook-destruction (meth [was-instakill?]
     "The monster can immediately attempt to attack, unless it killed itself by kamikaze."
-    (@try-to-attack-player))
+    (unless was-instakill?
+      (@try-to-attack-player)))
 
   :flavor "A giant aerial jellyfish, kept aloft by a foul-smelling and highly reactive gas. It doesn't fly so much as float about in the dungeon drafts. If disturbed, it readily explodes, and its explosions have the remarkable property of harming you and nobody else.")
 
@@ -729,9 +730,10 @@
       (@try-to-attack-player)
       (@summon :stem "gunk seed" :frequency @summon-frequency :hp 1)))
 
-  :hook-normal-destruction (meth []
+  :hook-destruction (meth [was-instakill?]
     "A gunk seed is created in its square."
-    (@replace "gunk seed"))
+    (unless was-instakill?
+      (@replace "gunk seed")))
 
   :flavor "A peevish and very prolific pile of puke that pokes with pseudopods. It resists most weapons, and even if you do manage to kill it, it leaves a seed behind.")
 
@@ -1130,9 +1132,10 @@
             (@wander)))))
     (setv @action-i (% (+ 1 @action-i) (len @action-list))))
 
-  :hook-normal-destruction (meth []
+  :hook-destruction (meth [was-instakill?]
     (doc f"A bat with {@summon-hp} HP is created in its square.")
-    (@replace "bat" :hp @summon-hp))
+    (unless was-instakill?
+      (@replace "bat" :hp @summon-hp)))
 
   :flavor "An aristocratic gentleman in a long black cloak with an infectious personality. A steady diet of the blood of the living makes him appear much more vivacious than other undead. Though he looks young, he is in fact somewhat long in the tooth.")
 

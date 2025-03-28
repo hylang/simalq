@@ -439,22 +439,19 @@
     (when (not instakill?)
       (@hook-damaged amount))
     (when (= @hp 0)
-      (@destroy instakill?)))
-
-  (defmeth destroy [was-instakill?]
-    (unless was-instakill?
-      (@hook-normal-destruction))
-    (unless @score-for-damaging
-      (+= G.score @destruction-points))
-    (@rm-from-map))
+      ; The tile is destroyed.
+      (@hook-destruction instakill?)
+      (unless @score-for-damaging
+        (+= G.score @destruction-points))
+      (@rm-from-map)))
 
   (defmeth hook-damaged [amount]
     "Called when the title has received finite damage (but before it's
     been destroyed, if applicable)."
     None)
 
-  (defmeth hook-normal-destruction []
-    "Called when the tile is about to be destroyed by finite damage."
+  (defmeth hook-destruction [was-instakill?]
+    "Called when the tile is about to be destroyed."
     None)
 
   (defmeth suffix-dict []
