@@ -568,7 +568,7 @@
   :$shot-frequency (f/ 4 5)
 
   :act (meth []
-    (doc f"Coward — If the monster is within {@flee-range} squares of you, it flees (per `Approach` in reverse). Otherwise, if it has line of sight to you (ignoring all obstacles), it adds {@shot-frequency} to its shot power. If this is ≥1, it subtracts 1 to shoot you. Otherwise, it wanders (per `Wander`).")
+    (doc f"If the monster is within {@flee-range} squares of you, it flees (per `Approach` in reverse). Otherwise, if it has line of sight to you (ignoring all obstacles), it adds {@shot-frequency} to its shot power. If this is ≥1, it subtracts 1 to shoot you. Otherwise, it wanders (per `Wander`).")
 
     (when (and
         (<= (dist G.player.pos @pos) @flee-range)
@@ -651,7 +651,7 @@
   :$disturbance-increment (f/ 1 5)
 
   :act (meth []
-    (doc f"Float — If you're adjacent, increases your floater disturbance by {@disturbance-increment}. If your floater disturbance reaches 1, it's cleared and the monster attacks. Otherwise, the monster wanders per `Wander`.")
+    (doc f"If you're adjacent, increases your floater disturbance by {@disturbance-increment}. If your floater disturbance reaches 1, it's cleared and the monster attacks. Otherwise, the monster wanders per `Wander`.")
     (when (adjacent? @pos G.player.pos)
       (+= G.player.floater-disturbance @disturbance-increment)
       (when (pop-integer-part G.player.floater-disturbance)
@@ -679,7 +679,7 @@
   :$summon-frequency (f/ 1 10)
 
   :act (meth []
-    (doc f"Blob – If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {@summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
+    (doc f"If the monster can attack, it does. Otherwise, if it has more than 1 HP, it builds up {@summon-frequency} summoning power per turn. With enough power, it can split (per `Generate`) into two blobs with half HP (in case of odd HP, the original gets the leftover hit point). If it lacks the HP or summoning power for splitting, it wanders per `Wander`.")
     (when (@try-to-attack-player)
       (return))
     (when (and
@@ -709,7 +709,7 @@
       #("Growth timer" @growth-timer)))
 
   :act (meth []
-    "Gunk Up — The monster's growth timer decreases by 1. If the timer has hit 0, it then transforms into an adult gunk."
+    "The monster's growth timer decreases by 1. If the timer has hit 0, it then transforms into an adult gunk."
     (-= @growth-timer 1)
     (when (= @growth-timer 0)
       (@replace "gunk")))
@@ -727,7 +727,7 @@
   :$summon-frequency (f/ 1 5)
 
   :act (meth []
-    (doc f"Gunky — If the monster can attack, it does. Otherwise, it builds up {@summon-frequency} summoning power per turn, which it can use to summon gunk seeds per `Generate`.")
+    (doc f"If the monster can attack, it does. Otherwise, it builds up {@summon-frequency} summoning power per turn, which it can use to summon gunk seeds per `Generate`.")
     (or
       (@try-to-attack-player)
       (@summon :stem "gunk seed" :frequency @summon-frequency :hp 1)))
@@ -749,7 +749,7 @@
   :sees-invisible T
 
   :act (meth []
-     "Haunt — Try to attack or approach per `Approach`. If that fails, try moving with a variation of `Approach` that allows skipping one intermediate tile."
+     "Try to attack or approach per `Approach`. If that fails, try moving with a variation of `Approach` that allows skipping one intermediate tile."
      (or
        (@approach :advance-approach-dir F)
        (@approach :implicit-attack F :jump T)))
@@ -765,7 +765,7 @@
   :$approach-range 2
 
   :act (meth []
-    (doc f"Webcrawl — If the monster is within {@approach-range} squares of you, it approaches (per `Approach`). Otherwise, it wanders (per `Wander`). In both cases, it can move through webs, and it creates a web on its square afterwards if no web is there already.")
+    (doc f"If the monster is within {@approach-range} squares of you, it approaches (per `Approach`). Otherwise, it wanders (per `Wander`). In both cases, it can move through webs, and it creates a web on its square afterwards if no web is there already.")
     ; Move or attack.
     (if (and
         (<= (dist G.player.pos @pos) @approach-range)
@@ -842,7 +842,7 @@
   :$shot-frequency (f/ 3 4)
 
   :act (meth []
-    (doc f"Teleport Attack — If the monster has line of sight to you, it adds {@shot-frequency} to its shot power. If this is ≥1, it subtracts 1 to shoot you. If it doesn't shoot you, it tries to teleport into line of sight, preferring to be as close as possible to you without being adjacent. Its destination must lie in the reality bubble.")
+    (doc f"If the monster has line of sight to you, it adds {@shot-frequency} to its shot power. If this is ≥1, it subtracts 1 to shoot you. If it doesn't shoot you, it tries to teleport into line of sight, preferring to be as close as possible to you without being adjacent. Its destination must lie in the reality bubble.")
     ; Teleporting mages' movement is much smarter than that of IQ's
     ; invisible mages, which compensates for the loss of their main
     ; ability.
@@ -935,7 +935,7 @@
   :$approach-range 3
 
   :act (meth []
-    (doc f"Guard — If the monster is within {@approach-range} squares of you, it approaches (per `Approach`). Otherwise, it does nothing.")
+    (doc f"If the monster is within {@approach-range} squares of you, it approaches (per `Approach`). Otherwise, it does nothing.")
     (when (and
         (<= (dist G.player.pos @pos) @approach-range)
         (not (@player-invisible-to?)))
@@ -964,7 +964,7 @@
   :damage-melee 10
 
   :act (meth []
-    "Tunnel — As `Wander`, but if the selected square is impassable, the monster tries to destroy one tile on that square. A tile can be destroyed if it's permeable with a passwall amulet. If successful, the monster can try once more to move onto that square."
+    "As `Wander`, but if the selected square is impassable, the monster tries to destroy one tile on that square. A tile can be destroyed if it's permeable with a passwall amulet. If successful, the monster can try once more to move onto that square."
     (@wander :bump-hook @destroy-walls))
 
   :$destroy-walls (meth [target]
@@ -1111,7 +1111,7 @@
       "act" (hy.repr (str (get @action-list @action-i)))})
 
   :act (meth []
-    (doc f"Idiosyncratic — If the monster can attack, it does. Otherwise, it rotates among its list of actions. `wander` works per `Wander`. `bats` summons {@summon-frequency} bats, each with {@summon-hp} HP. `vampirize` attempts to turn an adjacent monster into a vampire, and works per `Wander` if no eligible monster is present.")
+    (doc f"If the monster can attack, it does. Otherwise, it rotates among its list of actions. `wander` works per `Wander`. `bats` summons {@summon-frequency} bats, each with {@summon-hp} HP. `vampirize` attempts to turn an adjacent monster into a vampire, and works per `Wander` if no eligible monster is present.")
     (when (@try-to-attack-player)
       (return))
     (ecase (get @action-list @action-i)
@@ -1204,7 +1204,7 @@
     T)
 
   :act (meth []
-    (doc f"Idiosyncratic — If the monster is within {@sight-range} squares, it approaches (per `Approach`) if empty-handed, and flees (per `Approach` in reverse) if it's carrying an item. Otherwise, it wanders (per `Wander`), taking any item it happens to step onto. It drops what it's holding if it gets a new item, or after {@initial-interest} steps of wandering.")
+    (doc f"If the monster is within {@sight-range} squares, it approaches (per `Approach`) if empty-handed, and flees (per `Approach` in reverse) if it's carrying an item. Otherwise, it wanders (per `Wander`), taking any item it happens to step onto. It drops what it's holding if it gets a new item, or after {@initial-interest} steps of wandering.")
     (when (and
         (<= (dist G.player.pos @pos) @sight-range)
         (not (@player-invisible-to?)))
@@ -1287,7 +1287,7 @@
   :grow-stem "wyrmling"
 
   :act (meth []
-    (doc f"Grow — The monster {@grow-help}")
+    (doc f"The monster {@grow-help}")
     (@regen)))
 
 (deftile "D " "a wyrmling" Dragon
