@@ -1120,7 +1120,7 @@
       'bats
         (@summon "bat" @summon-frequency @summon-hp)
       'vampirize
-        (block (for [p (burst @pos 1 :exclude-center T)  tile (at p)]
+        (block (for [p (burst @pos 1 :include-center F)  tile (at p)]
           (when (and
               (isinstance tile Monster)
               tile.vampirizable

@@ -536,7 +536,7 @@
     f"a thorn-tree generator (HP 3, pw 0, freq 1, sHP {shp})")
   ; Check that the generator produces a ring of trees.
   (wait 9)
-  (for [p (burst (Pos G.map 3 2) 1 :exclude-center T)]
+  (for [p (burst (Pos G.map 3 2) 1 :include-center F)]
     (assert-at p "thorn tree")
     (assert-hp p shp)))
 

@@ -254,10 +254,10 @@
 
 
 (defn test-burst []
-  (for [size [2 6]  exclude-center [F T]  wrap-x [F T]  wrap-y [F T]]
+  (for [size [2 6]  include-center [F T]  wrap-x [F T]  wrap-y [F T]]
     (setv m (Map.make :!wrap-x :!wrap-y :width 5 :height 7))
     (setv p0 (Pos m 1 1))
-    (setv b (tuple (burst p0 size exclude-center)))
+    (setv b (tuple (burst p0 size include-center)))
     ; A burst shouldn't duplicate positions.
     (assert (= (len b) (len (set b))))
     ; A point should be in a burst if and only if it's close enough to
@@ -265,7 +265,7 @@
     (for [x (range m.width)  y (range m.height)]
       (setv p (Pos m x y))
       (assert (=
-        (if (= p p0) (not exclude-center) (<= (dist p p0) size))
+        (if (= p p0) include-center (<= (dist p p0) size))
         (in p b))))))
 
 

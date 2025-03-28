@@ -774,7 +774,7 @@
     ; positions.
     (setv candidate-dist Inf)
     (setv candidates [])
-    (for [p (burst G.player.pos G.rules.reality-bubble-size :exclude-center T)]
+    (for [p (burst G.player.pos G.rules.reality-bubble-size :include-center F)]
       (when (> (dist p @pos) candidate-dist)
         ; When multiple teleporters are in range, we consider only
         ; the subset that's as close as possible.
@@ -784,7 +784,7 @@
           ; This position can be a candidate if it has at least one
           ; free adjacent position.
           (when (setx neighbors (tuple (gfor
-              n-p (burst p 1 :exclude-center T)
+              n-p (burst p 1 :include-center F)
               :if (all (gfor
                 n-tile (at n-p)
                 (isinstance n-tile Monster)))

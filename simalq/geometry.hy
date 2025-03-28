@@ -210,7 +210,7 @@
       (break)))
   (tuple (cut out 1 None)))
 
-(defn burst [center size [exclude-center False]]
+(defn burst [center size [include-center T]]
   "Return a generator of all distinct points within distance `size` of
   `center`. Thus the points form a square that's `2 * size + 1`
   squares wide. The order in which they're generated spirals outwards
@@ -227,7 +227,7 @@
   allows monsters closer to the player to move first, so a line of
   monsters can march toward the player without creating gaps.
 
-  If `exclude-center` is true, the center position isn't returned."
+  If `include-center` is false, the center position isn't returned."
 
   (unique (gfor
     c (thru 0 (min size (max center.map.width center.map.height)))
@@ -239,7 +239,7 @@
     :setv p (try
       (Pos center.map (+ center.x x) (+ center.y y))
       (except [GeometryError]))
-    :if (and p (not (and exclude-center (= p center))))
+    :if (and p (or (!= p center) include-center))
     p)))
 
 (defn burst-size [size [article? True]]

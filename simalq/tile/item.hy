@@ -419,7 +419,7 @@
   :targeted F
   :use (meth []
     "Creates a magical energy shield in each square adjacent to you. These shield tiles block monsters and their shots, but not you or your shots."
-    (for [p (burst G.player.pos 1 :exclude-center T)]
+    (for [p (burst G.player.pos 1 :include-center F)]
       (Tile.make p "magical energy shield")))
 
   :flavor "Cowardice is the better part of valor.")
