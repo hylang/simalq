@@ -1017,7 +1017,7 @@
 
   ; Lords don't get to summon while attacking the player.
   (init
-    :starting-hp 500
+    :player-starting-hp 500
     :map "@ L .")
   (wait 10)
   (assert (= G.player.hp (- 500 (* 10 15))))
@@ -1156,7 +1156,7 @@
 
 (defn test-dragon []
   (init
-    :starting-hp 10,000
+    :player-starting-hp 10,000
     :tiles ['floor "dragon egg"])
 
   ; It takes a 1-HP dragon egg 4 turns to hatch. The newly created

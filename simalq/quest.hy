@@ -18,8 +18,6 @@
   :fields [
     name authors title
       ; Textual metadata
-    starting-hp
-      ; An integer
     levels
       ; A tuple of `Level` objects
     rules]
@@ -40,7 +38,7 @@
       (setattr G.rules k v)))
   (.initialize-states G)
   (setv G.player (Player :pos None))
-  (setv G.player.hp (refactor-hp quest.starting-hp)))
+  (setv G.player.hp (refactor-hp G.rules.player-starting-hp)))
 
 
 (defdataclass Level []

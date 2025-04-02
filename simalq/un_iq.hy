@@ -97,7 +97,7 @@
 (setv quest-fmt (with-construct (kw-struct
   :n-levels Byte
   (Bytes 261)
-  :starting-hp Int16ub
+  :player-starting-hp Int16ub
   :title (iq-str 256)
   (Bytes 897)
   :levels (Array this.n-levels (kw-struct
@@ -175,8 +175,8 @@
       "Yves and Serge Meynard"
       "Yves Meynard")
     :title data.title
-    :starting-hp data.starting-hp
-    :rules (Rules)
+    :rules (Rules
+      :player-starting-hp data.player-starting-hp)
     :levels (tuple (gfor
       [level-n l] (enumerate data.levels)
       :do (+= level-n 1)

@@ -21,14 +21,13 @@
 
 (defn init [
     #* levels
-    [starting-hp 100]
     #** kwargs]
   "(Re)initialize the global state."
+  (setv rules (dict :player-starting-hp 100))
   ; Extract elements of `kwargs` that correspond to rules.
-  (setv rules (dfor
-    [k v] (list (.items kwargs))
-    :if (in k Rules.__dataclass_fields__)
-    k (.pop kwargs k)))
+  (for [[k v] (list (.items kwargs))]
+    (when (in k Rules.__dataclass_fields__)
+      (setv (get rules k) (.pop kwargs k))))
   (when kwargs
     ; Any remaining `kwargs` should specify the only level, per
     ; `mk-level`, in place of a `levels` argument.
@@ -36,8 +35,7 @@
   (unless levels
     (setv levels [kwargs]))
   (start-quest
-    :quest (mk-quest #* levels :starting-hp starting-hp)
-    :rules rules)
+    :quest (mk-quest #* levels #** rules))
   (start-level 1))
 
 (defn init-boot-camp [[level-n 1]]

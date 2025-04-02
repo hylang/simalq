@@ -316,7 +316,7 @@
 
 (defn test-player-death []
   (init
-    :starting-hp 20
+    :player-starting-hp 20
     :player-start [1 0]
     :tiles [["Dark Knight" :hp 10] 'floor 'floor "orc"])
   (defn check [state-i player-hp orc-x]

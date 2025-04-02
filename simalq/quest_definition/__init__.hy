@@ -52,17 +52,15 @@ quest definitions from other files in this directory."
 (defn mk-quest [
   ; Make a quest.
     #* levels
-    [starting-hp 100]
     [name "Test Quest"]
     [authors "Mitt Lowporch and Cire Whyhall"]
     [title "Test Quest title"]
-    [rules None]]
+    #** rules]
   (pun (Quest
     :!name
     :!authors
     :!title
-    :!starting-hp
-    :rules (or rules (Rules))
+    :rules (Rules #** rules)
     :levels (tuple (gfor
       [i level-args] (enumerate levels)
       (mk-level :n (+ i 1) #** (kwdict level-args)))))))

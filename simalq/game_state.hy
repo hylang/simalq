@@ -149,8 +149,10 @@
       ; player in which monsters etc. get to act. It's a square
       ; spanning `(+ (* 2 reality-bubble-size) 1)` map squares on each
       ; side, with the player in the center.
+    player-starting-hp 500
+      ; The HP the player starts with (at least before `player-hp-factor`).
     player-hp-factor (f/ 1)
-      ; Multiplies the player's starting HP and healing.
+      ; Multiplies `player-starting-hp` and all healing to the player.
     poison-factor (f/ 1)
       ; Multiplies all ambient poison rates.
     max-keys 8
