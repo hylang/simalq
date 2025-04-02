@@ -61,8 +61,8 @@
 
 (defn test-shoot []
   (init
+    :reality-bubble-size 4
     :tiles ['floor 'floor 'floor 'floor ["orc" :hp 2]])
-  (setv G.rules.reality-bubble-size 4)
 
   (assert (= G.turn-n 0))
   (shoot 'E)

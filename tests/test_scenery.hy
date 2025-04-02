@@ -279,14 +279,14 @@
     "| " "breakable wall (meridional)"
     "- " "breakable wall (zonal)"})
   (init
+    :reality-bubble-size 2
+      ; Destruction propogates outside the reality bubble.
     :map "
       . | | | .
       . | | | .
       . | | | .
       @ - - | -"
     :map-marks marks)
-  (setv G.rules.reality-bubble-size 2)
-    ; Destruction propogates outside the reality bubble.
 
   (wk 'E)
   (assert-textmap :map-marks marks :text "
@@ -352,12 +352,12 @@
     "o " "phasing wall (out of phase)"
     "| " "phase trigger"})
   (init
+    :reality-bubble-size 1
+      ; Phasing occurs across the whole level.
     :map "
       X X X | X X o
       o X o @ X o o "
     :map-marks marks)
-  (setv G.rules.reality-bubble-size 1)
-    ; Phasing occurs across the whole level.
 
   ; Phase triggers can be triggered by sword or by arrow.
   (wk 'N)
@@ -389,6 +389,7 @@
 
 (defn test-explosive-wall []
   (init
+    :reality-bubble-size 1
     :map "
       @ X█o X█K X███X█
       X█X█X███X█X███X█
@@ -396,7 +397,6 @@
     :map-marks {
       "T " ["thorn tree" :hp 100]
       "K " ["Dark Knight" :hp 100]})
-  (setv G.rules.reality-bubble-size 1)
 
   ; Hit one of the explosive walls, setting off a chain reaction
   ; (which can extend past the reality bubble).
@@ -448,10 +448,10 @@
 
 (defn test-wall-generator []
   (init
+    :reality-bubble-size 2
     :map "
       . →|. . o . . .
       @ →|. . . . . .")
-  (setv G.rules.reality-bubble-size 2)
 
   ; Wall generators aren't limited by the reality bubble.
   (wk 'E)
@@ -573,9 +573,9 @@
   ; target square need not be.
   (for [size [2 3]]
     (init
+      :reality-bubble-size size
       :height 1
       :tiles ["teleporter" "wall" "wall" "teleporter"])
-    (setv G.rules.reality-bubble-size size)
     (wk 'E)
     (assert-player-at (if (= size 2) 1 5) 0))
 
@@ -656,6 +656,8 @@
 
 (defn test-wallfall-trap []
   (init
+    :reality-bubble-size 0
+      ; Wallfall traps are unaffected by the reality bubble.
     :map "
       @ t1t0t2
       . t1t0t2
@@ -669,9 +671,6 @@
       "W2" ["trapped wall" :wallnum 2]})
   (assert-full-name 'E "a wallfall trap (type 1)")
   (assert-full-name [3 0] "a trapped wall (type 2)")
-
-  (setv G.rules.reality-bubble-size 0)
-    ; Wallfall traps are unaffected by the reality bubble.
 
   (defn check [text]
     (assert-textmap text {

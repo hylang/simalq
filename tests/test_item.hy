@@ -580,10 +580,10 @@
 
 (defn test-wand-webs []
   (init
+    :reality-bubble-size 7
     :height 1
     :tiles ['floor "pile of gold" 'floor "wall" "giant spider" "wall" 'floor 'floor])
 
-  (setv G.rules.reality-bubble-size 7)
   (use-item "wand of webs")
   ; Every free square in the reality bubble gets a web.
   ; (The wand doesn't add a web under the spider, but the spider makes
@@ -684,6 +684,7 @@
 
 (defn test-wand-remote-action []
   (init
+    :reality-bubble-size Inf
     :width 30 :height 1
     :tiles [
       "pile of gold" "wall generator (west)"
@@ -693,7 +694,6 @@
       "cracked wall" "orc"])
   (defn remote [x]
     (use-item "wand of remote action" [x 0]))
-  (setv G.rules.reality-bubble-size 20)
   (setv nothing "There isn't anything you can affect there.")
 
   ; Wands of remote action can do lots of things.

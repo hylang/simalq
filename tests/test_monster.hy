@@ -156,10 +156,9 @@
 (defn test-nondainty []
   (for [dainty [F T]]
     (init
+      :dainty-monsters dainty
       :height 1
       :tiles ["pile of gold" "orc" "wall" "orc" "orc"])
-    (when (not dainty)
-      (setv G.rules.dainty-monsters F))
 
     (if dainty
       ; By default, normal monsters will only step on plain floor.
@@ -253,12 +252,12 @@
 
 (defn test-generator-reality-bubble []
   (init
+    :reality-bubble-size 4
     :height 1
     :tiles [
       'floor 'floor "wall" 'floor
       ["generator" :summon-class "orc" :summon-frequency (f/ 1)]
       'floor])
-  (setv G.rules.reality-bubble-size 4)
 
   ; Outside the reality bubble, generators do nothing.
   (wait 10)
@@ -278,6 +277,7 @@
     ; monster (`gen-west T`) and farther (`gen-west F`).
 
     (init
+      :dainty-monsters F
       :map "
         . . $ $
         @ . a b
@@ -287,7 +287,6 @@
           :summon-class "orc"
           :summon-frequency (f/ 1 4)]
         (if gen-west "b " "a ") 'floor})
-    (setv G.rules.dainty-monsters F)
 
     (defn check [orc-at-p1 orc-at-p2]
       (setv p1 (if gen-west (Pos G.map 3 1) (Pos G.map 2 1)))
@@ -336,12 +335,13 @@
   ; A wandering bat will eventually cover the reality bubble, if
   ; it can't attack the player. It can't leave the reality bubble
   ; on its own.
-  (init :map "
-    . . . . .
-    . . b . .
-    ██. . . .
-    @ ██. . .")
-  (setv G.rules.reality-bubble-size 3)
+  (init
+    :reality-bubble-size 3
+    :map "
+      . . . . .
+      . . b . .
+      ██. . . .
+      @ ██. . .")
   (assert (= G.player.hp 100))
   (setv seen-at (dfor
     x (range G.map.width)
@@ -884,8 +884,8 @@
 
 (defn test-siren []
   (init
+    :reality-bubble-size Inf
     :tiles (+ (* ['floor] 10) ["siren"]))
-  (setv G.rules.reality-bubble-size 20)
 
   ; The siren needs to build up shot power before it can paralyze.
   (assert-at [11 0] "siren")
@@ -954,6 +954,7 @@
 (defn test-umber-hulk []
 
   (init
+    :reality-bubble-size Inf
     :map "
       @ ▒▒| ##U █1^█++██◀▶██"
     :map-marks {
@@ -961,7 +962,6 @@
       "##" "cracked wall"
       "█1" "trapped wall"
       "++" "door"})
-  (setv G.rules.reality-bubble-size 20)
 
   ; Umber hulks can destroy somewhat more tiles than IQ's kroggs. Not
   ; everything, though.
@@ -1092,9 +1092,10 @@
     (fn [self state] #(Direction.E state)))
 
   ; Upon wandering onto an item, a snitch will pick it up.
-  (init :map "
-     @ . . . . n $ . . . . . . .")
-  (setv G.rules.reality-bubble-size 20)
+  (init
+    :reality-bubble-size Inf
+    :map "
+      @ . . . . n $ . . . . . . .")
   (wait 1)
   (assert-at [6 0] "snitch")
   ; The snitch holds the item for 5 turns before losing interest.
@@ -1108,11 +1109,11 @@
   ; When a snitch holding an item picks up a new one, it drops the old
   ; one on its previous square.
   (init
+    :reality-bubble-size Inf
     :map "
       @ . . . . n / . $ . . ."
     :map-marks {
       "/ " "wand of nothing"})
-  (setv G.rules.reality-bubble-size 20)
   (wait 3)
   (assert-at [7 0] "wand of nothing")
   (assert-at [8 0] "snitch")
