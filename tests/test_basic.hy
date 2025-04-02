@@ -61,7 +61,7 @@
 
 (defn test-shoot []
   (init
-    [:tiles ['floor 'floor 'floor 'floor ["orc" :hp 2]]])
+    :tiles ['floor 'floor 'floor 'floor ["orc" :hp 2]])
   (setv G.rules.reality-bubble-size 4)
 
   (assert (= G.turn-n 0))
@@ -87,7 +87,7 @@
 
   ; Shots are blocked by walls.
   (init
-    [:tiles ["wall" "orc"]])
+    :tiles ["wall" "orc"])
   (assert-hp [2 0] 1)
   (shoot 'E)
   (assert-hp [2 0] 1))
@@ -117,10 +117,10 @@
 
 
 (defn test-shoot-wrapping []
-  (init [
+  (init
     :map "
       . o . . @ ."
-    :wrap-x T])
+    :wrap-x T)
   ; We can shoot an arrow that wraps around the level to kill the orc.
   (assert-at [1 0] "orc")
   (shoot 'E)
@@ -187,7 +187,7 @@
 
   ; Try a lot of poison (more than IQ would support).
   (init
-    [:poison-intensity (+ 2 (f/ 1 3))])
+     :poison-intensity (+ 2 (f/ 1 3)))
   (check (f/ 0  ) 100)
   (wait)
   (check (f/ 1 3)  98)
@@ -199,16 +199,18 @@
 
 (defn test-ambient-poison-with-factor []
 
-  (init :poison-factor (f/ 1 4)
-    [:poison-intensity (f/ 1 3)])
+  (init
+    :poison-factor (f/ 1 4)
+    :poison-intensity (f/ 1 3))
   (assert (= G.player.hp 100))
   (wait 11)
   (assert (= G.player.hp 100))
   (wait)
   (assert (= G.player.hp 99))
 
-  (init :poison-factor (f/ 0)
-    [:poison-intensity (f/ 1 3)])
+  (init
+    :poison-factor (f/ 0)
+    :poison-intensity (f/ 1 3))
   (assert (= G.player.hp 100))
   (wait 50)
   (assert (= G.player.hp 100)))
@@ -242,7 +244,7 @@
 
 (defn test-game-state-history []
   (init
-    [:tiles ["handful of gems" "orc"]])
+    :tiles ["handful of gems" "orc"])
   (defn check [state turn score hp t0 t1 t2]
     (assert (and
       (= G.state-i state) (= G.turn-n turn)
@@ -287,7 +289,7 @@
 
 (defn test-saveload [tmp-path]
   (init
-    [:tiles ["key" "locked disappearing door"]])
+    :tiles ["key" "locked disappearing door"])
 
   (defn check [i n-states score keys thing px]
     (assert (and
@@ -315,9 +317,8 @@
 (defn test-player-death []
   (init
     :starting-hp 20
-    [
-      :player-start [1 0]
-      :tiles [["Dark Knight" :hp 10] 'floor 'floor "orc"]])
+    :player-start [1 0]
+    :tiles [["Dark Knight" :hp 10] 'floor 'floor "orc"])
   (defn check [state-i player-hp orc-x]
     (assert (= G.state-i state-i))
     (when (is-not player-hp None)

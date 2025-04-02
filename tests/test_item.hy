@@ -46,7 +46,7 @@
 
   ; Being maxed out on keys doesn't prevent you from unlocking a door
   ; on the same square.
-  (init [])
+  (init)
   (set-square 'E "key" "locked door")
   (assert-at 'E "key" "locked door")
   (setv G.player.keys G.rules.max-keys)
@@ -58,14 +58,14 @@
 
 
 (defn test-magic-arrow []
-  (init [
+  (init
     :map "
       ████████d ████
       @ ↑ o d ☠ ##G "
     :map-marks {
       "o " ["orc" :hp 4]
       "☠ " "jar of poison"
-      "##" ["cracked wall" :hp 3]}])
+      "##" ["cracked wall" :hp 3]})
 
   ; Pick up some magic arrows.
   (assert (= G.player.magic-arrows 0))
@@ -90,9 +90,9 @@
 
 
 (defn test-clock []
-  (init [
+  (init
     :time-limit 10
-    :tiles ["clock"]])
+    :tiles ["clock"])
   (wait 2)
   (assert (= G.time-left 8))
   (wk 'E)
@@ -100,9 +100,9 @@
 
 
 (defn test-food-eat []
-  (init [:tiles [
+  (init :tiles [
      "snack" "meal" "jar of poison" "rotten food" "empty platter"
-     "dessert" "snack" "dessert"]])
+     "dessert" "snack" "dessert"])
   (assert (= G.player.hp 100))
   (wk 'E)
   (assert (= G.player.hp 125))
@@ -124,8 +124,9 @@
 
 
 (defn test-food-hp-factor []
-  (init :player-hp-factor (f/ 1 2)
-    [:tiles ["snack" "meal" "dessert"]])
+  (init
+    :player-hp-factor (f/ 1 2)
+    :tiles ["snack" "meal" "dessert"])
   (assert (= G.player.hp 50))
   (wk 'E)
   (assert (= G.player.hp 62))
@@ -141,15 +142,15 @@
   "We also test poison-gas bombs here, because they have the same
   effect when used as a jar of poison does when shot."
 
-  (init [
-    :tiles ["snack"]])
+  (init
+    :tiles ["snack"])
   ; Shooting a snack (or most other foods) just destroys it.
   (assert-at 'E "snack")
   (shoot 'E)
   (assert-at 'E 'floor)
 
   (for [use-bomb? [F T]]
-    (init [
+    (init
       :map "
         @ ☠ ██o o
         ██##██G ██
@@ -157,7 +158,7 @@
       :map-marks {
         "☠ " "jar of poison"
         "##" ["cracked wall" :hp 2]
-        "o " ["orc" :hp 4]}])
+        "o " ["orc" :hp 4]})
     ; Shooting a jar of poison (or using a poison-gas bomb) creates a
     ; 5 × 5 cloud of poison, which can damage both the player and
     ; monsters. It goes through walls.
@@ -183,9 +184,9 @@
 
 
 (defn test-amulet-of-invulnerability []
-  (init [
+  (init
     :poison-intensity (f/ 1 3)
-    :tiles ["amulet of invulnerability" "orc"]])
+    :tiles ["amulet of invulnerability" "orc"])
   (defn check [turn-n player-hp [poison-dose None]]
     (assert (and (= G.turn-n turn-n)) (= G.player.hp player-hp))
     (when (is-not poison-dose None)
@@ -206,8 +207,8 @@
   (check 22 94 (f/ 2 3))
 
   ; If you get multiple status-effect items, the durations are summed.
-  (init [
-    :tiles [#* (* ["amulet of invulnerability"] 2) "orc"]])
+  (init
+    :tiles [#* (* ["amulet of invulnerability"] 2) "orc"])
   (wk 'E 2)
   (wait 38)
   (check 40 100)
@@ -217,7 +218,7 @@
 
 (defn test-cloak-of-invisibility []
 
-  (init [
+  (init
     :map "
       . d . . .
       . . . . .
@@ -225,7 +226,7 @@
       . . . . .
       . o . . ."
     :map-marks {
-      "! " "cloak of invisibility"}])
+      "! " "cloak of invisibility"})
   (assert (= G.player.hp 100))
   ; Get the cloak. Now that we're invisible, the orc can't approach
   ; and the devil can't shoot. (Nor can the imp flee, and it's too
@@ -246,21 +247,21 @@
 
   ; Contra IQ, monsters can still shoot an invisible Tris so long as
   ; they're adjacent.
-  (init [
+  (init
     :map "
        ██d
        . ██
        ! ██
        @ ██"
     :map-marks {
-      "! " "cloak of invisibility"}])
+      "! " "cloak of invisibility"})
   (wk 'N 2)
   (assert (= G.player.hp 90)))
 
 
 (defn test-potion-of-speed []
   (init
-    [:tiles ["potion of speed" "orc"]])
+    :tiles ["potion of speed" "orc"])
   (defn check [state-i turn-n [player-hp None]]
     (assert (and (= G.state-i state-i) (= G.turn-n turn-n)))
     (when (is-not player-hp None)
@@ -294,14 +295,14 @@
 
 
 (defn test-amulet-of-poison []
-  (init [
+  (init
     :map "
       . @ .
       o ! o
       o o o"
     :map-marks {
       "o " ["orc" :hp 10]
-      "! " "amulet of poison"}])
+      "! " "amulet of poison"})
 
   ; Pick up the amulet, doing 3 damage to all the surrounding orcs.
   (wk 'S)
@@ -318,7 +319,7 @@
 
   (defn ok [tile [can-pass-thru? True]]
     (init
-      [:tiles ["passwall amulet" tile]])
+      :tiles ["passwall amulet" tile])
     (wk 'E)
     (if can-pass-thru?
       (do
@@ -347,12 +348,12 @@
 
   ; Passwall allows you to ignore diagonal blockers that you would be
   ; able to walk through, but not other diagonal blockers (contra IQ).
-  (init [
+  (init
     :map "
       . ██.
       @ ! ██"
     :map-marks {
-      "! " "passwall amulet"}])
+      "! " "passwall amulet"})
   (wk 'E)
   (wk 'NE)
   (assert-player-at 2 1)
@@ -362,23 +363,23 @@
 
   ; Test for a bug where monsters could ignore diagonal blockers if
   ; the player had a passwall amulet.
-  (init [
+  (init
     :map "
       . ██o
       @ ! ██"
     :map-marks {
-      "! " "passwall amulet"}])
+      "! " "passwall amulet"})
   (wk 'E)
   (assert (= G.player.hp 100)))
 
 
 (defn test-ring-of-protection []
-  (init [
+  (init
     :height 1
     :tiles [
       "passwall amulet" "ring of protection"
       "anti-magic trap" "weakness trap"
-      "pile of gold" "hole" "archmage"]])
+      "pile of gold" "hole" "archmage"])
   (defn check [player-hp pass prot]
     (assert (= G.player.hp player-hp))
     (assert (= (.player-has? StatusEffect.Pass) pass))
@@ -421,10 +422,10 @@
     "one-way door (east)"      "door"
     "one-way door (north)"     "door"
     "metal door"               'floor})
-  (init [:tiles [
+  (init :tiles [
     "magical key" "magical key"
     #* (.keys becomes)
-    'floor "wall"]])
+    'floor "wall"])
 
   (wk 'E 19)
   (cant (wk 'E) move-blocked-msgs.simple)
@@ -433,9 +434,9 @@
 
 
 (defn test-inventory []
-  (init [:tiles [
+  (init :tiles [
      "wand of shielding" "wall-making wand"
-     "standard bomb" "standard bomb"]])
+     "standard bomb" "standard bomb"])
 
   (defn check [#* args]
     (assert (all (gfor
@@ -462,11 +463,10 @@
 
 
 (defn test-wand-shielding []
-  (init [
-    :map "
-      . o .
-      ██. .
-      $ @ ."])
+  (init :map "
+    . o .
+    ██. .
+    $ @ .")
 
   ; A wand of shielding creates a shield on each adjacent square (even
   ; if something else is there, unlike IQ). Monsters can't move onto
@@ -512,7 +512,7 @@
 
 (defn test-wand-wall-making []
   (init
-    [:tiles ["orc" "wall"]])
+    :tiles ["orc" "wall"])
 
   ; Unlike IQ, walls can be added regardless of what's already on the
   ; target square.
@@ -527,7 +527,7 @@
 
 
 (defn test-wand-phase []
-  (init [])
+  (init)
   (defn phase [start end]
     (set-square 'E #* start)
     (use-item "phase wand" 'E)
@@ -553,7 +553,7 @@
 
 (defn test-wand-wall-destroying []
   (init
-    [:tiles ["orc" "wall" "pillar"]])
+    :tiles ["orc" "wall" "pillar"])
 
   (cant (use-item "wall-destroying wand" 'E) "There isn't a destructible tile there.")
   (use-item "wall-destroying wand" [2 0])
@@ -579,9 +579,9 @@
 
 
 (defn test-wand-webs []
-  (init [
+  (init
     :height 1
-    :tiles ['floor "pile of gold" 'floor "wall" "giant spider" "wall" 'floor 'floor]])
+    :tiles ['floor "pile of gold" 'floor "wall" "giant spider" "wall" 'floor 'floor])
 
   (setv G.rules.reality-bubble-size 7)
   (use-item "wand of webs")
@@ -604,13 +604,13 @@
     "☉G" ["generator" :summon-class "ghost"]
     "☉o" ["generator" :summon-class "orc"]
     "##" "cracked wall"})
-  (init [
+  (init
     :map "
       ██d ██☉G██A
       t ██o ##i ██
       ██G ██☉o██K
       @ ██N ██s ██"
-    :map-marks map-marks])
+    :map-marks map-marks)
 
   (setv hp (int 1e20))
   (for [
@@ -635,7 +635,7 @@
 
 
 (defn test-wand-annihilation []
-  (init [])
+  (init)
   (set-square 'E
     "orc" "wall" "exit" "pile of gold" "negaton" "Void" "hole")
   ; Everything except the Void is destroyed by annihilation.
@@ -652,9 +652,9 @@
 
 
 (defn test-wand-flame []
-  (init [
+  (init
     :height 1
-    :tiles ["wall" ["orc" :hp 10] ["orc" :hp 10] "web" "wall" ["orc" :hp 10]]])
+    :tiles ["wall" ["orc" :hp 10] ["orc" :hp 10] "web" "wall" ["orc" :hp 10]])
 
   (assert (= G.player.hp 100))
   (use-item "wand of flame" [2 0])
@@ -673,8 +673,8 @@
 
 
 (defn test-wand-teleportation []
-  (init [
-    :tiles ["orc"]])
+  (init
+    :tiles ["orc"])
 
   (cant (use-item "wand of teleportation" 'E) "This wand can only target an empty square.")
     ; You can't tele-frag with a wand.
@@ -683,14 +683,14 @@
 
 
 (defn test-wand-remote-action []
-  (init [
+  (init
     :width 30 :height 1
     :tiles [
       "pile of gold" "wall generator (west)"
       "treasure chest" "key"
       "phase trigger" "phasing wall (in phase)"
       "barrier projector" "magical barrier (zonal)"
-      "cracked wall" "orc"]])
+      "cracked wall" "orc"])
   (defn remote [x]
     (use-item "wand of remote action" [x 0]))
   (setv G.rules.reality-bubble-size 20)
@@ -741,9 +741,9 @@
 
   (defn check [item-stem usage #* damages]
     (setv starting-orc-hp 10)
-    (init [
+    (init
       :height 1
-      :tiles (lfor  _ damages  ["orc" :hp starting-orc-hp])])
+      :tiles (lfor  _ damages  ["orc" :hp starting-orc-hp]))
     (ecase usage
       'use (do
         ; Actually use the bomb.
@@ -765,7 +765,7 @@
 
 
 (defn test-earthquake-bomb []
-  (init [
+  (init
     :map "
        ██| #2█1
        ↑↓#1←→.
@@ -774,7 +774,7 @@
       "o " ["orc" :hp 10]
       "#1" ["cracked wall" :hp 10]
       "#2" ["cracked wall" :hp  2]
-      "█1" "trapped wall"}])
+      "█1" "trapped wall"})
 
   ; An earthquake bomb does 3 damage to monsters and 2 to cracked
   ; walls.
@@ -793,15 +793,15 @@
 
   ; The sword artifact increases melee damage to 3. Multiple copies
   ; don't stack.
-  (init [
+  (init
     :height 1
-    :tiles ["Holy Sword" "Holy Sword" ["orc" :hp 4]]])
+    :tiles ["Holy Sword" "Holy Sword" ["orc" :hp 4]])
   (wk 'E 3)
   (assert-hp 'E 1)
 
   ; The bow artifact is similar, but increases ranged damage to 2.
   (init
-    [:tiles ["Elven Bow" ["orc" :hp 10]]])
+     :tiles ["Elven Bow" ["orc" :hp 10]])
   (wk 'E)
   (shoot 'E)
   (assert-hp 'E 8)
@@ -813,8 +813,8 @@
 
 
 (defn test-artifact-shield []
-  (init [
-    :tiles ["Magic Shield" "fixed damaging trap" "devil"]])
+  (init
+    :tiles ["Magic Shield" "fixed damaging trap" "devil"])
 
   ; The shield makes you take 3/4 damage, rounded up.
   ; A devil's shot normally does 10 damage, but now does

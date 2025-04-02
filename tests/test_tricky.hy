@@ -53,8 +53,8 @@
 
 (defn test-refresh-level []
   ; Levels are refreshed when you revisit them.
-  (init [
-    :next-level 1 :tiles [["orc" :hp 3] "key" "exit"]])
+  (init
+    :next-level 1 :tiles [["orc" :hp 3] "key" "exit"])
 
   (assert-player-at 0 0)
   (assert (= G.level-n 1))
@@ -78,7 +78,7 @@
         (replace "(o)" "(out of phase)")
         (replace "(z)" "(zonal)"))))
     (init
-      [:tiles ['floor tile 'floor ["devil" :hp 2]]])
+      :tiles ['floor tile 'floor ["devil" :hp 2]])
     (assert (= G.player.hp 100))
     (shoot 'E)
     (assert-hp
@@ -128,7 +128,7 @@
     (Pos G.map (if ranged 2 1) 0))
 
   (for [wall-on-top [F T]  ranged [F T]]
-    (init [])
+    (init)
     (mk-tile (mon-p) ["devil" :hp 3])
     (for [p [G.player.pos (mon-p)]]
       (mk-tile p "wall")
@@ -145,7 +145,7 @@
   "Monsters on your square can't attack you."
 
   (init
-    [:tiles ["devil"]])
+    :tiles ["devil"])
   (mv-player 1 0)
   (assert (= G.player.hp 100))
   ; We wait. The devil can't attack. It doesn't move, either, since

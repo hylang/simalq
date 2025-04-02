@@ -13,13 +13,13 @@
 
 (defn test-simple-full-name []
   (init
-    [:tiles [["orc" :hp 3]]])
+    :tiles [["orc" :hp 3]])
   (assert-full-name 'E "an orc (HP 3)"))
 
 
 (defn test-simple-melee-combat []
   (init
-    [:tiles [["Dark Knight" :hp 5]]])
+    :tiles [["Dark Knight" :hp 5]])
   (defn check [turn score tris mon]
     (assert (and (= G.turn-n turn) (= G.score score)))
     (assert (= G.player.hp tris))
@@ -44,10 +44,9 @@
 (defn test-monster-melee-diag []
 
   ; A monster can melee-attack diagonally around a column.
-  (init
-    [:map "
-      | @
-      o ."])
+  (init :map "
+    | @
+    o .")
   (assert (= G.player.hp 100))
   (assert-at 'SW "orc")
   (wait)
@@ -55,10 +54,9 @@
   (assert-at 'SW "orc")
 
   ; But not a wall. So the orc will use its first turn to walk east.
-  (init
-    [:map "
-      ██@
-      o ."])
+  (init :map "
+    ██@
+    o .")
   (assert (= G.player.hp 100))
   (assert-at 'SW "orc")
   (wait)
@@ -70,7 +68,7 @@
 
   ; A monster can approach in a straight line.
   (init
-    [:tiles ['floor 'floor 'floor "orc"]])
+    :tiles ['floor 'floor 'floor "orc"])
   (assert-at 'E 'floor)
   (wait 2)
   (assert-at 'E 'floor)
@@ -83,17 +81,16 @@
 
   ; A monster stymied when trying to go west will first try northwest.
   (init
-    [:tiles ["pillar" "orc"]])
+    :tiles ["pillar" "orc"])
   (wait)
   (assert-at 'NE "orc")
 
   ; A monster stymied going west *and* northwest will take 3 turns
   ; to finally try southwest.
-  (init
-    [:map "
-      . | .
-      @ | o
-      . . ."])
+  (init :map "
+    . | .
+    @ | o
+    . . .")
   (do-n 3
     (assert-at 'SE 'floor)
     (wait))
@@ -101,21 +98,20 @@
 
   ; When the monster is blocked W, NW, and SW, he'll just sit there
   ; forever.
-  (init
-    [:map "
-      . . .
-      @ ██o
-      . . ."])
-    ; A wall, unlike a pillar, blocks diagonal movement.
+  (init :map "
+    . . .
+    @ ██o
+    . . .")
   (assert-at [2 1] "orc")
   (wait 100)
+    ; A wall, unlike a pillar, blocks diagonal movement.
   (assert-at [2 1] "orc")
 
   ; A monster outside the reality bubble can't move.
   (setv r G.rules.reality-bubble-size)
-  (init [:tiles [
+  (init :tiles [
     #* (* ['floor] r)
-    "orc"]])
+    "orc"])
   (assert-at [(+ r 1) 0] "orc")
   (wait 100)
   (assert-at [(+ r 1) 0] "orc")
@@ -124,9 +120,9 @@
 
   ; A monster can chase Tris around a wrapped map.
   ; (Accompanied by "Yakety Sax", one imagines.)
-  (init [
+  (init
     :player-start #(4 4)
-    :width 9 :height 9 :wrap-y T])
+    :width 9 :height 9 :wrap-y T)
   (set-square 'N "orc")
   (do-n 100
     (wk 'S)
@@ -139,8 +135,7 @@
   property of the spiral activation order of monsters that we inherit
   from IQ."
 
-  (init
-    [:player-start #(8 8)])
+  (init :player-start #(8 8))
 
   (defn arms []
     (lfor
@@ -161,7 +156,8 @@
 (defn test-nondainty []
   (for [dainty [F T]]
     (init
-      [:height 1 :tiles ["pile of gold" "orc" "wall" "orc" "orc"]])
+      :height 1
+      :tiles ["pile of gold" "orc" "wall" "orc" "orc"])
     (when (not dainty)
       (setv G.rules.dainty-monsters F))
 
@@ -182,7 +178,7 @@
 
 (defn test-orc-or-goblin []
   (init
-    [:tiles [["orc" :hp 3]]])
+    :tiles [["orc" :hp 3]])
 
   (assert-at 'E "orc")
   ; Get stabbed.
@@ -204,7 +200,7 @@
   3 HP."
 
   (init
-    [:tiles [["orc" :hp 10]]])
+    :tiles [["orc" :hp 10]])
 
   (for [[orc-hp score player-hp] [
       [10 0 100]
@@ -222,7 +218,7 @@
 
 
 (defn test-generator []
-  (init [
+  (init
     :map "
       @ ████. .
       ████. G .
@@ -231,7 +227,7 @@
       "G " ["generator"
         :summon-class "orc"
         :summon-frequency (f/ 2 3)
-        :summon-hp 2]}])
+        :summon-hp 2]})
   (assert-full-name [3 1] "an orc generator (HP 1, pw 0, freq 2/3, sHP 2)")
 
   (defn check [power tN tNE tE tSE tW]
@@ -256,12 +252,12 @@
 
 
 (defn test-generator-reality-bubble []
-  (init [
+  (init
     :height 1
     :tiles [
       'floor 'floor "wall" 'floor
       ["generator" :summon-class "orc" :summon-frequency (f/ 1)]
-      'floor]])
+      'floor])
   (setv G.rules.reality-bubble-size 4)
 
   ; Outside the reality bubble, generators do nothing.
@@ -281,7 +277,7 @@
     ; Try a case with the generator nearer to the player than the
     ; monster (`gen-west T`) and farther (`gen-west F`).
 
-    (init [
+    (init
       :map "
         . . $ $
         @ . a b
@@ -290,7 +286,7 @@
         (if gen-west "a " "b ") ["generator"
           :summon-class "orc"
           :summon-frequency (f/ 1 4)]
-        (if gen-west "b " "a ") 'floor}])
+        (if gen-west "b " "a ") 'floor})
     (setv G.rules.dainty-monsters F)
 
     (defn check [orc-at-p1 orc-at-p2]
@@ -314,7 +310,7 @@
 
 (defn test-ghost []
   (init
-    [:tiles [["ghost" :hp 3]]])
+    :tiles [["ghost" :hp 3]])
   (assert (and (= G.player.hp 100) (= G.score 0)))
   (assert-at 'E "ghost")
   ; Attack the ghost. We get 10 points for doing 2 damage.
@@ -328,7 +324,7 @@
 
   ; A bat that's next to Tris just chews on her instead of moving.
   (init
-    [:tiles ["bat"]])
+    :tiles ["bat"])
   (assert (= G.player.hp 100))
   (wait)
   (assert (= G.player.hp 99))
@@ -340,12 +336,11 @@
   ; A wandering bat will eventually cover the reality bubble, if
   ; it can't attack the player. It can't leave the reality bubble
   ; on its own.
-  (init
-    [:map "
-        . . . . .
-        . . b . .
-        ██. . . .
-        @ ██. . ."])
+  (init :map "
+    . . . . .
+    . . b . .
+    ██. . . .
+    @ ██. . .")
   (setv G.rules.reality-bubble-size 3)
   (assert (= G.player.hp 100))
   (setv seen-at (dfor
@@ -368,7 +363,7 @@
 
   ; At range, a devil shoots for 10 damage.
   (init
-    [:tiles ['floor "devil"]])
+    :tiles ['floor "devil"])
   (assert (= G.player.hp 100))
   (wait)
   (assert (= G.player.hp 90))
@@ -377,17 +372,17 @@
   (assert (= G.player.hp 87))
 
   ; A diagonally blocked devil can't melee, so it shoots.
-  (init
-    [:map "
-      . d
-      @ ██"])
+  (init :map "
+    . d
+    @ ██")
   (assert (= G.player.hp 100))
   (wait)
   (assert (= G.player.hp 90))
 
   ; Monster shots can wrap around.
-  (init [:wrap-x T
-    :map ". @ ████████d ."])
+  (init
+    :wrap-x T
+    :map ". @ ████████d .")
   (assert (= G.player.hp 100))
   (wait)
   (assert (= G.player.hp 90))
@@ -395,8 +390,9 @@
   ; However, monsters only consider one direction for shooting. If the
   ; shortest path to the player (as the xorn phases) is blocked, they
   ; won't consider another valid direction.
-  (init [:wrap-x T
-    :map ". . @ ██d . ."])
+  (init
+    :wrap-x T
+    :map ". . @ ██d . .")
   (assert (= G.player.hp 100))
   (wait)
   (assert (= G.player.hp 100))
@@ -408,7 +404,8 @@
 
 (defn test-wizard []
   (init
-    [:player-start #(5 0) :tiles [["wizard" :hp 3]]])
+    :player-start #(5 0)
+    :tiles [["wizard" :hp 3]])
 
   (assert (= G.player.hp 100))
   ; Wizards always melee for 4 damage.
@@ -425,7 +422,8 @@
 (defn test-imp []
 
   (init
-    [:height 1 :tiles ["wall" "wall" "imp"]])
+    :height 1
+    :tiles ["wall" "wall" "imp"])
   (assert (= G.player.hp 100))
   ; An imp initially needs to gain some shot power before it can
   ; shoot.
@@ -449,11 +447,10 @@
 
   ; On a turn that an imp isn't shooting or fleeing (even if it's
   ; gaining shot power), it wanders.
-  (init
-    [:map "
-      . . . . .
-      @ . . i .
-      . . . . ."])
+  (init :map "
+    . . . . .
+    @ . . i .
+    . . . . .")
   (defn imp []
     (setv [mon] (gfor
       col G.map.data
@@ -471,7 +468,7 @@
 
 (defn test-thorn-tree []
   (init
-    [:tiles ['floor ["thorn tree" :hp 3] ["thorn tree" :hp 10]]])
+    :tiles ['floor ["thorn tree" :hp 3] ["thorn tree" :hp 10]])
 
   ; Thorn trees are immobile.
   (assert-at [2 0] "thorn tree")
@@ -503,7 +500,7 @@
   (namely, thorn trees)."
 
   (init
-    [:tiles [["generator" :hp 3 :summon-class "thorn tree"]]])
+    :tiles [["generator" :hp 3 :summon-class "thorn tree"]])
   ; Generators inherit the immunities of the monster type they
   ; generate, so a thorn-tree generator is immune to arrows.
   (shoot 'E)
@@ -518,7 +515,7 @@
   (assert (= G.score (* 4 10)))
 
   (setv shp 7)
-  (init [
+  (init
     :map "
       . . . . . .
       . . . . . .
@@ -530,7 +527,7 @@
         :hp 3
         :summon-class "thorn tree"
         :summon-frequency (f/ 1)
-        :summon-hp shp]}])
+        :summon-hp shp]})
   ; Check the full name.
   (assert-full-name [3 2]
     f"a thorn-tree generator (HP 3, pw 0, freq 1, sHP {shp})")
@@ -543,7 +540,7 @@
 
 (defn test-tricorn []
   (init
-    [:tiles ['floor 'floor 'floor "Tricorn"]])
+    :tiles ['floor 'floor 'floor "Tricorn"])
 
   ; Tricorns can't shoot from more than 3 squares away. When they
   ; can't shoot, they approach as normal.
@@ -556,7 +553,7 @@
 
 (defn test-death []
   (init
-    [:tiles [["Death" :hp 10]]])
+    :tiles [["Death" :hp 10]])
 
   (assert-hp 'E 10)
   ; Deaths are immune to mundane arrows.
@@ -573,9 +570,9 @@
 
 (defn test-floater []
 
-  (init [
+  (init
     :height 1
-    :tiles ["wall" "floater" "wall"]])
+    :tiles ["wall" "floater" "wall"])
   ; If a floater activates while adjacent to us, we gain 1/5 floater
   ; disturbance.
   (assert (= G.player.floater-disturbance (f/ 0)))
@@ -607,12 +604,12 @@
 
   ; Contra IQ, floaters can explode on death when killed with e.g.
   ; poison.
-  (init [
+  (init
     :map "
       ██f ██.
       @ > . ☠"
     :map-marks {
-      "☠ " "jar of poison"}])
+      "☠ " "jar of poison"})
   (assert (= G.player.hp 100))
   (assert-at 'NE "floater")
   (assert-at [3 0] "jar of poison")
@@ -623,9 +620,9 @@
   (assert-at [3 0] 'floor)
 
   ; But instakills, like a wand of death, prevent the explosion.
-  (init [
+  (init
     :height 1
-    :tiles ["floater" "wall"]])
+    :tiles ["floater" "wall"])
   (assert-at 'E "floater")
   (assert (= G.player.hp 100))
   (use-item "wand of death" [3 0])
@@ -634,12 +631,12 @@
 
 
 (defn test-blob []
-  (init [
+  (init
     :map "
       . ████.
       @ ██O ██"
     :map-marks {
-      "O " ["blob" :hp 5]}])
+      "O " ["blob" :hp 5]})
 
   (wait 9)
   (assert-full-name [2 0] f"a blob (HP 5, wd ....., pw 9/10)")
@@ -656,12 +653,12 @@
   (setv marks {
     "O " "gunk"
     "s " "gunk seed"})
-  (init [
+  (init
     :map "
       O . . .
       ████████
       @ ██s . "
-    :map-marks marks])
+    :map-marks marks)
   ; Gunks take 5 turns to reproduce, and gunk seeds take 5 turns to
   ; grow up.
   (wait 4)
@@ -695,7 +692,7 @@
 
   ; Test for a bug where the game tried to set an attribute on the
   ; wrong tile when there's more than one tile in a stack.
-  (init [])
+  (init)
   (set-square 'E "gunk seed" "wall")
   (wait 5)
   (assert-at 'E "gunk" "wall"))
@@ -704,9 +701,9 @@
 (defn test-specter []
 
   (defn check [turns #* middle-tiles]
-    (init [
+    (init
       :height 1
-      :tiles ['floor #* middle-tiles "specter"]])
+      :tiles ['floor #* middle-tiles "specter"])
     (if (= turns Inf)
       (do
         (wait 100)
@@ -731,12 +728,12 @@
 
   ; Test for a bug where a specter's movement state cycles too quickly
   ; to allow jumping east here.
-  (init [
+  (init
     :map "
        S ██.
        ████@"
     :map-marks {
-      "S " "specter"}])
+      "S " "specter"})
   (wait)
   (assert-at 'N "specter"))
 
@@ -744,7 +741,7 @@
 (defn test-spider []
 
   (init
-    [:tiles ['floor "web" "giant spider"]])
+    :tiles ['floor "web" "giant spider"])
   ; A spider can walk onto webs.
   (wk 'E)
   (assert-at 'E "giant spider" "web")
@@ -756,7 +753,7 @@
 
   ; A spider that doesn't move during its turn can still create a web.
   (init
-    [:tiles ["wall" "giant spider"]])
+    :tiles ["wall" "giant spider"])
   (assert-at [2 0] "giant spider")
   (wait)
   (assert-at [2 0] "giant spider" "web"))
@@ -764,7 +761,7 @@
 
 (defn test-turret []
   (init
-    [:tiles ["turret"]])
+    :tiles ["turret"])
 
   ; Turrets are immune to a lot of things.
   (wk 'E)
@@ -787,9 +784,9 @@
 
 (defn test-teleporting-mage []
   (defn check [text-map]
-    (init [:map text-map :map-marks {
+    (init :map text-map :map-marks {
       "1 " "teleporting mage"
-      "2 " 'floor}])
+      "2 " 'floor})
     (wait)
     (assert-textmap text-map :map-marks {
       "1 " 'floor
@@ -826,11 +823,11 @@
 
 (defn test-archmage []
 
-  (init [:tiles [
+  (init :tiles [
     "archmage"
     'floor
     "cloak of invisibility"
-    "cloak of invisibility"]])
+    "cloak of invisibility"])
   (mv-player 2 0)
   (assert (= G.player.hp 100))
   ; The shot of an archmage can disenchant, in which case it does no
@@ -852,7 +849,7 @@
 
   ; Test for a bug where a diagonally blocked but adjacent archmage
   ; didn't disenchant.
-  (init [
+  (init
     :map "
        ██W
        . ██
@@ -860,7 +857,7 @@
        @ ██"
     :map-marks {
       "W " "archmage"
-      "! " "cloak of invisibility"}])
+      "! " "cloak of invisibility"})
   (wk 'N)
   (assert (.player-has? StatusEffect.Ivis))
   (wk 'N)
@@ -869,8 +866,8 @@
 
 
 (defn test-ant []
-  (init [
-    :tiles ["giant ant"]])
+  (init
+    :tiles ["giant ant"])
 
   ; Ants paralyze if you're not already paralyzed, and otherwise do
   ; damage.
@@ -886,8 +883,8 @@
 
 
 (defn test-siren []
-  (init [:tiles
-    (+ (* ['floor] 10) ["siren"])])
+  (init
+    :tiles (+ (* ['floor] 10) ["siren"]))
   (setv G.rules.reality-bubble-size 20)
 
   ; The siren needs to build up shot power before it can paralyze.
@@ -919,7 +916,7 @@
 
 (defn test-golem []
   (init
-    [:tiles ['floor 'floor 'floor "golem"]])
+    :tiles ['floor 'floor 'floor "golem"])
 
   ; Golems do nothing unless they're within 3 squares of Tris.
   (assert-at [4 0] "golem")
@@ -934,7 +931,8 @@
 (defn test-cyclops []
 
   ; Cyclopes approach, but don't attack.
-  (init [:tiles ['floor "cyclops"]])
+  (init
+    :tiles ['floor "cyclops"])
   (wait 1)
   (assert-at 'E "cyclops")
   (wait 5)
@@ -946,24 +944,23 @@
 
   ; Contra IQ, cyclopes will try to get orthogonal to you even if
   ; they're diagonally adjacent and there are no diagonal blockers.
-  (init [
-    :map "
-       @ .
-       . C"])
+  (init :map "
+    @ .
+    . C")
   (wait)
   (assert-at 'S "cyclops"))
 
 
 (defn test-umber-hulk []
 
-  (init [
+  (init
     :map "
       @ ▒▒| ##U █1^█++██◀▶██"
     :map-marks {
       "▒▒" "Void"
       "##" "cracked wall"
       "█1" "trapped wall"
-      "++" "door"}])
+      "++" "door"})
   (setv G.rules.reality-bubble-size 20)
 
   ; Umber hulks can destroy somewhat more tiles than IQ's kroggs. Not
@@ -984,7 +981,7 @@
   "This test effectively covers archdevils and Dark Princes, which are
   special cases of Lords of the Undead."
 
-  (init [
+  (init
     :map "
        . . .
        . L .
@@ -992,7 +989,7 @@
        ██████
        @ ! ."
     :map-marks {
-      "! " "cloak of invisibility"}])
+      "! " "cloak of invisibility"})
         ; We use invisbility so monsters stay immobile.
   ; A Lord of the Undead can summon 2 monsters every 4 turns.
   (wk 'E)
@@ -1019,7 +1016,9 @@
     (assert-hp (+ p direction) hp))
 
   ; Lords don't get to summon while attacking the player.
-  (init :starting-hp 500 [:map "@ L ."])
+  (init
+    :starting-hp 500
+    :map "@ L .")
   (wait 10)
   (assert (= G.player.hp (- 500 (* 10 15))))
   (assert-at [2 0] 'floor))
@@ -1027,7 +1026,7 @@
 
 (defn test-vampire []
 
-  (init [
+  (init
     :map "
        d o w
        . V g
@@ -1035,7 +1034,7 @@
        ██████
        @ . ."
     :map-marks {
-      "w " ["wizard" :hp 10]}])
+      "w " ["wizard" :hp 10]})
   (assert-full-name [1 3] #[[a vampire (HP 1, wd ....., act "wander")]])
   ; Given enough time, all the non-vampires (except the devil, which
   ; isn't vampirizable) are vampirized, and the remaining empty space
@@ -1054,7 +1053,7 @@
 
   ; A slain vampire becomes a 3-HP bat.
   (init
-    [:tiles ["vampire"]])
+    :tiles ["vampire"])
   (wk 'E)
   (assert-at 'E "bat")
   (assert-hp 'E 3))
@@ -1064,21 +1063,21 @@
 
   ; Tris takes 5 damage for each point of damage received by a
   ; doppelganger (ignoring overkill).
-  (init [:tiles ["doppelganger"]])
+  (init :tiles ["doppelganger"])
   (shoot 'E)
   (assert (= G.player.hp 95))
-  (init [:tiles ["doppelganger"]])
+  (init :tiles ["doppelganger"])
   (wk 'E)
   (assert (= G.player.hp 95))
-  (init [:tiles [["doppelganger" :hp 2]]])
+  (init :tiles [["doppelganger" :hp 2]])
   (wk 'E)
   (assert (= G.player.hp 90))
-  (init [:tiles ['floor 'floor "jar of poison" "doppelganger"]])
+  (init :tiles ['floor 'floor "jar of poison" "doppelganger"])
   (shoot 'E)
   (assert (= G.player.hp 95))
 
   ; Instakills avoid this empathy damage.
-  (init [:tiles ["doppelganger"]])
+  (init :tiles ["doppelganger"])
   (use-item "wand of death" [3 0])
   (assert-at 'E 'floor)
   (assert (= G.player.hp 100)))
@@ -1093,8 +1092,8 @@
     (fn [self state] #(Direction.E state)))
 
   ; Upon wandering onto an item, a snitch will pick it up.
-  (init [:map "
-     @ . . . . n $ . . . . . . ."])
+  (init :map "
+     @ . . . . n $ . . . . . . .")
   (setv G.rules.reality-bubble-size 20)
   (wait 1)
   (assert-at [6 0] "snitch")
@@ -1108,11 +1107,11 @@
 
   ; When a snitch holding an item picks up a new one, it drops the old
   ; one on its previous square.
-  (init [
+  (init
     :map "
       @ . . . . n / . $ . . ."
     :map-marks {
-      "/ " "wand of nothing"}])
+      "/ " "wand of nothing"})
   (setv G.rules.reality-bubble-size 20)
   (wait 3)
   (assert-at [7 0] "wand of nothing")
@@ -1120,7 +1119,7 @@
 
   ; An empty-handed snitch within 4 squares of you will approach and
   ; attack.
-  (init [])
+  (init)
   (set-square [0 2] "snitch")
   (wait 2)
   (defn snitch [] (top 'N))
@@ -1158,7 +1157,7 @@
 (defn test-dragon []
   (init
     :starting-hp 10,000
-    [:tiles ['floor "dragon egg"]])
+    :tiles ['floor "dragon egg"])
 
   ; It takes a 1-HP dragon egg 4 turns to hatch. The newly created
   ; wyrmling doesn't get to move or attack on the same turn.

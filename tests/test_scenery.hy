@@ -42,7 +42,7 @@
   ; On a one-way door, you can still bump in the forbidden directions.
   ; IQ is inconsistent about this.
   (init
-    [:tiles ["one-way door (north)"]])
+    :tiles ["one-way door (north)"])
   (mv-player 1 0)
   ; Try unlocking a door.
   (set-square 'E "locked door")
@@ -99,7 +99,7 @@
 
 (defn test-portcullis []
   (init
-    [:tiles ["closed portcullis"]])
+    :tiles ["closed portcullis"])
 
   (cant (wk 'E) "It's locked, and you're keyless at the moment.")
   (setv G.player.keys 1)
@@ -115,7 +115,7 @@
 
 
 (defn test-chest []
-  (init [])
+  (init)
   (set-square [1 0] "treasure chest" "pile of gold")
   (set-square [2 0] "treasure chest" "meal")
 
@@ -136,7 +136,7 @@
 
 
 (defn test-metal-door []
-  (init [:player-start [1 0]])
+  (init :player-start [1 0])
 
   (set-square 'W ["metal-door control" :target (locate 'E)])
   ; Use the control to create a door.
@@ -265,7 +265,7 @@
 
   ; Destroy a wall with 10 HP.
   (init
-    [:tiles [["cracked wall" :hp 10]]])
+    :tiles [["cracked wall" :hp 10]])
   (assert-at 'E "cracked wall")
   (wk 'E 4)
   (assert-at 'E "cracked wall")
@@ -278,13 +278,13 @@
   (setv marks {
     "| " "breakable wall (meridional)"
     "- " "breakable wall (zonal)"})
-  (init [
+  (init
     :map "
       . | | | .
       . | | | .
       . | | | .
       @ - - | -"
-    :map-marks marks])
+    :map-marks marks)
   (setv G.rules.reality-bubble-size 2)
     ; Destruction propogates outside the reality bubble.
 
@@ -320,12 +320,12 @@
 
 
 (defn test-fading-wall []
-  (init [
+  (init
     :map "
       @ ^█^█^█^█{}. . . . . . x ^█"
     :map-marks {
       "{}" ["gate" :target "x "]
-      "x " 'floor}])
+      "x " 'floor})
 
   ; Fading walls near you at the very start of a level don't actually
   ; get a chance to fade till the end of your first turn.
@@ -351,11 +351,11 @@
     "X " "phasing wall (in phase)"
     "o " "phasing wall (out of phase)"
     "| " "phase trigger"})
-  (init [
+  (init
     :map "
       X X X | X X o
       o X o @ X o o "
-    :map-marks marks])
+    :map-marks marks)
   (setv G.rules.reality-bubble-size 1)
     ; Phasing occurs across the whole level.
 
@@ -388,14 +388,14 @@
 
 
 (defn test-explosive-wall []
-  (init [
+  (init
     :map "
       @ X█o X█K X███X█
       X█X█X███X█X███X█
       T T T T T T T T"
     :map-marks {
       "T " ["thorn tree" :hp 100]
-      "K " ["Dark Knight" :hp 100]}])
+      "K " ["Dark Knight" :hp 100]})
   (setv G.rules.reality-bubble-size 1)
 
   ; Hit one of the explosive walls, setting off a chain reaction
@@ -420,7 +420,7 @@
 
 (defn test-pushblock []
   (init
-    [:tiles ["pushblock" "pile of gold"]])
+    :tiles ["pushblock" "pile of gold"])
 
   ; Anything in the target square will block a pushblock.
   (cant (wk 'E) "There's no room to push the block there.")
@@ -435,7 +435,7 @@
 
 (defn test-pushblock-limited []
   (init
-    [:tiles [["pushblock" :n-pushes 3]]])
+    :tiles [["pushblock" :n-pushes 3]])
 
   (assert-full-name 'E f"a pushblock (pushes left = 3)")
   (wk 'E)
@@ -447,10 +447,10 @@
 
 
 (defn test-wall-generator []
-  (init [
+  (init
     :map "
       . →|. . o . . .
-      @ →|. . . . . ."])
+      @ →|. . . . . .")
   (setv G.rules.reality-bubble-size 2)
 
   ; Wall generators aren't limited by the reality bubble.
@@ -468,7 +468,7 @@
 
 
 (defn test-fountains []
-  (init [
+  (init
     :poison-intensity (f/ 1 5)
     :map "
       pfpfwf
@@ -477,7 +477,7 @@
     :map-marks {
       "wf" "water fountain"
       "pf" "poisonous fountain"
-      "☠ " "jar of poison"}])
+      "☠ " "jar of poison"})
 
   ; When next to at least one water fountain, the player takes no
   ; damage from ambient poison or from poison fountains.
@@ -508,7 +508,7 @@
   (for [one-shot? [F T]]
 
     (setv stem (+ (if one-shot? "one-shot " "") "gate"))
-    (init [])
+    (init)
     (defn t [] (Pos G.map 5 6))
 
     (mk-tile [1 0] [stem :target (t)])
@@ -526,12 +526,12 @@
 
 
 (defn test-gate-mapsym-target []
-  (init [
+  (init
     :map "
       . . o
       @ {}."
     :map-marks {
-      "{}" ["gate" :target "o "]}])
+      "{}" ["gate" :target "o "]})
 
   (wk 'E)
   (assert-player-at 2 1)
@@ -543,7 +543,7 @@
   ; With no other teleporters in range, nothing happens when you walk
   ; into a teleporter.
   (init
-    [:tiles ["teleporter"]])
+    :tiles ["teleporter"])
   (wk 'E)
   (assert-at 'here 'player "teleporter")
   ; Teleporters can't be walked past diagonally.
@@ -553,13 +553,13 @@
   ; With multiple porters in range, you get sent to one of the
   ; nearest. Re-entering the original sends you to different nearest
   ; porters in sequence.
-  (init [
+  (init
     :map "
       ██┣┫████. . .
       ██. ██████┣┫.
       @ ┣┫. ┣┫██. ."
     :map-marks
-      {"┣┫" "teleporter"}])
+      {"┣┫" "teleporter"})
   (wk 'E)
   (assert-player-at 2 0)
   (mv-player 0 0)
@@ -572,9 +572,9 @@
   ; The destination porter needs to be in the reality bubble, but the
   ; target square need not be.
   (for [size [2 3]]
-    (init [
+    (init
       :height 1
-      :tiles ["teleporter" "wall" "wall" "teleporter"]])
+      :tiles ["teleporter" "wall" "wall" "teleporter"])
     (setv G.rules.reality-bubble-size size)
     (wk 'E)
     (assert-player-at (if (= size 2) 1 5) 0))
@@ -582,8 +582,8 @@
   ; If you come out of the same teleporter several times, you'll
   ; arrive at its various adjacent free squares in a loop (north
   ; first, per `Direction.all`).
-  (init [
-    :tiles ["teleporter" "wall" "teleporter"]])
+  (init
+    :tiles ["teleporter" "wall" "teleporter"])
   (setv targets [])
   (do-n 5
     (mv-player 0 0)
@@ -595,7 +595,7 @@
   ; Squares with items or scenery aren't eligible targets, but squares
   ; with monsters are. The monsters die (with all the normal
   ; consequences of monsters dying, contra IQ).
-  (init [
+  (init
     :map "
       ████d 0 ┣┫
       @ ┣┫$ ┣┫++"
@@ -603,7 +603,7 @@
       "┣┫" "teleporter"
       "d " ["devil" :hp 3]
       "0 " "standard bomb"
-      "++" "door"}])
+      "++" "door"})
    (wk 'E)
    (assert-player-at 2 1)
    (assert-at 'here 'player)
@@ -612,9 +612,9 @@
 
 (defn test-controllable-teleporter []
 
-  (init [
+  (init
     :width 30 :height 1
-    :tiles ['floor "controllable teleporter" "wall" "orc" "pile of gold"]])
+    :tiles ['floor "controllable teleporter" "wall" "orc" "pile of gold"])
   ; Usually, the `UseControllableTeleporter` action just does the same
   ; thing as `Walk`. The user interface doesn't let you pick the
   ; action if there's no teleporter there, though.
@@ -640,7 +640,7 @@
 
   (for [teleport? [F T]]
     (init
-      [:tiles ["open portcullis" 'floor]])
+      :tiles ["open portcullis" 'floor])
     (wk 'E)
     (set-square 'E "controllable teleporter" "key")
     (setv tx 5)
@@ -655,7 +655,7 @@
 
 
 (defn test-wallfall-trap []
-  (init [
+  (init
     :map "
       @ t1t0t2
       . t1t0t2
@@ -666,7 +666,7 @@
       "t2" ["wallfall trap" :wallnum 2]
       "W0" ["trapped wall" :wallnum 0]
       "W1" ["trapped wall" :wallnum 1]
-      "W2" ["trapped wall" :wallnum 2]}])
+      "W2" ["trapped wall" :wallnum 2]})
   (assert-full-name 'E "a wallfall trap (type 1)")
   (assert-full-name [3 0] "a trapped wall (type 2)")
 
@@ -699,7 +699,7 @@
 
 (defn test-damaging-trap []
   (init
-    [:tiles ["fixed damaging trap" "one-shot damaging trap"]])
+    :tiles ["fixed damaging trap" "one-shot damaging trap"])
 
   (assert (= G.player.hp 100))
   ; Step on the trap, taking 5 damage.
@@ -720,7 +720,7 @@
 
 (defn test-paralysis-trap []
   (init
-    [:tiles ["paralysis trap" "orc"]])
+    :tiles ["paralysis trap" "orc"])
   (setv para-msg "You're paralyzed. You can only wait for it to pass.")
 
   ; Per IQ, after Tris gets paralyzed, monsters get 3 actions before
@@ -739,7 +739,7 @@
 
 (defn test-web []
   (init
-    [:tiles ["web"]])
+    :tiles ["web"])
   (assert-at 'E "web")
   ; Walking onto the web destroys it and paralyzes Tris.
   (wk 'E)
@@ -750,7 +750,7 @@
 (defn test-weakness-trap []
 
   (init
-    [:tiles ["weakness trap" ["orc" :hp 10]]])
+    :tiles ["weakness trap" ["orc" :hp 10]])
   ; Get weakened.
   (wk 'E)
   ; The weakness trap is still there.
@@ -775,20 +775,20 @@
     (setv ts ["Holy Sword" "weakness trap"])
     (when reverse?
       (setv ts (reversed ts)))
-    (init [
+    (init
       :height 1
-      :tiles [#* ts ["orc" :hp 10]]])
+      :tiles [#* ts ["orc" :hp 10]])
     (wk 'E 3)
     (assert-hp 'E 8)))
 
 
 (defn test-anti-magic-trap []
 
-  (init [:tiles [
+  (init :tiles [
     "cloak of invisibility"
     "potion of speed"
     "amulet of invulnerability"
-    "anti-magic trap"]])
+    "anti-magic trap"])
   (defn check [ivln ivis fast]
     (assert (= (.player-has? StatusEffect.Ivln) ivln))
     (assert (= (.player-has? StatusEffect.Ivis) ivis))
@@ -809,9 +809,9 @@
 
 
 (defn test-poison-plate []
-  (init [
+  (init
     :tiles ["poison pressure plate" "poison-protecting pressure plate"]
-    :poison-intensity (f/ 3 7)])
+    :poison-intensity (f/ 3 7))
 
   (assert (= G.level.poison-intensity (f/ 3 7)))
   ; Step on the poison plate, doubling the ambient poison and
@@ -830,10 +830,10 @@
 
 
 (defn test-phase-trap []
-  (init [:tiles [
+  (init :tiles [
     "phase trap"
     "phasing wall (out of phase)"
-    "phasing wall (in phase)"]])
+    "phasing wall (in phase)"])
 
   ; A phase trap works like a phase trigger.
   (wk 'E)
@@ -845,7 +845,7 @@
 
 (defn test-wall-making-trap []
   (init
-    [:tiles ["wall-making trap"]])
+    :tiles ["wall-making trap"])
   (wk 'E)
   (assert-at 'here 'player "wall-making trap")
   (wk 'E)
@@ -856,9 +856,9 @@
   "The behavior of magical barrier generators in IQ is pretty finicky, so
   a lot of the details are different in SQ."
 
-  (init [:map "
+  (init :map "
       ████████████████@ ||██████
-      []◀▶o $ ||==. ====[]==| []"])
+      []◀▶o $ ||==. ====[]==| []")
   (assert-full-name 'SE "a barrier projector (active)")
   ; Hitting the projector turns off barriers in an unbroken straight
   ; line from it.
@@ -898,11 +898,11 @@
   (assert (= G.score 3))
 
   ; A projector can connect with itself on a wrapped level.
-  (init [:wrap-x T :wrap-y T :map "
+  (init :wrap-x T :wrap-y T :map "
     . . . .
     . @ [].
     . . . .
-    . . . ."])
+    . . . .")
   ; Projectors can be deactivated by shooting them.
   (shoot 'E)
   (wait 10)
