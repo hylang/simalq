@@ -16,16 +16,22 @@
 (defdataclass Quest []
   "A scenario or campaign; a sequence of levels to play."
   :fields [
-    name authors title ; Textual metadata
-    starting-hp        ; An integer
-    levels]            ; A tuple of `Level` objects
+    name authors title
+      ; Textual metadata
+    starting-hp
+      ; An integer
+    levels
+      ; A tuple of `Level` objects
+    rules]
+      ; A `Rules` object; this represents only the default rules for
+      ; the quest, and can be overriden in `start-quest`.
   :frozen T)
 
 (defn start-quest [quest [rules None] [show-title T]]
   "Initialize the global state for playing the given quest."
   (setv
-    G.rules (Rules)
-    G.quest quest)
+    G.quest quest
+    G.rules quest.rules)
   (when show-title
     (hy.I.simalq/main.text-screen :center T
       f"{quest.name}\nby {quest.authors}\n\n{quest.title}"))

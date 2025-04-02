@@ -15,6 +15,7 @@
   construct
   toolz [partition]
   simalq.util [cache-dir]
+  simalq.game-state [Rules]
   simalq.geometry [Map Pos]
   simalq.quest [Quest Level]
   simalq.tile [Tile])
@@ -175,6 +176,7 @@
       "Yves Meynard")
     :title data.title
     :starting-hp data.starting-hp
+    :rules (Rules)
     :levels (tuple (gfor
       [level-n l] (enumerate data.levels)
       :do (+= level-n 1)

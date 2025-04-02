@@ -14,7 +14,7 @@ quest definitions from other files in this directory."
   textwrap [dedent]
   fractions [Fraction]
   toolz [partition]
-  simalq.game-state [G]
+  simalq.game-state [G Rules]
   simalq.geometry [Map Pos Direction]
   simalq.quest [Quest Level]
   simalq.tile [Tile])
@@ -53,12 +53,14 @@ quest definitions from other files in this directory."
     [starting-hp 100]
     [name "Test Quest"]
     [authors "Mitt Lowporch and Cire Whyhall"]
-    [title "Test Quest title"]]
+    [title "Test Quest title"]
+    [rules None]]
   (pun (Quest
     :!name
     :!authors
     :!title
     :!starting-hp
+    :rules (or rules (Rules))
     :levels (tuple (gfor
       [i level-args] (enumerate levels)
       (mk-level :n (+ i 1) #** (kwdict level-args)))))))
