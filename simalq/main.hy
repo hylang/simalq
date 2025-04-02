@@ -13,7 +13,7 @@
   contextlib [contextmanager]
   simalq [version-string]
   simalq.strings
-  simalq.util [CommandError StatusEffect message-queue msg DamageType GameOverException menu-letters burst-damage]
+  simalq.util [CommandError StatusEffect message-queue msg DamageType GameOverException menu-letters burst-damage mixed-number]
   simalq.color :as color
   simalq.geometry [burst at turn-and-pos-seed]
   simalq.game-state [G]
@@ -288,7 +288,9 @@
     f"Score: {G.score :10,}\n"
     f"Turn:  {G.turn-n :10,}\n"
     "\n"
-    G.quest.name
+    f"Quest:         {G.quest.name}\n"
+    f"HP factor:     {(mixed-number G.rules.player-hp-factor) :5}\n"
+    f"Poison factor: {(mixed-number G.rules.poison-factor) :5}\n"
     "\n"
     version-string)))
 
