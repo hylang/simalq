@@ -29,7 +29,7 @@ thousands of turns.]]
         UseItem ["UseItem"
           a.item-ix a.target-x a.target-y]
         UseControllableTeleporter ["UseControllableTeleporter"
-          a.direction a.target-x a.target-y])))))))
+          a.direction.x a.direction.y a.target-x a.target-y])))))))
 
 (defn load [path]
   (defn d [xs]
@@ -43,8 +43,8 @@ thousands of turns.]]
       "Shoot" (Shoot (d args))
       "UseItem" (UseItem #* args)
       "UseControllableTeleporter" (UseControllableTeleporter
-        (d (get args 0))
-        #* (cut args 1 None))))))
+        (d (cut args 2))
+        #* (cut args 2 None))))))
 
 
 (defmain [_ action path]
