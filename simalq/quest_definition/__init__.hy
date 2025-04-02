@@ -24,9 +24,11 @@ quest definitions from other files in this directory."
 ;; --------------------------------------------------
 
 (defn kwdict [iterable]
-  (dfor
-    [k v] (partition 2 iterable)
-    (hy.mangle k.name) v))
+  (if (isinstance iterable dict)
+    iterable
+    (dfor
+      [k v] (partition 2 iterable)
+      (hy.mangle k.name) v)))
 
 (defn locate [locator]
   (cond

@@ -9,7 +9,7 @@
   metadict [MetaDict]
   simalq.geometry [Pos at Direction]
   simalq.un-iq [iq-quest]
-  simalq.game-state [G]
+  simalq.game-state [G Rules]
   simalq.commands [Walk Wait Shoot UseItem UseControllableTeleporter]
   simalq.quest [start-quest start-level]
   simalq.quest-definition [mk-quest mk-tile locate parse-text-map]
@@ -19,8 +19,22 @@
 ;; * Initialization functions
 ;; --------------------------------------------------------------
 
-(defn init [#* levels [starting-hp 100] #** rules]
+(defn init [
+    #* levels
+    [starting-hp 100]
+    #** kwargs]
   "(Re)initialize the global state."
+  ; Extract elements of `kwargs` that correspond to rules.
+  (setv rules (dfor
+    [k v] (list (.items kwargs))
+    :if (in k Rules.__dataclass_fields__)
+    k (.pop kwargs k)))
+  (when kwargs
+    ; Any remaining `kwargs` should specify the only level, per
+    ; `mk-level`, in place of a `levels` argument.
+    (assert (not levels)))
+  (unless levels
+    (setv levels [kwargs]))
   (start-quest
     :quest (mk-quest #* levels :starting-hp starting-hp)
     :rules rules)
