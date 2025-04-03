@@ -59,7 +59,7 @@ While Yves kindly provided me with IQ's source code for reference, SQ is an orig
 Implementation
 ============================================================
 
-SQ is reasonably polished and allows playing through several complete quests. Not quite all of IQ's tile types are implemented, and so a few of its original quests (Nightmare 2, Delirium, and the original tutorial Boot Camp 2) aren't completely playable. You can try them if you want, but they aren't listed by ``--quests``.
+SQ is reasonably polished and allows playing through several complete quests. Not quite all of IQ's tile types are implemented, and so a few of its original quests (Delirium and the original tutorial Boot Camp 2) aren't completely playable. You can try them if you want, but they aren't listed by ``--quests``.
 
 Overall, the code is in good shape and provides examples of solving many different kinds of problems in Hy. Some files use `Outli <https://github.com/jdtsmith/outli>`__ headers in comments for organization. Among the things you can see demonstrated in SQ are:
 
@@ -78,6 +78,7 @@ Version history
 
 This section lists the most important user-visible changes in each release. Typically, saved games for each version *aren't* compatible with other versions, but release numbers marked with an asterisk (*) should be compatible with saved games from the previous release. Unless making a backward-compatible upgrade of this kind, you should delete all your saved games before upgrading the game.
 
+- 2.0.0 (2025-04-03): The IQ quest Nightmare 2 is now fully playable.
 - 1.0.2* (2024-09-22): Largely internal changes.
 - 1.0.1* (2024-05-20): Largely internal changes.
 - 1.0.0 (2024-03-01): Various improvements to the display.
