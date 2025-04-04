@@ -279,7 +279,7 @@
 
   :help (meth []
     f"Makes you invulnerable for {@duration} more turns, protecting you from all damage and ambient poison, but not harmful status effects or disenchantment.")
-  :flavor "A star-shaped pendant with two black spots in the center. Its magic is short-lived but potent indeed.")
+  :flavor "A star-shaped pendant with two black spots in the center. Its magic is short-lived but potent indeed.\n\n    There's a starman waiting in the sky.\n    He'd like to come and meet us\n    But he thinks he'd blow our minds.")
 
 (deftile "! " "a cloak of invisibility" StatusEffectItem
   :color 'blue
