@@ -7,7 +7,8 @@
   tests.lib [init assert-at assert-full-name assert-hp assert-textmap wait set-square wk shoot mv-player use-item top mk-tile]
   simalq.util [StatusEffect]
   simalq.geometry [Direction Pos ray at burst]
-  simalq.game-state [G])
+  simalq.game-state [G]
+  simalq.tile [Tile])
 (setv  T True  F False)
 
 
@@ -1131,6 +1132,9 @@
   (setv (get G.player.inventory 0) (mk-tile None "wand of shielding"))
   (wait 1)
   (assert (= G.player.hp 98))
+  (assert (= G.score (- (. Tile.types ["wand of shielding"] acquirement-points))))
+    ; You lose points when a snitch steals an item, so you can't
+    ; double-count them if you later reclaim the item.
   (assert (= (. (snitch) item stem) "wand of shielding"))
   (assert (is (get G.player.inventory 0) None))
   (assert (= G.player.keys 5))
