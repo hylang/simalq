@@ -28,7 +28,7 @@
       ; Block player and monster movement.
     blocks-diag F
       ; Block diagonal movement between orthogonally adjacent squares.
-    blocks-monster F
+    blocks-monster T
       ; Block monster movement, even if `blocks-move` is false.
     passwallable F
     wand-destructible F
@@ -46,12 +46,13 @@
     (.info-bullets (super)
       (when @blocks-move
         "Blocks all movement")
-      (when (and
-          (not @blocks-move)
-          (or @blocks-monster G.rules.dainty-monsters))
-        "Blocks monster movement")
       (when @blocks-diag
         "Blocks diagonal movement around itself")
+      (when (not (or
+          @blocks-move
+          @blocks-monster
+          G.rules.dainty-monsters))
+        "Allows monster movement")
       (cond
         (and @blocks-player-shots @blocks-monster-shots)
           "Blocks all shots"
@@ -211,7 +212,6 @@
 (deftile "++" "a door" Scenery
   :color 'brown
   :iq-ix 5
-  :blocks-monster T
   :passwallable T
   :flavor "It's unlocked, but it just won't stay open. Maybe that's for the best, since monsters are too dumb to operate it.")
 
@@ -220,9 +220,7 @@
 ;; --------------------------------------------------------------
 
 (defclass LockedDoor [Scenery]
-  (setv
-    result-when-opened None
-    blocks-monster T)
+  (setv result-when-opened None)
 
   (defmeth hook-player-bump [origin]
     (doc (+ "Consumes one key to "
@@ -327,7 +325,6 @@
 (defclass OneWayDoor [Scenery]
 
   (setv
-    blocks-monster T
     passwallable T
     direction None
     color #('brown 'red))
@@ -389,9 +386,7 @@
         "victory"
         f"level {(@effective-level-n)}")})
 
-  (setv
-    blocks-monster T
-    blocks-player-shots F  blocks-monster-shots F)
+  (setv  blocks-player-shots F  blocks-monster-shots F)
 
   (defmeth hook-player-walked-into []
     (doc f"Takes you to dungeon level {(@effective-level-n)}. If you're already on that level, it's refreshed. If there is no such level, you win the quest.")
@@ -633,7 +628,6 @@
   :suffix-dict (meth []
     (if (is @n-pushes None) {} {"pushes left =" @n-pushes}))
 
-  :blocks-monster T
   :wand-destructible T
   :hook-player-walk-to (meth [origin]
     (setv target (+ @pos (dir-to origin @pos)))
@@ -729,7 +723,6 @@
 ;; --------------------------------------------------------------
 
 (defclass Gate [TargetedScenery]
-  (setv blocks-monster T)
   (setv one-shot? F)
 
   (defmeth hook-player-walked-into []
@@ -763,7 +756,7 @@
     :output-dir None)
   :mutable-fields #("times_used" "output_dir")
   :iq-ix 23
-  :blocks-diag T :blocks-monster T
+  :blocks-diag T
 
   :hook-player-walked-into (meth []
     "Teleports you to a free square adjacent to the nearest other teleporter in the reality bubble. If there is no eligible destination teleporter, no teleportation occurs; if there are several tied for the nearest, you'll cycle through them when you re-enter this teleporter. Squares are considered to be free even if they contain monsters, which are slain instantly if you teleport into them. The free square that you appear on is cycled each time you re-exit a teleporter."
@@ -828,7 +821,7 @@
 (deftile "┣┫" "a controllable teleporter" Scenery
   :color 'dark-green
   :iq-ix 133
-  :blocks-diag T :blocks-monster T
+  :blocks-diag T
 
   :hook-player-walked-into (meth []
     "Teleports you to an empty square of your choice within the reality bubble. You may choose to cancel this and not teleport."
@@ -959,7 +952,7 @@
   :color 'dark-gray
   :iq-ix 136
 
-  :blocks-move F :blocks-monster T
+  :blocks-move F
   :hook-player-walked-into (meth []
     (doc f"The tile is destroyed, but you're paralyzed for {G.rules.paralysis-duration} turns.")
     (@rm-from-map)
@@ -1214,7 +1207,7 @@
   :iq-ix None
     ; In IQ, tiles of this type can only be created mid-game.
 
-  :blocks-move F :blocks-monster T
+  :blocks-move F
   :blocks-player-shots F :blocks-monster-shots T
 
   :suffix-dict (meth []
