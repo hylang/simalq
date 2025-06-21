@@ -77,8 +77,8 @@
         #())
       field))
 
-  (defn [classmethod property] name-with-article [cls]
-    (+ (if cls.article (+ cls.article " ") "") cls.stem))
+  (defmeth [property] name-with-article []
+    (+ (if @article (+ @article " ") "") @stem))
 
   (defmeth [property] full-name []
     (setv suffix-items (.items (@suffix-dict)))
