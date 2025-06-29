@@ -3,7 +3,7 @@ from pathlib import Path
 
 setuptools.setup(
     name = 'simalq',
-    version = '2.1.0',
+    version = '0.0.0',
     author = 'Kodi B. Arfer',
     description = 'Infinitesimal Quest 2 + ε: A turn-based puzzling dungeon crawler',
     long_description = Path('README.rst').read_text(),
