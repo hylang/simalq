@@ -78,6 +78,7 @@ Version history
 
 This section lists the most important user-visible changes in each release. Typically, saved games for each version *aren't* compatible with other versions, but release numbers marked with an asterisk (*) should be compatible with saved games from the previous release. Unless making a backward-compatible upgrade of this kind, you should delete all your saved games before upgrading the game.
 
+- 2.1.0 (2025-06-29): Added compatibility with Python 3.13. Monster movement has changed in the case of dainty-monsters mode being off, but this doesn't affect any IQ quests, since they all use dainty monsters.
 - 2.0.0 (2025-04-03): The IQ quest Nightmare 2 is now fully playable.
 - 1.0.2* (2024-09-22): Largely internal changes.
 - 1.0.1* (2024-05-20): Largely internal changes.
