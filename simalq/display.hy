@@ -102,7 +102,7 @@ interface elements as lists of `ColorChar`s."
     [inventory F]
     [messages #()]
     [overmarks None]]
-  "Return a colorstr for the main screen."
+  "Return a list of colorstrs for the main screen."
 
   (setv out [])
 
