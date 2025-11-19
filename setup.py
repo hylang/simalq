@@ -17,7 +17,7 @@ setuptools.setup(
         'hyrule >= 1',
         'toolz >= 1',
         'construct >= 2.10.70',
-        'blessed >= 1.20.0',
+        'blessed >= 1.24.0',
         'platformdirs >= 4.3.6',
         'metadict >= 0.1.3'],
     packages = setuptools.find_packages(),
