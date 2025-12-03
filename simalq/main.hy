@@ -197,9 +197,12 @@
   (B.inkey :esc-delay .01))
 
 (defn print-full-screen [#* output]
-  (print
-    :flush T :end "" :sep ""
-    B.home #* output))
+  (setv output (+ B.home (.join "" output)))
+  (with [(.synchronized-output B :timeout .05)]
+    ; .05 s may well be too little time for SSH, but making the user
+    ; not wait too long for a local terminal that just isn't
+    ; responding, as is the more common case, is more important.
+    (print :flush T :end "" output)))
 
 ;; --------------------------------------------------------------
 ;; ** The main loop for IO
