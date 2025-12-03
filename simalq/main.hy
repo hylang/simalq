@@ -196,6 +196,11 @@
   (while (B.inkey :timeout 0))
   (B.inkey :esc-delay .01))
 
+(defn print-full-screen [#* output]
+  (print
+    :flush T :end "" :sep ""
+    B.home #* output))
+
 ;; --------------------------------------------------------------
 ;; ** The main loop for IO
 ;; --------------------------------------------------------------
@@ -220,11 +225,9 @@
           (msg (get e.args 0)))))))
 
 (defn print-main-screen [#** kwargs]
-  (print
-    :flush T :sep "" :end ""
-    B.home
-    (.join "\n" (map (fn [x] (bless-colorstr B x)) (draw-screen
-      B.width B.height #** kwargs)))))
+  (print-full-screen (.join "\n" (gfor
+    line (draw-screen B.width B.height #** kwargs)
+    (bless-colorstr B line)))))
 
 ;; --------------------------------------------------------------
 ;; ** Text screens
@@ -305,9 +308,8 @@
   (io-mode
 
     :draw (fn []
-      (print
-        :flush T :sep "" :end ""
-        B.home B.clear
+      (print-full-screen
+        B.clear
         (.join "\n" (cut lines
           top-line-ix
           (+ top-line-ix B.height))))
@@ -346,9 +348,8 @@
   (io-mode
 
     :draw (fn []
-      (print
-        :flush T :sep "" :end ""
-        B.home B.clear
+      (print-full-screen
+        B.clear
         (.join "\n" (gfor
           line (cut display-lines B.height)
           (cut line B.width)))))
