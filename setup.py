@@ -15,11 +15,11 @@ setuptools.setup(
     install_requires = [
         'hy >= 1',
         'hyrule >= 1',
-        'toolz >= 1',
+        'toolz >= 1.1',
         'construct >= 2.10.70',
-        'blessed >= 1.20.0',
-        'platformdirs >= 4.3.6',
-        'metadict >= 0.1.3'],
+        'blessed >= 1.25',
+        'platformdirs >= 4.5',
+        'metadict >= 0.1.5'],
     packages = setuptools.find_packages(),
     package_data = dict(simalq = [
         str(p.relative_to('simalq'))
