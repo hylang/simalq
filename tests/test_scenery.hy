@@ -61,9 +61,15 @@
   (init-boot-camp)
   (setv G.player.keys 2)
 
-  ; Unlocked a locked door.
+  ; Check a help string for locked doors.
   (mv-player 13 6)
-  (assert-at 'S "locked door")
+  (setv [ld] (at (locate 'S)))
+  (assert (= ld.stem "locked door"))
+  (assert (in
+    "replace the tile with a door"
+    (.hook-player-bump.dynadoc ld ld)))
+
+  ; Unlocked a locked door.
   (setv p G.player.pos.xy)
   (assert (= G.turn-n 0))
   (wk 'S)  ; This just unlocks the door, without moving us.

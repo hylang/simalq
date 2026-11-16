@@ -225,7 +225,9 @@
   (defmeth hook-player-bump [origin]
     (doc (+ "Consumes one key to "
       (if @result-when-opened
-        f"replace the tile with {(. Tile types [@result-when-opened] name-with-article)}."
+        (do
+          (setv t (. Tile types [@result-when-opened]))
+          f"replace the tile with {(.name-with-article.fget t t)}.")
         "destroy the tile.")))
 
     (unless (.player-has? StatusEffect.MKey)
